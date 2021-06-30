@@ -1,0 +1,82 @@
+{% extends "layout.html" %}
+
+{% block pageTitle %}
+My applications
+{% endblock %}
+
+{% block content %}
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-full">
+    <div style="background-color: #E0EEF8">
+      <div class="govuk-form-group">
+        <br>
+        <h3 class="govuk-label-wrapper"><label class="govuk-label govuk-label--s" for="search">
+            Search for an application
+          </label>
+        </h3>
+        <div id="search-hint" class="govuk-hint">
+          Enter the refence number or applicant's full name
+        </div>
+        <input class="govuk-input govuk-input--width-30" id="search" name="search" type="text">
+        <input type="submit" class="govuk-button" value="Search">
+        <br>
+      </div>
+    </div>
+
+    <h1 class="govuk-heading-l">My applications</h1>
+    <p>3 applications</p>
+    <input type="submit" class="govuk-button" value="Show filters" style="background-color:#1D70B8">
+
+    <table class="govuk-table">
+      <thead class="govuk-table__head">
+        <tr class="govuk-table__row">
+          <th scope="col" class="govuk-table__header">Reference No.</th>
+          <th scope="col" class="govuk-table__header">Submitted</th>
+          <th scope="col" class="govuk-table__header">Last updated</th>
+          <th scope="col" class="govuk-table__header">Application type</th>
+          <th scope="col" class="govuk-table__header">DF</th>
+          <th scope="col" class="govuk-table__header">Category of law</th>
+          <th scope="col" class="govuk-table__header">Means type</th>
+          <th scope="col" class="govuk-table__header">Action</th>
+        </tr>
+      </thead>
+      <tbody class="govuk-table__body">
+        <tr class="govuk-table__row">
+          <td class="govuk-table__cell">30000009020</td>
+          <td class="govuk-table__cell">19 Mar 2020</td>
+          <td class="govuk-table__cell">26 Mar 2020</td>
+          <td class="govuk-table__cell">Initial application</td>
+          <td class="govuk-table__cell">Used</td>
+          <td class="govuk-table__cell">Family law</td>
+          <td class="govuk-table__cell">Passported</td>
+          <td class="govuk-table__cell"><a href="#">Details</a></td>
+        </tr>
+        <tr class="govuk-table__row">
+          <td class="govuk-table__cell">30000009021</td>
+          <td class="govuk-table__cell">19 Mar 2020</td>
+          <td class="govuk-table__cell">02 Apr 2020</td>
+          <td class="govuk-table__cell">Initial application</td>
+          <td class="govuk-table__cell">Used</td>
+          <td class="govuk-table__cell">Family law</td>
+          <td class="govuk-table__cell">Non passported</td>
+          <td class="govuk-table__cell"><a href="#">Details</a></td>
+        </tr>
+        <tr class="govuk-table__row">
+          <td class="govuk-table__cell">30000009022</td>
+          <td class="govuk-table__cell">19 Mar 2020</td>
+          <td class="govuk-table__cell">04 Apr 2020</td>
+          <td class="govuk-table__cell">Initial application</td>
+          <td class="govuk-table__cell">Used</td>
+          <td class="govuk-table__cell">Family law</td>
+          <td class="govuk-table__cell">Passported</td>
+          <td class="govuk-table__cell"><a href="#">Details</a></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p>Showing <b>1</b> to <b>3</b> of <b>3</b> results</p>
+  </div>
+</div>
+
+{% endblock %}
