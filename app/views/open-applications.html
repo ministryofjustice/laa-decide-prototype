@@ -1,0 +1,68 @@
+{% extends "layout.html" %}
+
+{% block pageTitle %}
+Home
+{% endblock %}
+
+{% block content %}
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-full">
+    <h1 class="govuk-heading-l">Open applications</h1>
+    <p>3 open applications</p>
+    <input type="submit" class="govuk-button" value="Show filters" style="background-color:#1D70B8">
+  </div>
+  <table class="govuk-table">
+    <thead class="govuk-table__head">
+      <tr class="govuk-table__row">
+        <th scope="col" class="govuk-table__header">Reference No.</th>
+        <th scope="col" class="govuk-table__header">Submitted</th>
+        <th scope="col" class="govuk-table__header">Last updated</th>
+        <th scope="col" class="govuk-table__header">Application type</th>
+        <th scope="col" class="govuk-table__header">DF</th>
+        <th scope="col" class="govuk-table__header">Category of law</th>
+        <th scope="col" class="govuk-table__header">Means type</th>
+        <th scope="col" class="govuk-table__header">Action</th>
+      </tr>
+    </thead>
+    <tbody class="govuk-table__body">
+      <tr class="govuk-table__row">
+        <td class="govuk-table__cell">30000009020</td>
+        <td class="govuk-table__cell">19 Mar 2020</td>
+        <td class="govuk-table__cell">26 Mar 2020</td>
+        <td class="govuk-table__cell">Initial application</td>
+        <td class="govuk-table__cell">Used</td>
+        <td class="govuk-table__cell">Family law</td>
+        <td class="govuk-table__cell">Passported</td>
+        <td class="govuk-table__cell">
+          <input type="submit" class="govuk-button" value="Add to my list" style="background-color:#F3F2F1; color:#0B0C0C">
+        </td>
+      </tr>
+      <tr class="govuk-table__row">
+        <td class="govuk-table__cell">30000009021</td>
+        <td class="govuk-table__cell">19 Mar 2020</td>
+        <td class="govuk-table__cell">02 Apr 2020</td>
+        <td class="govuk-table__cell">Initial application</td>
+        <td class="govuk-table__cell">Used</td>
+        <td class="govuk-table__cell">Family law</td>
+        <td class="govuk-table__cell">Non passported</td>
+        <td class="govuk-table__cell">
+          <input type="submit" class="govuk-button" value="Add to my list" style="background-color:#F3F2F1; color:#0B0C0C">
+        </td>
+      </tr>
+      <tr class="govuk-table__row">
+        <td class="govuk-table__cell">30000009022</td>
+        <td class="govuk-table__cell">19 Mar 2020</td>
+        <td class="govuk-table__cell">04 Apr 2020</td>
+        <td class="govuk-table__cell">Initial application</td>
+        <td class="govuk-table__cell">Used</td>
+        <td class="govuk-table__cell">Family law</td>
+        <td class="govuk-table__cell">Passported</td>
+        <td class="govuk-table__cell">
+          <input type="submit" class="govuk-button" value="Add to my list" style="background-color:#F3F2F1; color:#0B0C0C">
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+{% endblock %}
