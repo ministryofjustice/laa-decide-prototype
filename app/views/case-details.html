@@ -340,6 +340,40 @@ Case details
       </div>
 
       <div class="govuk-tabs__panel govuk-tabs__panel--hidden" id="application-history">
+        <table class="govuk-table">
+          <caption class="govuk-table__caption govuk-table__caption--m">Application history</caption>
+          <thead class="govuk-table__head">
+            <tr class="govuk-table__row">
+              <th scope="col" class="govuk-table__header">When</th>
+              <th scope="col" class="govuk-table__header">Who</th>
+              <th scope="col" class="govuk-table__header">What</th>
+            </tr>
+          </thead>
+          <tbody class="govuk-table__body">
+            <tr class="govuk-table__row">
+              <td class="govuk-table__cell">Wednesday 22 Mar 2021 12:21</td>
+              <td class="govuk-table__cell">Helen Roy<br>Customer service advisor</td>
+              <td class="govuk-table__cell"><b>Customer support note</b><br> Provider called and chased on the case. Client is due to hearing tomorrow.</td>
+            </tr>
+            <tr class="govuk-table__row">
+              <td class="govuk-table__cell">Thursday 11 Mar 2021 11:00</td>
+              <td class="govuk-table__cell">Mary Smith<br>Provider</td>
+              <td class="govuk-table__cell"><b>New documents uploaded</b></td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="govuk-form-group">
+          <h1 class="govuk-label-wrapper"><label class="govuk-label govuk-label--s" for="note">
+              Add a note to the application history
+            </label>
+          </h1>
+          <div id="note-hint" class="govuk-hint">
+            This information is for internal use only
+          </div>
+          <textarea class="govuk-textarea" name="note" id="note" rows="5"></textarea>
+          <input type="submit" class="govuk-button" value="Add to application history">
+        </div>
       </div>
     </div>
   </div>
