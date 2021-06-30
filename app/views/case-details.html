@@ -17,215 +17,293 @@ Case details
     <p><b>Date submitted:</b> 19 March 2020</p>
     <p><b>Assigned to:</b> Your name</p>
 
-    <table class="govuk-table">
-      <tr class="govuk-table__row">
-        <td class="govuk-table__cell"><a href='/case-details'>Application details</a></td>
-        <td class="govuk-table__cell"><a href='/case-details'>People</a></td>
-        <td class="govuk-table__cell"><a href='/case-details'>Application history</a></td>
-      </tr>
-    </table>
+    <div class="govuk-tabs" data-module="govuk-tabs">
+      <h2 class="govuk-tabs__title">
+        Case details
+      </h2>
+      <ul class="govuk-tabs__list">
+        <li class="govuk-tabs__list-item govuk-tabs__list-item--selected">
+          <a class="govuk-tabs__tab" href="#application-details">
+            Application details
+          </a>
+        </li>
+        <li class="govuk-tabs__list-item">
+          <a class="govuk-tabs__tab" href="#people">
+            People
+          </a>
+        </li>
+        <li class="govuk-tabs__list-item">
+          <a class="govuk-tabs__tab" href="#application-history">
+            Application history
+          </a>
+        </li>
+      </ul>
 
-    <table class="govuk-table">
-      <caption class="govuk-table__caption govuk-table__caption--m">Overview</caption>
-      <tbody class="govuk-table__body">
-        <tr class="govuk-table__row">
-          <td class="govuk-table__header">Application type</td>
-          <td class="govuk-table__cell">Initial</td>
-        </tr>
-        <tr class="govuk-table__row">
-          <td class="govuk-table__header">Delegated functions</td>
-          <td class="govuk-table__cell">Used</td>
-        </tr>
-        <tr class="govuk-table__row">
-          <td class="govuk-table__header">Certificate type</td>
-          <td class="govuk-table__cell">Emergency and substantive</td>
-        </tr>
-        <tr class="govuk-table__row">
-          <td class="govuk-table__header">Means assessment</td>
-          <td class="govuk-table__cell"><strong class="govuk-tag govuk-tag--grey">Passported</strong></td>
-        </tr>
-        <tr class="govuk-table__row">
-          <td class="govuk-table__header">Merits assessment</td>
-          <td class="govuk-table__cell"><strong class="govuk-tag govuk-tag--purple">Not started</strong></td>
-        </tr>
-      </tbody>
-    </table>
 
-    <div class="govuk-notification-banner" role="region" aria-labelledby="govuk-notification-banner-title" data-module="govuk-notification-banner">
-      <div class="govuk-notification-banner__header">
-        <h2 class="govuk-notification-banner__title" id="govuk-notification-banner-title">
-          Important
-        </h2>
+      <div class="govuk-tabs__panel" id="application-details">
+        <table class="govuk-table">
+          <caption class="govuk-table__caption govuk-table__caption--m">Overview</caption>
+          <tbody class="govuk-table__body">
+            <tr class="govuk-table__row">
+              <td class="govuk-table__header">Application type</td>
+              <td class="govuk-table__cell">Initial</td>
+            </tr>
+            <tr class="govuk-table__row">
+              <td class="govuk-table__header">Delegated functions</td>
+              <td class="govuk-table__cell">Used</td>
+            </tr>
+            <tr class="govuk-table__row">
+              <td class="govuk-table__header">Certificate type</td>
+              <td class="govuk-table__cell">Emergency and substantive</td>
+            </tr>
+            <tr class="govuk-table__row">
+              <td class="govuk-table__header">Means assessment</td>
+              <td class="govuk-table__cell"><strong class="govuk-tag govuk-tag--grey">Passported</strong></td>
+            </tr>
+            <tr class="govuk-table__row">
+              <td class="govuk-table__header">Merits assessment</td>
+              <td class="govuk-table__cell"><strong class="govuk-tag govuk-tag--purple">Not started</strong></td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="govuk-notification-banner" role="region" aria-labelledby="govuk-notification-banner-title" data-module="govuk-notification-banner">
+          <div class="govuk-notification-banner__header">
+            <h2 class="govuk-notification-banner__title" id="govuk-notification-banner-title">
+              Important
+            </h2>
+          </div>
+          <div class="govuk-notification-banner__content">
+            <p class="govuk-notification-banner__heading">This applicant has more than one application</p>
+            <table class="govuk-table">
+              <thead class="govuk-table__head">
+                <tr class="govuk-table__row">
+                  <th scope="col" class="govuk-table__header">Reference no.</th>
+                  <th scope="col" class="govuk-table__header">Status</th>
+                </tr>
+              </thead>
+              <tbody class="govuk-table__body">
+                <tr class="govuk-table__row">
+                  <td class="govuk-table__cell"><a href="#">300123455562</a></td>
+                  <td class="govuk-table__cell">Pending merits assessment</td>
+                </tr>
+                <tr class="govuk-table__row">
+                  <td class="govuk-table__cell"><a href="#">300123400000</a></td>
+                  <td class="govuk-table__cell">Pending billing</td>
+                </tr>
+                <tr class="govuk-table__row">
+                  <td class="govuk-table__cell"><a href="#">30000009020</a></td>
+                  <td class="govuk-table__cell">Closed</td>
+                </tr>
+                <tr class="govuk-table__row">
+                  <td class="govuk-table__cell"><a href="#">30000054256</a></td>
+                  <td class="govuk-table__cell">Closed</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <table class="govuk-table">
+          <caption class="govuk-table__caption govuk-table__caption--m">Delegated functions</caption>
+          <tbody class="govuk-table__body">
+            <tr class="govuk-table__row">
+              <td class="govuk-table__header">Non-molestation order</td>
+              <td class="govuk-table__cell">03 Mar 2020</td>
+            </tr>
+            <tr class="govuk-table__row">
+              <td class="govuk-table__header">Prohibitive steps order</td>
+              <td class="govuk-table__cell">Not used</td>
+            </tr>
+            <tr class="govuk-table__row">
+              <td class="govuk-table__header">Occupation order</td>
+              <td class="govuk-table__cell">03 Mar 2020</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h2 class="govuk-heading-m">Proceedings</h2>
+        <h2 class="govuk-heading-m">Non-molestation order</h2>
+        <details class="govuk-details" data-module="govuk-details">
+          <summary class="govuk-details__summary">
+            <span class="govuk-details__summary-text">
+              Scope limits
+            </span>
+          </summary>
+          <div class="govuk-details__text">
+            <h2 class="govuk-heading-m">Emergency certificate</h2>
+            <p><b>Form of service:</b> Full representation</p>
+            <p><b>Work the provider can do:</b> All steps up to and including the hearing on 21 July 2020.</p>
+
+            <h2 class="govuk-heading-m">Substantive certificate</h2>
+            <p><b>Form of service:</b> Full representation</p>
+            <p><b>Work the provider can do:</b> All steps up to and including getting and serving a final order. If the order is breached you can apply for power of arrest. You cannot apply for a warrant of arrest or contempt of court proceedings.
+            </p>
+          </div>
+        </details>
+
+        <h2 class="govuk-heading-m">Prohibited steps order</h2>
+        <details class="govuk-details" data-module="govuk-details">
+          <summary class="govuk-details__summary">
+            <span class="govuk-details__summary-text">
+              Scope limits
+            </span>
+          </summary>
+          <div class="govuk-details__text">
+            <h2 class="govuk-heading-m">Substantive certificate</h2>
+            <p><b>Form of service:</b> Family help (higher)</p>
+            <p><b>Work the provider can do:</b> Limited to Family Help (Higher) and to all steps necessary to negotiate and conclude a settlement. To include the issue of proceedings and representation in those proceedings save in relation to or at a
+              contested final hearing.
+            </p>
+          </div>
+        </details>
+
+        <h2 class="govuk-heading-m">Occupation order</h2>
+        <details class="govuk-details" data-module="govuk-details">
+          <summary class="govuk-details__summary">
+            <span class="govuk-details__summary-text">
+              Scope limits
+            </span>
+          </summary>
+          <div class="govuk-details__text">
+            <h2 class="govuk-heading-m">Emergency certificate</h2>
+            <p><b>Form of service:</b> Family help (higher)</p>
+            <p><b>Work the provider can do:</b> Limited to Family Help (Higher) and to all steps necessary to negotiate and conclude a settlement. To include the issue of proceedings and representation in those proceedings save in relation to or at a
+              contested final hearing.
+            </p>
+
+            <h2 class="govuk-heading-m">Substantive certificate</h2>
+            <p><b>Form of service:</b> Family help (higher)</p>
+            <p><b>Work the provider can do:</b> Limited to Family Help (Higher) and to all steps necessary to negotiate and conclude a settlement. To include the issue of proceedings and representation in those proceedings save in relation to or at a
+              contested final hearing.
+            </p>
+          </div>
+        </details>
+
+        <table class="govuk-table">
+          <caption class="govuk-table__caption govuk-table__caption--m">Cost limits</caption>
+          <tbody class="govuk-table__body">
+            <tr class="govuk-table__row">
+              <td class="govuk-table__header">Emergency certificate</td>
+              <td class="govuk-table__cell">£1,350</td>
+            </tr>
+            <tr class="govuk-table__row">
+              <td class="govuk-table__header">Substantive certificate</td>
+              <td class="govuk-table__cell">£25,000</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h2 class="govuk-heading-m">Documents</h2>
+        <details class="govuk-details" data-module="govuk-details">
+          <summary class="govuk-details__summary">
+            <span class="govuk-details__summary-text">
+              View documents
+            </span>
+          </summary>
+          <div class="govuk-details__text">
+            <table class="govuk-table">
+              <thead class="govuk-table__head">
+                <tr class="govuk-table__row">
+                  <th scope="col" class="govuk-table__header">File</th>
+                  <th scope="col" class="govuk-table__header">Date</th>
+                </tr>
+              </thead>
+              <tbody class="govuk-table__body">
+                <tr class="govuk-table__row">
+                  <td class="govuk-table__cell"><a href="#">Means_report.pdf</a></td>
+                  <td class="govuk-table__cell">23 Feb 2020</td>
+                </tr>
+                <tr class="govuk-table__row">
+                  <td class="govuk-table__cell"><a href="#">Merits_report.pdf</a></td>
+                  <td class="govuk-table__cell">23 Feb 2020</td>
+                </tr>
+                <tr class="govuk-table__row">
+                  <td class="govuk-table__cell"><a href="#">Police_report.pdf</a></td>
+                  <td class="govuk-table__cell">12 Mar 2020</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </details>
+
+        <form action="#">
+          <input type="submit" class="govuk-button" value="Request more information" style="background-color:#F3F2F1; color:#0B0C0C">
+        </form>
+
+        <h2 class="govuk-heading-m">Make a decision</h2>
+        <p>The means decision has been completed. You can view the <a href="#">application history</a> for further details.</p>
+
+        <div class="govuk-button-group">
+          <form action="#">
+            <input type="submit" class="govuk-button" value="Merits decision" style="background-color:#1D70B8; color:white">
+          </form>
+
+          <form action="#">
+            <input type="submit" class="govuk-button" value="Send back to provider" style="background-color:#D4351C; color:white">
+          </form>
+        </div>
       </div>
-      <div class="govuk-notification-banner__content">
-        <p class="govuk-notification-banner__heading">This applicant has more than one application</p>
+
+
+      <div class="govuk-tabs__panel govuk-tabs__panel--hidden" id="people">
+        <h2 class="govuk-heading-l">People</h2>
         <table class="govuk-table">
           <thead class="govuk-table__head">
             <tr class="govuk-table__row">
-              <th scope="col" class="govuk-table__header">Reference no.</th>
-              <th scope="col" class="govuk-table__header">Status</th>
+              <th scope="col" class="govuk-table__header">Case manager</th>
+              <th scope="col" class="govuk-table__header">Cases opened</th>
+              <th scope="col" class="govuk-table__header">Cases closed</th>
             </tr>
           </thead>
           <tbody class="govuk-table__body">
             <tr class="govuk-table__row">
-              <td class="govuk-table__cell"><a href="#">300123455562</a></td>
-              <td class="govuk-table__cell">Pending merits assessment</td>
+              <td class="govuk-table__cell">David Francis</td>
+              <td class="govuk-table__cell">24</td>
+              <td class="govuk-table__cell">18</td>
             </tr>
             <tr class="govuk-table__row">
-              <td class="govuk-table__cell"><a href="#">300123400000</a></td>
-              <td class="govuk-table__cell">Pending billing</td>
+              <td class="govuk-table__cell">Paul Farmer</td>
+              <td class="govuk-table__cell">16</td>
+              <td class="govuk-table__cell">20</td>
             </tr>
             <tr class="govuk-table__row">
-              <td class="govuk-table__cell"><a href="#">30000009020</a></td>
-              <td class="govuk-table__cell">Closed</td>
-            </tr>
-            <tr class="govuk-table__row">
-              <td class="govuk-table__cell"><a href="#">30000054256</a></td>
-              <td class="govuk-table__cell">Closed</td>
+              <td class="govuk-table__cell">Rita Patel</td>
+              <td class="govuk-table__cell">24</td>
+              <td class="govuk-table__cell">27</td>
             </tr>
           </tbody>
         </table>
       </div>
-    </div>
-
-    <table class="govuk-table">
-      <caption class="govuk-table__caption govuk-table__caption--m">Delegated functions</caption>
-      <tbody class="govuk-table__body">
-        <tr class="govuk-table__row">
-          <td class="govuk-table__header">Non-molestation order</td>
-          <td class="govuk-table__cell">03 Mar 2020</td>
-        </tr>
-        <tr class="govuk-table__row">
-          <td class="govuk-table__header">Prohibitive steps order</td>
-          <td class="govuk-table__cell">Not used</td>
-        </tr>
-        <tr class="govuk-table__row">
-          <td class="govuk-table__header">Occupation order</td>
-          <td class="govuk-table__cell">03 Mar 2020</td>
-        </tr>
-      </tbody>
-    </table>
-
-
-    <h2 class="govuk-heading-m">Proceedings</h2>
-    <h2 class="govuk-heading-m">Non-molestation order</h2>
-    <details class="govuk-details" data-module="govuk-details">
-      <summary class="govuk-details__summary">
-        <span class="govuk-details__summary-text">
-          Scope limits
-        </span>
-      </summary>
-      <div class="govuk-details__text">
-        <h2 class="govuk-heading-m">Emergency certificate</h2>
-        <p><b>Form of service:</b> Full representation</p>
-        <p><b>Work the provider can do:</b> All steps up to and including the hearing on 21 July 2020.</p>
-
-        <h2 class="govuk-heading-m">Substantive certificate</h2>
-        <p><b>Form of service:</b> Full representation</p>
-        <p><b>Work the provider can do:</b> All steps up to and including getting and serving a final order. If the order is breached you can apply for power of arrest. You cannot apply for a warrant of arrest or contempt of court proceedings.</p>
-      </div>
-    </details>
-
-    <h2 class="govuk-heading-m">Prohibited steps order</h2>
-    <details class="govuk-details" data-module="govuk-details">
-      <summary class="govuk-details__summary">
-        <span class="govuk-details__summary-text">
-          Scope limits
-        </span>
-      </summary>
-      <div class="govuk-details__text">
-        <h2 class="govuk-heading-m">Substantive certificate</h2>
-        <p><b>Form of service:</b> Family help (higher)</p>
-        <p><b>Work the provider can do:</b> Limited to Family Help (Higher) and to all steps necessary to negotiate and conclude a settlement. To include the issue of proceedings and representation in those proceedings save in relation to or at a
-          contested final hearing.
-        </p>
-      </div>
-    </details>
-
-    <h2 class="govuk-heading-m">Occupation order</h2>
-    <details class="govuk-details" data-module="govuk-details">
-      <summary class="govuk-details__summary">
-        <span class="govuk-details__summary-text">
-          Scope limits
-        </span>
-      </summary>
-      <div class="govuk-details__text">
-        <h2 class="govuk-heading-m">Emergency certificate</h2>
-        <p><b>Form of service:</b> Family help (higher)</p>
-        <p><b>Work the provider can do:</b> Limited to Family Help (Higher) and to all steps necessary to negotiate and conclude a settlement. To include the issue of proceedings and representation in those proceedings save in relation to or at a
-          contested final hearing.
-        </p>
-
-        <h2 class="govuk-heading-m">Substantive certificate</h2>
-        <p><b>Form of service:</b> Family help (higher)</p>
-        <p><b>Work the provider can do:</b> Limited to Family Help (Higher) and to all steps necessary to negotiate and conclude a settlement. To include the issue of proceedings and representation in those proceedings save in relation to or at a
-          contested final hearing.
-        </p>
-      </div>
-    </details>
-
-    <table class="govuk-table">
-      <caption class="govuk-table__caption govuk-table__caption--m">Cost limits</caption>
-      <tbody class="govuk-table__body">
-        <tr class="govuk-table__row">
-          <td class="govuk-table__header">Emergency certificate</td>
-          <td class="govuk-table__cell">£1,350</td>
-        </tr>
-        <tr class="govuk-table__row">
-          <td class="govuk-table__header">Substantive certificate</td>
-          <td class="govuk-table__cell">£25,000</td>
-        </tr>
-      </tbody>
-    </table>
-
-    <h2 class="govuk-heading-m">Documents</h2>
-    <details class="govuk-details" data-module="govuk-details">
-      <summary class="govuk-details__summary">
-        <span class="govuk-details__summary-text">
-          View documents
-        </span>
-      </summary>
-      <div class="govuk-details__text">
+      <div class="govuk-tabs__panel govuk-tabs__panel--hidden" id="application-history">
+        <h2 class="govuk-heading-l">Application history</h2>
         <table class="govuk-table">
           <thead class="govuk-table__head">
             <tr class="govuk-table__row">
-              <th scope="col" class="govuk-table__header">File</th>
-              <th scope="col" class="govuk-table__header">Date</th>
+              <th scope="col" class="govuk-table__header">Case manager</th>
+              <th scope="col" class="govuk-table__header">Cases opened</th>
+              <th scope="col" class="govuk-table__header">Cases closed</th>
             </tr>
           </thead>
           <tbody class="govuk-table__body">
             <tr class="govuk-table__row">
-              <td class="govuk-table__cell"><a href="#">Means_report.pdf</a></td>
-              <td class="govuk-table__cell">23 Feb 2020</td>
+              <td class="govuk-table__cell">David Francis</td>
+              <td class="govuk-table__cell">98</td>
+              <td class="govuk-table__cell">95</td>
             </tr>
             <tr class="govuk-table__row">
-              <td class="govuk-table__cell"><a href="#">Merits_report.pdf</a></td>
-              <td class="govuk-table__cell">23 Feb 2020</td>
+              <td class="govuk-table__cell">Paul Farmer</td>
+              <td class="govuk-table__cell">122</td>
+              <td class="govuk-table__cell">131</td>
             </tr>
             <tr class="govuk-table__row">
-              <td class="govuk-table__cell"><a href="#">Police_report.pdf</a></td>
-              <td class="govuk-table__cell">12 Mar 2020</td>
+              <td class="govuk-table__cell">Rita Patel</td>
+              <td class="govuk-table__cell">126</td>
+              <td class="govuk-table__cell">142</td>
             </tr>
           </tbody>
         </table>
       </div>
-    </details>
-
-    <form action="#">
-      <input type="submit" class="govuk-button" value="Request more information" style="background-color:#F3F2F1; color:#0B0C0C">
-    </form>
-
-    <h2 class="govuk-heading-m">Make a decision</h2>
-    <p>The means decision has been completed. You can view the <a href="#">application history</a> for further details.</p>
-
-    <div class="govuk-button-group">
-      <form action="#">
-        <input type="submit" class="govuk-button" value="Merits decision" style="background-color:#1D70B8; color:white">
-      </form>
-
-      <form action="#">
-        <input type="submit" class="govuk-button" value="Send back to provider" style="background-color:#D4351C; color:white">
-      </form>
     </div>
   </div>
 
@@ -235,5 +313,4 @@ Case details
     </form>
   </div>
 </div>
-
 {% endblock %}
