@@ -1,0 +1,29 @@
+{% extends "layout.html" %}
+
+{% block pageTitle %}
+You need to review this application in CCMS
+{% endblock %}
+
+{% block content %}
+
+<div class="govuk-panel govuk-panel--confirmation" style="text-align: left; background-color:#17539B">
+  <h1 class="govuk-panel__title">You need to review this application in CCMS</h1>
+  <div class="govuk-body" style="color:white">
+    You cannot use this service if you need to:
+    <ul class="govuk-list--bullet">
+      <li>amend application details</li>
+      <li>request more information</li>
+      <li>make a decision on means</li>
+      <li>change the scope</li>
+      <li>change the amount to be granted</li>
+    </ul>
+
+    <form action="/laa-online-portal">
+      <input type="submit" class="govuk-button" value="Continue in CCMS" style="background-color:white; color:black">
+    </form>
+
+    <a href="/case-details" class="govuk-link--inverse">Back to application</a>
+  </div>
+</div>
+
+{% endblock %}
