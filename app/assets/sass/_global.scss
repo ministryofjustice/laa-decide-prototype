@@ -1,0 +1,61 @@
+// Container max width
+.govuk-width-container, .moj-primary-navigation__container, .moj-header__container, .key-details-bar .key-details-bar__key-details {
+    max-width: 1220px;
+    margin: 0 15px;
+}
+@media (min-width: 40.0625em) {
+.govuk-width-container, .moj-primary-navigation__container, .moj-header__container, .key-details-bar .key-details-bar__key-details {
+    margin: 0 30px;
+    }
+}
+@media (min-width: 1020px) {
+    .govuk-width-container, .moj-primary-navigation__container, .moj-header__container, .key-details-bar .key-details-bar__key-details {
+        margin: 0 30px;
+        }
+    }
+@media (min-width: 1280px) {
+    .govuk-width-container, .moj-primary-navigation__container, .moj-header__container, .key-details-bar .key-details-bar__key-details {
+        margin: 0 auto;
+        }
+    }
+
+
+Element max width
+
+.govuk-heading-s,
+.govuk-heading-m,
+.govuk-heading-l,
+.govuk-heading-xl,
+.govuk-body,
+.govuk-body-l,
+.govuk-body-s,
+.govuk-caption-m,
+.govuk-caption-l,
+.govuk-caption-xl,
+.govuk-link,
+.govuk-list,
+.govuk-label,
+.govuk-hint,
+.govuk-fieldset__legend,
+.govuk-fieldset__heading,
+.govuk-accordion__section-heading,
+.govuk-textarea,
+.govuk-details__summary,
+.govuk-details__text,
+.govuk-error-message,
+.govuk-error-summary__title,
+.govuk-inset-text,
+.govuk-panel__title,
+.govuk-panel__body,
+.govuk-warning-text__text,
+.govuk-phase-banner__content,
+.govuk-select,
+.govuk-table__caption,
+.govuk-summary-list,
+.govuk-accordion,
+.govuk-table {
+    max-width: 727px;
+}
+.govuk-table-xl {
+    max-width: none;
+}
