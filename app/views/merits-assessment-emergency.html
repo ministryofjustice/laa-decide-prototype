@@ -1,0 +1,189 @@
+{% extends "layout.html" %}
+
+{% block pageTitle %}
+Case details
+{% endblock %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <a href="/case-details" class="govuk-back-link">Back to application details</a>
+  <br>
+  <br>
+  <br>
+  <!-- <div class="govuk-grid-column-two-thirds"> -->
+  <h1 class="govuk-heading-l">Make a decision on merits</h1>
+  <p class="govuk-body-l">30000009020</p>
+</div>
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    <h2 class="govuk-heading-m">Part 1: Emergency</h2>
+
+    <div class="govuk-form-group">
+      <fieldset class="govuk-fieldset" aria-describedby="decision-hint-1">
+        <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
+          <h3 class="govuk-heading-s">Non-molestation order</h3>
+        </legend>
+        <div id="decision-hint-1" class="govuk-hint">
+          Family law - Domestic abuse<br>The provider has requested full representation
+        </div>
+        <div class="govuk-radios govuk-radios--conditional" data-module="govuk-radios">
+          <div class="govuk-radios__item">
+            <input class="govuk-radios__input" id="grant" name="decision-1" type="radio" value="email" data-aria-controls="conditional-decision-1">
+            <label class="govuk-label govuk-radios__label" for="decision-1">
+              Grant
+            </label>
+          </div>
+          <div class="govuk-radios__item">
+            <input class="govuk-radios__input" id="refuse" name="decision-1" type="radio" value="phone" data-aria-controls="conditional-decision-1-2">
+            <label class="govuk-label govuk-radios__label" for="decision-1">
+              Refuse
+            </label>
+          </div>
+          <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-decision-1-2">
+            <div class="govuk-form-group">
+              <fieldset class="govuk-fieldset">
+                <div class="govuk-radios">
+                  <div class="govuk-radios__item">
+                    <input class="govuk-radios__input" id="refusal-reason" name="refusal-reason-1" type="radio" value="refusal-reason-1-1">
+                    <label class="govuk-label govuk-radios__label" for="refusal-reason">
+                      Because of x
+                    </label>
+                  </div>
+                  <div class="govuk-radios__item">
+                    <input class="govuk-radios__input" id="refusal-reason-2" name="refusal-reason-1" type="radio" value="refusal-reason-1-2">
+                    <label class="govuk-label govuk-radios__label" for="refusal-reason-2">
+                      Because of y
+                    </label>
+                  </div>
+                  <div class="govuk-radios__item">
+                    <input class="govuk-radios__input" id="refusal-reason-3" name="refusal-reason-1" type="radio" value="refusal-reason-1-3">
+                    <label class="govuk-label govuk-radios__label" for="refusal-reason-3">
+                      Because of z
+                    </label>
+                  </div>
+                </div>
+              </fieldset>
+            </div>
+          </div>
+        </div>
+      </fieldset>
+
+      <a href="/ccms-redirect" class="govuk-link">Make changes</a>
+    </div>
+
+    <div class="govuk-form-group">
+      <fieldset class="govuk-fieldset" aria-describedby="decision-hint-2">
+        <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
+          <h3 class="govuk-heading-s">Occupation order</h3>
+        </legend>
+        <div id="decision-hint-2" class="govuk-hint">
+          Family law - Domestic abuse<br>The provider has requested family help (higher)
+        </div>
+        <div class="govuk-radios govuk-radios--conditional" data-module="govuk-radios">
+          <div class="govuk-radios__item">
+            <input class="govuk-radios__input" id="grant" name="decision-2" type="radio" value="grant" data-aria-controls="conditional-decision-2-1">
+            <label class="govuk-label govuk-radios__label" for="decision-2">
+              Grant
+            </label>
+          </div>
+          <div class="govuk-radios__item">
+            <input class="govuk-radios__input" id="refuse" name="decision-2" type="radio" value="refuse" data-aria-controls="conditional-decision-2-2">
+            <label class="govuk-label govuk-radios__label" for="decision-2">
+              Refuse
+            </label>
+          </div>
+          <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-decision-2-2">
+            <div class="govuk-form-group">
+              <fieldset class="govuk-fieldset">
+                <div class="govuk-radios">
+                  <div class="govuk-radios__item">
+                    <input class="govuk-radios__input" id="refusal-reason" name="refusal-reason-2" type="radio" value="refusal-reason-2-1">
+                    <label class="govuk-label govuk-radios__label" for="refusal-reason">
+                      Because of x
+                    </label>
+                  </div>
+                  <div class="govuk-radios__item">
+                    <input class="govuk-radios__input" id="refusal-reason-2" name="refusal-reason-2" type="radio" value="refusal-reason-2-2">
+                    <label class="govuk-label govuk-radios__label" for="refusal-reason-2">
+                      Because of y
+                    </label>
+                  </div>
+                  <div class="govuk-radios__item">
+                    <input class="govuk-radios__input" id="where-do-you-live-3" name="refusal-reason-2" type="radio" value="refusal-reason-2-3">
+                    <label class="govuk-label govuk-radios__label" for="refusal-reason-3">
+                      Because of z
+                    </label>
+                  </div>
+                </div>
+              </fieldset>
+            </div>
+          </div>
+        </div>
+      </fieldset>
+
+      <a href="/ccms-redirect" class="govuk-link">Make changes</a>
+    </div>
+
+    <div>
+      <br>
+      <table class="govuk-table">
+        <caption class="govuk-table__caption govuk-table__caption--m">Cost limits</caption>
+        <tbody class="govuk-table__body">
+          <tr class="govuk-table__row">
+            <td class="govuk-table__header">Certificate type</td>
+            <td class="govuk-table__cell">Emergency</td>
+          </tr>
+          <tr class="govuk-table__row">
+            <td class="govuk-table__header">Default</td>
+            <td class="govuk-table__cell">£1,350</td>
+          </tr>
+          <tr class="govuk-table__row">
+            <td class="govuk-table__header">Requested</td>
+            <td class="govuk-table__cell">£4,000</td>
+          </tr>
+          <tr class="govuk-table__row">
+            <td class="govuk-table__header">Justification</td>
+            <td class="govuk-table__cell">Reason for requesting more than the default</td>
+          </tr>
+        </tbody>
+      </table>
+      <a href="/ccms-redirect" class="govuk-link">Grant a different amount</a>
+    </div>
+
+    <br>
+    <br>
+
+    <div class="govuk-form-group">
+      <h1 class="govuk-label-wrapper"><label class="govuk-label govuk-label--m" for="note">
+          Give further details
+        </label>
+      </h1>
+      <div id="note-hint" class="govuk-hint">
+        This information is for internal use. It will not be shared with the provider.
+      </div>
+      <textarea class="govuk-textarea" name="note" id="note" rows="10"></textarea>
+      <div class="govuk-button-group">
+        <form action="#">
+          <button class="govuk-button govuk-button" data-module="govuk-button">Save and continue</button>
+        </form>
+
+        <form action="/case-details">
+          <button class="govuk-button govuk-button--secondary" data-module="govuk-button">Save and come back later</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="govuk-grid-column-one-third">
+    <div class="govuk-button-group">
+      <form action="#">
+        <button class="govuk-button govuk-button--secondary" data-module="govuk-button">Grant all</button>
+      </form>
+      <form action="#">
+        <button class="govuk-button govuk-button--warning" data-module="govuk-button">Refuse all</button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
