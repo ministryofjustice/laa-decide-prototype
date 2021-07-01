@@ -45,20 +45,6 @@ GOV.UK Prototype Kit
     homepageUrl: "/",
     serviceName: serviceName,
     serviceUrl: "/",
-    navigation: [
-  {
-    href: "/home",
-    text: "Home"
-  },
-  {
-    href: "/open-applications",
-    text: "Open applications"
-  },
-  {
-    href: "/my-applications",
-    text: "My applications"
-  }
-],
     containerClasses: "govuk-width-container"
   }) }}
 
@@ -74,6 +60,28 @@ GOV.UK Prototype Kit
     </p>
   </div>
 </div>
+
+{%- from "moj/components/primary-navigation/macro.njk" import mojPrimaryNavigation -%}
+
+{{ mojPrimaryNavigation({
+    label: 'Primary navigation',
+    items: [
+      {
+        href: "/home",
+        text: "Home",
+        active: true
+      },
+      {
+        href: "/open-applications",
+        text: "Open applications"
+      },
+      {
+        href: "/my-applications",
+        text: "My applications"
+      }
+    ]
+  }) }}
+
 {% endblock %}
 
 {% set mainClasses = mainClasses | default("govuk-main-wrapper--auto-spacing") %}
