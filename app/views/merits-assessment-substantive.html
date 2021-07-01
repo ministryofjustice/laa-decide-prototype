@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 
 {% block pageTitle %}
-Merits assessment
+Case details
 {% endblock %}
 
 {% block content %}
@@ -75,10 +75,10 @@ Merits assessment
     <div class="govuk-form-group">
       <fieldset class="govuk-fieldset" aria-describedby="decision-hint-2">
         <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
-          <h3 class="govuk-heading-s">Occupation order</h3>
+          <h3 class="govuk-heading-s">Prohibited steps order</h3>
         </legend>
         <div id="decision-hint-2" class="govuk-hint">
-          Family law - Domestic abuse<br>The provider has requested family help (higher)
+          Family law - Children - section 8<br>The provider has requested family help (higher)
         </div>
         <div class="govuk-radios govuk-radios--conditional" data-module="govuk-radios">
           <div class="govuk-radios__item">
@@ -125,6 +125,59 @@ Merits assessment
       <a href="/ccms-redirect" class="govuk-link">Make changes</a>
     </div>
 
+    <div class="govuk-form-group">
+      <fieldset class="govuk-fieldset" aria-describedby="decision-hint-3">
+        <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
+          <h3 class="govuk-heading-s">Occupation order</h3>
+        </legend>
+        <div id="decision-hint-3" class="govuk-hint">
+          Family law - Domestic abuse<br>The provider has requested family help (higher)
+        </div>
+        <div class="govuk-radios govuk-radios--conditional" data-module="govuk-radios">
+          <div class="govuk-radios__item">
+            <input class="govuk-radios__input" id="grant" name="decision-3" type="radio" value="grant" data-aria-controls="conditional-decision-3-1">
+            <label class="govuk-label govuk-radios__label" for="decision-3">
+              Grant
+            </label>
+          </div>
+          <div class="govuk-radios__item">
+            <input class="govuk-radios__input" id="refuse" name="decision-3" type="radio" value="refuse" data-aria-controls="conditional-decision-3-2">
+            <label class="govuk-label govuk-radios__label" for="decision-3">
+              Refuse
+            </label>
+          </div>
+          <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-decision-3-2">
+            <div class="govuk-form-group">
+              <fieldset class="govuk-fieldset">
+                <div class="govuk-radios">
+                  <div class="govuk-radios__item">
+                    <input class="govuk-radios__input" id="refusal-reason" name="refusal-reason-2" type="radio" value="refusal-reason-3-1">
+                    <label class="govuk-label govuk-radios__label" for="refusal-reason">
+                      Because of x
+                    </label>
+                  </div>
+                  <div class="govuk-radios__item">
+                    <input class="govuk-radios__input" id="refusal-reason-2" name="refusal-reason-2" type="radio" value="refusal-reason-3-2">
+                    <label class="govuk-label govuk-radios__label" for="refusal-reason-2">
+                      Because of y
+                    </label>
+                  </div>
+                  <div class="govuk-radios__item">
+                    <input class="govuk-radios__input" id="where-do-you-live-3" name="refusal-reason-2" type="radio" value="refusal-reason-3-3">
+                    <label class="govuk-label govuk-radios__label" for="refusal-reason-3">
+                      Because of z
+                    </label>
+                  </div>
+                </div>
+              </fieldset>
+            </div>
+          </div>
+        </div>
+      </fieldset>
+
+      <a href="/ccms-redirect" class="govuk-link">Make changes</a>
+    </div>
+
     <div>
       <br>
       <table class="govuk-table">
@@ -132,19 +185,15 @@ Merits assessment
         <tbody class="govuk-table__body">
           <tr class="govuk-table__row">
             <td class="govuk-table__header">Certificate type</td>
-            <td class="govuk-table__cell">Emergency</td>
+            <td class="govuk-table__cell">Substantive</td>
           </tr>
           <tr class="govuk-table__row">
             <td class="govuk-table__header">Default</td>
-            <td class="govuk-table__cell">£1,350</td>
+            <td class="govuk-table__cell">£25,000</td>
           </tr>
           <tr class="govuk-table__row">
             <td class="govuk-table__header">Requested</td>
-            <td class="govuk-table__cell">£4,000</td>
-          </tr>
-          <tr class="govuk-table__row">
-            <td class="govuk-table__header">Justification</td>
-            <td class="govuk-table__cell">Reason for requesting more than the default</td>
+            <td class="govuk-table__cell">£30,000</td>
           </tr>
         </tbody>
       </table>
@@ -164,7 +213,7 @@ Merits assessment
       </div>
       <textarea class="govuk-textarea" name="note" id="note" rows="10"></textarea>
       <div class="govuk-button-group">
-        <form action="/merits-assessment-substantive">
+        <form action="/case-details">
           <button class="govuk-button govuk-button" data-module="govuk-button">Save and continue</button>
         </form>
 
