@@ -6,10 +6,22 @@ Case details
 
 {% block content %}
 <div class="govuk-grid-row">
-  <a href="/my-applications" class="govuk-back-link">Back to my applications</a>
+  <a href="my-applications" class="govuk-back-link">Back to my applications</a>
   <br>
   <br>
   <br>
+
+  <div class="govuk-notification-banner govuk-notification-banner--success" role="alert" aria-labelledby="govuk-notification-banner-title" data-module="govuk-notification-banner">
+    <div class="govuk-notification-banner__header">
+      <h2 class="govuk-notification-banner__title" id="govuk-notification-banner-title">
+        Success
+      </h2>
+    </div>
+    <div class="govuk-notification-banner__content">
+      <p class="govuk-notification-banner__heading">Merits decision saved. <a href="laa-online-portal">You should now update the status of the case in CCMS</a>.</p>
+    </div>
+  </div>
+
   <div class="govuk-grid-column-two-thirds">
     <h1 class="govuk-heading-l">30000009020</h1>
     <p class="govuk-body-l">Rita Patel</p>
@@ -39,7 +51,6 @@ Case details
         </li>
       </ul>
 
-
       <div class="govuk-tabs__panel" id="application-details">
         <table class="govuk-table">
           <caption class="govuk-table__caption govuk-table__caption--m">Overview</caption>
@@ -62,7 +73,7 @@ Case details
             </tr>
             <tr class="govuk-table__row">
               <td class="govuk-table__header">Merits assessment</td>
-              <td class="govuk-table__cell"><strong class="govuk-tag govuk-tag--purple">Not started</strong></td>
+              <td class="govuk-table__cell"><strong class="govuk-tag govuk-tag--green">Granted</strong></td>
             </tr>
           </tbody>
         </table>
@@ -132,13 +143,15 @@ Case details
           </summary>
           <div class="govuk-details__text">
             <h2 class="govuk-heading-m">Emergency certificate</h2>
-            <p><b>Form of service:</b> Full representation</p>
-            <p><b>Work the provider can do:</b> All steps up to and including the hearing on 21 July 2020.</p>
+            <p><b>Form of service: </b>Full representation</p>
+            <p><b>Work the provider can do: </b>All steps up to and including the hearing on 21 July 2020.</p>
+            <p><b>Merits decision: </b><strong class="govuk-tag govuk-tag--green">Granted</strong></p>
 
             <h2 class="govuk-heading-m">Substantive certificate</h2>
-            <p><b>Form of service:</b> Full representation</p>
-            <p><b>Work the provider can do:</b> All steps up to and including getting and serving a final order. If the order is breached you can apply for power of arrest. You cannot apply for a warrant of arrest or contempt of court proceedings.
+            <p><b>Form of service: </b>Full representation</p>
+            <p><b>Work the provider can do: </b>All steps up to and including getting and serving a final order. If the order is breached you can apply for power of arrest. You cannot apply for a warrant of arrest or contempt of court proceedings.
             </p>
+            <p><b>Merits decision: </b><strong class="govuk-tag govuk-tag--green">Granted</strong></p>
           </div>
         </details>
 
@@ -151,10 +164,11 @@ Case details
           </summary>
           <div class="govuk-details__text">
             <h2 class="govuk-heading-m">Substantive certificate</h2>
-            <p><b>Form of service:</b> Family help (higher)</p>
-            <p><b>Work the provider can do:</b> Limited to Family Help (Higher) and to all steps necessary to negotiate and conclude a settlement. To include the issue of proceedings and representation in those proceedings save in relation to or at a
+            <p><b>Form of service: </b>Family help (higher)</p>
+            <p><b>Work the provider can do: </b>Limited to Family Help (Higher) and to all steps necessary to negotiate and conclude a settlement. To include the issue of proceedings and representation in those proceedings save in relation to or at a
               contested final hearing.
             </p>
+            <p><b>Merits decision: </b><strong class="govuk-tag govuk-tag--green">Granted</strong></p>
           </div>
         </details>
 
@@ -167,16 +181,18 @@ Case details
           </summary>
           <div class="govuk-details__text">
             <h2 class="govuk-heading-m">Emergency certificate</h2>
-            <p><b>Form of service:</b> Family help (higher)</p>
-            <p><b>Work the provider can do:</b> Limited to Family Help (Higher) and to all steps necessary to negotiate and conclude a settlement. To include the issue of proceedings and representation in those proceedings save in relation to or at a
+            <p><b>Form of service: </b>Family help (higher)</p>
+            <p><b>Work the provider can do: </b>Limited to Family Help (Higher) and to all steps necessary to negotiate and conclude a settlement. To include the issue of proceedings and representation in those proceedings save in relation to or at a
               contested final hearing.
             </p>
+            <p><b>Merits decision: </b><strong class="govuk-tag govuk-tag--green">Granted</strong></p>
 
             <h2 class="govuk-heading-m">Substantive certificate</h2>
-            <p><b>Form of service:</b> Family help (higher)</p>
-            <p><b>Work the provider can do:</b> Limited to Family Help (Higher) and to all steps necessary to negotiate and conclude a settlement. To include the issue of proceedings and representation in those proceedings save in relation to or at a
+            <p><b>Form of service: </b>Family help (higher)</p>
+            <p><b>Work the provider can do: </b>Limited to Family Help (Higher) and to all steps necessary to negotiate and conclude a settlement. To include the issue of proceedings and representation in those proceedings save in relation to or at a
               contested final hearing.
             </p>
+            <p><b>Merits decision: </b><strong class="govuk-tag govuk-tag--green">Granted</strong></p>
           </div>
         </details>
 
@@ -227,22 +243,12 @@ Case details
           </div>
         </details>
 
-        <form action="/ccms-redirect">
+        <form action="ccms-redirect">
           <button class="govuk-button govuk-button--secondary" data-module="govuk-button">Request more information</button>
         </form>
 
         <h2 class="govuk-heading-m">Make a decision</h2>
-        <p>The means decision has been completed. You can view the <a href="#">application history</a> for further details.</p>
-
-        <div class="govuk-button-group">
-          <form action="/merits-assessment-emergency">
-            <button class="govuk-button" style="background-color:#1D70B8; color:white" data-module="govuk-button">Merits decision</button>
-          </form>
-
-          <form action="/reject-application">
-            <button class="govuk-button govuk-button--warning" data-module="govuk-button">Send back to provider</button>
-          </form>
-        </div>
+        <p>The merits and means decisions have been completed. You can view the <a href="#">application history</a> for further details.</p>
       </div>
 
       <div class="govuk-tabs__panel govuk-tabs__panel--hidden" id="people">
@@ -379,7 +385,7 @@ Case details
   </div>
 
   <div class="govuk-grid-column-one-third">
-    <form action="/remove-from-my-list">
+    <form action="remove-from-my-list">
       <button class="govuk-button govuk-button--secondary" data-module="govuk-button">Remove from my list</button>
     </form>
   </div>

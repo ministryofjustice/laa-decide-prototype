@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 
 {% block pageTitle %}
-My applications
+Open applications
 {% endblock %}
 
 {% block content %}
@@ -24,11 +24,11 @@ My applications
       </div>
     </div>
 
-    <h1 class="govuk-heading-l">My applications</h1>
-    <p>3 applications</p>
+    <h1 class="govuk-heading-l">Open applications</h1>
+    <p>3 open applications</p>
 
     <div class="moj-filter-layout">
-      {% include "_filter.html" %}
+      {% include "./_filter.html" %}
 
       <div class="moj-filter-layout__content">
         <div class="moj-action-bar">
@@ -59,7 +59,11 @@ My applications
                   <td class="govuk-table__cell">Used</td>
                   <td class="govuk-table__cell">Family law</td>
                   <td class="govuk-table__cell">Passported</td>
-                  <td class="govuk-table__cell"><a href="/case-details">Details</a></td>
+                  <td class="govuk-table__cell">
+                    <form action="my-applications">
+                      <button class="govuk-button govuk-button--secondary" data-module="govuk-button">Add to my list</button>
+                    </form>
+                  </td>
                 </tr>
                 <tr class="govuk-table__row">
                   <td class="govuk-table__cell">30000009021</td>
@@ -69,7 +73,11 @@ My applications
                   <td class="govuk-table__cell">Used</td>
                   <td class="govuk-table__cell">Family law</td>
                   <td class="govuk-table__cell">Non passported</td>
-                  <td class="govuk-table__cell"><a href="/case-details">Details</a></td>
+                  <td class="govuk-table__cell">
+                    <form action="my-applications">
+                      <button class="govuk-button govuk-button--secondary" data-module="govuk-button">Add to my list</button>
+                    </form>
+                  </td>
                 </tr>
                 <tr class="govuk-table__row">
                   <td class="govuk-table__cell">30000009022</td>
@@ -79,7 +87,11 @@ My applications
                   <td class="govuk-table__cell">Used</td>
                   <td class="govuk-table__cell">Family law</td>
                   <td class="govuk-table__cell">Passported</td>
-                  <td class="govuk-table__cell"><a href="/case-details">Details</a></td>
+                  <td class="govuk-table__cell">
+                    <form action="my-applications">
+                      <button class="govuk-button govuk-button--secondary" data-module="govuk-button">Add to my list</button>
+                    </form>
+                  </td>
                 </tr>
               </tbody>
             </table>
@@ -90,4 +102,5 @@ My applications
     </div>
   </div>
 </div>
+
 {% endblock %}
