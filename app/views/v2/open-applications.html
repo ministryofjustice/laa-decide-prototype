@@ -63,6 +63,7 @@ Open applications
                   <td class="govuk-table__cell">
                     <form action="my-applications">
                       <button class="govuk-button govuk-button--secondary" data-module="govuk-button">Add to my list</button>
+                      <input type="hidden" name="refNo" value="{{ application['applicationDetails']['refNo'] }}">
                     </form>
                   </td>
                 </tr>
@@ -76,5 +77,4 @@ Open applications
     </div>
   </div>
 </div>
-
 {% endblock %}
