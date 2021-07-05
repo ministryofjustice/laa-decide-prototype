@@ -25,7 +25,7 @@ My applications
     </div>
 
     <h1 class="govuk-heading-l">My applications</h1>
-    <p>{{ data['applications'].length }} applications</p>
+    <p>{{ data['assignedApplications'].length-1}} applications</p>
 
     <div class="moj-filter-layout">
       {% include "./_filter.html" %}
@@ -52,6 +52,7 @@ My applications
               </thead>
               <tbody class="govuk-table__body">
                 {% for application in data['applications'] %}
+                {% if application['applicationDetails']['refNo'] in data['assignedApplications'] %}
                 <tr class="govuk-table__row">
                   <td class="govuk-table__cell">{{ application['applicationDetails']['refNo'] }}</td>
                   <td class="govuk-table__cell">{{ application['applicationDetails']['submitted'] }}</td>
@@ -62,10 +63,11 @@ My applications
                   <td class="govuk-table__cell">{{ application['applicationDetails']['meansType'] }}</td>
                   <td class="govuk-table__cell"><a href="case-details">Details</a></td>
                 </tr>
+                {% endif %}
                 {% endfor %}
               </tbody>
             </table>
-            <p>Showing <b>1</b> to <b>{{ data['applications'].length }}</b> of <b>{{ data['applications'].length }}</b> results</p>
+            <p>Showing <b>1</b> to <b>{{ data['assignedApplications'].length-1 }}</b> of <b>{{ data['assignedApplications'].length-1}}</b> results</p>
           </div>
         </div>
       </div>

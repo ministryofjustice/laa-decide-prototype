@@ -27,8 +27,7 @@ module.exports = {
         'applicationType': 'Initial application',
         'delegatedFunctions': 'Used',
         'categoryLaw': 'Family law',
-        'meansType': 'Passported',
-        'assigned': 'nil'
+        'meansType': 'Passported'
       }
     },
     // application #2
@@ -39,8 +38,7 @@ module.exports = {
         'applicationType': 'Initial application',
         'delegatedFunctions': 'Used',
         'categoryLaw': 'Family law',
-        'meansType': 'Non passported',
-        'assigned': 'nil'
+        'meansType': 'Non passported'
       }
     },
     // application #3
@@ -51,9 +49,9 @@ module.exports = {
         'applicationType': 'Initial application',
         'delegatedFunctions': 'Used',
         'categoryLaw': 'Family law',
-        'meansType': 'Passported',
-        'assigned': 'nil'
+        'meansType': 'Passported'
       }
     }
-  ]
+  ],
+  assignedApplications: []
 }
