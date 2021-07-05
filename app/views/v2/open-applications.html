@@ -25,7 +25,7 @@ Open applications
     </div>
 
     <h1 class="govuk-heading-l">Open applications</h1>
-    <p>3 open applications</p>
+    <p>{{ data['applications'].length }} open applications</p>
 
     <div class="moj-filter-layout">
       {% include "./_filter.html" %}
@@ -51,51 +51,25 @@ Open applications
                 </tr>
               </thead>
               <tbody class="govuk-table__body">
+                {% for application in data['applications'] %}
                 <tr class="govuk-table__row">
-                  <td class="govuk-table__cell">30000009020</td>
-                  <td class="govuk-table__cell">19 Mar 2020</td>
-                  <td class="govuk-table__cell">26 Mar 2020</td>
-                  <td class="govuk-table__cell">Initial application</td>
-                  <td class="govuk-table__cell">Used</td>
-                  <td class="govuk-table__cell">Family law</td>
-                  <td class="govuk-table__cell">Passported</td>
+                  <td class="govuk-table__cell">{{ application['applicationDetails']['refNo'] }}</td>
+                  <td class="govuk-table__cell">{{ application['applicationDetails']['submitted'] }}</td>
+                  <td class="govuk-table__cell">{{ application['applicationDetails']['lastUpdated'] }}</td>
+                  <td class="govuk-table__cell">{{ application['applicationDetails']['applicationType'] }}</td>
+                  <td class="govuk-table__cell">{{ application['applicationDetails']['delegatedFunctions'] }}</td>
+                  <td class="govuk-table__cell">{{ application['applicationDetails']['categoryLaw'] }}</td>
+                  <td class="govuk-table__cell">{{ application['applicationDetails']['meansType'] }}</td>
                   <td class="govuk-table__cell">
                     <form action="my-applications">
                       <button class="govuk-button govuk-button--secondary" data-module="govuk-button">Add to my list</button>
                     </form>
                   </td>
                 </tr>
-                <tr class="govuk-table__row">
-                  <td class="govuk-table__cell">30000009021</td>
-                  <td class="govuk-table__cell">19 Mar 2020</td>
-                  <td class="govuk-table__cell">02 Apr 2020</td>
-                  <td class="govuk-table__cell">Initial application</td>
-                  <td class="govuk-table__cell">Used</td>
-                  <td class="govuk-table__cell">Family law</td>
-                  <td class="govuk-table__cell">Non passported</td>
-                  <td class="govuk-table__cell">
-                    <form action="my-applications">
-                      <button class="govuk-button govuk-button--secondary" data-module="govuk-button">Add to my list</button>
-                    </form>
-                  </td>
-                </tr>
-                <tr class="govuk-table__row">
-                  <td class="govuk-table__cell">30000009022</td>
-                  <td class="govuk-table__cell">19 Mar 2020</td>
-                  <td class="govuk-table__cell">04 Apr 2020</td>
-                  <td class="govuk-table__cell">Initial application</td>
-                  <td class="govuk-table__cell">Used</td>
-                  <td class="govuk-table__cell">Family law</td>
-                  <td class="govuk-table__cell">Passported</td>
-                  <td class="govuk-table__cell">
-                    <form action="my-applications">
-                      <button class="govuk-button govuk-button--secondary" data-module="govuk-button">Add to my list</button>
-                    </form>
-                  </td>
-                </tr>
+                {% endfor %}
               </tbody>
             </table>
-            <p>Showing <b>1</b> to <b>3</b> of <b>3</b> results</p>
+            <p>Showing <b>1</b> to <b>{{ data['applications'].length }}</b> of <b>{{ data['applications'].length }}</b> results</p>
           </div>
         </div>
       </div>

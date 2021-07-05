@@ -18,7 +18,42 @@ Example usage:
 */
 
 module.exports = {
-
-  // Insert values here
-
+  'applications': [
+    // application #1
+    { 'applicationDetails':
+      { 'refNo': '30000009020',
+        'submitted': '19/03/2020',
+        'lastUpdated': '26/03/2020',
+        'applicationType': 'Initial application',
+        'delegatedFunctions': 'Used',
+        'categoryLaw': 'Family law',
+        'meansType': 'Passported',
+        'assigned': 'nil'
+      }
+    },
+    // application #2
+    { 'applicationDetails':
+      { 'refNo': '30000009021',
+        'submitted': '19/03/2020',
+        'lastUpdated': '02/04/2020',
+        'applicationType': 'Initial application',
+        'delegatedFunctions': 'Used',
+        'categoryLaw': 'Family law',
+        'meansType': 'Non passported',
+        'assigned': 'nil'
+      }
+    },
+    // application #3
+    { 'applicationDetails':
+      { 'refNo': '30000009022',
+        'submitted': '19/03/2020',
+        'lastUpdated': '04/04/2020',
+        'applicationType': 'Initial application',
+        'delegatedFunctions': 'Used',
+        'categoryLaw': 'Family law',
+        'meansType': 'Passported',
+        'assigned': 'nil'
+      }
+    }
+  ]
 }
