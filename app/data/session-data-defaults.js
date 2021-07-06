@@ -1,40 +1,175 @@
-/*
-
-Provide default values for user session data. These are automatically added
-via the `autoStoreData` middleware. Values will only be added to the
-session if a value doesn't already exist. This may be useful for testing
-journeys where users are returning or logging in to an existing application.
-
-============================================================================
-
-Example usage:
-
-"full-name": "Sarah Philips",
-
-"options-chosen": [ "foo", "bar" ]
-
-============================================================================
-
-*/
-
 module.exports = {
   'applications': [
     // application #1
-    { 'applicationDetails':
-      { 'refNo': '30000009020',
-        'submitted': '19/03/2020',
-        'lastUpdated': '26/03/2020',
+    {
+      'applicationDetails':
+      {
+        'refNo': '30000009020',
+        'dateSubmitted': '19/03/2020',
+        'dateLastUpdated': '26/03/2020',
         'applicationType': 'Initial application',
         'delegatedFunctions': 'Used',
         'categoryLaw': 'Family law',
-        'meansType': 'Passported'
+        'meansType': 'Passported',
+        'applicant':
+        {
+          'name': 'Rita Patel',
+          'dob': '19/03/1993',
+          'nino': 'QQ112233Q',
+          'address':  '1 London Road</br>London</br>SW1A 1AA',
+        },
+        'provider':
+        {
+          'name': 'Joe Bloggs',
+          'firm': 'Joe Bloggs & Co',
+          'accountNumber': '12345',
+          'address': '2 London Road</br>London</br>SW1A 1AA',
+          'phone': '07123456789'
+        },
+        'opponent':
+        {
+          'name': 'Jonathan Hunt',
+          'dob': '23/11/1987',
+          'address': '1 London Road</br>London</br>SW1A 1AA',
+          'relationship': 'Father'
+        },
+        'children': [
+          {
+            'name': 'Sam Hunt',
+            'dob': '23/02/2007',
+            'address': '1 London Road</br>London</br>SW1A 1AA',
+            'relationship': 'Son'
+          }
+        ],
+        'certificateType': 'Emergency and substantive',
+        'meansAssessmentResult': 'Passported',
+        'meritsAssessmentResult': 'Not started',
+        'linkedApplications': [
+          {
+            'refNo': '300123455562',
+            'status': 'Pending merits assessment'
+          },
+          {
+            'refNo': '300123400000',
+            'status': 'Pending billing'
+          },
+          {
+            'refNo': '300000019111',
+            'status': 'Closed'
+          },
+          {
+            'refNo': '30000054256',
+            'status': 'Closed'
+          }
+        ],
+        'delegatedFunctionsDates': [
+          {
+            'proceedingType': 'Non-molestation order',
+            'dateUsed': '03/03/2020'
+          },
+          {
+            'proceedingType': 'Prohibitive steps order',
+            'dateUsed': 'Not used'
+           },
+          {
+            'proceedingType': 'Occupation order',
+            'dateUsed': '03/03/2020'
+          }
+        ],
+        'proceedings': [
+          {
+            'proceedingType': 'Non-molestation order',
+            'certificates': [
+              {
+                'certificateType': 'Emergency certificate',
+                'formOfService': 'Full representation',
+                'workProviderCanDo': 'All steps up to and including the hearing on 21 July 2020.'
+              },
+              {
+                'certificateType': 'Substantive certificate',
+                'formOfService': 'Full representation',
+                'workProviderCanDo': 'All steps up to and including getting and serving a final order. If the order is breached you can apply for power of arrest. You cannot apply for a warrant of arrest or contempt of court proceedings.'
+              }
+            ]
+          },
+          {
+            'proceedingType': 'Prohibited steps order',
+              'certificates': [
+              {
+                'certificateType': 'Substantive certificate',
+                'formOfService': 'Family help (higher)',
+                'workProviderCanDo': 'Limited to Family Help (Higher) and to all steps necessary to negotiate and conclude a settlement. To include the issue of proceedings and representation in those proceedings save in relation to or at a contested final hearing.'
+              }
+            ]
+          },
+          {
+            'proceedingType': 'Occupation order',
+              'certificates': [
+              {
+                'certificateType': 'Emergency certificate',
+                'formOfService': 'Family help (higher)',
+                'workProviderCanDo': 'Limited to Family Help (Higher) and to all steps necessary to negotiate and conclude a settlement. To include the issue of proceedings and representation in those proceedings save in relation to or at a contested final hearing.'
+              },
+              {
+                'certificateType': 'Substantive certificate',
+                'formOfService': 'Family help (higher)',
+                'workProviderCanDo': 'Limited to Family Help (Higher) and to all steps necessary to negotiate and conclude a settlement. To include the issue of proceedings and representation in those proceedings save in relation to or at a contested final hearing.'
+              }
+            ]
+          }
+        ],
+        'costLimitations': [
+          {
+            'certificateType':'Emergency certificate',
+            'costLimit':'£1,350'
+          },
+          {
+            'certificateType':'Substantive certificate',
+            'costLimit':'£25,000'
+          }
+        ],
+        'documents': [
+          {
+            'title': 'means_report.pdf',
+            'link': 'https://drive.google.com/file/d/16V-j11_Na8_bBz4fazl-TP5k8odpPbBX/view',
+            'date': '23/02/2020'
+          },
+          {
+            'title': 'merits_report.pdf',
+            'link': 'https://drive.google.com/file/d/19TddAL5MpWAPhDqRCsbggQVVngEHCQA5/view',
+            'date': '23/02/2020'
+          },
+          {
+            'title': 'police_report.pdf',
+            'link': 'https://drive.google.com/file/d/1m2SvoKEuJySNk3wxpjvfIYHqMTZlisQf/view',
+            'date': '12/03/2020'
+          }
+        ],
+        'notes': [
+          {
+            'when': 'Wednesday 22 March 2021 12:21',
+            'who': 'Helen Roy',
+            'role': 'Customer service advisor',
+            'title': 'Customer support note',
+            'text': 'Provider called and chased on the case. Client is due to hearing tomorrow.'
+          },
+          {
+            'when': 'Thursday 11 March 2021 11:00',
+            'who': 'Mary Smith',
+            'role': 'Provider',
+            'title': 'New documents uploaded',
+            'text': ''
+          }
+        ]
       }
     },
     // application #2
-    { 'applicationDetails':
-      { 'refNo': '30000009021',
-        'submitted': '19/03/2020',
-        'lastUpdated': '02/04/2020',
+    {
+      'applicationDetails':
+      {
+        'refNo': '30000009021',
+        'dateSubmitted': '19/03/2020',
+        'dateLastUpdated': '02/04/2020',
         'applicationType': 'Initial application',
         'delegatedFunctions': 'Used',
         'categoryLaw': 'Family law',
@@ -42,10 +177,12 @@ module.exports = {
       }
     },
     // application #3
-    { 'applicationDetails':
-      { 'refNo': '30000009022',
-        'submitted': '19/03/2020',
-        'lastUpdated': '04/04/2020',
+    {
+      'applicationDetails':
+      {
+        'refNo': '30000009022',
+        'dateSubmitted': '19/03/2020',
+        'dateLastUpdated': '04/04/2020',
         'applicationType': 'Initial application',
         'delegatedFunctions': 'Used',
         'categoryLaw': 'Family law',

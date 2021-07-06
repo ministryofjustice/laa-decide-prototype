@@ -54,8 +54,8 @@ Open applications
                 {% for application in data['applications'] %}
                 <tr class="govuk-table__row">
                   <td class="govuk-table__cell">{{ application['applicationDetails']['refNo'] }}</td>
-                  <td class="govuk-table__cell">{{ application['applicationDetails']['submitted'] }}</td>
-                  <td class="govuk-table__cell">{{ application['applicationDetails']['lastUpdated'] }}</td>
+                  <td class="govuk-table__cell">{{ application['applicationDetails']['dateSubmitted'] }}</td>
+                  <td class="govuk-table__cell">{{ application['applicationDetails']['dateLastUpdated'] }}</td>
                   <td class="govuk-table__cell">{{ application['applicationDetails']['applicationType'] }}</td>
                   <td class="govuk-table__cell">{{ application['applicationDetails']['delegatedFunctions'] }}</td>
                   <td class="govuk-table__cell">{{ application['applicationDetails']['categoryLaw'] }}</td>
