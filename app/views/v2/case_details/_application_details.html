@@ -1,0 +1,148 @@
+<div class="govuk-tabs__panel" id="application-details">
+  <table class="govuk-table">
+    <caption class="govuk-table__caption govuk-table__caption--m">Overview</caption>
+    <tbody class="govuk-table__body">
+      <tr class="govuk-table__row">
+        <td class="govuk-table__header">Application type</td>
+        <td class="govuk-table__cell">{{ application['applicationType'] }}</td>
+      </tr>
+      <tr class="govuk-table__row">
+        <td class="govuk-table__header">Delegated functions</td>
+        <td class="govuk-table__cell">{{ application['delegatedFunctions'] }}</td>
+      </tr>
+      <tr class="govuk-table__row">
+        <td class="govuk-table__header">Certificate type</td>
+        <td class="govuk-table__cell">{{ application['certificateType'] }}</td>
+      </tr>
+      <tr class="govuk-table__row">
+        <td class="govuk-table__header">Means assessment</td>
+        <td class="govuk-table__cell">
+          <strong class="govuk-tag govuk-tag--grey">{{ application['meansAssessmentResult'] }}</strong>
+        </td>
+      </tr>
+      <tr class="govuk-table__row">
+        <td class="govuk-table__header">Merits assessment</td>
+        <td class="govuk-table__cell">
+          <strong class="govuk-tag govuk-tag--purple">{{ application['meritsAssessmentResult'] }}</strong>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="govuk-notification-banner" role="region" aria-labelledby="govuk-notification-banner-title" data-module="govuk-notification-banner">
+    <div class="govuk-notification-banner__header">
+      <h2 class="govuk-notification-banner__title" id="govuk-notification-banner-title">
+        Important
+      </h2>
+    </div>
+    <div class="govuk-notification-banner__content">
+      <p class="govuk-notification-banner__heading">This applicant has more than one application</p>
+      <table class="govuk-table">
+        <thead class="govuk-table__head">
+          <tr class="govuk-table__row">
+            <th scope="col" class="govuk-table__header">Reference no.</th>
+            <th scope="col" class="govuk-table__header">Status</th>
+          </tr>
+        </thead>
+        <tbody class="govuk-table__body">
+          {% for linkedApplication in application['linkedApplications'] %}
+          <tr class="govuk-table__row">
+            <td class="govuk-table__cell"><a href="#">{{ linkedApplication['refNo'] }}</a></td>
+            <td class="govuk-table__cell">{{ linkedApplication['status'] }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <table class="govuk-table">
+    <caption class="govuk-table__caption govuk-table__caption--m">Delegated functions</caption>
+    <tbody class="govuk-table__body">
+      {% for delegatedFunction in application['delegatedFunctionsDates'] %}
+      <tr class="govuk-table__row">
+        <td class="govuk-table__header">{{ delegatedFunction['proceedingType'] }}</td>
+        <td class="govuk-table__cell">{{ delegatedFunction['dateUsed'] }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <h2 class="govuk-heading-m">Proceedings</h2>
+
+  {% for proceeding in application['proceedings'] %}
+  <h2 class="govuk-heading-m">{{ proceeding['proceedingType'] }}</h2>
+  <details class="govuk-details" data-module="govuk-details">
+    <summary class="govuk-details__summary">
+      <span class="govuk-details__summary-text">Scope limits</span>
+    </summary>
+    <div class="govuk-details__text">
+      {% for certificate in proceeding['certificates'] %}
+      <h2 class="govuk-heading-m">{{ certificate['certificateType'] }}</h2>
+      <p><b>Form of service: </b>{{ certificate['formOfService'] }}</p>
+      <p><b>Work the provider can do: </b>{{ certificate['workProviderCanDo'] }}</p>
+      {% endfor %}
+    </div>
+  </details>
+  {% endfor %}
+
+  <table class="govuk-table">
+    <caption class="govuk-table__caption govuk-table__caption--m">Cost limits</caption>
+    <tbody class="govuk-table__body">
+      {% for limitation in application['costLimitations'] %}
+      <tr class="govuk-table__row">
+        <td class="govuk-table__header">{{limitation['certificateType']}}</td>
+        <td class="govuk-table__cell">{{limitation['costLimit']}}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <h2 class="govuk-heading-m">Documents</h2>
+  <details class="govuk-details" data-module="govuk-details">
+    <summary class="govuk-details__summary">
+      <span class="govuk-details__summary-text">
+        View documents
+      </span>
+    </summary>
+    <div class="govuk-details__text">
+      <table class="govuk-table">
+        <thead class="govuk-table__head">
+          <tr class="govuk-table__row">
+            <th scope="col" class="govuk-table__header">File</th>
+            <th scope="col" class="govuk-table__header">Date</th>
+          </tr>
+        </thead>
+        <tbody class="govuk-table__body">
+          {% for document in application['documents'] %}
+          <tr class="govuk-table__row">
+            <td class="govuk-table__cell">
+              <a href="{{ document['link'] }}" class="govuk-link" rel="noreferrer noopener" target="_blank">
+                {{ document['title'] }}
+              </a>
+            </td>
+            <td class="govuk-table__cell">{{ document['date'] }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </details>
+
+  <form action="ccms-redirect">
+    <button class="govuk-button govuk-button--secondary" data-module="govuk-button">Request more information</button>
+  </form>
+
+  <h2 class="govuk-heading-m">Make a decision</h2>
+  <p>The means decision has been completed. You can view the <a href="#application-history">application history</a> for further details.</p>
+
+  <div class="govuk-button-group">
+    <form action="merits-assessment-emergency">
+      <button class="govuk-button" style="background-color:#1D70B8; color:white" data-module="govuk-button">Merits decision</button>
+    </form>
+
+    <form action="reject-application">
+      <button class="govuk-button govuk-button--warning" data-module="govuk-button">Send back to provider</button>
+    </form>
+  </div>
+</div>
