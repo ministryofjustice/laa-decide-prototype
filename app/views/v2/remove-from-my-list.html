@@ -5,52 +5,54 @@ Remove from my list
 {% endblock %}
 
 {% block content %}
+
 <div class="govuk-grid-row">
   <a href="my-applications" class="govuk-back-link">Back to my applications</a>
   <br>
   <br>
   <br>
   <div class="govuk-form-group">
-    <fieldset class="govuk-fieldset">
-      <legend class="govuk-fieldset__legend govuk-fieldset__legend--xl">
-        <h1 class="govuk-fieldset__heading">Remove from my list</h1>
-      </legend>
-      <h2 class="govuk-body-l govuk-!-font-size-36">30000009020</h2>
-      <p class="govuk-body">Select the reason for removing the application from your list</p>
-      <div class="govuk-radios govuk-radios--conditional" data-module="govuk-radios">
-        <div class="govuk-radios__item">
-          <input class="govuk-radios__input" id="removal-reason" name="removal-reason" type="radio" value="not-trained">
-          <label class="govuk-label govuk-radios__label" for="removal-reason">
-            I am not trained in this matter type
-          </label>
-        </div>
-        <div class="govuk-radios__item">
-          <input class="govuk-radios__input" id="removal-reason-2" name="removal-reason" type="radio" value="other-casworker">
-          <label class="govuk-label govuk-radios__label" for="removal-reason">
-            Another caseworker should complete this
-          </label>
-        </div>
-        <div class="govuk-radios__item">
-          <input class="govuk-radios__input" id="removal-reason-3" name="removal-reason" type="radio" value="other" data-aria-controls="conditional-other">
-          <label class="govuk-label govuk-radios__label" for="removal-reason-3">
-            Other
-          </label>
-        </div>
-        <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-other">
-          <div class="govuk-form-group">
-            <label class="govuk-label" for="other">
-              Give further details
+    <form action="my-applications">
+      <fieldset class="govuk-fieldset">
+        <legend class="govuk-fieldset__legend govuk-fieldset__legend--xl">
+          <h1 class="govuk-fieldset__heading">Remove from my list</h1>
+        </legend>
+        <h2 class="govuk-body-l govuk-!-font-size-36">{{ data['refNoToRemove'] }}</h2>
+        <p class="govuk-body">Select the reason for removing the application from your list</p>
+        <div class="govuk-radios govuk-radios--conditional" data-module="govuk-radios">
+          <div class="govuk-radios__item">
+            <input class="govuk-radios__input" id="removal-reason" name="removal-reason" type="radio" value="not-trained">
+            <label class="govuk-label govuk-radios__label" for="removal-reason">
+              I am not trained in this matter type
             </label>
-            <div id="other-hint" class="govuk-hint">
-              This information is for internal use only
-            </div>
-            <textarea class="govuk-textarea govuk-!-width-two-thirds" name="other" id="other" rows="10"></textarea>
           </div>
-        </div>
-    </fieldset>
+          <div class="govuk-radios__item">
+            <input class="govuk-radios__input" id="removal-reason-2" name="removal-reason" type="radio" value="other-casworker">
+            <label class="govuk-label govuk-radios__label" for="removal-reason">
+              Another caseworker should complete this
+            </label>
+          </div>
+          <div class="govuk-radios__item">
+            <input class="govuk-radios__input" id="removal-reason-3" name="removal-reason" type="radio" value="other" data-aria-controls="conditional-other">
+            <label class="govuk-label govuk-radios__label" for="removal-reason-3">
+              Other
+            </label>
+          </div>
+          <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-other">
+            <div class="govuk-form-group">
+              <label class="govuk-label" for="other">
+                Give further details
+              </label>
+              <div id="other-hint" class="govuk-hint">
+                This information is for internal use only
+              </div>
+              <textarea class="govuk-textarea govuk-!-width-two-thirds" name="other" id="other" rows="10"></textarea>
+            </div>
+          </div>
+      </fieldset>
+      <br>
+      <button class="govuk-button govuk-button" data-module="govuk-button">Save changes</button>
+    </form>
   </div>
-  <form action="my-applications">
-    <button class="govuk-button govuk-button" data-module="govuk-button">Save changes</button>
-  </form>
 </div>
 {% endblock %}

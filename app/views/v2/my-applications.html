@@ -25,7 +25,7 @@ My applications
     </div>
 
     <h1 class="govuk-heading-l">My applications</h1>
-    <p>{{ data['assignedApplications'].length-1}} applications</p>
+    <p>{{ data['assignedApplications'].length }} applications</p>
 
     <div class="moj-filter-layout">
       {% include "./_filter.html" %}
@@ -72,7 +72,7 @@ My applications
                 {% endfor %}
               </tbody>
             </table>
-            <p>Showing <b>1</b> to <b>{{ data['assignedApplications'].length-1 }}</b> of <b>{{ data['assignedApplications'].length-1}}</b> results</p>
+            <p>Showing <b>1</b> to <b>{{ data['assignedApplications'].length }}</b> of <b>{{ data['assignedApplications'].length }}</b> results</p>
           </div>
         </div>
       </div>

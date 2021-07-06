@@ -3,10 +3,26 @@ const router = express.Router()
 
 router.get('/v2/my-applications', function(req, res) {
   var refNo = req.session.data.refNo;
+  var refNoToRemove = req.session.data.refNoToRemove;
 
-  if (!req.session.data.assignedApplications.includes(refNo))
-    req.session.data.assignedApplications.push(refNo);
+  // if a refNo exists then we are assigning an application
+  if (refNo != null){
+    if (!req.session.data.assignedApplications.includes(refNo)){
+      req.session.data.assignedApplications.push(refNo);
+    }
+  }
 
+  // if a refNoToRemove exists then we are unassigning an application
+  if (refNoToRemove != null){
+    const index = req.session.data.assignedApplications.indexOf(refNoToRemove);
+    if (index > -1) {
+      req.session.data.assignedApplications.splice(index, 1);
+    }
+  }
+
+  refNo = null;
+  refNoToRemove = null;
+  
   res.render('./v2/my-applications');
 });
 
