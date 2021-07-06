@@ -11,6 +11,7 @@ $(document).ready(function () {
 })
 
 
+// Toggle filter button on Open Applications and My Applications pages
 new MOJFrontend.FilterToggleButton({
   bigModeMediaQuery: '(min-width: 48.063em)',
   startHidden: true,
@@ -28,3 +29,14 @@ new MOJFrontend.FilterToggleButton({
     container: $('.moj-filter')
   }
 });
+
+// Makes cards on the Home page clickable
+window.onload = function() {
+  document.querySelectorAll('.card--clickable').forEach(card => {
+    if (card.querySelector('a') !== null) {
+      card.addEventListener('click', () => {
+        card.querySelector('a').click()
+      })
+    }
+  })
+}
