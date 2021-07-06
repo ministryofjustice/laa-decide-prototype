@@ -20,9 +20,9 @@ router.get('/v2/my-applications', function(req, res) {
     }
   }
 
-  refNo = null;
-  refNoToRemove = null;
-  
+  req.session.data.refNo = null;
+  req.session.data.refNoToRemove = null;
+
   res.render('./v2/my-applications');
 });
 
