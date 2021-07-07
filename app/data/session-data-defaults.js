@@ -11,6 +11,9 @@ module.exports = {
         'delegatedFunctions': 'Used',
         'categoryLaw': 'Family law',
         'meansType': 'Passported',
+        'certificateType': 'Emergency and substantive',
+        'meansAssessmentResult': 'Passported',
+        'meritsAssessmentResult': 'Not started',
         'applicant':
         {
           'name': 'Rita Patel',
@@ -41,9 +44,6 @@ module.exports = {
             'relationship': 'Son'
           }
         ],
-        'certificateType': 'Emergency and substantive',
-        'meansAssessmentResult': 'Passported',
-        'meritsAssessmentResult': 'Not started',
         'linkedApplications': [
           {
             'refNo': '300123455562',
