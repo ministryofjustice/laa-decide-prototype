@@ -5,13 +5,16 @@ Merits assessment - substantive
 {% endblock %}
 
 {% block content %}
+
+{% set application = data['application']['applicationDetails'] %}
+
 <div class="govuk-grid-row">
   <a href="case-details" class="govuk-back-link">Back to application details</a>
   <br>
   <br>
   <br>
   <h1 class="govuk-heading-l">Make a decision on merits</h1>
-  <p class="govuk-body-l">30000009020</p>
+  <p class="govuk-body-l">{{ application['refNo'] }}</p>
 </div>
 
 <div class="govuk-grid-row">
@@ -19,22 +22,25 @@ Merits assessment - substantive
     <h2 class="govuk-heading-m">Part 2: Substantive</h2>
 
     <div class="govuk-form-group">
+      {% for proceeding in application['proceedings'] %}
+      {% for certificate in proceeding['certificates'] %}
+      {% if certificate['certificateType'] === 'Substantive certificate' %}
       <fieldset class="govuk-fieldset" aria-describedby="decision-hint-1">
         <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
-          <h3 class="govuk-heading-s">Non-molestation order</h3>
+          <h3 class="govuk-heading-s">{{proceeding['proceedingType']}}</h3>
         </legend>
         <div id="decision-hint-1" class="govuk-hint">
-          Family law - Domestic abuse<br>The provider has requested full representation
+          {{ application['categoryLaw'] }} - {{ proceeding['matterType'] }}<br>The provider has requested {{certificate['formOfService']}}
         </div>
         <div class="govuk-radios govuk-radios--conditional" data-module="govuk-radios">
           <div class="govuk-radios__item">
-            <input class="govuk-radios__input" id="grant" name="decision-1" type="radio" value="email" data-aria-controls="conditional-decision-1">
+            <input class="govuk-radios__input" id="grant" name="decision-1" type="radio" value="grant" data-aria-controls="conditional-decision-1">
             <label class="govuk-label govuk-radios__label" for="decision-1">
               Grant
             </label>
           </div>
           <div class="govuk-radios__item">
-            <input class="govuk-radios__input" id="refuse" name="decision-1" type="radio" value="phone" data-aria-controls="conditional-decision-1-2">
+            <input class="govuk-radios__input" id="refuse" name="decision-1" type="radio" value="refuse" data-aria-controls="conditional-decision-1-2">
             <label class="govuk-label govuk-radios__label" for="decision-1">
               Refuse
             </label>
@@ -69,112 +75,11 @@ Merits assessment - substantive
       </fieldset>
 
       <a href="ccms-redirect" class="govuk-link">Make changes</a>
-    </div>
-
-    <div class="govuk-form-group">
-      <fieldset class="govuk-fieldset" aria-describedby="decision-hint-2">
-        <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
-          <h3 class="govuk-heading-s">Prohibited steps order</h3>
-        </legend>
-        <div id="decision-hint-2" class="govuk-hint">
-          Family law - Children - section 8<br>The provider has requested family help (higher)
-        </div>
-        <div class="govuk-radios govuk-radios--conditional" data-module="govuk-radios">
-          <div class="govuk-radios__item">
-            <input class="govuk-radios__input" id="grant" name="decision-2" type="radio" value="grant" data-aria-controls="conditional-decision-2-1">
-            <label class="govuk-label govuk-radios__label" for="decision-2">
-              Grant
-            </label>
-          </div>
-          <div class="govuk-radios__item">
-            <input class="govuk-radios__input" id="refuse" name="decision-2" type="radio" value="refuse" data-aria-controls="conditional-decision-2-2">
-            <label class="govuk-label govuk-radios__label" for="decision-2">
-              Refuse
-            </label>
-          </div>
-          <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-decision-2-2">
-            <div class="govuk-form-group">
-              <fieldset class="govuk-fieldset">
-                <div class="govuk-radios">
-                  <div class="govuk-radios__item">
-                    <input class="govuk-radios__input" id="refusal-reason" name="refusal-reason-2" type="radio" value="refusal-reason-2-1">
-                    <label class="govuk-label govuk-radios__label" for="refusal-reason">
-                      Because of x
-                    </label>
-                  </div>
-                  <div class="govuk-radios__item">
-                    <input class="govuk-radios__input" id="refusal-reason-2" name="refusal-reason-2" type="radio" value="refusal-reason-2-2">
-                    <label class="govuk-label govuk-radios__label" for="refusal-reason-2">
-                      Because of y
-                    </label>
-                  </div>
-                  <div class="govuk-radios__item">
-                    <input class="govuk-radios__input" id="where-do-you-live-3" name="refusal-reason-2" type="radio" value="refusal-reason-2-3">
-                    <label class="govuk-label govuk-radios__label" for="refusal-reason-3">
-                      Because of z
-                    </label>
-                  </div>
-                </div>
-              </fieldset>
-            </div>
-          </div>
-        </div>
-      </fieldset>
-
-      <a href="ccms-redirect" class="govuk-link">Make changes</a>
-    </div>
-
-    <div class="govuk-form-group">
-      <fieldset class="govuk-fieldset" aria-describedby="decision-hint-3">
-        <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
-          <h3 class="govuk-heading-s">Occupation order</h3>
-        </legend>
-        <div id="decision-hint-3" class="govuk-hint">
-          Family law - Domestic abuse<br>The provider has requested family help (higher)
-        </div>
-        <div class="govuk-radios govuk-radios--conditional" data-module="govuk-radios">
-          <div class="govuk-radios__item">
-            <input class="govuk-radios__input" id="grant" name="decision-3" type="radio" value="grant" data-aria-controls="conditional-decision-3-1">
-            <label class="govuk-label govuk-radios__label" for="decision-3">
-              Grant
-            </label>
-          </div>
-          <div class="govuk-radios__item">
-            <input class="govuk-radios__input" id="refuse" name="decision-3" type="radio" value="refuse" data-aria-controls="conditional-decision-3-2">
-            <label class="govuk-label govuk-radios__label" for="decision-3">
-              Refuse
-            </label>
-          </div>
-          <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-decision-3-2">
-            <div class="govuk-form-group">
-              <fieldset class="govuk-fieldset">
-                <div class="govuk-radios">
-                  <div class="govuk-radios__item">
-                    <input class="govuk-radios__input" id="refusal-reason" name="refusal-reason-2" type="radio" value="refusal-reason-3-1">
-                    <label class="govuk-label govuk-radios__label" for="refusal-reason">
-                      Because of x
-                    </label>
-                  </div>
-                  <div class="govuk-radios__item">
-                    <input class="govuk-radios__input" id="refusal-reason-2" name="refusal-reason-2" type="radio" value="refusal-reason-3-2">
-                    <label class="govuk-label govuk-radios__label" for="refusal-reason-2">
-                      Because of y
-                    </label>
-                  </div>
-                  <div class="govuk-radios__item">
-                    <input class="govuk-radios__input" id="where-do-you-live-3" name="refusal-reason-2" type="radio" value="refusal-reason-3-3">
-                    <label class="govuk-label govuk-radios__label" for="refusal-reason-3">
-                      Because of z
-                    </label>
-                  </div>
-                </div>
-              </fieldset>
-            </div>
-          </div>
-        </div>
-      </fieldset>
-
-      <a href="ccms-redirect" class="govuk-link">Make changes</a>
+      <br>
+      <br>
+      {% endif %}
+      {% endfor %}
+      {% endfor %}
     </div>
 
     <div>
@@ -182,18 +87,26 @@ Merits assessment - substantive
       <table class="govuk-table">
         <caption class="govuk-table__caption govuk-table__caption--m">Cost limits</caption>
         <tbody class="govuk-table__body">
+          {% for limitation in application['costLimitations'] %}
+          {% if limitation['certificateType'] == 'Substantive certificate' %}
           <tr class="govuk-table__row">
             <td class="govuk-table__header">Certificate type</td>
-            <td class="govuk-table__cell">Substantive</td>
+            <td class="govuk-table__cell">{{ limitation['certificateType'] }}</td>
           </tr>
           <tr class="govuk-table__row">
             <td class="govuk-table__header">Default</td>
-            <td class="govuk-table__cell">£25,000</td>
+            <td class="govuk-table__cell">{{ limitation['costLimit'] }}</td>
           </tr>
           <tr class="govuk-table__row">
             <td class="govuk-table__header">Requested</td>
-            <td class="govuk-table__cell">£30,000</td>
+            <td class="govuk-table__cell">{{ limitation['requestedCostLimit'] }}</td>
           </tr>
+          <tr class="govuk-table__row">
+            <td class="govuk-table__header">Justification</td>
+            <td class="govuk-table__cell">{{ limitation['justification'] }}</td>
+          </tr>
+          {% endif %}
+          {% endfor %}
         </tbody>
       </table>
       <a href="ccms-redirect" class="govuk-link">Grant a different amount</a>
