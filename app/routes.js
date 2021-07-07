@@ -35,7 +35,7 @@ router.get('/v2/case-details', function(req, res) {
       application = app;
   }
 
-  // update substantive proceeding results
+  // update substantive proceeding merits results
   for (const proceeding of application['applicationDetails']['proceedings']){
     if (typeof req.session.data[proceeding['id']] !== 'undefined' && req.session.data[proceeding['id']] !== null){
       for (const certificate of proceeding['certificates']){
@@ -72,7 +72,7 @@ router.post('/v2/merits-assessment-substantive', function(req, res) {
       application = app;
   }
 
-  // update emergency proceeding results
+  // update emergency proceeding merits results
   for (const proceeding of application['applicationDetails']['proceedings']){
     if (typeof req.session.data[proceeding['id']] !== 'undefined' && req.session.data[proceeding['id']] !== null){
       for (const certificate of proceeding['certificates']){
@@ -82,6 +82,9 @@ router.post('/v2/merits-assessment-substantive', function(req, res) {
       }
     }
   }
+
+  // update  overall merits assessment result
+  application['applicationDetails']['meritsAssessmentResult'] = 'in progress'
 
   res.locals.data['application'] = application;
 
