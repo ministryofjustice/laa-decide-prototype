@@ -5,59 +5,65 @@ Merits assessment - emergency
 {% endblock %}
 
 {% block content %}
+
+{% set application = data['application']['applicationDetails'] %}
+
 <div class="govuk-grid-row">
   <a href="case-details" class="govuk-back-link">Back to application details</a>
   <br>
   <br>
   <br>
   <h1 class="govuk-heading-l">Make a decision on merits</h1>
-  <p class="govuk-body-l">30000009020</p>
+  <p class="govuk-body-l">{{ application['refNo'] }}</p>
 </div>
 
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">
-    <h2 class="govuk-heading-m">Part 2: Emergency</h2>
+    <h2 class="govuk-heading-m">Part 1: Emergency</h2>
 
     <div class="govuk-form-group">
+      {% for proceeding in application['proceedings'] %}
+      {% for certificate in proceeding['certificates'] %}
+      {% if certificate['certificateType'] === 'Emergency certificate' %}
       <fieldset class="govuk-fieldset" aria-describedby="decision-hint-1">
         <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
-          <h3 class="govuk-heading-s">Non-molestation order</h3>
+          <h3 class="govuk-heading-s">{{proceeding['proceedingType']}}</h3>
         </legend>
-        <div id="decision-hint-1" class="govuk-hint">
-          Family law - Domestic abuse<br>The provider has requested full representation
+        <div id="decision-hint-{{ proceeding['id'] }}" class="govuk-hint">
+          {{ application['categoryLaw'] }} - {{ proceeding['matterType'] }}<br>The provider has requested {{certificate['formOfService']}}
         </div>
-        <div class="govuk-radios govuk-radios--conditional" data-module="govuk-radios">
+        <div class=" govuk-radios govuk-radios--conditional" data-module="govuk-radios">
           <div class="govuk-radios__item">
-            <input class="govuk-radios__input" id="grant" name="decision-1" type="radio" value="grant" data-aria-controls="conditional-decision-1">
-            <label class="govuk-label govuk-radios__label" for="decision-1">
+            <input class="govuk-radios__input" id="grant" name="decision-{{ proceeding['id'] }}" type="radio" value="grant" data-aria-controls="conditional-decision-{{ proceeding['id'] }}">
+            <label class="govuk-label govuk-radios__label" for="decision-{{ proceeding['id'] }}">
               Grant
             </label>
           </div>
           <div class="govuk-radios__item">
-            <input class="govuk-radios__input" id="refuse" name="decision-1" type="radio" value="refuse" data-aria-controls="conditional-decision-1-2">
-            <label class="govuk-label govuk-radios__label" for="decision-1">
+            <input class="govuk-radios__input" id="refuse" name="decision-{{ proceeding['id'] }}" type="radio" value="refuse" data-aria-controls="conditional-decision-{{ proceeding['id'] }}-2">
+            <label class="govuk-label govuk-radios__label" for="decision-{{ proceeding['id'] }}">
               Refuse
             </label>
           </div>
-          <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-decision-1-2">
+          <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-decision-{{ proceeding['id'] }}-2">
             <div class="govuk-form-group">
               <fieldset class="govuk-fieldset">
                 <div class="govuk-radios">
                   <div class="govuk-radios__item">
-                    <input class="govuk-radios__input" id="refusal-reason" name="refusal-reason-1" type="radio" value="refusal-reason-1-1">
+                    <input class="govuk-radios__input" id="refusal-reason-{{ proceeding['id'] }}" name="refusal-reason-{{ proceeding['id'] }}" type="radio" value="refusal-reason-{{ proceeding['id'] }}-1">
                     <label class="govuk-label govuk-radios__label" for="refusal-reason">
                       Because of x
                     </label>
                   </div>
                   <div class="govuk-radios__item">
-                    <input class="govuk-radios__input" id="refusal-reason-2" name="refusal-reason-1" type="radio" value="refusal-reason-1-2">
-                    <label class="govuk-label govuk-radios__label" for="refusal-reason-2">
+                    <input class="govuk-radios__input" id="refusal-reason-{{ proceeding['id'] }}-2" name="refusal-reason-{{ proceeding['id'] }}" type="radio" value="refusal-reason-{{ proceeding['id'] }}-2">
+                    <label class="govuk-label govuk-radios__label" for="refusal-reason-{{ proceeding['id'] }}-2">
                       Because of y
                     </label>
                   </div>
                   <div class="govuk-radios__item">
-                    <input class="govuk-radios__input" id="refusal-reason-3" name="refusal-reason-1" type="radio" value="refusal-reason-1-3">
-                    <label class="govuk-label govuk-radios__label" for="refusal-reason-3">
+                    <input class="govuk-radios__input" id="refusal-reason-{{ proceeding['id'] }}-3" name="refusal-reason-{{ proceeding['id'] }}" type="radio" value="refusal-reason-{{ proceeding['id'] }}-3">
+                    <label class="govuk-label govuk-radios__label" for="refusal-reason-{{ proceeding['id'] }}-3">
                       Because of z
                     </label>
                   </div>
@@ -69,91 +75,44 @@ Merits assessment - emergency
       </fieldset>
 
       <a href="ccms-redirect" class="govuk-link">Make changes</a>
-    </div>
-
-    <div class="govuk-form-group">
-      <fieldset class="govuk-fieldset" aria-describedby="decision-hint-2">
-        <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
-          <h3 class="govuk-heading-s">Occupation order</h3>
-        </legend>
-        <div id="decision-hint-2" class="govuk-hint">
-          Family law - Domestic abuse<br>The provider has requested family help (higher)
-        </div>
-        <div class="govuk-radios govuk-radios--conditional" data-module="govuk-radios">
-          <div class="govuk-radios__item">
-            <input class="govuk-radios__input" id="grant" name="decision-2" type="radio" value="grant" data-aria-controls="conditional-decision-2-1">
-            <label class="govuk-label govuk-radios__label" for="decision-2">
-              Grant
-            </label>
-          </div>
-          <div class="govuk-radios__item">
-            <input class="govuk-radios__input" id="refuse" name="decision-2" type="radio" value="refuse" data-aria-controls="conditional-decision-2-2">
-            <label class="govuk-label govuk-radios__label" for="decision-2">
-              Refuse
-            </label>
-          </div>
-          <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-decision-2-2">
-            <div class="govuk-form-group">
-              <fieldset class="govuk-fieldset">
-                <div class="govuk-radios">
-                  <div class="govuk-radios__item">
-                    <input class="govuk-radios__input" id="refusal-reason" name="refusal-reason-2" type="radio" value="refusal-reason-2-1">
-                    <label class="govuk-label govuk-radios__label" for="refusal-reason">
-                      Because of x
-                    </label>
-                  </div>
-                  <div class="govuk-radios__item">
-                    <input class="govuk-radios__input" id="refusal-reason-2" name="refusal-reason-2" type="radio" value="refusal-reason-2-2">
-                    <label class="govuk-label govuk-radios__label" for="refusal-reason-2">
-                      Because of y
-                    </label>
-                  </div>
-                  <div class="govuk-radios__item">
-                    <input class="govuk-radios__input" id="where-do-you-live-3" name="refusal-reason-2" type="radio" value="refusal-reason-2-3">
-                    <label class="govuk-label govuk-radios__label" for="refusal-reason-3">
-                      Because of z
-                    </label>
-                  </div>
-                </div>
-              </fieldset>
-            </div>
-          </div>
-        </div>
-      </fieldset>
-
-      <a href="ccms-redirect" class="govuk-link">Make changes</a>
-    </div>
-
-    <div>
       <br>
+      <br>
+      <br>
+      {% endif %}
+      {% endfor %}
+      {% endfor %}
+
       <table class="govuk-table">
         <caption class="govuk-table__caption govuk-table__caption--m">Cost limits</caption>
         <tbody class="govuk-table__body">
+          {% for limitation in application['costLimitations'] %}
+          {% if limitation['certificateType'] == 'Emergency certificate' %}
           <tr class="govuk-table__row">
             <td class="govuk-table__header">Certificate type</td>
-            <td class="govuk-table__cell">Emergency</td>
+            <td class="govuk-table__cell">{{ limitation['certificateType'] }}</td>
           </tr>
-          <tr class="govuk-table__row">
+          <tr class=" govuk-table__row">
             <td class="govuk-table__header">Default</td>
-            <td class="govuk-table__cell">£1,350</td>
+            <td class="govuk-table__cell">{{ limitation['costLimit'] }}</td>
           </tr>
           <tr class="govuk-table__row">
             <td class="govuk-table__header">Requested</td>
-            <td class="govuk-table__cell">£4,000</td>
+            <td class="govuk-table__cell">{{ limitation['requestedCostLimit'] }}</td>
           </tr>
           <tr class="govuk-table__row">
             <td class="govuk-table__header">Justification</td>
-            <td class="govuk-table__cell">Reason for requesting more than the default</td>
+            <td class="govuk-table__cell">{{ limitation['justification'] }}</td>
           </tr>
+          {% endif %}
+          {% endfor %}
         </tbody>
       </table>
       <a href="ccms-redirect" class="govuk-link">Grant a different amount</a>
-    </div>
 
-    <br>
-    <br>
+      <br>
+      <br>
+      <br>
 
-    <div class="govuk-form-group">
       <h1 class="govuk-label-wrapper"><label class="govuk-label govuk-label--m" for="note">
           Give further details
         </label>

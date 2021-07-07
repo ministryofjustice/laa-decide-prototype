@@ -78,6 +78,8 @@ module.exports = {
         ],
         'proceedings': [
           {
+            'id': '1',
+            'matterType': 'Domestic abuse',
             'proceedingType': 'Non-molestation order',
             'certificates': [
               {
@@ -93,6 +95,8 @@ module.exports = {
             ]
           },
           {
+            'id': '2',
+            'matterType': 'Domestic abuse',
             'proceedingType': 'Prohibited steps order',
               'certificates': [
               {
@@ -103,6 +107,8 @@ module.exports = {
             ]
           },
           {
+            'id': '3',
+            'matterType': 'Domestic abuse',
             'proceedingType': 'Occupation order',
               'certificates': [
               {
@@ -121,11 +127,15 @@ module.exports = {
         'costLimitations': [
           {
             'certificateType':'Emergency certificate',
-            'costLimit':'£1,350'
+            'costLimit':'£1,350',
+            'requestedCostLimit':'£4,500',
+            'justification': 'because i am greedy'
           },
           {
             'certificateType':'Substantive certificate',
-            'costLimit':'£25,000'
+            'costLimit':'£25,000',
+            'requestedCostLimit':'£25,000',
+            'justification': 'n/a'
           }
         ],
         'documents': [

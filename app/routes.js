@@ -38,4 +38,28 @@ router.get('/v2/case-details', function(req, res) {
   res.render('./v2/case-details');
 });
 
+router.get('/v2/merits-assessment-emergency', function(req, res) {
+  var application = null;
+
+  for (const app of req.session.data.applications) {
+    if (app.applicationDetails.refNo === req.session.data.refNo)
+      application = app;
+  }
+
+  res.locals.data['application'] = application;
+  res.render('./v2/merits-assessment-emergency');
+});
+
+router.get('/v2/merits-assessment-substantive', function(req, res) {
+  var application = null;
+
+  for (const app of req.session.data.applications) {
+    if (app.applicationDetails.refNo === req.session.data.refNo)
+      application = app;
+  }
+
+  res.locals.data['application'] = application;
+  res.render('./v2/merits-assessment-substantive');
+});
+
 module.exports = router
