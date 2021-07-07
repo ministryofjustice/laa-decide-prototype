@@ -29,6 +29,7 @@ router.get('/v2/my-applications', function(req, res) {
 router.get('/v2/case-details', function(req, res) {
   var application = null;
 
+  // find the application
   for (const app of req.session.data.applications) {
     if (app.applicationDetails.refNo === req.session.data.refNo)
       application = app;
@@ -41,6 +42,7 @@ router.get('/v2/case-details', function(req, res) {
 router.get('/v2/merits-assessment-emergency', function(req, res) {
   var application = null;
 
+  // find the application
   for (const app of req.session.data.applications) {
     if (app.applicationDetails.refNo === req.session.data.refNo)
       application = app;
@@ -50,16 +52,36 @@ router.get('/v2/merits-assessment-emergency', function(req, res) {
   res.render('./v2/merits-assessment-emergency');
 });
 
-router.get('/v2/merits-assessment-substantive', function(req, res) {
+router.post('/v2/merits-assessment-substantive', function(req, res) {
   var application = null;
 
+  // find the application
   for (const app of req.session.data.applications) {
     if (app.applicationDetails.refNo === req.session.data.refNo)
       application = app;
   }
 
+  // update proceeding results
+  for (const proceeding of application['applicationDetails']['proceedings']){
+    if (typeof req.session.data[proceeding['id']] !== 'undefined' && req.session.data[proceeding['id']] !== null){
+      for (const certificate of proceeding['certificates']){
+        if (certificate['certificateType'] == 'Emergency certificate'){
+          certificate['meritsResult'] = req.session.data[proceeding['id']]
+        }
+      }
+    }
+  }
+
   res.locals.data['application'] = application;
-  res.render('./v2/merits-assessment-substantive');
+
+  // direct to correct page based on button clicked
+  if (req.session.data['continue_button'] == "Save and continue"){
+    res.render('./v2/merits-assessment-substantive');
+  }
+  else {
+    res.render('./v2/case-details');
+  }
+
 });
 
 module.exports = router

@@ -78,48 +78,53 @@ module.exports = {
         ],
         'proceedings': [
           {
-            'id': '1',
+            'id': 'proceeding_1',
             'matterType': 'Domestic abuse',
             'proceedingType': 'Non-molestation order',
             'certificates': [
               {
                 'certificateType': 'Emergency certificate',
                 'formOfService': 'Full representation',
-                'workProviderCanDo': 'All steps up to and including the hearing on 21 July 2020.'
+                'workProviderCanDo': 'All steps up to and including the hearing on 21 July 2020.',
+                'meritsResult':''
               },
               {
                 'certificateType': 'Substantive certificate',
                 'formOfService': 'Full representation',
-                'workProviderCanDo': 'All steps up to and including getting and serving a final order. If the order is breached you can apply for power of arrest. You cannot apply for a warrant of arrest or contempt of court proceedings.'
+                'workProviderCanDo': 'All steps up to and including getting and serving a final order. If the order is breached you can apply for power of arrest. You cannot apply for a warrant of arrest or contempt of court proceedings.',
+                'meritsResult':''
               }
             ]
           },
           {
-            'id': '2',
+            'id': 'proceeding_2',
             'matterType': 'Domestic abuse',
             'proceedingType': 'Prohibited steps order',
               'certificates': [
               {
                 'certificateType': 'Substantive certificate',
                 'formOfService': 'Family help (higher)',
-                'workProviderCanDo': 'Limited to Family Help (Higher) and to all steps necessary to negotiate and conclude a settlement. To include the issue of proceedings and representation in those proceedings save in relation to or at a contested final hearing.'
+                'workProviderCanDo': 'Limited to Family Help (Higher) and to all steps necessary to negotiate and conclude a settlement. To include the issue of proceedings and representation in those proceedings save in relation to or at a contested final hearing.',
+                'meritsResult':''
               }
             ]
           },
           {
-            'id': '3',
+            'id': 'proceeding_3',
             'matterType': 'Domestic abuse',
             'proceedingType': 'Occupation order',
               'certificates': [
               {
                 'certificateType': 'Emergency certificate',
                 'formOfService': 'Family help (higher)',
-                'workProviderCanDo': 'Limited to Family Help (Higher) and to all steps necessary to negotiate and conclude a settlement. To include the issue of proceedings and representation in those proceedings save in relation to or at a contested final hearing.'
+                'workProviderCanDo': 'Limited to Family Help (Higher) and to all steps necessary to negotiate and conclude a settlement. To include the issue of proceedings and representation in those proceedings save in relation to or at a contested final hearing.',
+                'meritsResult':''
               },
               {
                 'certificateType': 'Substantive certificate',
                 'formOfService': 'Family help (higher)',
-                'workProviderCanDo': 'Limited to Family Help (Higher) and to all steps necessary to negotiate and conclude a settlement. To include the issue of proceedings and representation in those proceedings save in relation to or at a contested final hearing.'
+                'workProviderCanDo': 'Limited to Family Help (Higher) and to all steps necessary to negotiate and conclude a settlement. To include the issue of proceedings and representation in those proceedings save in relation to or at a contested final hearing.',
+                'meritsResult':''
               }
             ]
           }
