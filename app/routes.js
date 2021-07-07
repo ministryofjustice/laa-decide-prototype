@@ -35,6 +35,17 @@ router.get('/v2/case-details', function(req, res) {
       application = app;
   }
 
+  // update substantive proceeding results
+  for (const proceeding of application['applicationDetails']['proceedings']){
+    if (typeof req.session.data[proceeding['id']] !== 'undefined' && req.session.data[proceeding['id']] !== null){
+      for (const certificate of proceeding['certificates']){
+        if (certificate['certificateType'] == 'Substantive certificate'){
+          certificate['meritsResult'] = req.session.data[proceeding['id']]
+        }
+      }
+    }
+  }
+
   res.locals.data['application'] = application;
   res.render('./v2/case-details');
 });
@@ -61,7 +72,7 @@ router.post('/v2/merits-assessment-substantive', function(req, res) {
       application = app;
   }
 
-  // update proceeding results
+  // update emergency proceeding results
   for (const proceeding of application['applicationDetails']['proceedings']){
     if (typeof req.session.data[proceeding['id']] !== 'undefined' && req.session.data[proceeding['id']] !== null){
       for (const certificate of proceeding['certificates']){
