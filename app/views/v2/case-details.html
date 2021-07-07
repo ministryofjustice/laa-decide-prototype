@@ -13,6 +13,20 @@ Case details
   <br>
   <br>
   <br>
+
+  {% if application['meritsAssessmentResult'] != 'Not started' %}
+  <div class="govuk-notification-banner govuk-notification-banner--success" role="alert" aria-labelledby="govuk-notification-banner-title" data-module="govuk-notification-banner">
+    <div class="govuk-notification-banner__header">
+      <h2 class="govuk-notification-banner__title" id="govuk-notification-banner-title">
+        Success
+      </h2>
+    </div>
+    <div class="govuk-notification-banner__content">
+      <p class="govuk-notification-banner__heading">Merits decision saved. <a href="laa-online-portal">You should now update the status of the case in CCMS</a>.</p>
+    </div>
+  </div>
+  {% endif %}
+
   <div class="govuk-grid-column-two-thirds">
     <h1 class="govuk-heading-l">{{ application['refNo'] }}</h1>
     <p class="govuk-body-l">{{ application['applicant']['name'] }}</p>

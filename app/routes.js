@@ -49,28 +49,28 @@ router.get('/v2/case-details', function(req, res) {
   // update overall merits results
   // count the numner of granted and refused proceedings
   var grants = 0;
-  var refuses = 0;
+  var refusals = 0;
   var total_proceedings = 0;
 
   for (const proceeding of application['applicationDetails']['proceedings']){
     for (const certificate of proceeding['certificates']){
-      if (certificate['meritsResult'] == 'grant'){
+      if (certificate['meritsResult'] == 'granted'){
         grants = grants + 1;
       }
-      if (certificate['meritsResult'] == 'refuse'){
-        refuses = refuses + 1;
+      if (certificate['meritsResult'] == 'refused'){
+        refusals = refusals + 1;
       }
       total_proceedings = total_proceedings + 1;
     }
 
     // if any proceedings have been refused, the application is refused
-    if (refuses > 0){
-      application['applicationDetails']['meritsAssessmentResult'] = 'refuse'
+    if (refusals > 0){
+      application['applicationDetails']['meritsAssessmentResult'] = 'refused'
     }
 
     // if all proceedings have been granted, the application is granted
     if (grants === total_proceedings){
-      application['applicationDetails']['meritsAssessmentResult'] = 'grant'
+      application['applicationDetails']['meritsAssessmentResult'] = 'granted'
     }
   }
 
