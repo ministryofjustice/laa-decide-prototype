@@ -63,14 +63,19 @@ router.get('/v2/case-details', function(req, res) {
       total_proceedings = total_proceedings + 1;
     }
 
-    // if any proceedings have been refused, the application is refused
-    if (refusals > 0){
+    // if all proceedings have been refused, the application is refused
+    if (refusals === total_proceedings){
       application['applicationDetails']['meritsAssessmentResult'] = 'refused'
     }
 
     // if all proceedings have been granted, the application is granted
     if (grants === total_proceedings){
       application['applicationDetails']['meritsAssessmentResult'] = 'granted'
+    }
+
+    // if some proceedings have been refused, the application is partially granted
+    if ((refusals > 0) && (refusals < total_proceedings)){
+      application['applicationDetails']['meritsAssessmentResult'] = 'partially granted'
     }
   }
 
