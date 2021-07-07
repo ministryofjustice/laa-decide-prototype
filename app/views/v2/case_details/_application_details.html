@@ -81,6 +81,12 @@
       <h2 class="govuk-heading-m">{{ certificate['certificateType'] }}</h2>
       <p><b>Form of service: </b>{{ certificate['formOfService'] }}</p>
       <p><b>Work the provider can do: </b>{{ certificate['workProviderCanDo'] }}</p>
+      {% if certificate['meritsResult'] === 'grant' %}
+      <p><b>Merits decision: </b><strong class="govuk-tag govuk-tag--green">{{ certificate['meritsResult'] }}</strong></p>
+      {% endif %}
+      {% if certificate['meritsResult'] === 'refuse' %}
+      <p><b>Merits decision: </b><strong class="govuk-tag govuk-tag--red">{{ certificate['meritsResult'] }}</strong></p>
+      {% endif %}
       {% endfor %}
     </div>
   </details>
