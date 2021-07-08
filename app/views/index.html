@@ -18,18 +18,36 @@ GOV.UK Prototype Kit
       <li>
         <a href="https://www.figma.com/proto/wWFrX4iYFIRu6fzOLfSSpY/Core-user-journey-%E2%80%93-v4?node-id=713%3A8792&scaling=min-zoom&page-id=713%3A7783">v4</a>
       </li>
+      <li>
+        <a href="https://www.figma.com/file/LQshY0ahMFw77uunpmoADE/Core-user-journey-%E2%80%93-v5?node-id=1036%3A0">v5</a>
+      </li>
     </ul>
     <h2 class="govuk-heading-m">GOVUK Prototype Kit prototypes</h2>
+    <p>[source code: <a href="https://github.com/ministryofjustice/laa-decide-prototype">https://github.com/ministryofjustice/laa-decide-prototype</a>]</p>
 
     <ul class="govuk-list govuk-list--bullet">
       <li>
-        <p><a href="/v1/laa-online-portal">v1</a> - copy of Figma prototype v4 @ 01/07/2021. Hard-coded data.</p>
+        <p><b><a href="/v1/laa-online-portal">v1</a> - copy of Figma prototype v4 @ 01/07/2021.</b> Hard-coded data.</p>
       </li>
       <li>
-        <p><a href="/v2/laa-online-portal">v2</a> - WIP</p>
+        <p><b><a href="/v2/laa-online-portal">v2</a> - dynamic version of Figma prototype v4.</b> Allows interaction with the service. Supported functionality:
+          <ul class="govuk-list govuk-list--bullet">
+            <li>Add to my list</li>
+            <li>Remove from my list</li>
+            <li>Merits decisions on emergency and substantial proceedings</li>
+            <li>Grant all</li>
+            <li>Refuse all</li>
+            <li>Save and come back later</li>
+            <li>Send back to provider</li>
+          </ul>
+          Unsupported functionality:
+          <ul class="govuk-list govuk-list--bullet">
+            <li>Search - search bar is present but does not function</li>
+            <li>Filter - filter is present but does not function</li>
+            <li>Application history - hardcoded. Interacting with the service does not update the history</li>
+          </ul>
+        </p>
       </li>
     </ul>
   </div>
-</div>
-
-{% endblock %}
+</div> {% endblock %}
