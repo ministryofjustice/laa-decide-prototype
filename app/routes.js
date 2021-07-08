@@ -46,29 +46,6 @@ router.get('/v2/case-details', function(req, res) {
     }
   }
 
-  if (req.session.data.update_all_substantive === 'Refuse all'){
-    res.render('./v2/refuse-application');
-  }
-  else if (req.session.data.update_all_substantive === 'Grant all'){
-    console.log('here1')
-    var application = null;
-
-    // find the application
-    for (const app of req.session.data.applications) {
-      if (app.applicationDetails.refNo === req.session.data.refNo)
-        application = app;
-    }
-
-    // grant all substantive proceeding merits results
-    for (const proceeding of application['applicationDetails']['proceedings']){
-      for (const certificate of proceeding['certificates']){
-        if (certificate['certificateType'] == 'Substantive certificate'){
-          certificate['meritsResult'] = 'granted';
-        }
-      }
-    }
-  }
-
   // update overall merits results
   // count the numner of granted and refused proceedings
   var grants = 0;
@@ -86,10 +63,6 @@ router.get('/v2/case-details', function(req, res) {
       total_proceedings = total_proceedings + 1;
     }
   }
-  
-  console.log('grants: ' + grants)
-  console.log('refusals: ' + refusals)
-  console.log('total_proceedings: ' + total_proceedings)
 
   // if all proceedings have been refused, the application is refused
   if (refusals === total_proceedings){
@@ -106,7 +79,6 @@ router.get('/v2/case-details', function(req, res) {
     application['applicationDetails']['meritsAssessmentResult'] = 'partially granted'
   }
 
-  console.log('here2')
   res.locals.data['application'] = application;
   res.render('./v2/case-details');
 });
@@ -172,17 +144,86 @@ router.post('/v2/merits-assessment-substantive', function(req, res) {
     }
   }
 
-  // update  overall merits assessment result
+  // update overall merits assessment result
   application['applicationDetails']['meritsAssessmentResult'] = 'in progress'
 
   res.locals.data['application'] = application;
 
   // direct to correct page based on button clicked
-  if (req.session.data['continue_button'] == "Save and continue"){
-    res.render('./v2/merits-assessment-substantive');
+  if (req.session.data['continue_button'] == "Save and come back later"){
+    res.render('./v2/case-details');
   }
   else {
-    res.render('./v2/case-details');
+    res.render('./v2/merits-assessment-substantive');
+  }
+});
+
+router.post('/v2/refuse-application', function(req, res) {
+  var application = null;
+
+  // find the application
+  for (const app of req.session.data.applications) {
+    if (app.applicationDetails.refNo === req.session.data.refNo)
+      application = app;
+  }
+
+  if (req.session.data['update_all_substantive'] === "Refuse all") {
+
+    // refuse all substantive proceeding merits results
+    for (const proceeding of application['applicationDetails']['proceedings']){
+      for (const certificate of proceeding['certificates']){
+        if (certificate['certificateType'] == 'Substantive certificate'){
+          certificate['meritsResult'] = 'refused';
+        }
+      }
+    }
+
+    application['applicationDetails']['meritsAssessmentResult'] = 'in progress'
+    res.locals.data['application'] = application;
+    res.locals.data['update_all_substantive'] = 0;
+    res.redirect('./case-details');
+  }
+  else if (req.session.data['update_all_emergency'] === "Refuse all"){
+
+    // refuse all emergency proceeding merits results
+    for (const proceeding of application['applicationDetails']['proceedings']){
+      for (const certificate of proceeding['certificates']){
+        if (certificate['certificateType'] == 'Emergency certificate'){
+          certificate['meritsResult'] = 'refused';
+        }
+      }
+    }
+
+    application['applicationDetails']['meritsAssessmentResult'] = 'in progress'
+    res.locals.data['application'] = application;
+    res.redirect(307, './merits-assessment-substantive');
+  }
+});
+
+
+router.get('/v2/substantive-update-all', function(req, res) {
+  if (req.session.data.update_all_substantive === 'Refuse all'){
+    res.render('./v2/refuse-application');
+  }
+  else if (req.session.data.update_all_substantive === 'Grant all'){
+    var application = null;
+
+    // find the application
+    for (const app of req.session.data.applications) {
+      if (app.applicationDetails.refNo === req.session.data.refNo)
+        application = app;
+    }
+
+    // grant all substantive proceeding merits results
+    for (const proceeding of application['applicationDetails']['proceedings']){
+      for (const certificate of proceeding['certificates']){
+        if (certificate['certificateType'] == 'Substantive certificate'){
+          certificate['meritsResult'] = 'granted';
+        }
+      }
+    }
+    res.locals.data['application'] = application;
+    res.redirect(307, './case-details');
   }
 });
 
