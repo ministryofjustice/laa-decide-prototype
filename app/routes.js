@@ -46,6 +46,29 @@ router.get('/v2/case-details', function(req, res) {
     }
   }
 
+  if (req.session.data.update_all_substantive === 'Refuse all'){
+    res.render('./v2/refuse-application');
+  }
+  else if (req.session.data.update_all_substantive === 'Grant all'){
+    console.log('here1')
+    var application = null;
+
+    // find the application
+    for (const app of req.session.data.applications) {
+      if (app.applicationDetails.refNo === req.session.data.refNo)
+        application = app;
+    }
+
+    // grant all substantive proceeding merits results
+    for (const proceeding of application['applicationDetails']['proceedings']){
+      for (const certificate of proceeding['certificates']){
+        if (certificate['certificateType'] == 'Substantive certificate'){
+          certificate['meritsResult'] = 'granted';
+        }
+      }
+    }
+  }
+
   // update overall merits results
   // count the numner of granted and refused proceedings
   var grants = 0;
@@ -62,23 +85,28 @@ router.get('/v2/case-details', function(req, res) {
       }
       total_proceedings = total_proceedings + 1;
     }
+  }
+  
+  console.log('grants: ' + grants)
+  console.log('refusals: ' + refusals)
+  console.log('total_proceedings: ' + total_proceedings)
 
-    // if all proceedings have been refused, the application is refused
-    if (refusals === total_proceedings){
-      application['applicationDetails']['meritsAssessmentResult'] = 'refused'
-    }
-
-    // if all proceedings have been granted, the application is granted
-    if (grants === total_proceedings){
-      application['applicationDetails']['meritsAssessmentResult'] = 'granted'
-    }
-
-    // if some proceedings have been refused, the application is partially granted
-    if ((refusals > 0) && (grants > 0)){
-      application['applicationDetails']['meritsAssessmentResult'] = 'partially granted'
-    }
+  // if all proceedings have been refused, the application is refused
+  if (refusals === total_proceedings){
+    application['applicationDetails']['meritsAssessmentResult'] = 'refused'
   }
 
+  // if all proceedings have been granted, the application is granted
+  if (grants === total_proceedings){
+    application['applicationDetails']['meritsAssessmentResult'] = 'granted'
+  }
+
+  // if some proceedings have been refused, the application is partially granted
+  if ((refusals > 0) && (grants > 0) && (refusals + grants == total_proceedings)){
+    application['applicationDetails']['meritsAssessmentResult'] = 'partially granted'
+  }
+
+  console.log('here2')
   res.locals.data['application'] = application;
   res.render('./v2/case-details');
 });
@@ -100,7 +128,7 @@ router.get('/v2/merits-assessment-substantive', function(req, res) {
   if (req.session.data.update_all_emergency === 'Refuse all'){
     res.render('./v2/refuse-application');
   }
-  else {
+  else if (req.session.data.update_all_emergency === 'Grant all'){
     var application = null;
 
     // find the application
@@ -156,7 +184,6 @@ router.post('/v2/merits-assessment-substantive', function(req, res) {
   else {
     res.render('./v2/case-details');
   }
-
 });
 
 module.exports = router
