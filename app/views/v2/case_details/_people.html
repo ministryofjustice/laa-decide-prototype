@@ -69,10 +69,10 @@
     </tbody>
   </table>
 
+  {% for child in application['children'] %}
   <table class="govuk-table">
     <caption class="govuk-table__caption govuk-table__caption--m">Child details</caption>
     <tbody class="govuk-table__body">
-      {% for child in application['children'] %}
       <tr class="govuk-table__row">
         <td class="govuk-table__header">Name</td>
         <td class="govuk-table__cell">{{ child['name'] }}</td>
@@ -89,7 +89,7 @@
         <td class="govuk-table__header">Relationship</td>
         <td class="govuk-table__cell">{{ child['relationship'] }}</td>
       </tr>
-      {% endfor %}
     </tbody>
   </table>
+  {% endfor %}
 </div>

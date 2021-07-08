@@ -42,6 +42,7 @@
     </tbody>
   </table>
 
+  {% if application['linkedApplications'].length > 0 %}
   <div class="govuk-notification-banner" role="region" aria-labelledby="govuk-notification-banner-title" data-module="govuk-notification-banner">
     <div class="govuk-notification-banner__header">
       <h2 class="govuk-notification-banner__title" id="govuk-notification-banner-title">
@@ -68,6 +69,7 @@
       </table>
     </div>
   </div>
+  {% endif %}
 
   <table class="govuk-table">
     <caption class="govuk-table__caption govuk-table__caption--m">Delegated functions</caption>
