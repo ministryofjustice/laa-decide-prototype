@@ -83,12 +83,14 @@ module.exports = {
             'proceedingType': 'Non-molestation order',
             'certificates': [
               {
+                'id': 'certificate_1_1',
                 'certificateType': 'Emergency certificate',
                 'formOfService': 'Full representation',
                 'workProviderCanDo': 'All steps up to and including the hearing on 21 July 2020.',
                 'meritsResult': ''
               },
               {
+                'id': 'certificate_1_2',
                 'certificateType': 'Substantive certificate',
                 'formOfService': 'Full representation',
                 'workProviderCanDo': 'All steps up to and including getting and serving a final order. If the order is breached you can apply for power of arrest. You cannot apply for a warrant of arrest or contempt of court proceedings.',
@@ -102,6 +104,7 @@ module.exports = {
             'proceedingType': 'Prohibited steps order',
               'certificates': [
               {
+                'id': 'certificate_2_1',
                 'certificateType': 'Substantive certificate',
                 'formOfService': 'Family help (higher)',
                 'workProviderCanDo': 'Limited to Family Help (Higher) and to all steps necessary to negotiate and conclude a settlement. To include the issue of proceedings and representation in those proceedings save in relation to or at a contested final hearing.',
@@ -115,12 +118,14 @@ module.exports = {
             'proceedingType': 'Occupation order',
               'certificates': [
               {
+                'id': 'certificate_3_1',
                 'certificateType': 'Emergency certificate',
                 'formOfService': 'Family help (higher)',
                 'workProviderCanDo': 'Limited to Family Help (Higher) and to all steps necessary to negotiate and conclude a settlement. To include the issue of proceedings and representation in those proceedings save in relation to or at a contested final hearing.',
                 'meritsResult': ''
               },
               {
+                'id': 'certificate_3_2',
                 'certificateType': 'Substantive certificate',
                 'formOfService': 'Family help (higher)',
                 'workProviderCanDo': 'Limited to Family Help (Higher) and to all steps necessary to negotiate and conclude a settlement. To include the issue of proceedings and representation in those proceedings save in relation to or at a contested final hearing.',
@@ -242,12 +247,14 @@ module.exports = {
             'proceedingType': 'Non-molestation order',
             'certificates': [
               {
+                'id': 'certificate_1_1',
                 'certificateType': 'Emergency certificate',
                 'formOfService': 'Full representation',
                 'workProviderCanDo': 'All steps up to and including the hearing on 21 July 2020.',
                 'meritsResult': ''
               },
               {
+                'id': 'certificate_1_2',
                 'certificateType': 'Substantive certificate',
                 'formOfService': 'Full representation',
                 'workProviderCanDo': 'All steps up to and including getting and serving a final order. If the order is breached you can apply for power of arrest. You cannot apply for a warrant of arrest or contempt of court proceedings.',
@@ -341,12 +348,14 @@ module.exports = {
             'proceedingType': 'Non-molestation order',
             'certificates': [
               {
+                'id': 'certificate_1_1',
                 'certificateType': 'Emergency certificate',
                 'formOfService': 'Full representation',
                 'workProviderCanDo': 'All steps up to and including the hearing on 21 July 2020.',
                 'meritsResult': ''
               },
               {
+                'id': 'certificate_1_2',
                 'certificateType': 'Substantive certificate',
                 'formOfService': 'Full representation',
                 'workProviderCanDo': 'All steps up to and including getting and serving a final order. If the order is breached you can apply for power of arrest. You cannot apply for a warrant of arrest or contempt of court proceedings.',
