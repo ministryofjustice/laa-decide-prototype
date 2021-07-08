@@ -37,11 +37,9 @@ router.get('/v2/case-details', function(req, res) {
 
   // update substantive proceeding merits results
   for (const proceeding of application['applicationDetails']['proceedings']){
-    if (typeof req.session.data[proceeding['id']] !== 'undefined' && req.session.data[proceeding['id']] !== null){
-      for (const certificate of proceeding['certificates']){
-        if (certificate['certificateType'] == 'Substantive certificate'){
-          certificate['meritsResult'] = req.session.data[proceeding['id']]
-        }
+    for (const certificate of proceeding['certificates']){
+      if (typeof req.session.data[certificate['id']] !== 'undefined' && req.session.data[certificate['id']] !== null){
+          certificate['meritsResult'] = req.session.data[certificate['id']]
       }
     }
   }
@@ -135,11 +133,9 @@ router.post('/v2/merits-assessment-substantive', function(req, res) {
 
   // update emergency proceeding merits results
   for (const proceeding of application['applicationDetails']['proceedings']){
-    if (typeof req.session.data[proceeding['id']] !== 'undefined' && req.session.data[proceeding['id']] !== null){
-      for (const certificate of proceeding['certificates']){
-        if (certificate['certificateType'] == 'Emergency certificate'){
-          certificate['meritsResult'] = req.session.data[proceeding['id']]
-        }
+    for (const certificate of proceeding['certificates']){
+      if (typeof req.session.data[certificate['id']] !== 'undefined' && req.session.data[certificate['id']] !== null){
+          certificate['meritsResult'] = req.session.data[certificate['id']]
       }
     }
   }

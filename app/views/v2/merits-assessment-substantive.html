@@ -25,54 +25,65 @@ Merits assessment - substantive
         {% for proceeding in application['proceedings'] %}
         {% for certificate in proceeding['certificates'] %}
         {% if certificate['certificateType'] === 'Substantive certificate' %}
-        <fieldset class="govuk-fieldset" aria-describedby="decision-hint-{{ proceeding['id'] }}">
-          <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
-            <h3 class="govuk-heading-s">{{proceeding['proceedingType']}}</h3>
-          </legend>
-          <div id="decision-hint-{{ proceeding['id'] }}" class="govuk-hint">
-            {{ application['categoryLaw'] }} - {{ proceeding['matterType'] }}<br>The provider has requested {{certificate['formOfService']}}
-          </div>
-          <div class=" govuk-radios govuk-radios--conditional" data-module="govuk-radios">
-            <div class="govuk-radios__item">
-              <input class="govuk-radios__input" id="granted" name="{{ proceeding['id'] }}" type="radio" value="granted" data-aria-controls="conditional-decision-{{ proceeding['id'] }}">
-              <label class="govuk-label govuk-radios__label" for="{{ proceeding['id'] }}">
-                Grant
-              </label>
-            </div>
-            <div class="govuk-radios__item">
-              <input class="govuk-radios__input" id="refused" name="{{ proceeding['id'] }}" type="radio" value="refused" data-aria-controls="conditional-decision-{{ proceeding['id'] }}-2">
-              <label class="govuk-label govuk-radios__label" for="{{ proceeding['id'] }}">
-                Refuse
-              </label>
-            </div>
-            <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-decision-{{ proceeding['id'] }}-2">
-              <div class="govuk-form-group">
-                <fieldset class="govuk-fieldset">
-                  <div class="govuk-radios">
-                    <div class="govuk-radios__item">
-                      <input class="govuk-radios__input" id="refusal-reason-{{ proceeding['id'] }}" name="refusal-reason-{{ proceeding['id'] }}" type="radio" value="Because of x">
-                      <label class="govuk-label govuk-radios__label" for="refusal-reason">
-                        Because of x
-                      </label>
-                    </div>
-                    <div class="govuk-radios__item">
-                      <input class="govuk-radios__input" id="refusal-reason-{{ proceeding['id'] }}-2" name="refusal-reason-{{ proceeding['id'] }}" type="radio" value="Because of y">
-                      <label class="govuk-label govuk-radios__label" for="refusal-reason-{{ proceeding['id'] }}-2">
-                        Because of y
-                      </label>
-                    </div>
-                    <div class="govuk-radios__item">
-                      <input class="govuk-radios__input" id="refusal-reason-{{ proceeding['id'] }}-3" name="refusal-reason-{{ proceeding['id'] }}" type="radio" value="Because of z">
-                      <label class="govuk-label govuk-radios__label" for="refusal-reason-{{ proceeding['id'] }}-3">
-                        Because of z
-                      </label>
-                    </div>
-                  </div>
-                </fieldset>
-              </div>
-            </div>
-          </div>
-        </fieldset>
+
+        {% set hint=application['categoryLaw'] + ' - ' + proceeding['matterType'] +  '<br>' + 'The provider has requested ' + certificate['formOfService']  %}
+
+        {% set refuseHtml %}
+        {{ govukRadios({
+          idPrefix: certificate['id']+"_reason",
+          name: certificate['id']+"_reason",
+          fieldset: {},
+          items: [
+            {
+              value: "refused_x",
+              text: "Reason x",
+              id: "refused_x",
+              checked: checked(certificate['id']+"_reason", "refused_x")
+            },
+            {
+              value: "refused_y",
+              text: "Reason y",
+              id: "refused_y",
+              checked: checked(certificate['id']+"_reason", "refused_y")
+            },
+            {
+              value: "refused_z",
+              text: "Reason z",
+              id: "refused_z",
+              checked: checked(certificate['id']+"_reason", "refused_z")
+            }
+          ]
+        })}}
+        {% endset -%}
+
+        {{ govukRadios({
+          idPrefix: certificate['id']+"_decision",
+          name: certificate['id'],
+          fieldset: {
+            legend: {
+              text: proceeding['proceedingType'],
+              classes: "govuk-fieldset__legend--m"
+            }
+          },
+          hint: {
+            text: hint | safe
+          },
+          items: [
+            {
+              value: "granted",
+              text: "Grant",
+              checked: checked(certificate['id'], "granted")
+            },
+            {
+              value: "refused",
+              text: "Refuse",
+              checked: checked(certificate['id'], "refused"),
+              conditional: {
+                html: refuseHtml
+              }
+            }
+          ]
+        })}}
 
         <a href="ccms-redirect" class="govuk-link">Make changes</a>
         <br>
@@ -122,7 +133,7 @@ Merits assessment - substantive
         <div id="note-hint" class="govuk-hint">
           This information is for internal use. It will not be shared with the provider.
         </div>
-        <textarea class="govuk-textarea" name="note" id="note" rows="10"></textarea>
+        <textarea class="govuk-textarea" name="substantive-note" id="substantive-note" rows="10">{{ data['substantive-note'] }}</textarea>
         <div class="govuk-button-group">
           <input type="submit" name="continue_button" value="Save and continue" id="continue" class="govuk-button form-button" data-module="govuk-button" data-disable-with="Save and continue">
           <input type="submit" name="continue_button" value="Save and come back later" id="continue" class="govuk-button form-button govuk-button--secondary govuk-!-margin-left-3" data-module="govuk-button"
