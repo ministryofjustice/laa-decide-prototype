@@ -180,7 +180,6 @@ router.post('/v2/refuse-application', function(req, res) {
 
     application['applicationDetails']['meritsAssessmentResult'] = 'in progress'
     res.locals.data['application'] = application;
-    res.locals.data['update_all_substantive'] = 0;
     res.redirect('./case-details');
   }
   else if (req.session.data['update_all_emergency'] === "Refuse all"){
@@ -201,30 +200,19 @@ router.post('/v2/refuse-application', function(req, res) {
 });
 
 
-router.get('/v2/substantive-update-all', function(req, res) {
-  if (req.session.data.update_all_substantive === 'Refuse all'){
-    res.render('./v2/refuse-application');
-  }
-  else if (req.session.data.update_all_substantive === 'Grant all'){
-    var application = null;
+router.post('/v2/reject-application', function(req, res) {
+  var application = null;
 
-    // find the application
-    for (const app of req.session.data.applications) {
-      if (app.applicationDetails.refNo === req.session.data.refNo)
-        application = app;
-    }
-
-    // grant all substantive proceeding merits results
-    for (const proceeding of application['applicationDetails']['proceedings']){
-      for (const certificate of proceeding['certificates']){
-        if (certificate['certificateType'] == 'Substantive certificate'){
-          certificate['meritsResult'] = 'granted';
-        }
-      }
-    }
-    res.locals.data['application'] = application;
-    res.redirect(307, './case-details');
+  // find the application
+  for (const app of req.session.data.applications) {
+    if (app.applicationDetails.refNo === req.session.data.refNo)
+      application = app;
   }
+
+  application['applicationDetails']['meritsAssessmentResult'] = 'rejected'
+  application['applicationDetails']['meansAssessmentResult'] = 'rejected'
+
+  res.redirect('./case-details');
 });
 
 module.exports = router

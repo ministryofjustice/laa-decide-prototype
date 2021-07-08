@@ -14,7 +14,7 @@ Case details
   <br>
   <br>
 
-  {% if (application['meritsAssessmentResult'] != 'Not started') and (application['meritsAssessmentResult'] != 'in progress') %}
+  {% if (application['meritsAssessmentResult'] != 'Not started') and (application['meritsAssessmentResult'] != 'in progress') and (application['meritsAssessmentResult'] != 'rejected') %}
   <div class="govuk-notification-banner govuk-notification-banner--success" role="alert" aria-labelledby="govuk-notification-banner-title" data-module="govuk-notification-banner">
     <div class="govuk-notification-banner__header">
       <h2 class="govuk-notification-banner__title" id="govuk-notification-banner-title">

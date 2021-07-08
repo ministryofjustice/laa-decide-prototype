@@ -17,7 +17,12 @@
       <tr class="govuk-table__row">
         <td class="govuk-table__header">Means assessment</td>
         <td class="govuk-table__cell">
+          {% if application['meansAssessmentResult'] === 'rejected' %}
+          <strong class="govuk-tag govuk-tag--red">{{ application['meansAssessmentResult'] }}</strong>
+          {% endif %}
+          {% if application['meansAssessmentResult'] === 'Passported' %}
           <strong class="govuk-tag govuk-tag--grey">{{ application['meansAssessmentResult'] }}</strong>
+          {% endif %}
         </td>
       </tr>
       <tr class="govuk-table__row">
@@ -29,7 +34,7 @@
           {% if (application['meritsAssessmentResult'] === 'granted') or (application['meritsAssessmentResult'] === 'partially granted') %}
           <strong class="govuk-tag govuk-tag--green">{{ application['meritsAssessmentResult'] }}</strong>
           {% endif %}
-          {% if application['meritsAssessmentResult'] === 'refused' %}
+          {% if (application['meritsAssessmentResult'] === 'refused') or (application['meritsAssessmentResult'] === 'rejected') %}
           <strong class="govuk-tag govuk-tag--red">{{ application['meritsAssessmentResult'] }}</strong>
           {% endif %}
         </td>
