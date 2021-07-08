@@ -23,7 +23,7 @@
       <tr class="govuk-table__row">
         <td class="govuk-table__header">Merits assessment</td>
         <td class="govuk-table__cell">
-          {% if application['meritsAssessmentResult'] === 'Not started' %}
+          {% if application['meritsAssessmentResult'] === 'Not started' or (application['meritsAssessmentResult'] === 'in progress') %}
           <strong class="govuk-tag govuk-tag--purple">{{ application['meritsAssessmentResult'] }}</strong>
           {% endif %}
           {% if (application['meritsAssessmentResult'] === 'granted') or (application['meritsAssessmentResult'] === 'partially granted') %}
@@ -149,7 +149,7 @@
 
   <h2 class="govuk-heading-m">Make a decision</h2>
 
-  {% if application['meritsAssessmentResult'] == 'Not started' %}
+  {% if (application['meritsAssessmentResult'] == 'Not started') or (application['meritsAssessmentResult'] == 'in progress') %}
   <p>The means decision has been completed. You can view the <a href="#application-history">application history</a> for further details.</p>
 
   <div class="govuk-button-group">

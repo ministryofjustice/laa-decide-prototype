@@ -74,7 +74,7 @@ router.get('/v2/case-details', function(req, res) {
     }
 
     // if some proceedings have been refused, the application is partially granted
-    if ((refusals > 0) && (refusals < total_proceedings)){
+    if ((refusals > 0) && (grants > 0)){
       application['applicationDetails']['meritsAssessmentResult'] = 'partially granted'
     }
   }
@@ -94,6 +94,34 @@ router.get('/v2/merits-assessment-emergency', function(req, res) {
 
   res.locals.data['application'] = application;
   res.render('./v2/merits-assessment-emergency');
+});
+
+router.get('/v2/merits-assessment-substantive', function(req, res) {
+  if (req.session.data.update_all_emergency === 'Refuse all'){
+    res.render('./v2/refuse-application');
+  }
+  else {
+    var application = null;
+
+    // find the application
+    for (const app of req.session.data.applications) {
+      if (app.applicationDetails.refNo === req.session.data.refNo)
+        application = app;
+    }
+
+    // grant all emergency proceeding merits results
+    for (const proceeding of application['applicationDetails']['proceedings']){
+      for (const certificate of proceeding['certificates']){
+        if (certificate['certificateType'] == 'Emergency certificate'){
+          certificate['meritsResult'] = 'granted';
+        }
+      }
+    }
+
+    application['applicationDetails']['meritsAssessmentResult'] = 'in progress'
+    res.locals.data['application'] = application;
+    res.render('./v2/merits-assessment-substantive');
+  }
 });
 
 router.post('/v2/merits-assessment-substantive', function(req, res) {
