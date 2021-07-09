@@ -4,15 +4,15 @@
 Merits assessment - emergency
 {% endblock %}
 
+{% block beforeContent %}
+<a class="govuk-back-link" href="case-details">Back to application details</a>
+{% endblock %}
+
 {% block content %}
 
 {% set application = data['application']['applicationDetails'] %}
 
 <div class="govuk-grid-row">
-  <a href="case-details" class="govuk-back-link">Back to application details</a>
-  <br>
-  <br>
-  <br>
   <h1 class="govuk-heading-l">Make a decision on merits</h1>
   <p class="govuk-body-l">{{ application['refNo'] }}</p>
 </div>

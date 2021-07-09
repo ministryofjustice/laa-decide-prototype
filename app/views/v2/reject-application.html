@@ -4,12 +4,12 @@
 Reject application
 {% endblock %}
 
+{% block beforeContent %}
+<a class="govuk-back-link" href="case-details">Back to application details</a>
+{% endblock %}
+
 {% block content %}
 <div class="govuk-grid-row">
-  <a href="case-details" class="govuk-back-link">Back to application details</a>
-  <br>
-  <br>
-  <br>
   <form action="reject-application" method="POST">
     <div class="govuk-form-group">
       <fieldset class="govuk-fieldset">
