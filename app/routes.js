@@ -44,39 +44,41 @@ router.get('/v2/case-details', function(req, res) {
     }
   }
 
-  // update overall merits results
-  // count the numner of granted and refused proceedings
-  var grants = 0;
-  var refusals = 0;
-  var total_proceedings = 0;
 
-  for (const proceeding of application['applicationDetails']['proceedings']){
-    for (const certificate of proceeding['certificates']){
-      if (certificate['meritsResult'] == 'granted'){
-        grants = grants + 1;
+  if (req.session.data['continue_button'] != "Save and come back later"){
+    // update overall merits results
+    // count the numner of granted and refused proceedings
+    var grants = 0;
+    var refusals = 0;
+    var total_proceedings = 0;
+
+    for (const proceeding of application['applicationDetails']['proceedings']){
+      for (const certificate of proceeding['certificates']){
+        if (certificate['meritsResult'] == 'granted'){
+          grants = grants + 1;
+        }
+        if (certificate['meritsResult'] == 'refused'){
+          refusals = refusals + 1;
+        }
+        total_proceedings = total_proceedings + 1;
       }
-      if (certificate['meritsResult'] == 'refused'){
-        refusals = refusals + 1;
-      }
-      total_proceedings = total_proceedings + 1;
+    }
+
+    // if all proceedings have been refused, the application is refused
+    if (refusals === total_proceedings){
+      application['applicationDetails']['meritsAssessmentResult'] = 'refused'
+    }
+
+    // if all proceedings have been granted, the application is granted
+    if (grants === total_proceedings){
+      application['applicationDetails']['meritsAssessmentResult'] = 'granted'
+    }
+
+    // if some proceedings have been refused, the application is partially granted
+    if ((refusals > 0) && (grants > 0) && (refusals + grants == total_proceedings)){
+      application['applicationDetails']['meritsAssessmentResult'] = 'partially granted'
     }
   }
-
-  // if all proceedings have been refused, the application is refused
-  if (refusals === total_proceedings){
-    application['applicationDetails']['meritsAssessmentResult'] = 'refused'
-  }
-
-  // if all proceedings have been granted, the application is granted
-  if (grants === total_proceedings){
-    application['applicationDetails']['meritsAssessmentResult'] = 'granted'
-  }
-
-  // if some proceedings have been refused, the application is partially granted
-  if ((refusals > 0) && (grants > 0) && (refusals + grants == total_proceedings)){
-    application['applicationDetails']['meritsAssessmentResult'] = 'partially granted'
-  }
-
   res.locals.data['application'] = application;
   res.render('./v2/case-details');
 });
