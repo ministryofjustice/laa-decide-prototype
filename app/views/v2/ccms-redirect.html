@@ -4,15 +4,11 @@
 You need to review this application in CCMS
 {% endblock %}
 
+{% block beforeContent %}
+<a class="govuk-back-link" href="case-details">Back</a>
+{% endblock %}
+
 {% block content %}
-
-<div class="govuk-grid-row">
-  <a href="case-details" class="govuk-back-link">Back</a>
-  <br>
-  <br>
-  <br>
-</div>
-
 <div class="govuk-panel govuk-panel--confirmation" style="text-align: left; background-color:#17539B">
   <h1 class="govuk-panel__title">You need to review this application in CCMS</h1>
   <div class="govuk-body" style="color:white">

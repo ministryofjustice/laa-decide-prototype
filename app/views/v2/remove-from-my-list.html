@@ -4,13 +4,13 @@
 Remove from my list
 {% endblock %}
 
+{% block beforeContent %}
+<a class="govuk-back-link" href="my-applications">Back to my applications</a>
+{% endblock %}
+
 {% block content %}
 
 <div class="govuk-grid-row">
-  <a href="my-applications" class="govuk-back-link">Back to my applications</a>
-  <br>
-  <br>
-  <br>
   <div class="govuk-form-group">
     <form action="my-applications">
       <fieldset class="govuk-fieldset">
