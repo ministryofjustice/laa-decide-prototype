@@ -8,13 +8,14 @@ Merits assessment - substantive
 <a class="govuk-back-link" href="case-details">Back to application details</a>
 {% endblock %}
 
-{% block content %}
-
 {% set application = data['application']['applicationDetails'] %}
 
+{% block content %}
 <div class="govuk-grid-row">
-  <h1 class="govuk-heading-l">Make a decision on merits</h1>
-  <p class="govuk-body-l">{{ application['refNo'] }}</p>
+  <div class="govuk-grid-column-two-thirds">
+    <h1 class="govuk-heading-l">Make a decision on merits</h1>
+    <p class="govuk-body-l">{{ application['refNo'] }}</p>
+  </div>
 </div>
 
 <div class="govuk-grid-row">

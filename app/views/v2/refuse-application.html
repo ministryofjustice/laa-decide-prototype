@@ -10,67 +10,69 @@ Refuse application
 
 {% block content %}
 <div class="govuk-grid-row">
-  <form action="refuse-application" method="POST">
-    <div class="govuk-form-group">
-      <fieldset class="govuk-fieldset">
-        <legend class="govuk-fieldset__legend govuk-fieldset__legend--xl">
-          <h1 class="govuk-fieldset__heading">Refuse application</h1>
-        </legend>
-        <h2 class="govuk-body-l govuk-!-font-size-36">30000009020</h2>
-        <p class="govuk-body">Select the reason for refusing this application</p>
-        <div class="govuk-radios">
-          <div class="govuk-radios__item">
-            <input class="govuk-radios__input" id="refusal-reason" name="refusal-reason" type="radio" value="duplicate-case">
-            <label class="govuk-label govuk-radios__label" for="refusal-reason">
-              Duplicate case
-            </label>
+  <div class="govuk-grid-column-two-thirds">
+    <form action="refuse-application" method="POST">
+      <div class="govuk-form-group">
+        <fieldset class="govuk-fieldset">
+          <legend class="govuk-fieldset__legend govuk-fieldset__legend--xl">
+            <h1 class="govuk-fieldset__heading">Refuse application</h1>
+          </legend>
+          <h2 class="govuk-body-l govuk-!-font-size-36">30000009020</h2>
+          <p class="govuk-body">Select the reason for refusing this application</p>
+          <div class="govuk-radios">
+            <div class="govuk-radios__item">
+              <input class="govuk-radios__input" id="refusal-reason" name="refusal-reason" type="radio" value="duplicate-case">
+              <label class="govuk-label govuk-radios__label" for="refusal-reason">
+                Duplicate case
+              </label>
+            </div>
+            <div class="govuk-radios__item">
+              <input class="govuk-radios__input" id="refusal-reason-2" name="refusal-reason" type="radio" value="duplicate-proceeding">
+              <label class="govuk-label govuk-radios__label" for="refusal-reason-2">
+                Duplicate proceeding
+              </label>
+            </div>
+            <div class="govuk-radios__item">
+              <input class="govuk-radios__input" id="refusal-reason-3" name="refusal-reason" type="radio" value="means-evidence">
+              <label class="govuk-label govuk-radios__label" for="refusal-reason-3">
+                Means evidence non co-op
+              </label>
+            </div>
+            <div class="govuk-radios__item">
+              <input class="govuk-radios__input" id="refusal-reason-4" name="refusal-reason" type="radio" value="no-attempt-settle">
+              <label class="govuk-label govuk-radios__label" for="refusal-reason-4">
+                No attempt to settle
+              </label>
+            </div>
+            <div class="govuk-radios__item">
+              <input class="govuk-radios__input" id="refusal-reason-5" name="refusal-reason" type="radio" value="out-of-scope-criteria">
+              <label class="govuk-label govuk-radios__label" for="refusal-reason-5">
+                Out of scope - Criteria not satisfied
+              </label>
+            </div>
+            <div class="govuk-radios__item">
+              <input class="govuk-radios__input" id="refusal-reason-6" name="refusal-reason" type="radio" value="out-of-scope-income">
+              <label class="govuk-label govuk-radios__label" for="refusal-reason-6">
+                Out of scope - Income
+              </label>
+            </div>
+            <div class="govuk-radios__item">
+              <input class="govuk-radios__input" id="refusal-reason-7" name="refusal-reason" type="radio" value="wrongful-interference">
+              <label class="govuk-label govuk-radios__label" for="refusal-reason-7">
+                Wrongful interference with goods
+              </label>
+            </div>
+            <div class="govuk-radios__item">
+              <input class="govuk-radios__input" id="refusal-reason-8" name="refusal-reason" type="radio" value="other">
+              <label class="govuk-label govuk-radios__label" for="refusal-reason-8">
+                Other
+              </label>
+            </div>
           </div>
-          <div class="govuk-radios__item">
-            <input class="govuk-radios__input" id="refusal-reason-2" name="refusal-reason" type="radio" value="duplicate-proceeding">
-            <label class="govuk-label govuk-radios__label" for="refusal-reason-2">
-              Duplicate proceeding
-            </label>
-          </div>
-          <div class="govuk-radios__item">
-            <input class="govuk-radios__input" id="refusal-reason-3" name="refusal-reason" type="radio" value="means-evidence">
-            <label class="govuk-label govuk-radios__label" for="refusal-reason-3">
-              Means evidence non co-op
-            </label>
-          </div>
-          <div class="govuk-radios__item">
-            <input class="govuk-radios__input" id="refusal-reason-4" name="refusal-reason" type="radio" value="no-attempt-settle">
-            <label class="govuk-label govuk-radios__label" for="refusal-reason-4">
-              No attempt to settle
-            </label>
-          </div>
-          <div class="govuk-radios__item">
-            <input class="govuk-radios__input" id="refusal-reason-5" name="refusal-reason" type="radio" value="out-of-scope-criteria">
-            <label class="govuk-label govuk-radios__label" for="refusal-reason-5">
-              Out of scope - Criteria not satisfied
-            </label>
-          </div>
-          <div class="govuk-radios__item">
-            <input class="govuk-radios__input" id="refusal-reason-6" name="refusal-reason" type="radio" value="out-of-scope-income">
-            <label class="govuk-label govuk-radios__label" for="refusal-reason-6">
-              Out of scope - Income
-            </label>
-          </div>
-          <div class="govuk-radios__item">
-            <input class="govuk-radios__input" id="refusal-reason-7" name="refusal-reason" type="radio" value="wrongful-interference">
-            <label class="govuk-label govuk-radios__label" for="refusal-reason-7">
-              Wrongful interference with goods
-            </label>
-          </div>
-          <div class="govuk-radios__item">
-            <input class="govuk-radios__input" id="refusal-reason-8" name="refusal-reason" type="radio" value="other">
-            <label class="govuk-label govuk-radios__label" for="refusal-reason-8">
-              Other
-            </label>
-          </div>
-        </div>
-      </fieldset>
-    </div>
-    <button class="govuk-button govuk-button" data-module="govuk-button">Save changes</button>
-  </form>
+        </fieldset>
+      </div>
+      <button class="govuk-button govuk-button" data-module="govuk-button">Save changes</button>
+    </form>
+  </div>
 </div>
 {% endblock %}
