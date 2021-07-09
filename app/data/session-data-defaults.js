@@ -78,19 +78,19 @@ module.exports = {
         ],
         'proceedings': [
           {
-            'id': 'proceeding_1',
+            'id': 'application_1_proceeding_1',
             'matterType': 'Domestic abuse',
             'proceedingType': 'Non-molestation order',
             'certificates': [
               {
-                'id': 'certificate_1_1',
+                'id': 'application_1_proceeding_1_certificate_1',
                 'certificateType': 'Emergency certificate',
                 'formOfService': 'Full representation',
                 'workProviderCanDo': 'All steps up to and including the hearing on 21 July 2020.',
                 'meritsResult': ''
               },
               {
-                'id': 'certificate_1_2',
+                'id': 'application_1_proceeding_1_certificate_2',
                 'certificateType': 'Substantive certificate',
                 'formOfService': 'Full representation',
                 'workProviderCanDo': 'All steps up to and including getting and serving a final order. If the order is breached you can apply for power of arrest. You cannot apply for a warrant of arrest or contempt of court proceedings.',
@@ -99,12 +99,12 @@ module.exports = {
             ]
           },
           {
-            'id': 'proceeding_2',
+            'id': 'application_1_proceeding_2',
             'matterType': 'Domestic abuse',
             'proceedingType': 'Prohibited steps order',
               'certificates': [
               {
-                'id': 'certificate_2_1',
+                'id': 'application_1_proceeding_2_certificate_1',
                 'certificateType': 'Substantive certificate',
                 'formOfService': 'Family help (higher)',
                 'workProviderCanDo': 'Limited to Family Help (Higher) and to all steps necessary to negotiate and conclude a settlement. To include the issue of proceedings and representation in those proceedings save in relation to or at a contested final hearing.',
@@ -113,19 +113,19 @@ module.exports = {
             ]
           },
           {
-            'id': 'proceeding_3',
+            'id': 'application_1_proceeding_3',
             'matterType': 'Domestic abuse',
             'proceedingType': 'Occupation order',
               'certificates': [
               {
-                'id': 'certificate_3_1',
+                'id': 'application_1_proceeding_3_certificate_1',
                 'certificateType': 'Emergency certificate',
                 'formOfService': 'Family help (higher)',
                 'workProviderCanDo': 'Limited to Family Help (Higher) and to all steps necessary to negotiate and conclude a settlement. To include the issue of proceedings and representation in those proceedings save in relation to or at a contested final hearing.',
                 'meritsResult': ''
               },
               {
-                'id': 'certificate_3_2',
+                'id': 'application_1_proceeding_3_certificate_2',
                 'certificateType': 'Substantive certificate',
                 'formOfService': 'Family help (higher)',
                 'workProviderCanDo': 'Limited to Family Help (Higher) and to all steps necessary to negotiate and conclude a settlement. To include the issue of proceedings and representation in those proceedings save in relation to or at a contested final hearing.',
@@ -242,19 +242,19 @@ module.exports = {
         ],
         'proceedings': [
           {
-            'id': 'proceeding_1',
+            'id': 'application_2_proceeding_1',
             'matterType': 'Domestic abuse',
             'proceedingType': 'Non-molestation order',
             'certificates': [
               {
-                'id': 'certificate_1_1',
+                'id': 'application_2_proceeding_1_certificate_1',
                 'certificateType': 'Emergency certificate',
                 'formOfService': 'Full representation',
                 'workProviderCanDo': 'All steps up to and including the hearing on 21 July 2020.',
                 'meritsResult': ''
               },
               {
-                'id': 'certificate_1_2',
+                'id': 'application_2_proceeding_1_certificate_2',
                 'certificateType': 'Substantive certificate',
                 'formOfService': 'Full representation',
                 'workProviderCanDo': 'All steps up to and including getting and serving a final order. If the order is breached you can apply for power of arrest. You cannot apply for a warrant of arrest or contempt of court proceedings.',
@@ -343,19 +343,19 @@ module.exports = {
         ],
         'proceedings': [
           {
-            'id': 'proceeding_1',
+            'id': 'application_3_proceeding_1',
             'matterType': 'Domestic abuse',
             'proceedingType': 'Non-molestation order',
             'certificates': [
               {
-                'id': 'certificate_1_1',
+                'id': 'application_3_proceeding_1_certificate_1',
                 'certificateType': 'Emergency certificate',
                 'formOfService': 'Full representation',
                 'workProviderCanDo': 'All steps up to and including the hearing on 21 July 2020.',
                 'meritsResult': ''
               },
               {
-                'id': 'certificate_1_2',
+                'id': 'application_3_proceeding_1_certificate_2',
                 'certificateType': 'Substantive certificate',
                 'formOfService': 'Full representation',
                 'workProviderCanDo': 'All steps up to and including getting and serving a final order. If the order is breached you can apply for power of arrest. You cannot apply for a warrant of arrest or contempt of court proceedings.',
