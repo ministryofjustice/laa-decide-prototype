@@ -38,13 +38,15 @@
     "inquirer": "^7.1.0",
     "keypather": "^3.0.0",
     "marked": "^2.0.0",
+    "moment": "^2.29.1",
     "notifications-node-client": "^4.7.2",
     "nunjucks": "^3.2.1",
     "portscanner": "^2.1.1",
     "require-dir": "^1.0.0",
     "sync-request": "^6.0.0",
     "universal-analytics": "^0.4.16",
-    "uuid": "^7.0.3"
+    "uuid": "^7.0.3",
+    "validate.js": "^0.13.1"
   },
   "greenkeeper": {
     "ignore": [

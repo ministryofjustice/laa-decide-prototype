@@ -1,6 +1,8 @@
 const express = require('express')
 const router = express.Router()
 
+router.use('/node_modules', express.static('node_modules'))
+
 router.get('/v2/my-applications', function(req, res) {
   var refNo = req.session.data.refNo;
   var refNoToRemove = req.session.data.refNoToRemove;
