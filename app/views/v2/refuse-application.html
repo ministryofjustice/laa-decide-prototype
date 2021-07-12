@@ -11,7 +11,7 @@ Refuse application
 {% block content %}
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">
-    <form action="refuse-application" method="POST">
+    <form action="refuse-application" method="POST" novalidate data-validate='refusal-validation'>
       <div class="govuk-form-group">
         <fieldset class="govuk-fieldset">
           <legend class="govuk-fieldset__legend govuk-fieldset__legend--xl">
@@ -71,8 +71,27 @@ Refuse application
           </div>
         </fieldset>
       </div>
-      <button class="govuk-button govuk-button" data-module="govuk-button">Save changes</button>
+      <div class="govuk-form-group">
+        <label class="govuk-label govuk-label--m" for="refusal-note">
+          Give further details
+        </label>
+        <div id="note-hint" class="govuk-hint">
+          We'll share this information with the provider.
+        </div>
+        <textarea class="govuk-textarea" name="refusal-note" id="refusal-note" rows="10"></textarea>
+        <div class="govuk-button-group">
+          <input type="submit" name="continue_button" value="Save changes" id="continue" class="govuk-button form-button" data-module="govuk-button" data-disable-with="Save changes">
+        </div>
+      </div>
     </form>
   </div>
 </div>
+
+<script type="application/json" id="refusal-validation">
+  {
+    "refusal-reason": {
+      "presence": true
+    }
+  }
+</script>
 {% endblock %}
