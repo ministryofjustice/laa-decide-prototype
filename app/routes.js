@@ -93,7 +93,13 @@ router.get('/v2/merits-assessment-emergency', function(req, res) {
   }
 
   res.locals.data['application'] = application;
-  res.render('./v2/merits-assessment-emergency');
+
+  if (application['applicationDetails']['certificateType'] === 'Substantive'){
+    res.render('./v2/merits-assessment-substantive');
+  }
+  else {
+    res.render('./v2/merits-assessment-emergency');
+  }
 });
 
 router.get('/v2/merits-assessment-substantive', function(req, res) {

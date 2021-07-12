@@ -397,6 +397,94 @@ module.exports = {
         ],
         'notes': []
       }
+    },
+    // application #3
+    {
+      'applicationDetails':
+      {
+        'refNo': '30000009023',
+        'dateSubmitted': '19/03/2020',
+        'dateLastUpdated': '04/04/2020',
+        'applicationType': 'Initial application',
+        'delegatedFunctions': 'Not used',
+        'categoryLaw': 'Family law',
+        'meansType': 'Passported',
+        'certificateType': 'Substantive',
+        'meansAssessmentResult': 'Passported',
+        'meritsAssessmentResult': 'Not started',
+        'applicant':
+        {
+          'name': 'Nina Lamb',
+          'dob': '25/10/1978',
+          'nino': 'XX112233X',
+          'address': '1 Any Street</br>Some Town</br>Nowheresville</br>Out in the Sticks</br>SW1A 1AA',
+        },
+        'provider':
+        {
+          'name': 'Atticus Finch',
+          'firm': 'Finch & Co',
+          'accountNumber': '0D134K',
+          'address': '2 Any Street</br>Some Town</br>Nowheresville</br>Out in the Sticks</br>SW1A 1AA',
+          'phone': '07111111111'
+        },
+        'opponent':
+        {
+          'name': 'Uriah Daugherty',
+          'dob': '22/06/1980',
+          'address': '1 Any Street</br>Some Town</br>Nowheresville</br>Out in the Sticks</br>SW1A 1AA',
+          'relationship': 'Husband'
+        },
+        'children': [],
+        'linkedApplications': [],
+        'delegatedFunctionsDates': [
+          {
+            'proceedingType': 'Non-molestation order',
+            'dateUsed': 'Not used'
+          }
+        ],
+        'proceedings': [
+          {
+            'id': 'application_3_proceeding_1',
+            'matterType': 'Domestic abuse',
+            'proceedingType': 'Non-molestation order',
+            'certificates': [
+              {
+                'id': 'application_3_proceeding_1_certificate_2',
+                'certificateType': 'Substantive certificate',
+                'formOfService': 'Full representation',
+                'workProviderCanDo': 'All steps up to and including getting and serving a final order. If the order is breached you can apply for power of arrest. You cannot apply for a warrant of arrest or contempt of court proceedings.',
+                'meritsResult': ''
+              }
+            ]
+          }
+        ],
+        'costLimitations': [
+          {
+            'certificateType': 'Substantive certificate',
+            'costLimit': '£25,000',
+            'requestedCostLimit': '£25,000',
+            'justification': 'n/a'
+          }
+        ],
+        'documents': [
+          {
+            'title': 'means_report.pdf',
+            'link': 'https://drive.google.com/file/d/16V-j11_Na8_bBz4fazl-TP5k8odpPbBX/view',
+            'date': '23/02/2020'
+          },
+          {
+            'title': 'merits_report.pdf',
+            'link': 'https://drive.google.com/file/d/19TddAL5MpWAPhDqRCsbggQVVngEHCQA5/view',
+            'date': '23/02/2020'
+          },
+          {
+            'title': 'police_report.pdf',
+            'link': 'https://drive.google.com/file/d/1m2SvoKEuJySNk3wxpjvfIYHqMTZlisQf/view',
+            'date': '12/03/2020'
+          }
+        ],
+        'notes': []
+      }
     }
   ],
   assignedApplications: []
