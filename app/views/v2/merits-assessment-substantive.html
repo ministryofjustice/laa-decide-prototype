@@ -10,6 +10,12 @@ Merits assessment - substantive
 
 {% set application = data['application']['applicationDetails'] %}
 
+{% if application['certificateType'] === 'Substantive' %}
+{% set part = '1' %}
+{% else %}
+{% set part = '2' %}
+{% endif %}
+
 {% block content %}
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">
@@ -20,7 +26,7 @@ Merits assessment - substantive
 
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">
-    <h2 class="govuk-heading-m">Part 2: Substantive</h2>
+    <h2 class="govuk-heading-m">Part {{ part }}: Substantive</h2>
     <form action="case-details" method="POST">
       <div class="govuk-form-group">
         {% for proceeding in application['proceedings'] %}
