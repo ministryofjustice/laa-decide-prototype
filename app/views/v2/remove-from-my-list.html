@@ -11,7 +11,7 @@ Remove from my list
 {% block content %}
 <div class="govuk-grid-row">
   <div class="govuk-form-group">
-    <form action="my-applications">
+    <form action="my-applications" novalidate data-validate='remove-from-list-validation'>
       <fieldset class="govuk-fieldset">
         <legend class="govuk-fieldset__legend govuk-fieldset__legend--xl">
           <h1 class="govuk-fieldset__heading">Remove from my list</h1>
@@ -54,4 +54,21 @@ Remove from my list
     </form>
   </div>
 </div>
+
+<script type="application/json" id="remove-from-list-validation">
+  {
+    "removal-reason": {
+      "presence": true
+    },
+    "other": {
+      "conditionallyRequired": {
+        "dependentOn": {
+          "name": "removal-reason",
+          "value": "other"
+        },
+        "message": "^Please enter a reason for removing the application from your list"
+      }
+    }
+  }
+</script>
 {% endblock %}
