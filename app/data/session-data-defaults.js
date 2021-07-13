@@ -4,7 +4,7 @@ module.exports = {
     {
       'applicationDetails':
       {
-        'refNo': '30000009020',
+        'refNo': 'L-A1B-C2D',
         'dateSubmitted': '19/03/2020',
         'dateLastUpdated': '26/03/2020',
         'applicationType': 'Initial application',
@@ -46,19 +46,19 @@ module.exports = {
         ],
         'linkedApplications': [
           {
-            'refNo': '300123455562',
+            'refNo': 'L-E1F-G2H',
             'status': 'Pending merits assessment'
           },
           {
-            'refNo': '300123400000',
+            'refNo': 'L-J1K-L2M',
             'status': 'Pending billing'
           },
           {
-            'refNo': '300000019111',
+            'refNo': 'L-N1P-Q2R',
             'status': 'Closed'
           },
           {
-            'refNo': '30000054256',
+            'refNo': 'L-S1T-U2V',
             'status': 'Closed'
           }
         ],
@@ -187,7 +187,7 @@ module.exports = {
     {
       'applicationDetails':
       {
-        'refNo': '30000009021',
+        'refNo': 'L-W1X-Y2Z',
         'dateSubmitted': '19/03/2020',
         'dateLastUpdated': '02/04/2020',
         'applicationType': 'Initial application',
@@ -301,7 +301,7 @@ module.exports = {
     {
       'applicationDetails':
       {
-        'refNo': '30000009022',
+        'refNo': 'L-A2G-H4Q',
         'dateSubmitted': '19/03/2020',
         'dateLastUpdated': '04/04/2020',
         'applicationType': 'Initial application',
@@ -402,7 +402,7 @@ module.exports = {
     {
       'applicationDetails':
       {
-        'refNo': '30000009023',
+        'refNo': 'L-F4R-E5M',
         'dateSubmitted': '01/07/2021',
         'dateLastUpdated': '01/07/2021',
         'applicationType': 'Initial application',
