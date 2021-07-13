@@ -1,0 +1,37 @@
+<div style="background-color: #E0EEF8">
+  <form>
+    <div class="govuk-form-group">
+      <div class="govuk-!-padding-top-4"></div>
+      <h3 class="govuk-label-wrapper"><label class="govuk-label govuk-label--s" for="search">
+          Search for an application
+        </label>
+      </h3>
+      <div id="search-hint" class="govuk-hint">
+        Enter the refence number or applicant's full name
+      </div>
+      <input class="govuk-input govuk-input--width-30" id="search" name="search" type="text">
+      <div class="govuk-!-padding-top-4"></div>
+      <details class="govuk-details" data-module="govuk-details">
+        <summary class="govuk-details__summary">
+          <span class="govuk-details__summary-text">
+            Advanced search
+          </span>
+        </summary>
+        <div class="govuk-details__text">
+          {{ govukDateInput({
+            id: "advanced-search",
+            namePrefix: "advanced-search",
+            fieldset: {
+              legend: {
+                text: "Applicant date of birth",
+                isPageHeading: false,
+                classes: "govuk-fieldset__legend--s"
+              }
+            }
+          })}}
+        </div>
+      </details>
+      <button class="govuk-button" data-module="govuk-button">Search</button>
+    </div>
+  </form>
+</div>
