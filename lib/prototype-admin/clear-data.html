@@ -1,15 +1,14 @@
-
-{% extends "layout.html" %}
+{% extends "layout_portal.html" %}
 
 {% block pageTitle %}
-  Clear data? - GOV.UK Prototype Kit
+Clear data? - GOV.UK Prototype Kit
 {% endblock %}
 
 {% block beforeContent %}
-  {{ govukBackLink({
+{{ govukBackLink({
       "text": "Back",
       "href": "javascript: window.history.go(-1)"
-    }) 
+    })
   }}
 {% endblock %}
 
