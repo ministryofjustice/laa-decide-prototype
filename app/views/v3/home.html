@@ -8,22 +8,10 @@ Home
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-full">
     <h1 class="govuk-heading-l">Decide if an applicant can get legal aid</h1>
-    <div style="background-color: #E0EEF8">
-      <div class="govuk-form-group">
-        <div class="govuk-!-padding-top-4"></div>
-        <h3 class="govuk-label-wrapper"><label class="govuk-label govuk-label--s" for="search">
-            Search for an application
-          </label>
-        </h3>
-        <div id="search-hint" class="govuk-hint">
-          Enter the refence number or applicant's full name
-        </div>
-        <input class="govuk-input govuk-input--width-30" id="search" name="search" type="text">
-        <button class="govuk-button" data-module="govuk-button">Search</button>
-      </div>
-    </div>
   </div>
 </div>
+
+{% include "./_search.html" %}
 
 <div class="homepage-content">
   <div class="govuk-width-container">
