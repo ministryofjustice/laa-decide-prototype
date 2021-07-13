@@ -1,0 +1,67 @@
+{% extends "layout.html" %}
+
+{% block pageTitle %}
+Case details
+{% endblock %}
+
+{% block beforeContent %}
+<a class="govuk-back-link" href="my-applications">Back to my applications</a>
+{% endblock %}
+
+{% set application = data['application']['applicationDetails'] %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-full">
+    {% if (application['meritsAssessmentResult'] != 'Not started') and (application['meritsAssessmentResult'] != 'in progress') and (application['meritsAssessmentResult'] != 'rejected') %}
+    <div class="govuk-notification-banner govuk-notification-banner--success" role="alert" aria-labelledby="govuk-notification-banner-title" data-module="govuk-notification-banner">
+      <div class="govuk-notification-banner__header">
+        <h2 class="govuk-notification-banner__title" id="govuk-notification-banner-title">
+          Success
+        </h2>
+      </div>
+      <div class="govuk-notification-banner__content">
+        <p class="govuk-notification-banner__heading">Merits decision saved. <a href="laa-online-portal">You should now update the status of the case in CCMS</a>.</p>
+      </div>
+    </div>
+    {% endif %}
+
+    <div class="govuk-grid-column-two-thirds">
+      <h1 class="govuk-heading-l">{{ application['refNo'] }}</h1>
+      <p class="govuk-body-l">{{ application['applicant']['name'] }}</p>
+
+      <p><b>Date submitted: </b>{{ application['dateSubmitted'] }}</p>
+      <p><b>Assigned to: </b>Your name</p>
+
+      <div class="govuk-tabs" data-module="govuk-tabs">
+        <h2 class="govuk-tabs__title">
+          Case details
+        </h2>
+        <ul class="govuk-tabs__list">
+          <li class="govuk-tabs__list-item govuk-tabs__list-item--selected">
+            <a class="govuk-tabs__tab" href="#application-details">Application details</a>
+          </li>
+          <li class="govuk-tabs__list-item">
+            <a class="govuk-tabs__tab" href="#people">People</a>
+          </li>
+          <li class="govuk-tabs__list-item">
+            <a class="govuk-tabs__tab" href="#application-history">Application history</a>
+          </li>
+        </ul>
+
+        {% include "./case_details/_application_details.html" %}
+        {% include "./case_details/_people.html" %}
+        {% include "./case_details/_application_history.html" %}
+
+      </div>
+    </div>
+
+    <div class="govuk-grid-column-one-third">
+      <form action="remove-from-my-list">
+        <button class="govuk-button govuk-button--secondary" data-module="govuk-button">Remove from my list</button>
+        <input type="hidden" name="refNoToRemove" value="{{ application['refNo'] }}">
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
