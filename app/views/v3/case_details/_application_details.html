@@ -150,10 +150,15 @@
     </div>
   </details>
 
+  {% if data['refNo'] in data['assignedApplications'] %}
+  {% if (application['meritsAssessmentResult'] == 'Not started') or (application['meritsAssessmentResult'] == 'in progress') %}
   <form action="ccms-redirect">
     <button class="govuk-button govuk-button--secondary" data-module="govuk-button">Request more information</button>
   </form>
+  {% endif %}
+  {% endif %}
 
+  {% if data['refNo'] in data['assignedApplications'] %}
   <h2 class="govuk-heading-m">Make a decision</h2>
 
   {% if (application['meritsAssessmentResult'] == 'Not started') or (application['meritsAssessmentResult'] == 'in progress') %}
@@ -170,5 +175,6 @@
   </div>
   {% else %}
   <p>The merits and means decisions have been completed. You can view the <a href="#application-history">application history</a> for further details.</p>
+  {% endif %}
   {% endif %}
 </div>
