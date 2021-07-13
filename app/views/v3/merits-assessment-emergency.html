@@ -1,0 +1,151 @@
+{% extends "layout.html" %}
+
+{% block pageTitle %}
+Merits assessment - emergency
+{% endblock %}
+
+{% block beforeContent %}
+<a class="govuk-back-link" href="case-details">Back to application details</a>
+{% endblock %}
+
+{% set application = data['application']['applicationDetails'] %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    <h1 class="govuk-heading-l">Make a decision on merits</h1>
+    <p class="govuk-body-l">{{ application['refNo'] }}</p>
+  </div>
+</div>
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    <h2 class="govuk-heading-m">Part 1: Emergency</h2>
+    <form action="merits-assessment-substantive" method="POST">
+      <div class="govuk-form-group">
+        {% for proceeding in application['proceedings'] %}
+        {% for certificate in proceeding['certificates'] %}
+        {% if certificate['certificateType'] === 'Emergency certificate' %}
+
+        {% set hint=application['categoryLaw'] + ' - ' + proceeding['matterType'] +  '<br>' + 'The provider has requested ' + certificate['formOfService']  %}
+
+        {% set refuseHtml %}
+        {{ govukRadios({
+          idPrefix: certificate['id']+"_reason",
+          name: certificate['id']+"_reason",
+          fieldset: {},
+          items: [
+            {
+              value: "refused_x",
+              text: "Reason x",
+              id: "refused_x",
+              checked: checked(certificate['id']+"_reason", "refused_x")
+            },
+            {
+              value: "refused_y",
+              text: "Reason y",
+              id: "refused_y",
+              checked: checked(certificate['id']+"_reason", "refused_y")
+            },
+            {
+              value: "refused_z",
+              text: "Reason z",
+              id: "refused_z",
+              checked: checked(certificate['id']+"_reason", "refused_z")
+            }
+          ]
+        })}}
+        {% endset -%}
+
+        {{ govukRadios({
+          idPrefix: certificate['id']+"_decision",
+          name: certificate['id'],
+          fieldset: {
+            legend: {
+              text: proceeding['proceedingType'],
+              classes: "govuk-fieldset__legend--m"
+            }
+          },
+          hint: {
+            text: hint | safe
+          },
+          items: [
+            {
+              value: "granted",
+              text: "Grant",
+              checked: checked(certificate['id'], "granted")
+            },
+            {
+              value: "refused",
+              text: "Refuse",
+              checked: checked(certificate['id'], "refused"),
+              conditional: {
+                html: refuseHtml
+              }
+            }
+          ]
+        })}}
+
+        <a href="ccms-redirect" class="govuk-link">Make changes</a>
+        <div class="govuk-!-padding-top-8"></div>
+        {% endif %}
+        {% endfor %}
+        {% endfor %}
+
+        <table class="govuk-table">
+          <caption class="govuk-table__caption govuk-table__caption--m">Cost limits</caption>
+          <tbody class="govuk-table__body">
+            {% for limitation in application['costLimitations'] %}
+            {% if limitation['certificateType'] == 'Emergency certificate' %}
+            <tr class="govuk-table__row">
+              <td class="govuk-table__header">Certificate type</td>
+              <td class="govuk-table__cell">{{ limitation['certificateType'] }}</td>
+            </tr>
+            <tr class=" govuk-table__row">
+              <td class="govuk-table__header">Default</td>
+              <td class="govuk-table__cell">{{ limitation['costLimit'] }}</td>
+            </tr>
+            <tr class="govuk-table__row">
+              <td class="govuk-table__header">Requested</td>
+              <td class="govuk-table__cell">{{ limitation['requestedCostLimit'] }}</td>
+            </tr>
+            <tr class="govuk-table__row">
+              <td class="govuk-table__header">Justification</td>
+              <td class="govuk-table__cell">{{ limitation['justification'] }}</td>
+            </tr>
+            {% endif %}
+            {% endfor %}
+          </tbody>
+        </table>
+        <a href="ccms-redirect" class="govuk-link">Grant a different amount</a>
+
+        <div class="govuk-!-padding-top-8"></div>
+
+        <div class="govuk-form-group">
+          <label class="govuk-label govuk-label--m" for="emergency-note">
+            Give further details
+          </label>
+          <div id="note-hint" class="govuk-hint">
+            This information is for internal use. It will not be shared with the provider.
+          </div>
+          <textarea class="govuk-textarea" name="emergency-note" id="emergency-note" rows="10">{{ data['emergency-note'] }}</textarea>
+          <div class="govuk-button-group">
+            <input type="submit" name="continue_button" value="Save and continue" id="continue" class="govuk-button form-button" data-module="govuk-button" data-disable-with="Save and continue">
+            <input type="submit" name="continue_button" value="Save and come back later" id="continue" class="govuk-button form-button govuk-button--secondary govuk-!-margin-left-3" data-module="govuk-button"
+              data-disable-with="Save and come back later">
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <div class="govuk-grid-column-one-third">
+    <form action="merits-assessment-substantive">
+      <div class="govuk-button-group">
+        <input type="submit" name="update_all_emergency" value="Grant all" id="grant-all-emergency" class="govuk-button form-button govuk-button--secondary" data-module="govuk-button" data-disable-with="Grant all">
+        <input type="submit" name="update_all_emergency" value="Refuse all" id="refuse-all-emergency" class="govuk-button form-button govuk-button--warning govuk-!-margin-left-3" data-module="govuk-button" data-disable-with="Refuse all">
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
