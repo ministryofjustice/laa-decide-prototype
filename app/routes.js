@@ -560,4 +560,27 @@ router.post('/v3/reject-application', function(req, res) {
   res.redirect('./case-details');
 });
 
+router.post('/v3/case-details', function(req, res) {
+  var application = null;
+
+  // find the application
+  for (const app of req.session.data.applications) {
+    if (app.applicationDetails.refNo === req.session.data.refNo)
+      application = app;
+  }
+
+  // add an item to the application history
+  var new_note = {
+              'when': moment().format("dddd MMMM Do YYYY HH:mm"),
+              'who': 'You',
+              'role': null,
+              'title': 'User note',
+              'text': req.session.data['note']
+            };
+
+  application.applicationDetails.notes.push(new_note);
+  res.locals.data['application'] = application;
+  res.redirect('./case-details#application-history');
+});
+
 module.exports = router
