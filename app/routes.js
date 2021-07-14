@@ -339,7 +339,6 @@ router.get('/v3/case-details', function(req, res) {
     }
   }
 
-
   if (req.session.data['continue_button'] != "Save and come back later"){
     // update overall merits results
     // count the numner of granted and refused proceedings
@@ -372,6 +371,28 @@ router.get('/v3/case-details', function(req, res) {
     // if some proceedings have been refused, the application is partially granted
     if ((refusals > 0) && (grants > 0) && (refusals + grants == total_proceedings)){
       application['applicationDetails']['meritsAssessmentResult'] = 'partially granted'
+    }
+
+    if (application['applicationDetails']['meritsAssessmentResult'] != "Not started"){
+      var note_text = '';
+      for(let proceeding of application['applicationDetails']['proceedings']) {
+        note_text = note_text + proceeding['proceedingType'] + '<br><p class="govuk-hint">'
+        for(let certificate of proceeding['certificates']) {
+          note_text = note_text + '' + certificate['certificateType'] + ': ' + certificate['meritsResult'] + '<br>'
+        }
+        note_text = note_text + '</p>'
+      }
+
+      // add an item to the application history
+      var new_note = {
+                  'when': moment().format("dddd MMMM Do YYYY HH:mm"),
+                  'who': 'You',
+                  'role': null,
+                  'title': 'Merits decision made',
+                  'text': note_text
+                };
+
+      application.applicationDetails.notes.push(new_note);
     }
   }
   res.locals.data['application'] = application;
