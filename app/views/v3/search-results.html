@@ -4,9 +4,29 @@
 Search results
 {% endblock %}
 
+{% if (data['advanced-search-day'].length == 1) %}
+{% set day = '0' + data['advanced-search-day'] %}
+{% else %}
+{% set day = data['advanced-search-day'] %}
+{% endif %}
+
+{% if data['advanced-search-month'].length == 1 %}
+{% set month = '0' + data['advanced-search-month'] %}
+{% else %}
+{% set month = data['advanced-search-month'] %}
+{% endif %}
+
+{% if data['advanced-search-year'].length == 2 %}
+{% set year = '20' + data['advanced-search-year'] %}
+{% else %}
+{% set year = data['advanced-search-year'] %}
+{% endif %}
+
+{% set dateOfBirth = day + '/' + month + '/' + year %}
+
 {% set count = 0 %}
 {% for application in data['applications'] %}
-{% if (application['applicationDetails']['refNo'] == data['name-or-reference']) or (application['applicationDetails']['applicant']['name'] == data['name-or-reference']) %}
+{% if (application['applicationDetails']['refNo'] == data['name-or-reference']) or (application['applicationDetails']['applicant']['name'] == data['name-or-reference']) or (application['applicationDetails']['applicant']['dob'] == dateOfBirth) %}
 {% set count = count + 1 %}
 {% endif %}
 {% endfor %}
@@ -44,7 +64,7 @@ Search results
               </thead>
               <tbody class="govuk-table__body">
                 {% for application in data['applications'] %}
-                {% if (application['applicationDetails']['refNo'] == data['name-or-reference']) or (application['applicationDetails']['applicant']['name'] == data['name-or-reference']) %}
+                {% if (application['applicationDetails']['refNo'] == data['name-or-reference']) or (application['applicationDetails']['applicant']['name'] == data['name-or-reference']) or (application['applicationDetails']['applicant']['dob'] == dateOfBirth) %}
                 <tr class="govuk-table__row">
                   <td class="govuk-table__cell">{{ application['applicationDetails']['refNo'] }}<br>
                     <a class="govuk_link" href="/v3/case-details?refNo={{ application['applicationDetails']['refNo'] }}">{{ application['applicationDetails']['applicant']['name'] }}</a></td>
