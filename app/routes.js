@@ -1,5 +1,6 @@
 const express = require('express')
 const router = express.Router()
+const moment = require('moment');
 
 router.use('/node_modules', express.static('node_modules'))
 
@@ -259,6 +260,27 @@ router.get('/v3/my-applications', function(req, res) {
     if (!req.session.data.assignedApplications.includes(refNo)){
       req.session.data.assignedApplications.push(refNo);
     }
+
+    var application = null;
+
+    // find the application
+    for (const app of req.session.data.applications) {
+      if (app.applicationDetails.refNo === req.session.data.refNo)
+        application = app;
+    }
+
+    if (refNoToRemove == null){
+      // add an item to the application history
+      var new_note = {
+                  'when': moment().format("dddd MMMM Do YYYY HH:mm"),
+                  'who': 'You',
+                  'role': null,
+                  'title': 'Application added to workload',
+                  'text': null
+                };
+
+      application.applicationDetails.notes.push(new_note);
+    }
   }
 
   // if a refNoToRemove exists then we are unassigning an application
@@ -267,6 +289,30 @@ router.get('/v3/my-applications', function(req, res) {
     if (index > -1) {
       req.session.data.assignedApplications.splice(index, 1);
     }
+
+    var application = null;
+
+    // find the application
+    for (const app of req.session.data.applications) {
+      if (app.applicationDetails.refNo === req.session.data.refNo)
+        application = app;
+    }
+
+    // add an item to the application history
+    var other_reason = '';
+    if (req.session.data['removal-reason-other']){
+      other_reason = ' - ' + req.session.data['removal-reason-other']
+    }
+
+    var new_note = {
+                'when': moment().format("dddd MMMM Do YYYY HH:mm"),
+                'who': 'You',
+                'role': null,
+                'title': 'Application removed from workload',
+                'text': req.session.data['removal-reason'] + other_reason
+              };
+
+    application.applicationDetails.notes.push(new_note);
   }
 
   req.session.data.refNo = null;
