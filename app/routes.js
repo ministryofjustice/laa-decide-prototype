@@ -536,6 +536,27 @@ router.post('/v3/reject-application', function(req, res) {
   application['applicationDetails']['meritsAssessmentResult'] = 'rejected'
   application['applicationDetails']['meansAssessmentResult'] = 'rejected'
 
+  var other_reason = '';
+  if (req.session.data['rejection-reason-other']){
+    other_reason = ' - ' + req.session.data['rejection-reason-other']
+  }
+  else{
+    if (req.session.data['incorrect-means']){
+      other_reason = ' - ' + req.session.data['incorrect-means']
+    }
+  }
+
+  // add an item to the application history
+  var new_note = {
+              'when': moment().format("dddd MMMM Do YYYY HH:mm"),
+              'who': 'You',
+              'role': null,
+              'title': 'Application sent back to provider',
+              'text': req.session.data['rejection-reason'] + other_reason
+            };
+
+  application.applicationDetails.notes.push(new_note);
+
   res.redirect('./case-details');
 });
 
