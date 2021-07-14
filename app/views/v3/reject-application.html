@@ -21,13 +21,13 @@ Reject application
           <p class="govuk-body">Select the reason for returning this application</p>
           <div class="govuk-radios govuk-radios--conditional" data-module="govuk-radios">
             <div class="govuk-radios__item">
-              <input class="govuk-radios__input" id="rejection-reason" name="rejection-reason" type="radio" value="incorrect-proceedings">
+              <input class="govuk-radios__input" id="rejection-reason" name="rejection-reason" type="radio" value="Incorrect proceedings">
               <label class="govuk-label govuk-radios__label" for="rejection-reason">
                 Incorrect proceedings
               </label>
             </div>
             <div class="govuk-radios__item">
-              <input class="govuk-radios__input" id="rejection-reason-2" name="rejection-reason" type="radio" value="incorrect-means" data-aria-controls="conditional-incorrect-means">
+              <input class="govuk-radios__input" id="rejection-reason-2" name="rejection-reason" type="radio" value="Incorrect means information" data-aria-controls="conditional-incorrect-means">
               <label class="govuk-label govuk-radios__label" for="rejection-reason-2">
                 Incorrect means information
               </label>
@@ -35,21 +35,21 @@ Reject application
             <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-incorrect-means">
               <div class="govuk-form-group">
                 <fieldset class="govuk-fieldset">
-                  <div class="govuk-radios">
+                  <div class="govuk-radios" name="incorrect-means" id="incorrect-means">
                     <div class="govuk-radios__item">
-                      <input class="govuk-radios__input" id="incorrect-means-1" name="incorrect-means" type="radio" value="should-be-non-passported">
+                      <input class="govuk-radios__input" id="incorrect-means-1" name="incorrect-means" type="radio" value="Client should be non-passported">
                       <label class="govuk-label govuk-radios__label" for="incorrect-means-1">
                         Client should be non-passported
                       </label>
                     </div>
                     <div class="govuk-radios__item">
-                      <input class="govuk-radios__input" id="incorrect-means-2" name="incorrect-means" type="radio" value="should-be-passported">
+                      <input class="govuk-radios__input" id="incorrect-means-2" name="incorrect-means" type="radio" value="Client should be passported">
                       <label class="govuk-label govuk-radios__label" for="incorrect-means-2">
                         Client should be passported
                       </label>
                     </div>
                     <div class="govuk-radios__item">
-                      <input class="govuk-radios__input" id="incorrect-means-3" name="incorrect-means" type="radio" value="partner-not-declared">
+                      <input class="govuk-radios__input" id="incorrect-means-3" name="incorrect-means" type="radio" value="Partner that was not declared">
                       <label class="govuk-label govuk-radios__label" for="incorrect-means-3">
                         Partner that was not declared
                       </label>
@@ -59,44 +59,44 @@ Reject application
               </div>
             </div>
             <div class="govuk-radios__item">
-              <input class="govuk-radios__input" id="rejection-reason-3" name="rejection-reason" type="radio" value="incorrect-merits">
+              <input class="govuk-radios__input" id="rejection-reason-3" name="rejection-reason" type="radio" value="Incorrect merits information">
               <label class="govuk-label govuk-radios__label" for="rejection-reason-3">
                 Incorrect merits information
               </label>
             </div>
             <div class="govuk-radios__item">
-              <input class="govuk-radios__input" id="rejection-reason-4" name="rejection-reason" type="radio" value="domestic-waiver">
+              <input class="govuk-radios__input" id="rejection-reason-4" name="rejection-reason" type="radio" value="Domestic waiver applies">
               <label class="govuk-label govuk-radios__label" for="rejection-reason-4">
                 Domestic waiver applies
               </label>
             </div>
             <div class="govuk-radios__item">
-              <input class="govuk-radios__input" id="rejection-reason-5" name="rejection-reason" type="radio" value="insufficient-evidence">
+              <input class="govuk-radios__input" id="rejection-reason-5" name="rejection-reason" type="radio" value="Insufficient evidence">
               <label class="govuk-label govuk-radios__label" for="rejection-reason-5">
                 Insufficient evidence
               </label>
             </div>
             <div class="govuk-radios__item">
-              <input class="govuk-radios__input" id="rejection-reason-6" name="rejection-reason" type="radio" value="duplicate-proceedings">
+              <input class="govuk-radios__input" id="rejection-reason-6" name="rejection-reason" type="radio" value="Duplicate proceedings">
               <label class="govuk-label govuk-radios__label" for="rejection-reason-6">
                 Duplicate proceedings
               </label>
             </div>
             <div class="govuk-radios__item">
-              <input class="govuk-radios__input" id="rejection-reason-8" name="rejection-reason" type="radio" value="other" data-aria-controls="conditional-other">
+              <input class="govuk-radios__input" id="rejection-reason-8" name="rejection-reason" type="radio" value="Other" data-aria-controls="conditional-other">
               <label class="govuk-label govuk-radios__label" for="rejection-reason-8">
                 Other
               </label>
             </div>
             <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-other">
               <div class="govuk-form-group">
-                <label class="govuk-label" for="other">
+                <label class="govuk-label" for="rejection-reason-other">
                   Give further details
                 </label>
                 <div id="other-hint" class="govuk-hint">
                   This information is for internal use only
                 </div>
-                <textarea class="govuk-textarea govuk-!-width-two-thirds" name="other" id="other" rows="10"></textarea>
+                <textarea class="govuk-textarea govuk-!-width-two-thirds" name="rejection-reason-other" id="rejection-reason-other" rows="10"></textarea>
               </div>
             </div>
         </fieldset>
@@ -110,15 +110,6 @@ Reject application
   {
     "rejection-reason": {
       "presence": true
-    },
-    "other": {
-      "conditionallyRequired": {
-        "dependentOn": {
-          "name": "rejection-reason",
-          "value": "other"
-        },
-        "message": "^Please enter a reason for returning the application to the provider"
-      }
     }
   }
 </script>
