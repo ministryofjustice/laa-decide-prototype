@@ -152,7 +152,7 @@
 
   {% if data['refNo'] in data['assignedApplications'] %}
   {% if (application['meritsAssessmentResult'] == 'Not started') or (application['meritsAssessmentResult'] == 'in progress') %}
-  <form action="ccms-redirect">
+  <form action="request-more-information">
     <button class="govuk-button govuk-button--secondary" data-module="govuk-button">Request more information</button>
   </form>
   {% endif %}
