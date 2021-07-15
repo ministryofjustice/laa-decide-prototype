@@ -749,6 +749,19 @@ router.get('/v4/case-details', function(req, res) {
 
       application.applicationDetails.notes.push(new_note);
     }
+
+    // if a request for further info has been made, add an item to the application history
+    if (req.session.data['request-more-information']) {
+      var new_note = {
+                  'when': moment().format("dddd MMMM Do YYYY HH:mm"),
+                  'who': 'You',
+                  'role': null,
+                  'title': 'Further information requested',
+                  'text': null
+                };
+
+      application.applicationDetails.notes.push(new_note);
+    }
   }
   res.locals.data['application'] = application;
   res.render('./v4/case-details');
