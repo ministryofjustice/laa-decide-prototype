@@ -1,0 +1,75 @@
+{% extends "layout.html" %}
+
+{% block pageTitle %}
+Home
+{% endblock %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-full">
+    <h1 class="govuk-heading-l">Decide if an applicant can get legal aid</h1>
+  </div>
+</div>
+
+{% include "./_search.html" %}
+
+<div class="homepage-content">
+  <div class="govuk-width-container">
+    <ul class="govuk-grid-row card-group">
+      <li class="govuk-grid-column-one-third card-group__item">
+        <div class="card card--clickable" data-test="open-applications">
+          <h2 class="govuk-heading-m card__heading">
+            <a class="govuk-link card__link govuk-link--no-visited-state" href="open-applications">Open applications</a>
+          </h2>
+          <p class="govuk-body card__description">View the details of open applications and select a case to work on</p>
+        </div>
+      </li>
+
+      <li class="govuk-grid-column-one-third card-group__item">
+        <div class="card card--clickable">
+          <h2 class="govuk-heading-m card__heading">
+            <a class="govuk-link card__link govuk-link--no-visited-state" href="my-applications">My applications</a>
+          </h2>
+          <p class=" govuk-body card__description">View your workload and remove work from your list</p>
+        </div>
+      </li>
+
+      <li class="govuk-grid-column-one-third card-group__item">
+        <div class="card card--clickable">
+          <h2 class="govuk-heading-m card__heading">
+            <a class="govuk-link card__link govuk-link--no-visited-state" href="#">Applications pending billing</a>
+          </h2>
+          <p class="govuk-body card__description">View the details of applications gone to billing</p>
+        </div>
+      </li>
+
+      <li class="govuk-grid-column-one-third card-group__item">
+        <div class="card card--clickable">
+          <h2 class="govuk-heading-m card__heading">
+            <a class="govuk-link card__link govuk-link--no-visited-state" href="#"">Closed applications</a>
+          </h2>
+          <p class=" govuk-body card__description">View the details of closed applications</p>
+        </div>
+      </li>
+
+      <li class="govuk-grid-column-one-third card-group__item">
+        <div class="card card--clickable">
+          <h2 class="govuk-heading-m card__heading">
+            <a class="govuk-link card__link govuk-link--no-visited-state" href="#">My performance</a>
+          </h2>
+          <p class="govuk-body card__description">View statistics on your performance</p>
+        </div>
+      </li>
+
+      <li class="govuk-grid-column-one-third card-group__item">
+        <div class="card card--clickable">
+          <h2 class="govuk-heading-m card__heading">
+            <a class="govuk-link card__link govuk-link--no-visited-state" href="#">View user permissions</a>
+          </h2>
+          <p class="govuk-body card__description">View what you are allowed to do</p>
+        </div>
+      </li>
+    </ul>
+  </div>
+</div>
+{% endblock %}
