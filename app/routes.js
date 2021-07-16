@@ -705,7 +705,7 @@ router.get('/v4/case-details', function(req, res) {
 
     for (const proceeding of application['applicationDetails']['proceedings']){
       for (const certificate of proceeding['certificates']){
-        if (certificate['meritsResult'] == 'granted'){
+        if ((certificate['meritsResult'] == 'granted') || (certificate['meritsResult'] == 'amended')){
           grants = grants + 1;
         }
         if (certificate['meritsResult'] == 'refused'){
