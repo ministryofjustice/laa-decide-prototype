@@ -36,31 +36,7 @@ Merits assessment - substantive
         {% set hint=application['categoryLaw'] + ' - ' + proceeding['matterType'] +  '<br>' + 'The provider has requested ' + certificate['formOfService']  %}
 
         {% set refuseHtml %}
-        {{ govukRadios({
-          idPrefix: certificate['id']+"_reason",
-          name: certificate['id']+"_reason",
-          fieldset: {},
-          items: [
-            {
-              value: "refused_x",
-              text: "Reason x",
-              id: "refused_x",
-              checked: checked(certificate['id']+"_reason", "refused_x")
-            },
-            {
-              value: "refused_y",
-              text: "Reason y",
-              id: "refused_y",
-              checked: checked(certificate['id']+"_reason", "refused_y")
-            },
-            {
-              value: "refused_z",
-              text: "Reason z",
-              id: "refused_z",
-              checked: checked(certificate['id']+"_reason", "refused_z")
-            }
-          ]
-        })}}
+        {% include "./_refusal_reasons_dropdown.html" %}
         {% endset -%}
 
         {{ govukRadios({
