@@ -1,0 +1,121 @@
+{{ govukSelect({
+  idPrefix: certificate['id']+"_reason",
+  name: certificate['id']+"_reason",
+  fieldset: {},
+  items: [
+    {
+      value: "Evidence does not justify legal aid",
+      text: "Evidence does not justify legal aid",
+      id: "refused_1",
+      selected: checked(certificate['id']+"_reason", "Evidence does not justify legal aid")
+    },
+    {
+      value: "Insufficient information has been provided",
+      text: "Insufficient information has been provided",
+      id: "refused_2",
+      selected: checked(certificate['id']+"_reason", "Insufficient information has been provided")
+    },
+    {
+      value: "No attempt to settle has been made",
+      text: "No attempt to settle has been made",
+      id: "refused_3",
+      selected: checked(certificate['id']+"_reason", "No attempt to settle has been made")
+    },
+    {
+      value: "Applicant has a live certificate that can be amended",
+      text: "Applicant has a live certificate that can be amended",
+      id: "refused_4",
+      selected: checked(certificate['id']+"_reason", "Applicant has a live certificate that can be amended")
+    },
+    {
+      value: "The reasonable private paying individual test has not been satisfied",
+      text: "The reasonable private paying individual test has not been satisfied",
+      id: "refused_5",
+      selected: checked(certificate['id']+"_reason", "The reasonable private paying individual test has not been satisfied")
+    },
+    {
+      value: "Low chances of success",
+      text: "Low chances of success",
+      id: "refused_6",
+      selected: checked(certificate['id']+"_reason", "Low chances of success")
+    },
+    {
+      value: "The proportionality test has not been satisfied",
+      text: "The proportionality test has not been satisfied",
+      id: "refused_7",
+      selected: checked(certificate['id']+"_reason", "The proportionality test has not been satisfied")
+    },
+    {
+      value: "The nature or timeframe of the incident does not justify legal aid",
+      text: "The nature or timeframe of the incident does not justify legal aid",
+      id: "refused_8",
+      selected: checked(certificate['id']+"_reason", "The nature or timeframe of the incident does not justify legal aid")
+    },
+    {
+      value: "No genuine dispute between the parties for a court order to be necessary",
+      text: "No genuine dispute between the parties for a court order to be necessary",
+      id: "refused_9",
+      selected: checked(certificate['id']+"_reason", "No genuine dispute between the parties for a court order to be necessary")
+    },
+    {
+      value: "Too soon to make a decision because of ongoing negotiation",
+      text: "Too soon to make a decision because of ongoing negotiation",
+      id: "refused_10",
+      selected: checked(certificate['id']+"_reason", "Too soon to make a decision because of ongoing negotiation")
+    },
+    {
+      value: "No warning letter was sent to the opponent",
+      text: "No warning letter was sent to the opponent",
+      id: "refused_11",
+      selected: checked(certificate['id']+"_reason", "No warning letter was sent to the opponent")
+    },
+    {
+      value: "Granting or rejecting would be illegal, irrational or procedurally improper",
+      text: "Granting or rejecting would be illegal, irrational or procedurally improper",
+      id: "refused_12",
+      selected: checked(certificate['id']+"_reason", "Granting or rejecting would be illegal, irrational or procedurally improper")
+    },
+    {
+      value: "Bail conditions in force or the opponent has been remanded in custody",
+      text: "Bail conditions in force or the opponent has been remanded in custody",
+      id: "refused_13",
+      selected: checked(certificate['id']+"_reason", "Bail conditions in force or the opponent has been remanded in custody")
+    },
+    {
+      value: "The police are involved",
+      text: "The police are involved",
+      id: "refused_14",
+      selected: checked(certificate['id']+"_reason", "The police are involved")
+    },
+    {
+      value: "The opponent should offer an undertaking",
+      text: "The opponent should offer an undertaking",
+      id: "refused_15",
+      selected: checked(certificate['id']+"_reason", "The opponent should offer an undertaking")
+    },
+    {
+      value: "Pre-action correspondence was not sent",
+      text: "Pre-action correspondence was not sent",
+      id: "refused_16",
+      selected: checked(certificate['id']+"_reason", "Pre-action correspondence was not sent")
+    },
+    {
+      value: "Provider must show that orders obtained in England or Wales can be enforced abroad",
+      text: "Provider must show that orders obtained in England or Wales can be enforced abroad",
+      id: "refused_17",
+      selected: checked(certificate['id']+"_reason", "Provider must show that orders obtained in England or Wales can be enforced abroad")
+    },
+    {
+      value: "Investigative work must be carried out and result in reasonable indication that the case is arguable",
+      text: "Investigative work must be carried out and result in reasonable indication that the case is arguable",
+      id: "refused_18",
+      selected: checked(certificate['id']+"_reason", "Investigative work must be carried out and result in reasonable indication that the case is arguable")
+    },
+    {
+      value: "Other",
+      text: "Other",
+      id: "refused_19",
+      selected: checked(certificate['id']+"_reason", "Other")
+    }
+  ]
+})}}
