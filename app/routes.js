@@ -373,7 +373,7 @@ router.get('/v3/case-details', function(req, res) {
       application['applicationDetails']['meritsAssessmentResult'] = 'partially granted'
     }
 
-    if (application['applicationDetails']['meritsAssessmentResult'] != "Not started"){
+    if ((application['applicationDetails']['meritsAssessmentResult'] != "Not started") && (application['applicationDetails']['meritsAssessmentResult'] != "In progress")){
       var note_text = '';
       for(let proceeding of application['applicationDetails']['proceedings']) {
         note_text = note_text + proceeding['proceedingType'] + '<br><p class="govuk-hint">'
@@ -728,7 +728,7 @@ router.get('/v4/case-details', function(req, res) {
       application['applicationDetails']['meritsAssessmentResult'] = 'partially granted'
     }
 
-    if (application['applicationDetails']['meritsAssessmentResult'] != "Not started"){
+    if ((application['applicationDetails']['meritsAssessmentResult'] != "Not started") && (application['applicationDetails']['meritsAssessmentResult'] != "In progress")){
       var note_text = '';
       for(let proceeding of application['applicationDetails']['proceedings']) {
         note_text = note_text + proceeding['proceedingType'] + '<br><p class="govuk-hint">'
