@@ -163,7 +163,7 @@
   </details>
 
   {% if data['refNo'] in data['assignedApplications'] %}
-  {% if (application['meritsAssessmentResult'] == 'Not started') or (application['meritsAssessmentResult'] == 'in progress') %}
+  {% if (application['meritsAssessmentResult'] == 'Not started') or (application['meritsAssessmentResult'] == 'in progress') or (application['meansAssessmentResult'] == 'Not started') %}
   <form action="request-more-information">
     <button class="govuk-button govuk-button--secondary" data-module="govuk-button">Request more information</button>
   </form>
@@ -172,25 +172,40 @@
 
   {% if data['refNo'] in data['assignedApplications'] %}
   <h2 class="govuk-heading-m">Make a decision</h2>
+  {% if ((application['meritsAssessmentResult'] == 'granted') or (application['meritsAssessmentResult'] == 'refused') or (application['meritsAssessmentResult'] == 'partially granted'))
+     and ((application['meansAssessmentResult'] == 'granted') or (application['meansAssessmentResult'] == 'refused') or (application['meansAssessmentResult'] == 'partially granted') or (application['meansAssessmentResult'] == 'Passported')) %}
+  <p>The merits and means decisions have been completed. You can view the <a href="#application-history">application history</a> for further details.</p>
+  {% endif %}
 
-  {% if (application['meritsAssessmentResult'] == 'Not started') or (application['meritsAssessmentResult'] == 'in progress') %}
+  {% if ((application['meritsAssessmentResult'] == 'Not started') or (application['meritsAssessmentResult'] == 'in progress'))
+     and ((application['meansAssessmentResult'] == 'granted') or (application['meansAssessmentResult'] == 'refused') or (application['meansAssessmentResult'] == 'partially granted') or (application['meansAssessmentResult'] == 'Passported')) %}
   <p>The means decision has been completed. You can view the <a href="#application-history">application history</a> for further details.</p>
+  {% endif %}
+
+  {% if ((application['meritsAssessmentResult'] == 'granted') or (application['meritsAssessmentResult'] == 'refused') or (application['meritsAssessmentResult'] == 'partially granted'))
+     and (application['meansAssessmentResult'] == 'Not started') %}
+  <p>The merits decision has been completed. You can view the <a href="#application-history">application history</a> for further details.</p>
+  {% endif %}
 
   <div class="govuk-button-group">
+    {% if ((application['meritsAssessmentResult'] == 'Not started') or (application['meritsAssessmentResult'] == 'in progress')) %}
     <form action="merits-assessment-emergency">
       <button class="govuk-button" style="background-color:#1D70B8; color:white" data-module="govuk-button">Merits decision</button>
     </form>
+    {% endif %}
 
+    {% if (application['meansAssessmentResult'] == 'Not started') %}
     <form action="means-assessment">
       <button class="govuk-button" style="background-color:#1D70B8; color:white" data-module="govuk-button">Means decision</button>
     </form>
+    {% endif %}
 
+    {% if (application['meansAssessmentResult'] == 'Not started') or (application['meritsAssessmentResult'] == 'Not started') or (application['meritsAssessmentResult'] == 'in progress') %}
     <form action="reject-application">
       <button class="govuk-button govuk-button--warning" data-module="govuk-button">Send back to provider</button>
     </form>
+    {% endif %}
   </div>
-  {% else %}
-  <p>The merits and means decisions have been completed. You can view the <a href="#application-history">application history</a> for further details.</p>
-  {% endif %}
+
   {% endif %}
 </div>
