@@ -5,7 +5,11 @@ Case details
 {% endblock %}
 
 {% block beforeContent %}
+{% if data['refNo'] in data['assignedApplications'] %}
 <a class="govuk-back-link" href="my-applications">Back to my applications</a>
+{% else %}
+<a class="govuk-back-link" href="open-applications">Back to open applications</a>
+{% endif %}
 {% endblock %}
 
 {% set application = data['application']['applicationDetails'] %}
