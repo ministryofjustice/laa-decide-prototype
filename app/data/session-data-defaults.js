@@ -81,6 +81,7 @@ module.exports = {
             'id': 'application_1_proceeding_1',
             'matterType': 'Domestic abuse',
             'proceedingType': 'Non-molestation order',
+            'meansResult': '',
             'certificates': [
               {
                 'id': 'application_1_proceeding_1_certificate_1',
@@ -102,7 +103,8 @@ module.exports = {
             'id': 'application_1_proceeding_2',
             'matterType': 'Domestic abuse',
             'proceedingType': 'Prohibited steps order',
-              'certificates': [
+            'meansResult': '',
+            'certificates': [
               {
                 'id': 'application_1_proceeding_2_certificate_1',
                 'certificateType': 'Substantive certificate',
@@ -116,6 +118,7 @@ module.exports = {
             'id': 'application_1_proceeding_3',
             'matterType': 'Domestic abuse',
             'proceedingType': 'Occupation order',
+            'meansResult': '',
               'certificates': [
               {
                 'id': 'application_1_proceeding_3_certificate_1',
@@ -246,6 +249,7 @@ module.exports = {
             'id': 'application_2_proceeding_1',
             'matterType': 'Domestic abuse',
             'proceedingType': 'Non-molestation order',
+            'meansResult': '',
             'certificates': [
               {
                 'id': 'application_2_proceeding_1_certificate_1',
@@ -348,6 +352,7 @@ module.exports = {
             'id': 'application_3_proceeding_1',
             'matterType': 'Domestic abuse',
             'proceedingType': 'Non-molestation order',
+            'meansResult': '',
             'certificates': [
               {
                 'id': 'application_3_proceeding_1_certificate_1',
@@ -450,6 +455,7 @@ module.exports = {
             'id': 'application_4_proceeding_1',
             'matterType': 'Domestic abuse',
             'proceedingType': 'Non-molestation order',
+            'meansResult': '',
             'certificates': [
               {
                 'id': 'application_4_proceeding_1_certificate_1',
@@ -536,12 +542,13 @@ module.exports = {
         ],
         'proceedings': [
           {
-            'id': 'application_4_proceeding_1',
+            'id': 'application_5_proceeding_1',
             'matterType': 'Domestic abuse',
             'proceedingType': 'Non-molestation order',
+            'meansResult': '',
             'certificates': [
               {
-                'id': 'application_4_proceeding_1_certificate_1',
+                'id': 'application_5_proceeding_1_certificate_1',
                 'certificateType': 'Substantive certificate',
                 'formOfService': 'Full representation',
                 'workProviderCanDo': 'All steps up to and including getting and serving a final order. If the order is breached you can apply for power of arrest. You cannot apply for a warrant of arrest or contempt of court proceedings.',

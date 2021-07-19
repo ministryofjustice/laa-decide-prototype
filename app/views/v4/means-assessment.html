@@ -22,35 +22,35 @@ Means assessment
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">
     <h2 class="govuk-heading-l">Proceedings</h2>
-    <form action="means-assessment" method="POST">
+    <form action="case-details" method="GET">
       <div class="govuk-form-group">
         {% for proceeding in application['proceedings'] %}
         {% set hint=application['categoryLaw'] + ' - ' + proceeding['matterType'] %}
 
         {% set refuseHtml %}
         {{ govukRadios({
-          idPrefix: proceeding['id']+"_reason",
-          name: proceeding['id']+"_reason",
+          idPrefix: proceeding['id']+"_means_refusal_reason",
+          name: proceeding['id']+"_means_refusal_reason",
           fieldset: {},
           items: [
             {
               value: "Insufficient information has been provided",
               text: "Insufficient information has been provided",
               id: "refused_1",
-              selected: checked(proceeding['id']+"_reason", "Insufficient information has been provided")
+              selected: checked(proceeding['id']+"_means_refusal_reason", "Insufficient information has been provided")
             },
             {
               value: "Other",
               text: "Other",
               id: "refused_2",
-              selected: checked(proceeding['id']+"_reason", "Other")
+              selected: checked(proceeding['id']+"_means_refusal_reason", "Other")
             }
           ]
         })}}
         {% endset -%}
 
         {{ govukRadios({
-          idPrefix: proceeding['id']+"_decision",
+          idPrefix: proceeding['id']+"_means_decision",
           name: proceeding['id'],
           fieldset: {
             legend: {

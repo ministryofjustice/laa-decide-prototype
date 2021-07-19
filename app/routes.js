@@ -767,6 +767,59 @@ router.get('/v4/case-details', function(req, res) {
       application.applicationDetails.notes.push(new_note);
     }
   }
+
+  // update proceeding means results
+  if (req.session.data['continue_button'] === "Save decision"){
+    for (const proceeding of application['applicationDetails']['proceedings']){
+      console.log(req.session.data[proceeding['id']])
+      if (typeof req.session.data[proceeding['id']] !== 'undefined' && req.session.data[proceeding['id']] !== null){
+          proceeding['meansResult'] = req.session.data[proceeding['id']]
+      }
+    }
+
+    // count the number of granted and refused proceedings
+    var grants = 0;
+    var refusals = 0;
+    var total_proceedings = 0;
+
+    for (const proceeding of application['applicationDetails']['proceedings']){
+      if (proceeding['meansResult'] == 'granted') {
+          grants = grants + 1;
+      }
+      if (proceeding['meansResult'] == 'refused'){
+        refusals = refusals + 1;
+      }
+      total_proceedings = total_proceedings + 1;
+    }
+
+    // if all proceedings have been refused, the application is refused
+    if (refusals === total_proceedings){
+      application['applicationDetails']['meansAssessmentResult'] = 'refused'
+    }
+
+    // if all proceedings have been granted, the application is granted
+    if (grants === total_proceedings){
+      application['applicationDetails']['meansAssessmentResult'] = 'granted'
+    }
+
+    // if some proceedings have been refused, the application is partially granted
+    if ((refusals > 0) && (grants > 0) && (refusals + grants == total_proceedings)){
+      application['applicationDetails']['meansAssessmentResult'] = 'partially granted'
+    }
+
+    var new_note = {
+                'when': moment().format("dddd MMMM Do YYYY HH:mm"),
+                'who': 'You',
+                'role': null,
+                'title': 'Means decision made',
+                'text': application['applicationDetails']['meansAssessmentResult']
+              };
+
+    application.applicationDetails.notes.push(new_note);
+
+    req.session.data['continue_button'] = '';
+  }
+
   res.locals.data['application'] = application;
   res.render('./v4/case-details');
 });
