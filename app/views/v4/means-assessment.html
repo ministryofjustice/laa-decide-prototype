@@ -22,7 +22,7 @@ Means assessment
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">
     <h2 class="govuk-heading-l">Proceedings</h2>
-    <form action="case-details" method="GET">
+    <form action="case-details" method="POST">
       <div class="govuk-form-group">
         {% for proceeding in application['proceedings'] %}
         {% set hint=application['categoryLaw'] + ' - ' + proceeding['matterType'] %}
@@ -170,7 +170,7 @@ Means assessment
           </div>
           <textarea class="govuk-textarea" name="means-note" id="means-note" rows="10">{{ data['means-note'] }}</textarea>
           <div class="govuk-button-group">
-            <input type="submit" name="continue_button" value="Save decision" id="continue" class="govuk-button form-button" data-module="govuk-button" data-disable-with="Save decision">
+            <input type="submit" name="means_continue_button" value="Save decision" id="continue" class="govuk-button form-button" data-module="govuk-button" data-disable-with="Save decision">
           </div>
         </div>
       </div>

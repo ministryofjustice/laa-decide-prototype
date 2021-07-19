@@ -583,7 +583,7 @@ router.post('/v3/reject-application', function(req, res) {
   res.redirect('./case-details');
 });
 
-router.post('/v3/case-details', function(req, res) {
+router.post('/v3/add-note', function(req, res) {
   var application = null;
 
   // find the application
@@ -602,7 +602,7 @@ router.post('/v3/case-details', function(req, res) {
             };
 
   application.applicationDetails.notes.push(new_note);
-  res.locals.data['application'] = application;
+
   res.redirect('./case-details#application-history');
 });
 
@@ -696,81 +696,85 @@ router.get('/v4/case-details', function(req, res) {
     }
   }
 
-  if (req.session.data['continue_button'] != "Save and come back later"){
-    // update overall merits results
-    // count the numner of granted and refused proceedings
-    var grants = 0;
-    var refusals = 0;
-    var total_proceedings = 0;
+  if ((req.session.data['merits_continue_button']) || (req.session.data['update_all_substantive'])){
+    if (req.session.data['merits_continue_button'] != "Save and come back later"){
+      // update overall merits results
+      // count the numner of granted and refused proceedings
+      var grants = 0;
+      var refusals = 0;
+      var total_proceedings = 0;
 
-    for (const proceeding of application['applicationDetails']['proceedings']){
-      for (const certificate of proceeding['certificates']){
-        if ((certificate['meritsResult'] == 'granted') || (certificate['meritsResult'] == 'amended')){
-          grants = grants + 1;
+      for (const proceeding of application['applicationDetails']['proceedings']){
+        for (const certificate of proceeding['certificates']){
+          if ((certificate['meritsResult'] == 'granted') || (certificate['meritsResult'] == 'amended')){
+            grants = grants + 1;
+          }
+          if (certificate['meritsResult'] == 'refused'){
+            refusals = refusals + 1;
+          }
+          total_proceedings = total_proceedings + 1;
         }
-        if (certificate['meritsResult'] == 'refused'){
-          refusals = refusals + 1;
-        }
-        total_proceedings = total_proceedings + 1;
-      }
-    }
-
-    // if all proceedings have been refused, the application is refused
-    if (refusals === total_proceedings){
-      application['applicationDetails']['meritsAssessmentResult'] = 'refused'
-    }
-
-    // if all proceedings have been granted, the application is granted
-    if (grants === total_proceedings){
-      application['applicationDetails']['meritsAssessmentResult'] = 'granted'
-    }
-
-    // if some proceedings have been refused, the application is partially granted
-    if ((refusals > 0) && (grants > 0) && (refusals + grants == total_proceedings)){
-      application['applicationDetails']['meritsAssessmentResult'] = 'partially granted'
-    }
-
-    if ((application['applicationDetails']['meritsAssessmentResult'] != "Not started")
-        && (application['applicationDetails']['meritsAssessmentResult'] != "In progress")
-        && (application['applicationDetails']['meritsAssessmentResult'] != "rejected")){
-
-      var note_text = '';
-      for(let proceeding of application['applicationDetails']['proceedings']) {
-        note_text = note_text + proceeding['proceedingType'] + '<br><p class="govuk-hint">'
-        for(let certificate of proceeding['certificates']) {
-          note_text = note_text + '' + certificate['certificateType'] + ': ' + certificate['meritsResult'] + '<br>'
-        }
-        note_text = note_text + '</p>'
       }
 
-      // add an item to the application history
-      var new_note = {
-                  'when': moment().format("dddd MMMM Do YYYY HH:mm"),
-                  'who': 'You',
-                  'role': null,
-                  'title': 'Merits decision made',
-                  'text': note_text
-                };
+      // if all proceedings have been refused, the application is refused
+      if (refusals === total_proceedings){
+        application['applicationDetails']['meritsAssessmentResult'] = 'refused'
+      }
 
-      application.applicationDetails.notes.push(new_note);
+      // if all proceedings have been granted, the application is granted
+      if (grants === total_proceedings){
+        application['applicationDetails']['meritsAssessmentResult'] = 'granted'
+      }
+
+      // if some proceedings have been refused, the application is partially granted
+      if ((refusals > 0) && (grants > 0) && (refusals + grants == total_proceedings)){
+        application['applicationDetails']['meritsAssessmentResult'] = 'partially granted'
+      }
+
+      if ((application['applicationDetails']['meritsAssessmentResult'] != "Not started")
+          && (application['applicationDetails']['meritsAssessmentResult'] != "In progress")
+          && (application['applicationDetails']['meritsAssessmentResult'] != "rejected")){
+
+        var note_text = '';
+        for(let proceeding of application['applicationDetails']['proceedings']) {
+          note_text = note_text + proceeding['proceedingType'] + '<br><p class="govuk-hint">'
+          for(let certificate of proceeding['certificates']) {
+            note_text = note_text + '' + certificate['certificateType'] + ': ' + certificate['meritsResult'] + '<br>'
+          }
+          note_text = note_text + '</p>'
+        }
+
+        // add an item to the application history
+        var new_note = {
+                    'when': moment().format("dddd MMMM Do YYYY HH:mm"),
+                    'who': 'You',
+                    'role': null,
+                    'title': 'Merits decision made',
+                    'text': note_text
+                  };
+
+        application.applicationDetails.notes.push(new_note);
+      }
+
+      // if a request for further info has been made, add an item to the application history
+      if (req.session.data['request-more-information']) {
+        var new_note = {
+                    'when': moment().format("dddd MMMM Do YYYY HH:mm"),
+                    'who': 'You',
+                    'role': null,
+                    'title': 'Further information requested',
+                    'text': null
+                  };
+
+        application.applicationDetails.notes.push(new_note);
+      }
     }
-
-    // if a request for further info has been made, add an item to the application history
-    if (req.session.data['request-more-information']) {
-      var new_note = {
-                  'when': moment().format("dddd MMMM Do YYYY HH:mm"),
-                  'who': 'You',
-                  'role': null,
-                  'title': 'Further information requested',
-                  'text': null
-                };
-
-      application.applicationDetails.notes.push(new_note);
-    }
+    req.session.data['merits_continue_button'] = '';
+    req.session.data['update_all_substantive'] = '';
   }
 
   // update proceeding means results
-  if ((req.session.data['continue_button'] === "Save decision") || (req.session.data['update_all_means'])) {
+  if ((req.session.data['means_continue_button'] === "Save decision") || (req.session.data['update_all_means'])) {
     for (const proceeding of application['applicationDetails']['proceedings']){
       console.log(req.session.data[proceeding['id']])
       if (typeof req.session.data[proceeding['id']] !== 'undefined' && req.session.data[proceeding['id']] !== null){
@@ -822,8 +826,8 @@ router.get('/v4/case-details', function(req, res) {
               };
 
     application.applicationDetails.notes.push(new_note);
-
-    req.session.data['continue_button'] = '';
+    req.session.data['means_continue_button'] = '';
+    req.session.data['update_all_means'] = '';
   }
 
   res.locals.data['application'] = application;
@@ -901,7 +905,7 @@ router.post('/v4/merits-assessment-substantive', function(req, res) {
   res.locals.data['application'] = application;
 
   // direct to correct page based on button clicked
-  if (req.session.data['continue_button'] == "Save and come back later"){
+  if (req.session.data['merits_continue_button'] == "Save and come back later"){
     res.render('./v4/case-details');
   }
   else {
@@ -1012,7 +1016,7 @@ router.post('/v4/reject-application', function(req, res) {
   res.redirect('./case-details');
 });
 
-router.post('/v4/case-details', function(req, res) {
+router.post('/v4/add-note', function(req, res) {
   var application = null;
 
   // find the application
@@ -1031,7 +1035,7 @@ router.post('/v4/case-details', function(req, res) {
             };
 
   application.applicationDetails.notes.push(new_note);
-  res.locals.data['application'] = application;
+
   res.redirect('./case-details#application-history');
 });
 
