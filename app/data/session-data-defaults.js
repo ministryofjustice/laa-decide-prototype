@@ -148,6 +148,7 @@ module.exports = {
             'justification': 'n/a'
           }
         ],
+        'contributions': [],
         'documents': [
           {
             'title': 'means_report.pdf',
@@ -193,7 +194,7 @@ module.exports = {
         'applicationType': 'Initial application',
         'delegatedFunctions': 'Used',
         'categoryLaw': 'Family law',
-        'meansType': 'Non passported',
+        'meansType': 'Passported',
         'certificateType': 'Emergency and substantive',
         'meansAssessmentResult': 'Passported',
         'meritsAssessmentResult': 'Not started',
@@ -277,6 +278,7 @@ module.exports = {
             'justification': 'n/a'
           }
         ],
+        'contributions': [],
         'documents': [
           {
             'title': 'means_report.pdf',
@@ -378,6 +380,7 @@ module.exports = {
             'justification': 'n/a'
           }
         ],
+        'contributions': [],
         'documents': [
           {
             'title': 'means_report.pdf',
@@ -464,6 +467,105 @@ module.exports = {
             'costLimit': '£25,000',
             'requestedCostLimit': '£25,000',
             'justification': 'n/a'
+          }
+        ],
+        'contributions': [],
+        'documents': [
+          {
+            'title': 'means_report.pdf',
+            'link': 'https://drive.google.com/file/d/16V-j11_Na8_bBz4fazl-TP5k8odpPbBX/view',
+            'date': '23/02/2020'
+          },
+          {
+            'title': 'merits_report.pdf',
+            'link': 'https://drive.google.com/file/d/19TddAL5MpWAPhDqRCsbggQVVngEHCQA5/view',
+            'date': '23/02/2020'
+          },
+          {
+            'title': 'police_report.pdf',
+            'link': 'https://drive.google.com/file/d/1m2SvoKEuJySNk3wxpjvfIYHqMTZlisQf/view',
+            'date': '12/03/2020'
+          }
+        ],
+        'notes': []
+      }
+    },
+    // application #5
+    {
+      'applicationDetails':
+      {
+        'refNo': 'L-D5A-A6L',
+        'dateSubmitted': '21/07/2021',
+        'dateLastUpdated': '21/07/2021',
+        'applicationType': 'Initial application',
+        'delegatedFunctions': 'Not used',
+        'categoryLaw': 'Family law',
+        'meansType': 'Non passported',
+        'certificateType': 'Substantive',
+        'meansAssessmentResult': 'Not started',
+        'meritsAssessmentResult': 'Not started',
+        'applicant':
+        {
+          'name': 'Brittany Boyd',
+          'dob': '15/4/1981',
+          'nino': 'AA111111Q',
+          'address': '102 Petty France</br>London</br>SW1H 9AJ',
+        },
+        'provider':
+        {
+          'name': 'Lawyer McLawyerFace',
+          'firm': 'Lawyers R Us',
+          'accountNumber': '0P345F',
+          'address': 'Albany House</br>Petty France</br>London</br>SW1H 9AE',
+          'phone': '07333333333'
+        },
+        'opponent':
+        {
+          'name': 'Bob Boyd',
+          'dob': '14/06/1991',
+          'address': '102 Petty France</br>London</br>SW1H 9AJ',
+          'relationship': 'Partner'
+        },
+        'children': [],
+        'linkedApplications': [],
+        'delegatedFunctionsDates': [
+          {
+            'proceedingType': 'Non-molestation order',
+            'dateUsed': 'Not used'
+          }
+        ],
+        'proceedings': [
+          {
+            'id': 'application_4_proceeding_1',
+            'matterType': 'Domestic abuse',
+            'proceedingType': 'Non-molestation order',
+            'certificates': [
+              {
+                'id': 'application_4_proceeding_1_certificate_1',
+                'certificateType': 'Substantive certificate',
+                'formOfService': 'Full representation',
+                'workProviderCanDo': 'All steps up to and including getting and serving a final order. If the order is breached you can apply for power of arrest. You cannot apply for a warrant of arrest or contempt of court proceedings.',
+                'meritsResult': ''
+              }
+            ]
+          }
+        ],
+        'costLimitations': [
+          {
+            'certificateType': 'Substantive certificate',
+            'costLimit': '£25,000',
+            'requestedCostLimit': '£25,000',
+            'justification': 'n/a'
+          }
+        ],
+        'contributions': [
+          {
+            'description': 'per month from their disposable income',
+            'amount': '25.68'
+          },
+          {
+            'description': 'from their disposable capital',
+            'amount': '4,500'
           }
         ],
         'documents': [
