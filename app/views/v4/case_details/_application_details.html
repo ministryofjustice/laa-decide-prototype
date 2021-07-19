@@ -17,11 +17,17 @@
       <tr class="govuk-table__row">
         <td class="govuk-table__header">Means assessment</td>
         <td class="govuk-table__cell">
-          {% if application['meansAssessmentResult'] === 'rejected' %}
+          {% if (application['meansAssessmentResult'] === 'Not started') %}
+          <strong class="govuk-tag govuk-tag--purple">{{ application['meansAssessmentResult'] }}</strong>
+          {% endif %}
+          {% if (application['meansAssessmentResult'] === 'refused') or (application['meansAssessmentResult'] === 'rejected') %}
           <strong class="govuk-tag govuk-tag--red">{{ application['meansAssessmentResult'] }}</strong>
           {% endif %}
           {% if application['meansAssessmentResult'] === 'Passported' %}
           <strong class="govuk-tag govuk-tag--grey">{{ application['meansAssessmentResult'] }}</strong>
+          {% endif %}
+          {% if (application['meansAssessmentResult'] === 'granted') or (application['meansAssessmentResult'] === 'partially granted') %}
+          <strong class="govuk-tag govuk-tag--green">{{ application['meansAssessmentResult'] }}</strong>
           {% endif %}
         </td>
       </tr>
@@ -96,8 +102,14 @@
       <h2 class="govuk-heading-m">{{ certificate['certificateType'] }}</h2>
       <p><b>Form of service: </b>{{ certificate['formOfService'] }}</p>
       <p><b>Work the provider can do: </b>{{ certificate['workProviderCanDo'] }}</p>
+      {% if proceeding['meansResult'] === 'granted' %}
+      <p><b>Means decision: </b><strong class="govuk-tag govuk-tag--green">{{ proceeding['meansResult'] }}</strong></p>
+      {% endif %}
       {% if certificate['meritsResult'] === 'granted' %}
       <p><b>Merits decision: </b><strong class="govuk-tag govuk-tag--green">{{ certificate['meritsResult'] }}</strong></p>
+      {% endif %}
+      {% if proceeding['meansResult'] === 'refused' %}
+      <p><b>Means decision: </b><strong class="govuk-tag govuk-tag--red">{{ proceeding['meansResult'] }}</strong></p>
       {% endif %}
       {% if certificate['meritsResult'] === 'refused' %}
       <p><b>Merits decision: </b><strong class="govuk-tag govuk-tag--red">{{ certificate['meritsResult'] }}</strong></p>
