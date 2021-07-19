@@ -770,7 +770,7 @@ router.get('/v4/case-details', function(req, res) {
   }
 
   // update proceeding means results
-  if (req.session.data['continue_button'] === "Save decision"){
+  if ((req.session.data['continue_button'] === "Save decision") || (req.session.data['update_all_means'])) {
     for (const proceeding of application['applicationDetails']['proceedings']){
       console.log(req.session.data[proceeding['id']])
       if (typeof req.session.data[proceeding['id']] !== 'undefined' && req.session.data[proceeding['id']] !== null){
@@ -1047,6 +1047,46 @@ router.get('/v4/means-assessment', function(req, res) {
   res.locals.data['application'] = application;
 
   res.render('./v4/means-assessment');
+});
+
+
+router.get('/v4/means-update-all', function(req, res) {
+  if (req.session.data.update_all_means === 'Refuse all'){
+    res.render('./v4/refuse-means');
+  }
+  else if (req.session.data.update_all_means === 'Grant all'){
+    var application = null;
+
+    // find the application
+    for (const app of req.session.data.applications) {
+      if (app.applicationDetails.refNo === req.session.data.refNo)
+        application = app;
+    }
+
+    // grant all proceeding means results
+    for (const proceeding of application['applicationDetails']['proceedings']){
+      proceeding['meansResult'] = 'granted';
+    }
+    res.locals.data['application'] = application;
+    res.redirect(307, './case-details');
+  }
+});
+
+router.get('/v4/refuse-all-means', function(req, res) {
+  var application = null;
+
+  // find the application
+  for (const app of req.session.data.applications) {
+    if (app.applicationDetails.refNo === req.session.data.refNo)
+      application = app;
+  }
+
+  // grant all proceeding means results
+  for (const proceeding of application['applicationDetails']['proceedings']){
+    proceeding['meansResult'] = 'refused';
+  }
+  res.locals.data['application'] = application;
+  res.redirect(307, './case-details');
 });
 
 module.exports = router
