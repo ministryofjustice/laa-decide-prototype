@@ -733,6 +733,7 @@ router.get('/v4/case-details', function(req, res) {
     if ((application['applicationDetails']['meritsAssessmentResult'] != "Not started")
         && (application['applicationDetails']['meritsAssessmentResult'] != "In progress")
         && (application['applicationDetails']['meritsAssessmentResult'] != "rejected")){
+
       var note_text = '';
       for(let proceeding of application['applicationDetails']['proceedings']) {
         note_text = note_text + proceeding['proceedingType'] + '<br><p class="govuk-hint">'
@@ -807,12 +808,17 @@ router.get('/v4/case-details', function(req, res) {
       application['applicationDetails']['meansAssessmentResult'] = 'partially granted'
     }
 
+    var note_text = '';
+    for(let proceeding of application['applicationDetails']['proceedings']) {
+      note_text = note_text + proceeding['proceedingType'] + ': ' + proceeding['meansResult'] + '<br>'
+    }
+
     var new_note = {
                 'when': moment().format("dddd MMMM Do YYYY HH:mm"),
                 'who': 'You',
                 'role': null,
                 'title': 'Means decision made',
-                'text': application['applicationDetails']['meansAssessmentResult']
+                'text': note_text
               };
 
     application.applicationDetails.notes.push(new_note);

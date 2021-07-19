@@ -555,6 +555,21 @@ module.exports = {
                 'meritsResult': ''
               }
             ]
+          },
+          {
+            'id': 'application_5_proceeding_2',
+            'matterType': 'Domestic abuse',
+            'proceedingType': 'Prohibited steps order',
+            'meansResult': '',
+            'certificates': [
+              {
+                'id': 'application_5_proceeding_2_certificate_1',
+                'certificateType': 'Substantive certificate',
+                'formOfService': 'Family help (higher)',
+                'workProviderCanDo': 'Limited to Family Help (Higher) and to all steps necessary to negotiate and conclude a settlement. To include the issue of proceedings and representation in those proceedings save in relation to or at a contested final hearing.',
+                'meritsResult': ''
+              }
+            ]
           }
         ],
         'costLimitations': [
