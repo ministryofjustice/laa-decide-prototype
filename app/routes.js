@@ -976,4 +976,18 @@ router.post('/v4/case-details', function(req, res) {
   res.redirect('./case-details#application-history');
 });
 
+router.get('/v4/means-assessment', function(req, res) {
+  var application = null;
+
+  // find the application
+  for (const app of req.session.data.applications) {
+    if (app.applicationDetails.refNo === req.session.data.refNo)
+      application = app;
+  }
+
+  res.locals.data['application'] = application;
+
+  res.render('./v4/means-assessment');
+});
+
 module.exports = router
