@@ -66,6 +66,15 @@ Reject application
   {
     "rejection-reason": {
       "presence": true
+    },
+    "rejection-reason-other": {
+      "conditionallyRequired": {
+        "dependentOn": {
+          "name": "rejection-reason",
+          "value": "Other"
+        },
+        "message": "^Please enter a reason for sending the application back to the provider"
+      }
     }
   }
 </script>
