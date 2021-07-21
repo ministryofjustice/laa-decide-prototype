@@ -61,6 +61,15 @@ Remove from my list
   {
     "removal-reason": {
       "presence": true
+    },
+    "removal-reason-other": {
+      "conditionallyRequired": {
+        "dependentOn": {
+          "name": "removal-reason",
+          "value": "Other"
+        },
+        "message": "^Please enter a reason for removing the application from your list"
+      }
     }
   }
 </script>
