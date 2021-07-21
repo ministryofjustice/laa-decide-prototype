@@ -23,8 +23,8 @@ Open applications
         <div class="moj-scrollable-pane">
           <div class="moj-scrollable-pane__wrapper">
             <table class="govuk-table" data-module="moj-sortable-table">
-              <thead class="govuk-table__head">
-                <tr class="govuk-table__row">
+              <thead class="govuk-table__head" style="background-color:#f3f2f1">
+                <tr class=" govuk-table__row">
                   <th scope="col" class="govuk-table__header">Reference No./Applicant</th>
                   <th scope="col" class="govuk-table__header" aria-sort="none">Submitted</th>
                   <th scope="col" class="govuk-table__header" aria-sort="none">Last updated</th>
@@ -38,7 +38,7 @@ Open applications
               <tbody class="govuk-table__body">
                 {% for application in data['applications'] %}
                 <tr class="govuk-table__row">
-                  <td class="govuk-table__cell">{{ application['applicationDetails']['refNo'] }}<br>
+                  <td class="govuk-table__cell"><b>{{ application['applicationDetails']['refNo'] }}</b><br>
                     <a class="govuk_link" href="/v3/case-details?refNo={{ application['applicationDetails']['refNo'] }}">{{ application['applicationDetails']['applicant']['name'] }}</a></td>
                   <td class="govuk-table__cell">{{ application['applicationDetails']['dateSubmitted'] }}</td>
                   <td class="govuk-table__cell">{{ application['applicationDetails']['dateLastUpdated'] }}</td>
