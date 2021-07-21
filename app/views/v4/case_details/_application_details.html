@@ -162,12 +162,10 @@
     </div>
   </details>
 
-  {% if data['refNo'] in data['assignedApplications'] %}
   {% if (application['meritsAssessmentResult'] == 'Not started') or (application['meritsAssessmentResult'] == 'in progress') or (application['meansAssessmentResult'] == 'Not started') %}
   <form action="request-more-information">
     <button class="govuk-button govuk-button--secondary" data-module="govuk-button">Request more information</button>
   </form>
-  {% endif %}
   {% endif %}
 
   {% if data['refNo'] in data['assignedApplications'] %}
