@@ -153,6 +153,7 @@
   {% if (application['meritsAssessmentResult'] == 'Not started') or (application['meritsAssessmentResult'] == 'in progress') %}
   <form action="ccms-redirect">
     <button class="govuk-button govuk-button--secondary" data-module="govuk-button">Request more information</button>
+    <input type="hidden" name="ccms-source" value="case-details">
   </form>
   {% endif %}
 
