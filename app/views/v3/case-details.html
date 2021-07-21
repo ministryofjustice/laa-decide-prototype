@@ -63,6 +63,13 @@ Case details
         <input type="hidden" name="refNoToRemove" value="{{ application['refNo'] }}">
       </form>
     </div>
+    {% else %}
+    <div class="govuk-grid-column-one-third">
+      <form action="my-applications">
+        <button class="govuk-button govuk-button--secondary" data-module="govuk-button">Add to my list</button>
+        <input type="hidden" name="refNo" value="{{ data['refNo'] }}">
+      </form>
+    </div>
     {% endif %}
   </div>
 </div>
