@@ -501,8 +501,8 @@ module.exports = {
       'applicationDetails':
       {
         'refNo': 'L-D5A-A6L',
-        'dateSubmitted': '21/07/2021',
-        'dateLastUpdated': '21/07/2021',
+        'dateSubmitted': '02/07/2021',
+        'dateLastUpdated': '02/07/2021',
         'applicationType': 'Initial application',
         'delegatedFunctions': 'Not used',
         'categoryLaw': 'Family law',

@@ -1,0 +1,14 @@
+.govuk-button--filter {
+  color: #FFFFFF;
+  background-color: #1D70B8;
+}
+
+.govuk-button--filter:hover {
+  background-color: #1D70B8;
+  color: white;
+}
+
+.govuk-button:focus:not(:active):not(:hover) {
+  background-color: #1D70B8;
+  color: white;
+}
