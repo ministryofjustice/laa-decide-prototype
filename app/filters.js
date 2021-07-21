@@ -37,8 +37,12 @@ module.exports = function (env) {
     documentation.
 
   ------------------------------------------------------------------ */
+  const moment = require('moment');
+  filters.moment = function(dateString) {
+    return moment(dateString, 'DD/MM/YYYY');
+  };
 
-  /* ------------------------------------------------------------------
+    /* ------------------------------------------------------------------
     keep the following line to return your filters to the app
   ------------------------------------------------------------------ */
   return filters

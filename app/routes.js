@@ -606,6 +606,22 @@ router.post('/v3/add-note', function(req, res) {
   res.redirect('./case-details#application-history');
 });
 
+router.get('/v3/filter', function(req, res) {
+  if (req.session.data['filter-button'] === 'Apply filters') {
+    res.render('./v3/filter-results');
+  }
+  else if (req.session.data['filter-button'] === 'Clear all') {
+    req.session.data['categoryLaw'] = [];
+    req.session.data['delegatedFunctions'] = [];
+    req.session.data['meansType'] = [];
+    req.session.data['certificateType'] = [];
+    req.session.data['applicationType'] = [];
+    req.session.data['submitted-date-from'] = '';
+    req.session.data['submitted-date-to'] = '';
+    res.redirect('./open-applications');
+  }
+});
+
 /////////////////////////////////// V4 /////////////////////////////////////////
 
 router.get('/v4/my-applications', function(req, res) {
