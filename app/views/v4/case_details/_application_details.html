@@ -93,7 +93,7 @@
 
   {% for proceeding in application['proceedings'] %}
   <h2 class="govuk-heading-m">{{ proceeding['proceedingType'] }}</h2>
-  <details class="govuk-details" data-module="govuk-details">
+  <details class="govuk-details" data-module="govuk-details" open>
     <summary class="govuk-details__summary">
       <span class="govuk-details__summary-text">Scope limits</span>
     </summary>
@@ -132,7 +132,7 @@
   </table>
 
   <h2 class="govuk-heading-m">Documents</h2>
-  <details class="govuk-details" data-module="govuk-details">
+  <details class="govuk-details" data-module="govuk-details" open>
     <summary class="govuk-details__summary">
       <span class="govuk-details__summary-text">
         View documents
