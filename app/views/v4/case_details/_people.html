@@ -8,7 +8,7 @@
       </tr>
       <tr class="govuk-table__row">
         <td class="govuk-table__header">Date of birth</td>
-        <td class="govuk-table__cell">{{ application['applicant']['dob'] }}</td>
+        <td class="govuk-table__cell">{{ application['applicant']['dob'] | date }}</td>
       </tr>
       <tr class="govuk-table__row">
         <td class="govuk-table__header">National insurance number</td>
@@ -56,7 +56,7 @@
       </tr>
       <tr class="govuk-table__row">
         <td class="govuk-table__header">Date of birth</td>
-        <td class="govuk-table__cell">{{ application['opponent']['dob'] }}</td>
+        <td class="govuk-table__cell">{{ application['opponent']['dob'] | date }}</td>
       </tr>
       <tr class="govuk-table__row">
         <td class="govuk-table__header">Address</td>
@@ -79,7 +79,7 @@
       </tr>
       <tr class="govuk-table__row">
         <td class="govuk-table__header">Date of birth</td>
-        <td class="govuk-table__cell">{{ child['dob'] }}</td>
+        <td class="govuk-table__cell">{{ child['dob'] | date }}</td>
       </tr>
       <tr class="govuk-table__row">
         <td class="govuk-table__header">Address</td>
