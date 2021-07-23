@@ -52,6 +52,15 @@ module.exports = function (env) {
     }
   };
 
+  filters.history_date = function(dateString) {
+    if (moment(dateString).format() === 'Invalid date'){
+      return dateString;
+    }
+    else{
+      return moment(dateString).format('DD MMM YYYY HH:mm');
+    }
+  };
+
     /* ------------------------------------------------------------------
     keep the following line to return your filters to the app
   ------------------------------------------------------------------ */

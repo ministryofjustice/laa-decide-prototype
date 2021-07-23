@@ -272,7 +272,7 @@ router.get('/v3/my-applications', function(req, res) {
     if (refNoToRemove == null){
       // add an item to the application history
       var new_note = {
-                  'when': moment().format("dddd MMMM Do YYYY HH:mm"),
+                  'when': moment(),
                   'who': 'You',
                   'role': null,
                   'title': 'Application added to workload',

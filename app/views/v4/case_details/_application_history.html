@@ -11,7 +11,7 @@
     <tbody class="govuk-table__body">
       {% for note in application['notes'] | reverse %}
       <tr class="govuk-table__row">
-        <td class="govuk-table__cell">{{ note['when'] | date }}</td>
+        <td class="govuk-table__cell">{{ note['when'] | history_date }}</td>
         <td class="govuk-table__cell">{{ note['who'] }}<br>{{ note['role'] }}</td>
         <td class="govuk-table__cell"><b>{{ note['title'] }}</b><br>{{ note['text'] | safe }}</td>
       </tr>
