@@ -8,9 +8,9 @@ Filter results
 {% for application in data['applications'] %}
 {% if data['categoryLaw'] and data['delegatedFunctions'] and data['meansType'] and data['applicationType']%}
 {% if (application['applicationDetails']['categoryLaw'] in data['categoryLaw']) and (application['applicationDetails']['delegatedFunctions'] in data['delegatedFunctions']) and (application['applicationDetails']['meansType'] in data['meansType']) and (application['applicationDetails']['applicationType'] in data['applicationType'])%}
-{% set app_submitted_date = application['applicationDetails']['dateSubmitted'] | moment %}
-{% set param_from_date = data['submitted-date-from'] | moment %}
-{% set param_to_date = data['submitted-date-to'] | moment %}
+{% set app_submitted_date = application['applicationDetails']['dateSubmitted'] | submitted_date_for_filter %}
+{% set param_from_date = data['submitted-date-from'] | date_parameter_for_filter %}
+{% set param_to_date = data['submitted-date-to'] | date_parameter_for_filter %}
 {% if (app_submitted_date >= param_from_date) and (app_submitted_date <= param_to_date) %}
 {% set count = count + 1 %}
 {% endif %}
@@ -53,9 +53,9 @@ Filter results
                 {% for application in data['applications'] %}
                 {% if data['categoryLaw'] and data['delegatedFunctions'] and data['meansType'] and data['applicationType']%}
                 {% if (application['applicationDetails']['categoryLaw'] in data['categoryLaw']) and (application['applicationDetails']['delegatedFunctions'] in data['delegatedFunctions']) and (application['applicationDetails']['meansType'] in data['meansType']) and (application['applicationDetails']['applicationType'] in data['applicationType']) %}
-                {% set app_submitted_date = application['applicationDetails']['dateSubmitted'] | moment %}
-                {% set param_from_date = data['submitted-date-from'] | moment %}
-                {% set param_to_date = data['submitted-date-to'] | moment %}
+                {% set app_submitted_date = application['applicationDetails']['dateSubmitted'] | submitted_date_for_filter %}
+                {% set param_from_date = data['submitted-date-from'] | date_parameter_for_filter %}
+                {% set param_to_date = data['submitted-date-to'] | date_parameter_for_filter %}
                 {% if (app_submitted_date >= param_from_date) and (app_submitted_date <= param_to_date) %}
                 <tr class="govuk-table__row">
                   <td class="govuk-table__cell">{{ application['applicationDetails']['refNo'] }}<br>
