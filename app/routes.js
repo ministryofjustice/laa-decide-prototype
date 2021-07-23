@@ -936,7 +936,6 @@ router.get('/v4/merits-assessment-emergency', function(req, res) {
 
 router.get('/v4/merits-assessment-substantive', function(req, res) {
   if (req.session.data.update_all_emergency === 'Refuse all'){
-    req.session.data.update_all_emergency = '';
     res.render('./v4/refuse-application');
   }
   else if (req.session.data.update_all_emergency === 'Grant all'){
@@ -958,7 +957,6 @@ router.get('/v4/merits-assessment-substantive', function(req, res) {
     }
 
     application['applicationDetails']['meritsAssessmentResult'] = 'in progress'
-    req.session.data.update_all_emergency = '';
     res.locals.data['application'] = application;
     res.render('./v4/merits-assessment-substantive');
   }
