@@ -321,7 +321,7 @@ router.get('/v3/my-applications', function(req, res) {
   res.render('./v3/my-applications');
 });
 
-router.get('/v3/case-details', function(req, res) {
+router.get('/v3/application-details', function(req, res) {
   var application = null;
 
   // find the application
@@ -398,7 +398,34 @@ router.get('/v3/case-details', function(req, res) {
     }
   }
   res.locals.data['application'] = application;
-  res.render('./v3/case-details');
+  res.render('./v3/application-details');
+});
+
+router.get('/v3/application-history', function(req, res) {
+  var application = null;
+
+  // find the application
+  for (const app of req.session.data.applications) {
+    if (app.applicationDetails.refNo === req.session.data.refNo)
+      application = app;
+  }
+
+  res.locals.data['application'] = application;
+  // req.session.data['application'] = application;
+  res.render('./v3/application-history');
+});
+
+router.get('/v3/people', function(req, res) {
+  var application = null;
+
+  // find the application
+  for (const app of req.session.data.applications) {
+    if (app.applicationDetails.refNo === req.session.data.refNo)
+      application = app;
+  }
+
+  res.locals.data['application'] = application;
+  res.render('./v3/people');
 });
 
 router.get('/v3/merits-assessment-emergency', function(req, res) {
@@ -473,7 +500,7 @@ router.post('/v3/merits-assessment-substantive', function(req, res) {
 
   // direct to correct page based on button clicked
   if (req.session.data['continue_button'] == "Save and come back later"){
-    res.render('./v3/case-details');
+    res.render('./v3/application-details');
   }
   else {
     res.render('./v3/merits-assessment-substantive');
@@ -502,7 +529,7 @@ router.post('/v3/refuse-application', function(req, res) {
 
     application['applicationDetails']['meritsAssessmentResult'] = 'in progress'
     res.locals.data['application'] = application;
-    res.redirect('./case-details');
+    res.redirect('./application-details');
   }
   else if (req.session.data['update_all_emergency'] === "Refuse all"){
 
@@ -543,7 +570,7 @@ router.get('/v3/substantive-update-all', function(req, res) {
       }
     }
     res.locals.data['application'] = application;
-    res.redirect(307, './case-details');
+    res.redirect(307, './application-details');
   }
 });
 
@@ -580,7 +607,7 @@ router.post('/v3/reject-application', function(req, res) {
 
   application.applicationDetails.notes.push(new_note);
 
-  res.redirect('./case-details');
+  res.redirect('./application-details');
 });
 
 router.post('/v3/add-note', function(req, res) {
@@ -603,7 +630,7 @@ router.post('/v3/add-note', function(req, res) {
 
   application.applicationDetails.notes.push(new_note);
 
-  res.redirect('./case-details#application-history');
+  res.redirect('./application-history');
 });
 
 router.get('/v3/filter', function(req, res) {
