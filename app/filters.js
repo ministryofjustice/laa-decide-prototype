@@ -39,8 +39,12 @@ module.exports = function (env) {
   ------------------------------------------------------------------ */
   const moment = require('moment');
 
-  filters.moment = function(dateString) {
-    return moment(dateString, 'DD/MM/YYYY');
+  filters.date_parameter_for_filter = function(dateString) {
+    return moment(dateString, 'DD/MM/YYYY').utcOffset('+0000').add(1, 'hours');
+  };
+
+  filters.submitted_date_for_filter = function(dateString) {
+    return moment(dateString).utcOffset('+0000');
   };
 
   filters.date = function(dateString) {
