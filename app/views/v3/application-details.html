@@ -72,9 +72,8 @@ Application details
             <td class="govuk-table__cell">
               {% if application['meansAssessmentResult'] === 'rejected' %}
               <strong class="govuk-tag govuk-tag--red">{{ application['meansAssessmentResult'] }}</strong>
-              {% endif %}
-              {% if application['meansAssessmentResult'] === 'Passported' %}
-              <strong class="govuk-tag govuk-tag--grey">{{ application['meansAssessmentResult'] }}</strong>
+              {% else %}
+              <strong class="govuk-tag govuk-tag--grey">Passported</strong>
               {% endif %}
             </td>
           </tr>
