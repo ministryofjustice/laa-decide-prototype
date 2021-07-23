@@ -448,6 +448,7 @@ router.get('/v3/merits-assessment-emergency', function(req, res) {
 
 router.get('/v3/merits-assessment-substantive', function(req, res) {
   if (req.session.data.update_all_emergency === 'Refuse all'){
+    req.session.data.update_all_emergency = '';
     res.render('./v3/refuse-application');
   }
   else if (req.session.data.update_all_emergency === 'Grant all'){
@@ -469,6 +470,18 @@ router.get('/v3/merits-assessment-substantive', function(req, res) {
     }
 
     application['applicationDetails']['meritsAssessmentResult'] = 'in progress'
+    req.session.data.update_all_emergency = '';
+    res.locals.data['application'] = application;
+    res.render('./v3/merits-assessment-substantive');
+  }
+  else {
+    var application = null;
+
+    // find the application
+    for (const app of req.session.data.applications) {
+      if (app.applicationDetails.refNo === req.session.data.refNo)
+        application = app;
+    }
     res.locals.data['application'] = application;
     res.render('./v3/merits-assessment-substantive');
   }
@@ -530,7 +543,7 @@ router.post('/v3/refuse-application', function(req, res) {
     res.locals.data['application'] = application;
     res.redirect('./application-details');
   }
-  else if (req.session.data['update_all_emergency'] === "Refuse all"){
+  else {
 
     // refuse all emergency proceeding merits results
     for (const proceeding of application['applicationDetails']['proceedings']){
@@ -923,6 +936,7 @@ router.get('/v4/merits-assessment-emergency', function(req, res) {
 
 router.get('/v4/merits-assessment-substantive', function(req, res) {
   if (req.session.data.update_all_emergency === 'Refuse all'){
+    req.session.data.update_all_emergency = '';
     res.render('./v4/refuse-application');
   }
   else if (req.session.data.update_all_emergency === 'Grant all'){
@@ -944,6 +958,19 @@ router.get('/v4/merits-assessment-substantive', function(req, res) {
     }
 
     application['applicationDetails']['meritsAssessmentResult'] = 'in progress'
+    req.session.data.update_all_emergency = '';
+    res.locals.data['application'] = application;
+    res.render('./v4/merits-assessment-substantive');
+  }
+  else {
+    var application = null;
+
+    // find the application
+    for (const app of req.session.data.applications) {
+      if (app.applicationDetails.refNo === req.session.data.refNo)
+        application = app;
+    }
+
     res.locals.data['application'] = application;
     res.render('./v4/merits-assessment-substantive');
   }
