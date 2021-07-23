@@ -5,8 +5,8 @@ You need to review this application in CCMS
 {% endblock %}
 
 {% block beforeContent %}
-{% if data['ccms-source'] == 'case-details' %}
-<a class="govuk-back-link" href="case-details">Back</a>
+{% if data['ccms-source'] == 'application-details' %}
+<a class="govuk-back-link" href="application-details">Back</a>
 {% endif %}
 {% if data['ccms-source'] == 'emergency' %}
 <a class="govuk-back-link" href="merits-assessment-emergency">Back</a>
@@ -33,8 +33,8 @@ You need to review this application in CCMS
       <button class="govuk-button govuk-button--secondary" data-module="govuk-button">Continue in CCMS</button>
     </form>
 
-    {% if data['ccms-source'] == 'case-details' %}
-    <a href="case-details" class="govuk-link--inverse">Back to application</a>
+    {% if data['ccms-source'] == 'application-details' %}
+    <a href="application-details" class="govuk-link--inverse">Back to application</a>
     {% endif %}
     {% if data['ccms-source'] == 'emergency' %}
     <a href="merits-assessment-emergency" class="govuk-link--inverse">Back to application</a>

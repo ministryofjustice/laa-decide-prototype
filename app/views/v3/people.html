@@ -1,0 +1,167 @@
+{% extends "layout.html" %}
+
+{% block pageTitle %}
+People
+{% endblock %}
+
+{% block beforeContent %}
+{% if data['refNo'] in data['assignedApplications'] %}
+<a class="govuk-back-link" href="my-applications">Back to my applications</a>
+{% else %}
+<a class="govuk-back-link" href="open-applications">Back to open applications</a>
+{% endif %}
+{% endblock %}
+
+{% set application = data['application']['applicationDetails'] %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-full">
+    {% if (application['meritsAssessmentResult'] != 'Not started') and (application['meritsAssessmentResult'] != 'in progress') and (application['meritsAssessmentResult'] != 'rejected') %}
+    <div class="govuk-notification-banner govuk-notification-banner--success" role="alert" aria-labelledby="govuk-notification-banner-title" data-module="govuk-notification-banner">
+      <div class="govuk-notification-banner__header">
+        <h2 class="govuk-notification-banner__title" id="govuk-notification-banner-title">
+          Success
+        </h2>
+      </div>
+      <div class="govuk-notification-banner__content">
+        <p class="govuk-notification-banner__heading">Merits decision saved. <a href="laa-online-portal">You should now update the status of the case in CCMS</a>.</p>
+      </div>
+    </div>
+    {% endif %}
+
+    <div class="govuk-grid-column-two-thirds">
+      <h1 class="govuk-heading-xl govuk-!-margin-bottom-4">{{ application['refNo'] }}</h1>
+      <p class="govuk-body govuk-!-font-size-36">{{ application['applicant']['name'] }}</p>
+      <div class="govuk-!-padding-top-4"></div>
+
+      <p><b>Date submitted: </b>{{ application['dateSubmitted'] | date }}</p>
+      <p><b>Assigned to: </b>Your name</p>
+
+      <nav class="moj-sub-navigation" aria-label="Sub navigation">
+        <ul class="moj-sub-navigation__list">
+          <li class="moj-sub-navigation__item">
+            <a class="moj-sub-navigation__link" href="application-details">Application details</a>
+          </li>
+          <li class="moj-sub-navigation__item">
+            <a class="moj-sub-navigation__link" aria-current="page" href="people">People</a>
+          </li>
+          <li class="moj-sub-navigation__item">
+            <a class="moj-sub-navigation__link" href="application-history">Application history</a>
+          </li>
+        </ul>
+      </nav>
+
+      <table class="govuk-table">
+        <caption class="govuk-table__caption govuk-table__caption--m">Applicant details</caption>
+        <tbody class="govuk-table__body">
+          <tr class="govuk-table__row">
+            <td class="govuk-table__header govuk-!-width-one-half">Name</td>
+            <td class="govuk-table__cell">{{ application['applicant']['name'] }}</td>
+          </tr>
+          <tr class="govuk-table__row">
+            <td class="govuk-table__header">Date of birth</td>
+            <td class="govuk-table__cell">{{ application['applicant']['dob'] | date }}</td>
+          </tr>
+          <tr class="govuk-table__row">
+            <td class="govuk-table__header">National insurance number</td>
+            <td class="govuk-table__cell">{{ application['applicant']['nino'] }}</td>
+          </tr>
+          <tr class="govuk-table__row">
+            <td class="govuk-table__header">Address</td>
+            <td class="govuk-table__cell">{{ application['applicant']['address']|safe }}</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <table class="govuk-table">
+        <caption class="govuk-table__caption govuk-table__caption--m">Provider details</caption>
+        <tbody class="govuk-table__body">
+          <tr class="govuk-table__row">
+            <td class="govuk-table__header govuk-!-width-one-half">Name</td>
+            <td class="govuk-table__cell">{{ application['provider']['name'] }}</td>
+          </tr>
+          <tr class="govuk-table__row">
+            <td class="govuk-table__header">Firm</td>
+            <td class="govuk-table__cell">{{ application['provider']['firm'] }}</td>
+          </tr>
+          <tr class="govuk-table__row">
+            <td class="govuk-table__header">Account number</td>
+            <td class="govuk-table__cell">{{ application['provider']['accountNumber'] }}</td>
+          </tr>
+          <tr class="govuk-table__row">
+            <td class="govuk-table__header">Address</td>
+            <td class="govuk-table__cell">{{ application['provider']['address']|safe }}</td>
+          </tr>
+          <tr class="govuk-table__row">
+            <td class="govuk-table__header">Phone</td>
+            <td class="govuk-table__cell">{{ application['provider']['phone'] }}</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <table class="govuk-table">
+        <caption class="govuk-table__caption govuk-table__caption--m">Opponent details</caption>
+        <tbody class="govuk-table__body">
+          <tr class="govuk-table__row">
+            <td class="govuk-table__header govuk-!-width-one-half">Name</td>
+            <td class="govuk-table__cell">{{ application['opponent']['name'] }}</td>
+          </tr>
+          <tr class="govuk-table__row">
+            <td class="govuk-table__header">Date of birth</td>
+            <td class="govuk-table__cell">{{ application['opponent']['dob'] | date }}</td>
+          </tr>
+          <tr class="govuk-table__row">
+            <td class="govuk-table__header">Address</td>
+            <td class="govuk-table__cell">{{ application['opponent']['address']|safe }}</td>
+          </tr>
+          <tr class="govuk-table__row">
+            <td class="govuk-table__header">Relationship</td>
+            <td class="govuk-table__cell">{{ application['opponent']['relationship'] }}</td>
+          </tr>
+        </tbody>
+      </table>
+
+      {% for child in application['children'] %}
+      <table class="govuk-table">
+        <caption class="govuk-table__caption govuk-table__caption--m">Child details</caption>
+        <tbody class="govuk-table__body">
+          <tr class="govuk-table__row">
+            <td class="govuk-table__header govuk-!-width-one-half">Name</td>
+            <td class="govuk-table__cell">{{ child['name'] }}</td>
+          </tr>
+          <tr class="govuk-table__row">
+            <td class="govuk-table__header">Date of birth</td>
+            <td class="govuk-table__cell">{{ child['dob'] | date }}</td>
+          </tr>
+          <tr class="govuk-table__row">
+            <td class="govuk-table__header">Address</td>
+            <td class="govuk-table__cell">{{ child['address']|safe }}</td>
+          </tr>
+          <tr class="govuk-table__row">
+            <td class="govuk-table__header">Relationship</td>
+            <td class="govuk-table__cell">{{ child['relationship'] }}</td>
+          </tr>
+        </tbody>
+      </table>
+      {% endfor %}
+    </div>
+
+    {% if data['refNo'] in data['assignedApplications'] %}
+    <div class="govuk-grid-column-one-third">
+      <form action="remove-from-my-list">
+        <button class="govuk-button govuk-button--secondary" data-module="govuk-button">Remove from my list</button>
+        <input type="hidden" name="refNoToRemove" value="{{ application['refNo'] }}">
+      </form>
+    </div>
+    {% else %}
+    <div class="govuk-grid-column-one-third">
+      <form action="my-applications">
+        <button class="govuk-button govuk-button--secondary" data-module="govuk-button">Add to my list</button>
+        <input type="hidden" name="refNo" value="{{ data['refNo'] }}">
+      </form>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

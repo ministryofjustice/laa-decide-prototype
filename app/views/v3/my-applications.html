@@ -40,7 +40,7 @@ My applications
                 {% if application['applicationDetails']['refNo'] in data['assignedApplications'] %}
                 <tr class="govuk-table__row">
                   <td class="govuk-table__cell"><b>{{ application['applicationDetails']['refNo'] }}</b><br>
-                    <a class="govuk_link" href="/v3/case-details?refNo={{ application['applicationDetails']['refNo'] }}">{{ application['applicationDetails']['applicant']['name'] }}</a></td>
+                    <a class="govuk_link" href="/v3/application-details?refNo={{ application['applicationDetails']['refNo'] }}">{{ application['applicationDetails']['applicant']['name'] }}</a></td>
                   <td class="govuk-table__cell"><input type="hidden" name="date" value="{{ application['applicationDetails']['dateSubmitted'] }}" />{{ application['applicationDetails']['dateSubmitted'] | date}}</td>
                   <td class="govuk-table__cell"><input type="hidden" name="date" value="{{ application['applicationDetails']['dateLastUpdated'] }}" />{{ application['applicationDetails']['dateLastUpdated'] | date}}</td>
                   <td class="govuk-table__cell">{{ application['applicationDetails']['applicationType'] }}</td>
@@ -48,8 +48,8 @@ My applications
                   <td class="govuk-table__cell">{{ application['applicationDetails']['categoryLaw'] }}</td>
                   <td class="govuk-table__cell">{{ application['applicationDetails']['meansType'] }}</td>
                   <td class="govuk-table__cell">
-                    <form action="case-details">
-                      <a href="case-details" onclick="this.closest('form').submit();return false;">Details</a>
+                    <form action="application-details">
+                      <a href="application-details" onclick="this.closest('form').submit();return false;">Details</a>
                       <input type="hidden" name="refNo" value="{{ application['applicationDetails']['refNo'] }}">
                     </form>
                   </td>
