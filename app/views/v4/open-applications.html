@@ -39,7 +39,7 @@ Open applications
                 {% for application in data['applications'] %}
                 <tr class="govuk-table__row">
                   <td class="govuk-table__cell"><b>{{ application['applicationDetails']['refNo'] }}</b><br>
-                    <a class="govuk_link" href="/v4/case-details?refNo={{ application['applicationDetails']['refNo'] }}">{{ application['applicationDetails']['applicant']['name'] }}</a></td>
+                    <a class="govuk_link" href="/v4/application-details?refNo={{ application['applicationDetails']['refNo'] }}">{{ application['applicationDetails']['applicant']['name'] }}</a></td>
                   <td class="govuk-table__cell"><input type="hidden" name="date" value="{{ application['applicationDetails']['dateSubmitted'] }}" />{{ application['applicationDetails']['dateSubmitted'] | date}}</td>
                   <td class="govuk-table__cell"><input type="hidden" name="date" value="{{ application['applicationDetails']['dateLastUpdated'] }}" />{{ application['applicationDetails']['dateLastUpdated'] | date}}</td>
                   <td class="govuk-table__cell">{{ application['applicationDetails']['applicationType'] }}</td>
