@@ -77,7 +77,7 @@
       {% for delegatedFunction in application['delegatedFunctionsDates'] %}
       <tr class="govuk-table__row">
         <td class="govuk-table__header">{{ delegatedFunction['proceedingType'] }}</td>
-        <td class="govuk-table__cell">{{ delegatedFunction['dateUsed'] }}</td>
+        <td class="govuk-table__cell">{{ delegatedFunction['dateUsed'] | date }}</td>
       </tr>
       {% endfor %}
     </tbody>
@@ -142,7 +142,7 @@
                 {{ document['title'] }}
               </a>
             </td>
-            <td class="govuk-table__cell">{{ document['date'] }}</td>
+            <td class="govuk-table__cell">{{ document['date'] | date }}</td>
           </tr>
           {% endfor %}
         </tbody>

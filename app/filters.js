@@ -38,8 +38,18 @@ module.exports = function (env) {
 
   ------------------------------------------------------------------ */
   const moment = require('moment');
+
   filters.moment = function(dateString) {
     return moment(dateString, 'DD/MM/YYYY');
+  };
+
+  filters.date = function(dateString) {
+    if (moment(dateString).format() === 'Invalid date'){
+      return dateString;
+    }
+    else{
+      return moment(dateString).format('DD MMM YYYY');
+    }
   };
 
     /* ------------------------------------------------------------------
