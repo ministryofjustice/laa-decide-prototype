@@ -68,8 +68,8 @@ Search results
                 <tr class="govuk-table__row">
                   <td class="govuk-table__cell">{{ application['applicationDetails']['refNo'] }}<br>
                     <a class="govuk_link" href="/v3/case-details?refNo={{ application['applicationDetails']['refNo'] }}">{{ application['applicationDetails']['applicant']['name'] }}</a></td>
-                  <td class="govuk-table__cell">{{ application['applicationDetails']['dateSubmitted'] }}</td>
-                  <td class="govuk-table__cell">{{ application['applicationDetails']['dateLastUpdated'] }}</td>
+                  <td class="govuk-table__cell"><input type="hidden" name="date" value="{{ application['applicationDetails']['dateSubmitted'] }}" />{{ application['applicationDetails']['dateSubmitted'] | date}}</td>
+                  <td class="govuk-table__cell"><input type="hidden" name="date" value="{{ application['applicationDetails']['dateLastUpdated'] }}" />{{ application['applicationDetails']['dateLastUpdated'] | date}}</td>
                   <td class="govuk-table__cell">{{ application['applicationDetails']['applicationType'] }}</td>
                   <td class="govuk-table__cell">{{ application['applicationDetails']['delegatedFunctions'] }}</td>
                   <td class="govuk-table__cell">{{ application['applicationDetails']['categoryLaw'] }}</td>

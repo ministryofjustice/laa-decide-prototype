@@ -5,8 +5,8 @@ module.exports = {
       'applicationDetails':
       {
         'refNo': 'L-A1B-C2D',
-        'dateSubmitted': '19/03/2020',
-        'dateLastUpdated': '26/03/2020',
+        'dateSubmitted': '2020-03-26T00:00:00.000Z',
+        'dateLastUpdated': '2020-03-26T00:00:00.000Z',
         'applicationType': 'Initial application',
         'delegatedFunctions': 'Used',
         'categoryLaw': 'Family law',
@@ -17,7 +17,7 @@ module.exports = {
         'applicant':
         {
           'name': 'Rita Patel',
-          'dob': '19/03/1993',
+          'dob': '1993-03-19T00:00:00.000Z',
           'nino': 'QQ112233Q',
           'address':  '1 London Road</br>London</br>SW1A 1AA',
         },
@@ -32,14 +32,14 @@ module.exports = {
         'opponent':
         {
           'name': 'Jonathan Hunt',
-          'dob': '23/11/1987',
+          'dob': '1987-11-23T00:00:00.000Z',
           'address': '1 London Road</br>London</br>SW1A 1AA',
           'relationship': 'Father'
         },
         'children': [
           {
             'name': 'Sam Hunt',
-            'dob': '23/02/2007',
+            'dob': '2007-02-23T00:00:00.000Z',
             'address': '1 London Road</br>London</br>SW1A 1AA',
             'relationship': 'Son'
           }
@@ -65,7 +65,7 @@ module.exports = {
         'delegatedFunctionsDates': [
           {
             'proceedingType': 'Non-molestation order',
-            'dateUsed': '03/03/2020'
+            'dateUsed': '2020-03-03T00:00:00.000Z'
           },
           {
             'proceedingType': 'Prohibitive steps order',
@@ -73,7 +73,7 @@ module.exports = {
            },
           {
             'proceedingType': 'Occupation order',
-            'dateUsed': '03/03/2020'
+            'dateUsed': '2020-03-03T00:00:00.000Z'
           }
         ],
         'proceedings': [
@@ -156,35 +156,20 @@ module.exports = {
           {
             'title': 'means_report.pdf',
             'link': 'https://drive.google.com/file/d/16V-j11_Na8_bBz4fazl-TP5k8odpPbBX/view',
-            'date': '23/02/2020'
+            'date': '2020-02-23T00:00:00.000Z'
           },
           {
             'title': 'merits_report.pdf',
             'link': 'https://drive.google.com/file/d/19TddAL5MpWAPhDqRCsbggQVVngEHCQA5/view',
-            'date': '23/02/2020'
+            'date': '2020-02-23T00:00:00.000Z'
           },
           {
             'title': 'police_report.pdf',
             'link': 'https://drive.google.com/file/d/1m2SvoKEuJySNk3wxpjvfIYHqMTZlisQf/view',
-            'date': '12/03/2020'
+            'date': '2020-03-12T00:00:00.000Z'
           }
         ],
-        'notes': [
-          {
-            'when': 'Wednesday 22 March 2021 12:21',
-            'who': 'Helen Roy',
-            'role': 'Customer service advisor',
-            'title': 'Customer support note',
-            'text': 'Provider called and chased on the case. Client is due to hearing tomorrow.'
-          },
-          {
-            'when': 'Thursday 11 March 2021 11:00',
-            'who': 'Mary Smith',
-            'role': 'Provider',
-            'title': 'New documents uploaded',
-            'text': ''
-          }
-        ]
+        'notes': []
       }
     },
     // application #2
@@ -192,8 +177,8 @@ module.exports = {
       'applicationDetails':
       {
         'refNo': 'L-W1X-Y2Z',
-        'dateSubmitted': '19/03/2020',
-        'dateLastUpdated': '02/04/2020',
+        'dateSubmitted': '2020-03-19T00:00:00.000Z',
+        'dateLastUpdated': '2020-04-02T00:00:00.000Z',
         'applicationType': 'Initial application',
         'delegatedFunctions': 'Used',
         'categoryLaw': 'Family law',
@@ -204,7 +189,7 @@ module.exports = {
         'applicant':
         {
           'name': 'Amelia Daugherty',
-          'dob': '15/05/2000',
+          'dob': '2000-05-15T00:00:00.000Z',
           'nino': 'ZZ112233Z',
           'address': '1 High Street</br>London</br>SW1A 1AA',
         },
@@ -219,20 +204,20 @@ module.exports = {
         'opponent':
         {
           'name': 'Uriah Daugherty',
-          'dob': '22/06/1980',
+          'dob': '1980-06-22T00:00:00.000Z',
           'address': '1 High Street</br>London</br>SW1A 1AA',
           'relationship': 'Husband'
         },
         'children': [
           {
             'name': 'Bert Daugherty',
-            'dob': '03/12/2008',
+            'dob': '2008-12-03T00:00:00.000Z',
             'address': '1 High Street</br>London</br>SW1A 1AA',
             'relationship': 'Son'
           },
           {
             'name': 'Madaline Daugherty',
-            'dob': '04/05/2010',
+            'dob': '2010-05-04T00:00:00.000Z',
             'address': '1 High Street</br>London</br>SW1A 1AA',
             'relationship': 'Daughter'
           }
@@ -241,7 +226,7 @@ module.exports = {
         'delegatedFunctionsDates': [
           {
             'proceedingType': 'Non-molestation order',
-            'dateUsed': '03/03/2020'
+            'dateUsed': '2020-03-03T00:00:00.000Z'
           }
         ],
         'proceedings': [
@@ -287,17 +272,17 @@ module.exports = {
           {
             'title': 'means_report.pdf',
             'link': 'https://drive.google.com/file/d/16V-j11_Na8_bBz4fazl-TP5k8odpPbBX/view',
-            'date': '23/02/2020'
+            'date': '2020-02-23T00:00:00.000Z'
           },
           {
             'title': 'merits_report.pdf',
             'link': 'https://drive.google.com/file/d/19TddAL5MpWAPhDqRCsbggQVVngEHCQA5/view',
-            'date': '23/02/2020'
+            'date': '2020-02-23T00:00:00.000Z'
           },
           {
             'title': 'police_report.pdf',
             'link': 'https://drive.google.com/file/d/1m2SvoKEuJySNk3wxpjvfIYHqMTZlisQf/view',
-            'date': '12/03/2020'
+            'date': '2020-03-12T00:00:00.000Z'
           }
         ],
         'notes': []
@@ -308,8 +293,8 @@ module.exports = {
       'applicationDetails':
       {
         'refNo': 'L-A2G-H4Q',
-        'dateSubmitted': '19/03/2020',
-        'dateLastUpdated': '04/04/2020',
+        'dateSubmitted': '2020-03-20T00:00:00.000Z',
+        'dateLastUpdated': '2020-04-04T00:00:00.000Z',
         'applicationType': 'Initial application',
         'delegatedFunctions': 'Used',
         'categoryLaw': 'Family law',
@@ -320,7 +305,7 @@ module.exports = {
         'applicant':
         {
           'name': 'Nina Lamb',
-          'dob': '25/10/1978',
+          'dob': '1978-10-23T00:00:00.000Z',
           'nino': 'XX112233X',
           'address': '1 Any Street</br>Some Town</br>Nowheresville</br>Out in the Sticks</br>SW1A 1AA',
         },
@@ -335,7 +320,7 @@ module.exports = {
         'opponent':
         {
           'name': 'Uriah Daugherty',
-          'dob': '22/06/1980',
+          'dob': '1980-06-22T00:00:00.000Z',
           'address': '1 Any Street</br>Some Town</br>Nowheresville</br>Out in the Sticks</br>SW1A 1AA',
           'relationship': 'Husband'
         },
@@ -344,7 +329,7 @@ module.exports = {
         'delegatedFunctionsDates': [
           {
             'proceedingType': 'Non-molestation order',
-            'dateUsed': '03/03/2020'
+            'dateUsed': '2020-03-03T00:00:00.000Z'
           }
         ],
         'proceedings': [
@@ -390,17 +375,17 @@ module.exports = {
           {
             'title': 'means_report.pdf',
             'link': 'https://drive.google.com/file/d/16V-j11_Na8_bBz4fazl-TP5k8odpPbBX/view',
-            'date': '23/02/2020'
+            'date': '2020-02-23T00:00:00.000Z'
           },
           {
             'title': 'merits_report.pdf',
             'link': 'https://drive.google.com/file/d/19TddAL5MpWAPhDqRCsbggQVVngEHCQA5/view',
-            'date': '23/02/2020'
+            'date': '2020-02-23T00:00:00.000Z'
           },
           {
             'title': 'police_report.pdf',
             'link': 'https://drive.google.com/file/d/1m2SvoKEuJySNk3wxpjvfIYHqMTZlisQf/view',
-            'date': '12/03/2020'
+            'date': '2020-03-12T00:00:00.000Z'
           }
         ],
         'notes': []
@@ -411,8 +396,8 @@ module.exports = {
       'applicationDetails':
       {
         'refNo': 'L-F4R-E5M',
-        'dateSubmitted': '01/07/2021',
-        'dateLastUpdated': '01/07/2021',
+        'dateSubmitted': '2021-07-01T00:00:00.000Z',
+        'dateLastUpdated': '2021-07-01T00:00:00.000Z',
         'applicationType': 'Initial application',
         'delegatedFunctions': 'Not used',
         'categoryLaw': 'Family law',
@@ -423,7 +408,7 @@ module.exports = {
         'applicant':
         {
           'name': 'Kevin MacFarlane',
-          'dob': '22/01/1982',
+          'dob': '1982-01-22T00:00:00.000Z',
           'nino': 'ZZ112233Z',
           'address': '102 Petty France</br>London</br>SW1H 9AJ',
         },
@@ -438,7 +423,7 @@ module.exports = {
         'opponent':
         {
           'name': 'Luciana MacFarlane',
-          'dob': '14/06/1991',
+          'dob': '1991-06-14T00:00:00.000Z',
           'address': '102 Petty France</br>London</br>SW1H 9AJ',
           'relationship': 'Wife'
         },
@@ -480,17 +465,17 @@ module.exports = {
           {
             'title': 'means_report.pdf',
             'link': 'https://drive.google.com/file/d/16V-j11_Na8_bBz4fazl-TP5k8odpPbBX/view',
-            'date': '23/02/2020'
+            'date': '2020-02-23T00:00:00.000Z'
           },
           {
             'title': 'merits_report.pdf',
             'link': 'https://drive.google.com/file/d/19TddAL5MpWAPhDqRCsbggQVVngEHCQA5/view',
-            'date': '23/02/2020'
+            'date': '2020-02-23T00:00:00.000Z'
           },
           {
             'title': 'police_report.pdf',
             'link': 'https://drive.google.com/file/d/1m2SvoKEuJySNk3wxpjvfIYHqMTZlisQf/view',
-            'date': '12/03/2020'
+            'date': '2020-03-12T00:00:00.000Z'
           }
         ],
         'notes': []
@@ -501,8 +486,8 @@ module.exports = {
       'applicationDetails':
       {
         'refNo': 'L-D5A-A6L',
-        'dateSubmitted': '02/07/2021',
-        'dateLastUpdated': '02/07/2021',
+        'dateSubmitted': '2021-07-02T00:00:00.000Z',
+        'dateLastUpdated': '2021-07-02T00:00:00.000Z',
         'applicationType': 'Initial application',
         'delegatedFunctions': 'Not used',
         'categoryLaw': 'Family law',
@@ -513,7 +498,7 @@ module.exports = {
         'applicant':
         {
           'name': 'Brittany Boyd',
-          'dob': '15/4/1981',
+          'dob': '1981-04-15T00:00:00.000Z',
           'nino': 'AA111111Q',
           'address': '102 Petty France</br>London</br>SW1H 9AJ',
         },
@@ -528,7 +513,7 @@ module.exports = {
         'opponent':
         {
           'name': 'Bob Boyd',
-          'dob': '14/06/1991',
+          'dob': '1991-06-14T00:00:00.000Z',
           'address': '102 Petty France</br>London</br>SW1H 9AJ',
           'relationship': 'Partner'
         },
@@ -594,17 +579,17 @@ module.exports = {
           {
             'title': 'means_report.pdf',
             'link': 'https://drive.google.com/file/d/16V-j11_Na8_bBz4fazl-TP5k8odpPbBX/view',
-            'date': '23/02/2020'
+            'date': '2020-02-23T00:00:00.000Z'
           },
           {
             'title': 'merits_report.pdf',
             'link': 'https://drive.google.com/file/d/19TddAL5MpWAPhDqRCsbggQVVngEHCQA5/view',
-            'date': '23/02/2020'
+            'date': '2020-02-23T00:00:00.000Z'
           },
           {
             'title': 'police_report.pdf',
             'link': 'https://drive.google.com/file/d/1m2SvoKEuJySNk3wxpjvfIYHqMTZlisQf/view',
-            'date': '12/03/2020'
+            'date': '2020-03-12T00:00:00.000Z'
           }
         ],
         'notes': []
