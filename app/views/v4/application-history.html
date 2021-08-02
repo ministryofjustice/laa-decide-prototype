@@ -1,0 +1,126 @@
+{% extends "layout.html" %}
+
+{% block pageTitle %}
+Application history
+{% endblock %}
+
+{% block beforeContent %}
+{% if data['refNo'] in data['assignedApplications'] %}
+<a class="govuk-back-link" href="my-applications">Back to my applications</a>
+{% else %}
+<a class="govuk-back-link" href="open-applications">Back to open applications</a>
+{% endif %}
+{% endblock %}
+
+{% set application = data['application']['applicationDetails'] %}
+
+{% set success_message %}
+{% if ((application['meritsAssessmentResult'] == 'granted') or (application['meritsAssessmentResult'] == 'refused') or (application['meritsAssessmentResult'] == 'partially granted'))
+   and ((application['meansAssessmentResult'] == 'granted') or (application['meansAssessmentResult'] == 'refused') or (application['meansAssessmentResult'] == 'partially granted') or (application['meansAssessmentResult'] == 'Passported')) %}
+Means and merits decisions saved. <a href="laa-online-portal">You should now update the status of the case in CCMS</a>.
+{% endif %}
+
+{% if ((application['meritsAssessmentResult'] == 'Not started') or (application['meritsAssessmentResult'] == 'in progress'))
+   and ((application['meansAssessmentResult'] == 'granted') or (application['meansAssessmentResult'] == 'refused') or (application['meansAssessmentResult'] == 'partially granted') or (application['meansAssessmentResult'] == 'Passported')) %}
+Means decision saved.
+{% endif %}
+
+{% if ((application['meritsAssessmentResult'] == 'granted') or (application['meritsAssessmentResult'] == 'refused') or (application['meritsAssessmentResult'] == 'partially granted'))
+   and (application['meansAssessmentResult'] == 'Not started') %}
+Merits decision saved.
+{% endif %}
+{% endset %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-full">
+    {% if (application['meritsAssessmentResult'] == 'granted') or (application['meritsAssessmentResult'] == 'refused') or (application['meritsAssessmentResult'] == 'partially granted') or (application['meansAssessmentResult'] == 'granted') or (application['meansAssessmentResult'] == 'refused') or (application['meansAssessmentResult'] == 'partially granted') %}
+    <div class="govuk-notification-banner govuk-notification-banner--success" role="alert" aria-labelledby="govuk-notification-banner-title" data-module="govuk-notification-banner">
+      <div class="govuk-notification-banner__header">
+        <h2 class="govuk-notification-banner__title" id="govuk-notification-banner-title">
+          Success
+        </h2>
+      </div>
+      <div class="govuk-notification-banner__content">
+        <p class="govuk-notification-banner__heading">{{ success_message | safe}}</p>
+      </div>
+    </div>
+    {% endif %}
+
+    <div class="govuk-grid-column-two-thirds">
+      <h1 class="govuk-heading-xl govuk-!-margin-bottom-4">{{ application['refNo'] }}</h1>
+      <p class="govuk-body govuk-!-font-size-36">{{ application['applicant']['name'] }}</p>
+      <div class="govuk-!-padding-top-4"></div>
+
+      <p><b>Date submitted: </b>{{ application['dateSubmitted'] | date }}</p>
+      <p><b>Assigned to: </b>Your name</p>
+
+      <nav class="moj-sub-navigation" aria-label="Sub navigation">
+        <ul class="moj-sub-navigation__list">
+          <li class="moj-sub-navigation__item">
+            <a class="moj-sub-navigation__link" href="application-details">Application details</a>
+          </li>
+          <li class="moj-sub-navigation__item">
+            <a class="moj-sub-navigation__link" href="people">People</a>
+          </li>
+          <li class="moj-sub-navigation__item">
+            <a class="moj-sub-navigation__link" aria-current="page" href="application-history">Application history</a>
+          </li>
+        </ul>
+      </nav>
+
+      <table class="govuk-table">
+        <caption class="govuk-table__caption govuk-table__caption--m">Application history</caption>
+        <thead class="govuk-table__head">
+          <tr class="govuk-table__row">
+            <th scope="col" class="govuk-table__header">When</th>
+            <th scope="col" class="govuk-table__header">Who</th>
+            <th scope="col" class="govuk-table__header">What</th>
+          </tr>
+        </thead>
+        <tbody class="govuk-table__body">
+          {% for note in application['notes'] | reverse %}
+          <tr class="govuk-table__row">
+            <td class="govuk-table__cell">{{ note['when'] | history_date }}</td>
+            <td class="govuk-table__cell">{{ note['who'] }}<br>{{ note['role'] }}</td>
+            <td class="govuk-table__cell"><b>{{ note['title'] }}</b><br>{{ note['text'] | safe }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+
+      {% if data['refNo'] in data['assignedApplications'] %}
+      <form action="add-note" method="POST">
+        <div class="govuk-form-group">
+          <h1 class="govuk-label-wrapper"><label class="govuk-label govuk-label--s" for="note">
+              Add a note to the application history
+            </label>
+          </h1>
+          <div id="note-hint" class="govuk-hint">
+            This information is for internal use only
+          </div>
+          <textarea class="govuk-textarea" name="note" id="note" rows="5"></textarea>
+          <button class="govuk-button" data-module="govuk-button">Add to application history</button>
+        </div>
+      </form>
+      {% endif %}
+    </div>
+
+    {% if data['refNo'] in data['assignedApplications'] %}
+    <div class="govuk-grid-column-one-third">
+      <form action="remove-from-my-list">
+        <button class="govuk-button govuk-button--secondary" data-module="govuk-button">Remove from my list</button>
+        <input type="hidden" name="refNoToRemove" value="{{ application['refNo'] }}">
+      </form>
+    </div>
+    {% else %}
+    <div class="govuk-grid-column-one-third">
+      <form action="my-applications">
+        <button class="govuk-button govuk-button--secondary" data-module="govuk-button">Add to my list</button>
+        <input type="hidden" name="refNo" value="{{ data['refNo'] }}">
+      </form>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

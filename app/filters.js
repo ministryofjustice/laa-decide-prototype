@@ -37,8 +37,35 @@ module.exports = function (env) {
     documentation.
 
   ------------------------------------------------------------------ */
+  const moment = require('moment');
 
-  /* ------------------------------------------------------------------
+  filters.date_parameter_for_filter = function(dateString) {
+    return moment(dateString, 'DD/MM/YYYY').utcOffset('+0000').add(1, 'hours');
+  };
+
+  filters.submitted_date_for_filter = function(dateString) {
+    return moment(dateString).utcOffset('+0000');
+  };
+
+  filters.date = function(dateString) {
+    if (moment(dateString).format() === 'Invalid date'){
+      return dateString;
+    }
+    else{
+      return moment(dateString).format('DD MMM YYYY');
+    }
+  };
+
+  filters.history_date = function(dateString) {
+    if (moment(dateString).format() === 'Invalid date'){
+      return dateString;
+    }
+    else{
+      return moment(dateString).format('DD MMM YYYY HH:mm');
+    }
+  };
+
+    /* ------------------------------------------------------------------
     keep the following line to return your filters to the app
   ------------------------------------------------------------------ */
   return filters

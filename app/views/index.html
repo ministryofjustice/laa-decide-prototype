@@ -1,44 +1,84 @@
-
-{% extends "layout.html" %}
+{% extends "layout_portal.html" %}
 
 {% block pageTitle %}
-  GOV.UK Prototype Kit
+GOV.UK Prototype Kit
 {% endblock %}
 
 {% block content %}
 
-  <div class="govuk-grid-row">
-    <div class="govuk-grid-column-two-thirds">
-      <h1 class="govuk-heading-xl">
-        The GOV.UK Prototype Kit
-        <span class="govuk-caption-xl">{{releaseVersion}}</span>
-      </h1>{{releaseVersion | log }}
-      <p>
-        This kit lets you rapidly create HTML prototypes of GOV.UK services.
-      </p>
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    <h1 class="govuk-heading-xl">
+      Prototypes for Decide
+    </h1>
 
-      <p>
-        It contains all you need to prototype anything from simple static pages to complex, data-driven transactions.
-      </p>
+    <h2 class="govuk-heading-m">Figma prototypes</h2>
 
-      <h2 class="govuk-heading-m">About this page</h2>
+    <ul class="govuk-list govuk-list--bullet">
+      <li>
+        <a href="https://www.figma.com/proto/wWFrX4iYFIRu6fzOLfSSpY/Core-user-journey-%E2%80%93-v4?node-id=713%3A8792&scaling=min-zoom&page-id=713%3A7783">v4</a>
+      </li>
+      <li>
+        <a href="https://www.figma.com/file/LQshY0ahMFw77uunpmoADE/Core-user-journey-%E2%80%93-V5-(End-of-Alpha)?node-id=713%3A7783">v5 - MVP</a>
+      </li>
+      <li>
+        <a href="https://www.figma.com/file/LQshY0ahMFw77uunpmoADE/Core-user-journey-%E2%80%93-V5-(End-of-Alpha)?node-id=1036%3A0">v5 - post-MVP</a>
+      </li>
+    </ul>
+    <h2 class="govuk-heading-m">GOVUK Prototype Kit prototypes</h2>
+    <p>[source code: <a href="https://github.com/ministryofjustice/laa-decide-prototype">https://github.com/ministryofjustice/laa-decide-prototype</a>]</p>
 
-      <p>We recommend you add links to your prototype to this page, rather than delete it.
-        You'll find this page in the kit at '/app/views/index.html'.</p>
-
-      <p>You can change the service name by editing the file '/app/config.js'.</p>
-
-      <h2 class="govuk-heading-m">Examples and documentation</h2>
-
-      <ul class="govuk-list govuk-list--bullet">
-        <li>
-          <a href="/docs/tutorials-and-examples">Example pages and documentation</a>
-        </li>
-        <li>
-          <a href="https://design-system.service.gov.uk">GOV.UK Design System</a>
-        </li>
-      </ul>
-    </div>
+    <ul class="govuk-list govuk-list--bullet">
+      <li>
+        <p><b><a href="/v1/laa-online-portal">v1</a> - Figma prototype v4 @ 01/07/2021.</b> Hard-coded data.</p>
+      </li>
+      <li>
+        <p><b><a href="/v2/laa-online-portal">v2</a> - dynamic version of Figma prototype v4.</b> Allows interaction with the service. Supported functionality:
+          <ul class="govuk-list govuk-list--bullet">
+            <li>Add to my list</li>
+            <li>Remove from my list</li>
+            <li>Merits decisions on emergency and substantial proceedings</li>
+            <li>Grant all</li>
+            <li>Refuse all</li>
+            <li>Save and come back later</li>
+            <li>Send back to provider</li>
+          </ul>
+          Unsupported functionality:
+          <ul class="govuk-list govuk-list--bullet">
+            <li>Search - search bar is present but does not function</li>
+            <li>Filter - filter is present but does not function</li>
+            <li>Application history - hardcoded. Interacting with the service does not update the history</li>
+          </ul>
+        </p>
+      </li>
+      <li>
+        <p><b><a href="/v3/laa-online-portal">v3</a> - dynamic version of Figma prototype v5 - MVP.</b> Includes all functionality from <a href="/v2/laa-online-portal">v2</a>, fixes issues with Search and Application History, plus updates to bring it
+          in line with the MVP version of v5
+          of the Figma prototype.
+          <br>
+          <br>
+          Unsupported functionality:
+          <ul class="govuk-list govuk-list--bullet">
+            <li>Filter - filter is present but does not function</li>
+            <li>Fake data - applications need to be replaced with realistic provided by the business</li>
+          </ul>
+        </p>
+      </li>
+      <li>
+        <p><b><a href="/v4/laa-online-portal">v4</a> - dynamic version of Figma prototype v5 - post-MVP</b> Includes all functionality from <a href="/v3/laa-online-portal">v3</a>, plus additional features to support post-MVP work. This
+          includes:
+          <ul class="govuk-list govuk-list--bullet">
+            <li>Means assessments</li>
+            <li>Requests for more information</li>
+            <li>Changing merits assessment data</li>
+          </ul>
+          Unsupported functionality:
+          <ul class="govuk-list govuk-list--bullet">
+            <li>Filter - filter is present but does not function</li>
+            <li>Fake data - applications need to be replaced with realistic provided by the business</li>
+          </ul>
+        </p>
+      </li>
+    </ul>
   </div>
-
-{% endblock %}
+</div> {% endblock %}

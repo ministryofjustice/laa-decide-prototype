@@ -1,0 +1,106 @@
+{% extends "layout.html" %}
+
+{% block pageTitle %}
+Open applications
+{% endblock %}
+
+{% block content %}
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-full">
+    <div style="background-color: #E0EEF8">
+      <div class="govuk-form-group">
+        <br>
+        <h3 class="govuk-label-wrapper"><label class="govuk-label govuk-label--s" for="search">
+            Search for an application
+          </label>
+        </h3>
+        <div id="search-hint" class="govuk-hint">
+          Enter the refence number or applicant's full name
+        </div>
+        <input class="govuk-input govuk-input--width-30" id="search" name="search" type="text">
+        <button class="govuk-button" data-module="govuk-button">Search</button>
+        <br>
+      </div>
+    </div>
+
+    <h1 class="govuk-heading-l">Open applications</h1>
+    <p>3 open applications</p>
+
+    <div class="moj-filter-layout">
+      {% include "./_filter.html" %}
+
+      <div class="moj-filter-layout__content">
+        <div class="moj-action-bar">
+          <div class="moj-action-bar__filter"></div>
+        </div>
+
+        <div class="moj-scrollable-pane">
+          <div class="moj-scrollable-pane__wrapper">
+            <table class="govuk-table" data-module="moj-sortable-table">
+              <thead class="govuk-table__head">
+                <tr class="govuk-table__row">
+                  <th scope="col" class="govuk-table__header">Reference No.</th>
+                  <th scope="col" class="govuk-table__header" aria-sort="none">Submitted</th>
+                  <th scope="col" class="govuk-table__header" aria-sort="none">Last updated</th>
+                  <th scope="col" class="govuk-table__header">Application type</th>
+                  <th scope="col" class="govuk-table__header">DF</th>
+                  <th scope="col" class="govuk-table__header">Category of law</th>
+                  <th scope="col" class="govuk-table__header">Means type</th>
+                  <th scope="col" class="govuk-table__header">Action</th>
+                </tr>
+              </thead>
+              <tbody class="govuk-table__body">
+                <tr class="govuk-table__row">
+                  <td class="govuk-table__cell">30000009020</td>
+                  <td class="govuk-table__cell">19 Mar 2020</td>
+                  <td class="govuk-table__cell">26 Mar 2020</td>
+                  <td class="govuk-table__cell">Initial application</td>
+                  <td class="govuk-table__cell">Used</td>
+                  <td class="govuk-table__cell">Family law</td>
+                  <td class="govuk-table__cell">Passported</td>
+                  <td class="govuk-table__cell">
+                    <form action="my-applications">
+                      <button class="govuk-button govuk-button--secondary" data-module="govuk-button">Add to my list</button>
+                    </form>
+                  </td>
+                </tr>
+                <tr class="govuk-table__row">
+                  <td class="govuk-table__cell">30000009021</td>
+                  <td class="govuk-table__cell">19 Mar 2020</td>
+                  <td class="govuk-table__cell">02 Apr 2020</td>
+                  <td class="govuk-table__cell">Initial application</td>
+                  <td class="govuk-table__cell">Used</td>
+                  <td class="govuk-table__cell">Family law</td>
+                  <td class="govuk-table__cell">Non passported</td>
+                  <td class="govuk-table__cell">
+                    <form action="my-applications">
+                      <button class="govuk-button govuk-button--secondary" data-module="govuk-button">Add to my list</button>
+                    </form>
+                  </td>
+                </tr>
+                <tr class="govuk-table__row">
+                  <td class="govuk-table__cell">30000009022</td>
+                  <td class="govuk-table__cell">19 Mar 2020</td>
+                  <td class="govuk-table__cell">04 Apr 2020</td>
+                  <td class="govuk-table__cell">Initial application</td>
+                  <td class="govuk-table__cell">Used</td>
+                  <td class="govuk-table__cell">Family law</td>
+                  <td class="govuk-table__cell">Passported</td>
+                  <td class="govuk-table__cell">
+                    <form action="my-applications">
+                      <button class="govuk-button govuk-button--secondary" data-module="govuk-button">Add to my list</button>
+                    </form>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <p>Showing <b>1</b> to <b>3</b> of <b>3</b> results</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

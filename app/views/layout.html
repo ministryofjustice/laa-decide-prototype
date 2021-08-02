@@ -9,6 +9,7 @@
 {% from "govuk/components/button/macro.njk"              import govukButton %}
 {% from "govuk/components/character-count/macro.njk"     import govukCharacterCount %}
 {% from "govuk/components/checkboxes/macro.njk"          import govukCheckboxes %}
+{% from "govuk/components/cookie-banner/macro.njk"       import govukCookieBanner %}
 {% from "govuk/components/date-input/macro.njk"          import govukDateInput %}
 {% from "govuk/components/details/macro.njk"             import govukDetails %}
 {% from "govuk/components/error-message/macro.njk"       import govukErrorMessage %}
@@ -31,29 +32,62 @@
 {% from "govuk/components/warning-text/macro.njk"        import govukWarningText %}
 
 {% block head %}
-  {% include "includes/head.html" %}
+{% include "includes/head.html" %}
 {% endblock %}
 
 {% block pageTitle %}
-  GOV.UK Prototype Kit
+GOV.UK Prototype Kit
 {% endblock %}
 
 {% block header %}
-  {% include "includes/cookie-banner.html" %}
-  {# Set serviceName in config.js. #}
-  {{ govukHeader({
+{# Set serviceName in config.js. #}
+{{ govukHeader({
     homepageUrl: "/",
     serviceName: serviceName,
     serviceUrl: "/",
     containerClasses: "govuk-width-container"
   }) }}
+
+<div class="govuk-width-container">
+  <div class="govuk-phase-banner">
+    <p class="govuk-phase-banner__content">
+      <strong class="govuk-tag govuk-phase-banner__content__tag">
+        alpha
+      </strong>
+      <span class="govuk-phase-banner__text">
+        This is a new service – your <a class="govuk-link" href="#">feedback</a> will help us to improve it.
+      </span>
+    </p>
+  </div>
+</div>
+
+{%- from "moj/components/primary-navigation/macro.njk" import mojPrimaryNavigation -%}
+
+{{ mojPrimaryNavigation({
+    label: 'Primary navigation',
+    items: [
+      {
+        href: "home",
+        text: "Home"
+      },
+      {
+        href: "open-applications",
+        text: "Open applications"
+      },
+      {
+        href: "my-applications",
+        text: "My applications"
+      }
+    ]
+  }) }}
+
 {% endblock %}
 
 {% set mainClasses = mainClasses | default("govuk-main-wrapper--auto-spacing") %}
 
 {% if useAutoStoreData %}
-  {% block footer %}
-    {{ govukFooter({
+{% block footer %}
+{{ govukFooter({
       meta: {
         items: [
           {
@@ -67,13 +101,13 @@
         ]
       }
     }) }}
-  {% endblock %}
+{% endblock %}
 {% endif %}
 
 {% block bodyEnd %}
-  {% block scripts %}
-    {% include "includes/scripts.html" %}
-    {% block pageScripts %}{% endblock %}
-  {% endblock %}
-  <!-- GOV.UK Prototype Kit {{releaseVersion}} -->
+{% block scripts %}
+{% include "includes/scripts.html" %}
+{% block pageScripts %}{% endblock %}
+{% endblock %}
+<!-- GOV.UK Prototype Kit {{releaseVersion}} -->
 {% endblock %}
