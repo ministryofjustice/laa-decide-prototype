@@ -1129,7 +1129,7 @@ router.post('/v4/add-note', function(req, res) {
 
   application.applicationDetails.notes.push(new_note);
 
-  res.redirect('./application-details');
+  res.redirect('./application-history');
 });
 
 router.get('/v4/means-assessment', function(req, res) {
