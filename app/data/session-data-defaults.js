@@ -634,7 +634,7 @@ module.exports = {
         'children': [
           {
             'name': 'Child One Test',
-            'dob': '2019-20-19T00:00:00.000Z',
+            'dob': '2019-10-25T00:00:00.000Z',
             'address': '1 Legal Aid Place</br>Jarrow</br>NE1 23Z',
             'relationship': 'Child'
           }
@@ -650,7 +650,7 @@ module.exports = {
             'dateUsed': '2020-07-19T00:00:00.000Z'
            },
           {
-            'proceedingType': 'CAO Contact',
+            'proceedingType': 'CAO contact',
             'dateUsed': '2020-07-19T00:00:00.000Z'
           }
         ],
@@ -680,7 +680,7 @@ module.exports = {
           {
             'id': 'application_6_proceeding_2',
             'matterType': 'Domestic abuse',
-            'proceedingType': 'Prohibited steps order',
+            'proceedingType': 'App parental responsibilty order',
             'meansResult': '',
             'certificates': [
               {
@@ -702,7 +702,7 @@ module.exports = {
           {
             'id': 'application_6_proceeding_3',
             'matterType': 'Domestic abuse',
-            'proceedingType': 'Occupation order',
+            'proceedingType': 'CAO contact',
             'meansResult': '',
               'certificates': [
               {
@@ -809,7 +809,7 @@ module.exports = {
           },
           {
             'proceedingType': 'Specific Issue Order',
-            'dateUsed': '2020-07-19T00:00:00.000Z'
+            'dateUsed': '2020-07-18T00:00:00.000Z'
            }
         ],
         'proceedings': [
@@ -938,7 +938,7 @@ module.exports = {
           {
             'id': 'application_8_proceeding_1',
             'matterType': 'Domestic abuse',
-            'proceedingType': 'Prohibited Steps Order',
+            'proceedingType': 'CAO Residence',
             'meansResult': '',
             'certificates': [
               {
