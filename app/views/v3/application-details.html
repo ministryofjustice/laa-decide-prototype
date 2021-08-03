@@ -221,7 +221,7 @@ Application details
       <h2 class="govuk-heading-m">Make a decision</h2>
 
       {% if (application['meritsAssessmentResult'] == 'Not started') or (application['meritsAssessmentResult'] == 'in progress') %}
-      <p>The means decision has been completed. You can view the <a href="#application-history">application history</a> for further details.</p>
+      <p>The means decision has been completed. You can view the <a href="application-history">application history</a> for further details.</p>
 
       <div class="govuk-button-group">
         <form action="merits-assessment-emergency">
@@ -233,7 +233,7 @@ Application details
         </form>
       </div>
       {% else %}
-      <p>The merits and means decisions have been completed. You can view the <a href="#application-history">application history</a> for further details.</p>
+      <p>The merits and means decisions have been completed. You can view the <a href="application-history">application history</a> for further details.</p>
       {% endif %}
       {% endif %}
     </div>
