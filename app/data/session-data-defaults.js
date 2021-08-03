@@ -429,12 +429,7 @@ module.exports = {
         },
         'children': [],
         'linkedApplications': [],
-        'delegatedFunctionsDates': [
-          {
-            'proceedingType': 'Non-molestation order',
-            'dateUsed': 'Not used'
-          }
-        ],
+        'delegatedFunctionsDates': [],
         'proceedings': [
           {
             'id': 'application_4_proceeding_1',
@@ -519,12 +514,7 @@ module.exports = {
         },
         'children': [],
         'linkedApplications': [],
-        'delegatedFunctionsDates': [
-          {
-            'proceedingType': 'Non-molestation order',
-            'dateUsed': 'Not used'
-          }
-        ],
+        'delegatedFunctionsDates': [],
         'proceedings': [
           {
             'id': 'application_5_proceeding_1',
@@ -891,7 +881,7 @@ module.exports = {
         'dateSubmitted': '2020-07-15:00:00.000Z',
         'dateLastUpdated': '2020-07-20T00:00:00.000Z',
         'applicationType': 'Initial application',
-        'delegatedFunctions': 'Used',
+        'delegatedFunctions': 'Not used',
         'categoryLaw': 'Family law',
         'meansType': 'Passported',
         'certificateType': 'Substantive',
@@ -928,12 +918,7 @@ module.exports = {
           }
         ],
         'linkedApplications': [],
-        'delegatedFunctionsDates': [
-          {
-            'proceedingType': 'CAO Residence',
-            'dateUsed': 'Not used'
-          }
-        ],
+        'delegatedFunctionsDates': [],
         'proceedings': [
           {
             'id': 'application_8_proceeding_1',

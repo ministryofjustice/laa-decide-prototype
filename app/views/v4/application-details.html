@@ -156,6 +156,7 @@ Merits decision saved.
       </div>
       {% endif %}
 
+      {% if application['delegatedFunctionsDates'].length > 0 %}
       <table class="govuk-table">
         <caption class="govuk-table__caption govuk-table__caption--m">Delegated functions</caption>
         <tbody class="govuk-table__body">
@@ -167,6 +168,7 @@ Merits decision saved.
           {% endfor %}
         </tbody>
       </table>
+      {% endif %}
 
       <h2 class="govuk-heading-m">Proceedings</h2>
 
