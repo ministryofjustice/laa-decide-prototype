@@ -17,7 +17,7 @@ Application details
 {% set success_message %}
 {% if ((application['meritsAssessmentResult'] == 'granted') or (application['meritsAssessmentResult'] == 'refused') or (application['meritsAssessmentResult'] == 'partially granted'))
    and ((application['meansAssessmentResult'] == 'granted') or (application['meansAssessmentResult'] == 'refused') or (application['meansAssessmentResult'] == 'partially granted') or (application['meansAssessmentResult'] == 'Passported')) %}
-Means and merits decisions saved. <a href="laa-online-portal">You should now update the status of the case in CCMS</a>.
+Means and merits decisions saved and shared with the provider.
 {% endif %}
 
 {% if ((application['meritsAssessmentResult'] == 'Not started') or (application['meritsAssessmentResult'] == 'in progress'))
