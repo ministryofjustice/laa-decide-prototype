@@ -108,7 +108,7 @@ module.exports = {
               {
                 'id': 'application_1_proceeding_2_certificate_1',
                 'certificateType': 'Substantive certificate',
-                'formOfService': 'Family help (higher)',
+                'formOfService': 'Family Help (Higher)',
                 'workProviderCanDo': 'Limited to Family Help (Higher) and to all steps necessary to negotiate and conclude a settlement. To include the issue of proceedings and representation in those proceedings save in relation to or at a contested final hearing.',
                 'meritsResult': ''
               }
@@ -123,14 +123,14 @@ module.exports = {
               {
                 'id': 'application_1_proceeding_3_certificate_1',
                 'certificateType': 'Emergency certificate',
-                'formOfService': 'Family help (higher)',
+                'formOfService': 'Family Help (Higher)',
                 'workProviderCanDo': 'Limited to Family Help (Higher) and to all steps necessary to negotiate and conclude a settlement. To include the issue of proceedings and representation in those proceedings save in relation to or at a contested final hearing.',
                 'meritsResult': ''
               },
               {
                 'id': 'application_1_proceeding_3_certificate_2',
                 'certificateType': 'Substantive certificate',
-                'formOfService': 'Family help (higher)',
+                'formOfService': 'Family Help (Higher)',
                 'workProviderCanDo': 'Limited to Family Help (Higher) and to all steps necessary to negotiate and conclude a settlement. To include the issue of proceedings and representation in those proceedings save in relation to or at a contested final hearing.',
                 'meritsResult': ''
               }
@@ -550,7 +550,7 @@ module.exports = {
               {
                 'id': 'application_5_proceeding_2_certificate_1',
                 'certificateType': 'Substantive certificate',
-                'formOfService': 'Family help (higher)',
+                'formOfService': 'Family Help (Higher)',
                 'workProviderCanDo': 'Limited to Family Help (Higher) and to all steps necessary to negotiate and conclude a settlement. To include the issue of proceedings and representation in those proceedings save in relation to or at a contested final hearing.',
                 'meritsResult': ''
               }
@@ -590,6 +590,381 @@ module.exports = {
             'title': 'police_report.pdf',
             'link': 'https://drive.google.com/file/d/1m2SvoKEuJySNk3wxpjvfIYHqMTZlisQf/view',
             'date': '2020-03-12T00:00:00.000Z'
+          }
+        ],
+        'notes': []
+      }
+    },
+    // application #6 - benefits testing - high complexity
+    {
+      'applicationDetails':
+      {
+        'refNo': 'L-D7Q-R2W',
+        'dateSubmitted': '2020-07-20:00:00.000Z',
+        'dateLastUpdated': '2020-07-20T00:00:00.000Z',
+        'applicationType': 'Initial application',
+        'delegatedFunctions': 'Used',
+        'categoryLaw': 'Family law',
+        'meansType': 'Passported',
+        'certificateType': 'Emergency and substantive',
+        'meansAssessmentResult': 'Passported',
+        'meritsAssessmentResult': 'Not started',
+        'applicant':
+        {
+          'name': 'One Test',
+          'dob': '1999-11-16T00:00:00.000Z',
+          'nino': 'AB123456Z',
+          'address': '1 Legal Aid Place</br>Jarrow</br>NE1 23Z'
+        },
+        'provider':
+        {
+          'name': 'Any Solicitor',
+          'firm': 'Solicitor and Co',
+          'accountNumber': '1A123Z',
+          'address': '1 Law Street</br>Jarrow</br>NE2 34Z',
+          'phone': '07123456789'
+        },
+        'opponent':
+        {
+          'name': 'Test One',
+          'dob': '1996-09-26T00:00:00.000Z',
+          'address': '1 Respondent Avenue</br>Jarrow</br>NE1 23A',
+          'relationship': 'Ex partner'
+        },
+        'children': [
+          {
+            'name': 'Child One Test',
+            'dob': '2019-20-19T00:00:00.000Z',
+            'address': '1 Legal Aid Place</br>Jarrow</br>NE1 23Z',
+            'relationship': 'Child'
+          }
+        ],
+        'linkedApplications': [],
+        'delegatedFunctionsDates': [
+          {
+            'proceedingType': 'Non-molestation order',
+            'dateUsed': '2020-07-18T00:00:00.000Z'
+          },
+          {
+            'proceedingType': 'App parental responsibilty order',
+            'dateUsed': '2020-07-19T00:00:00.000Z'
+           },
+          {
+            'proceedingType': 'CAO Contact',
+            'dateUsed': '2020-07-19T00:00:00.000Z'
+          }
+        ],
+        'proceedings': [
+          {
+            'id': 'application_6_proceeding_1',
+            'matterType': 'Domestic abuse',
+            'proceedingType': 'Non-molestation order',
+            'meansResult': '',
+            'certificates': [
+              {
+                'id': 'application_6_proceeding_1_certificate_1',
+                'certificateType': 'Emergency certificate',
+                'formOfService': 'Full representation',
+                'workProviderCanDo': 'As to an application under Part IV Family Law Act 1996 limited to all steps necessary to apply for an interim order where application is made without notice to include representation on the return date.<br><br>As to proceedings under Part IV Family Law Act 1996 limited to all steps up to and including obtaining and serving a final order and in the event of breach leading to the exercise of a power of arrest to representation on the consideration.',
+                'meritsResult': ''
+              },
+              {
+                'id': 'application_6_proceeding_1_certificate_2',
+                'certificateType': 'Substantive certificate',
+                'formOfService': 'Full representation',
+                'workProviderCanDo': 'As to an application under Part IV Family Law Act 1996 limited to all steps necessary to apply for an interim order where application is made without notice to include representation on the return date.<br><br>As to proceedings under Part IV Family Law Act 1996 limited to all steps up to and including obtaining and serving a final order and in the event of breach leading to the exercise of a power of arrest to representation on the consideration.',
+                'meritsResult': ''
+              }
+            ]
+          },
+          {
+            'id': 'application_6_proceeding_2',
+            'matterType': 'Domestic abuse',
+            'proceedingType': 'Prohibited steps order',
+            'meansResult': '',
+            'certificates': [
+              {
+                'id': 'application_6_proceeding_2_certificate_1',
+                'certificateType': 'Emergency certificate',
+                'formOfService': 'Family Help (Higher)',
+                'workProviderCanDo': 'Limited to all steps up to and including the hearing on 01/10/2021.<br><br>Limited to Family Help (Higher) and to all steps necessary to negotiate and conclude a settlement. To include the issue of proceedings and representation in those proceedings save in relation to or at a contested final hearing.',
+                'meritsResult': ''
+              },
+              {
+                'id': 'application_6_proceeding_2_certificate_2',
+                'certificateType': 'Substantive certificate',
+                'formOfService': 'Family Help (Higher)',
+                'workProviderCanDo': 'Limited to all steps up to and including the hearing on 01/10/2021.<br><br>Limited to Family Help (Higher) and to all steps necessary to negotiate and conclude a settlement. To include the issue of proceedings and representation in those proceedings save in relation to or at a contested final hearing.',
+                'meritsResult': ''
+              }
+            ]
+          },
+          {
+            'id': 'application_6_proceeding_3',
+            'matterType': 'Domestic abuse',
+            'proceedingType': 'Occupation order',
+            'meansResult': '',
+              'certificates': [
+              {
+                'id': 'application_6_proceeding_3_certificate_1',
+                'certificateType': 'Emergency certificate',
+                'formOfService': 'Family Help (Higher)',
+                'workProviderCanDo': 'Limited to all steps up to and including the hearing on 01/10/2021.<br><br>Limited to Family Help (Higher) and to all steps necessary to negotiate and conclude a settlement. To include the issue of proceedings and representation in those proceedings save in relation to or at a contested final hearing.',
+                'meritsResult': ''
+              },
+              {
+                'id': 'application_6_proceeding_3_certificate_2',
+                'certificateType': 'Substantive certificate',
+                'formOfService': 'Family Help (Higher)',
+                'workProviderCanDo': 'Limited to all steps up to and including the hearing on 01/10/2021.<br><br>Limited to Family Help (Higher) and to all steps necessary to negotiate and conclude a settlement. To include the issue of proceedings and representation in those proceedings save in relation to or at a contested final hearing.',
+                'meritsResult': ''
+              }
+            ]
+          }
+        ],
+        'costLimitations': [
+          {
+            'certificateType': 'Emergency certificate',
+            'costLimit': '£1,350',
+            'requestedCostLimit': '£1,350',
+            'justification': ''
+          },
+          {
+            'certificateType': 'Substantive certificate',
+            'costLimit': '£25,000',
+            'requestedCostLimit': '£25,000',
+            'justification': ''
+          }
+        ],
+        'contributions': [],
+        'documents': [
+          {
+            'title': 'merits_report.pdf',
+            'link': 'https://docs.google.com/document/d/1pDq2iq_PKiw512b_P9-1PagxK2uqwyXv/edit?usp=sharing&ouid=116296643418406453308&rtpof=true&sd=true',
+            'date': '2020-07-20T00:00:00.000Z'
+          },
+          {
+            'title': 'statement_of_case.pdf',
+            'link': 'https://docs.google.com/document/d/140HjKAVgNX_BKchnNX8N78zHkDOo5R0i/edit?usp=sharing&ouid=116296643418406453308&rtpof=true&sd=true',
+            'date': '2020-07-20T00:00:00.000Z'
+          },
+          {
+            'title': 'dv_evidence.pdf',
+            'link': 'https://docs.google.com/document/d/1X5_0hXo8q4rmiVU4-ZMwMrEMSsqkyU5F/edit?usp=sharing&ouid=116296643418406453308&rtpof=true&sd=true',
+            'date': '2020-07-20T00:00:00.000Z'
+          }
+        ],
+        'notes': []
+      }
+    },
+    // application #7 - benefits testing - medium complexity
+    {
+      'applicationDetails':
+      {
+        'refNo': 'L-K2C-F1M',
+        'dateSubmitted': '2020-07-20:00:00.000Z',
+        'dateLastUpdated': '2020-07-20T00:00:00.000Z',
+        'applicationType': 'Initial application',
+        'delegatedFunctions': 'Used',
+        'categoryLaw': 'Family law',
+        'meansType': 'Passported',
+        'certificateType': 'Emergency and substantive',
+        'meansAssessmentResult': 'Passported',
+        'meritsAssessmentResult': 'Not started',
+        'applicant':
+        {
+          'name': 'Two Test',
+          'dob': '1996-04-20T00:00:00.000Z',
+          'nino': 'AB234567Y',
+          'address': '2 Legal Aid Place</br>Manchester</br>MA12 3YZ'
+        },
+        'provider':
+        {
+          'name': 'Any Provider',
+          'firm': 'Provider and Co',
+          'accountNumber': '2Z000Y',
+          'address': '1 Law Street</br>Manchester</br>MA2 34Z',
+          'phone': '07123456789'
+        },
+        'opponent':
+        {
+          'name': 'Test Two',
+          'dob': '1997-07-21T00:00:00.000Z',
+          'address': '1 Defendant Drive</br>Manchester</br>MA5 67Z',
+          'relationship': 'Ex partner'
+        },
+        'children': [
+          {
+            'name': 'Child Two Test',
+            'dob': '2020-07-21T00:00:00.000Z',
+            'address': '2 Legal Aid Place</br>Manchester</br>MA12 3YZ',
+            'relationship': 'Child'
+          }
+        ],
+        'linkedApplications': [],
+        'delegatedFunctionsDates': [
+          {
+            'proceedingType': 'Prohibited Steps Order',
+            'dateUsed': '2020-07-18T00:00:00.000Z'
+          },
+          {
+            'proceedingType': 'Specific Issue Order',
+            'dateUsed': '2020-07-19T00:00:00.000Z'
+           }
+        ],
+        'proceedings': [
+          {
+            'id': 'application_7_proceeding_1',
+            'matterType': 'Domestic abuse',
+            'proceedingType': 'Prohibited Steps Order',
+            'meansResult': '',
+            'certificates': [
+              {
+                'id': 'application_7_proceeding_1_certificate_1',
+                'certificateType': 'Emergency certificate',
+                'formOfService': 'Family Help (Higher)',
+                'workProviderCanDo': 'As to an application under Part IV Family Law Act 1996 limited to all steps necessary to apply for an interim order where application is made without notice to include representation on the return date.<br><br>Limited to Family Help (Higher) and to all steps necessary to negotiate and conclude a settlement. To include the issue of proceedings and representation in those proceedings save in relation to or at a contested final hearing.',
+                'meritsResult': ''
+              },
+              {
+                'id': 'application_7_proceeding_1_certificate_2',
+                'certificateType': 'Substantive certificate',
+                'formOfService': 'Family Help (Higher)',
+                'workProviderCanDo': 'As to an application under Part IV Family Law Act 1996 limited to all steps necessary to apply for an interim order where application is made without notice to include representation on the return date.<br><br>Limited to Family Help (Higher) and to all steps necessary to negotiate and conclude a settlement. To include the issue of proceedings and representation in those proceedings save in relation to or at a contested final hearing.',
+                'meritsResult': ''
+              }
+            ]
+          },
+          {
+            'id': 'application_7_proceeding_2',
+            'matterType': 'Domestic abuse',
+            'proceedingType': 'Specific Issue Order',
+            'meansResult': '',
+            'certificates': [
+              {
+                'id': 'application_7_proceeding_2_certificate_1',
+                'certificateType': 'Emergency certificate',
+                'formOfService': 'Family Help (Higher)',
+                'workProviderCanDo': 'As to an application under Part IV Family Law Act 1996 limited to all steps necessary to apply for an interim order where application is made without notice to include representation on the return date.<br><br>Limited to Family Help (Higher) and to all steps necessary to negotiate and conclude a settlement. To include the issue of proceedings and representation in those proceedings save in relation to or at a contested final hearing.',
+                'meritsResult': ''
+              },
+              {
+                'id': 'application_7_proceeding_2_certificate_2',
+                'certificateType': 'Substantive certificate',
+                'formOfService': 'Family Help (Higher)',
+                'workProviderCanDo': 'As to an application under Part IV Family Law Act 1996 limited to all steps necessary to apply for an interim order where application is made without notice to include representation on the return date.<br><br>Limited to Family Help (Higher) and to all steps necessary to negotiate and conclude a settlement. To include the issue of proceedings and representation in those proceedings save in relation to or at a contested final hearing.',
+                'meritsResult': ''
+              }
+            ]
+          }
+        ],
+        'costLimitations': [
+          {
+            'certificateType': 'Emergency certificate',
+            'costLimit': '£1,350',
+            'requestedCostLimit': '£1,350',
+            'justification': ''
+          },
+          {
+            'certificateType': 'Substantive certificate',
+            'costLimit': '£25,000',
+            'requestedCostLimit': '£25,000',
+            'justification': ''
+          }
+        ],
+        'contributions': [],
+        'documents': [
+          {
+            'title': 'merits_report.pdf',
+            'link': 'https://docs.google.com/document/d/1MCheEMZsnzv7DpxPo73q8RdfECFuXoTJ/edit?usp=sharing&ouid=116296643418406453308&rtpof=true&sd=true',
+            'date': '2020-07-20T00:00:00.000Z'
+          }
+        ],
+        'notes': []
+      }
+    },
+    // application #8 - benefits testing - low complexity
+    {
+      'applicationDetails':
+      {
+        'refNo': 'L-A8X-S7G',
+        'dateSubmitted': '2020-07-15:00:00.000Z',
+        'dateLastUpdated': '2020-07-20T00:00:00.000Z',
+        'applicationType': 'Initial application',
+        'delegatedFunctions': 'Used',
+        'categoryLaw': 'Family law',
+        'meansType': 'Passported',
+        'certificateType': 'Substantive',
+        'meansAssessmentResult': 'Passported',
+        'meritsAssessmentResult': 'Not started',
+        'applicant':
+        {
+          'name': 'Three Test',
+          'dob': '1991-07-21T00:00:00.000Z',
+          'nino': 'AB456789Z',
+          'address': '3 Legal Aid Place</br>Liverpool</br>LO1 23Z'
+        },
+        'provider':
+        {
+          'name': 'Any Fee Earner',
+          'firm': 'Fee Earner and Co',
+          'accountNumber': '3Y111X',
+          'address': '1 Law Street</br>Liverpool</br>LO2 34X',
+          'phone': '07123456789'
+        },
+        'opponent':
+        {
+          'name': 'Test Three',
+          'dob': '1990-07-18T00:00:00.000Z',
+          'address': '1 Other Side Grove</br>Liverpool</br>LO9 99Z',
+          'relationship': 'Ex partner'
+        },
+        'children': [
+          {
+            'name': 'Child Three Test',
+            'dob': '2021-05-21T00:00:00.000Z',
+            'address': '3 Legal Aid Place</br>Liverpool</br>LO1 23Z',
+            'relationship': 'Child'
+          }
+        ],
+        'linkedApplications': [],
+        'delegatedFunctionsDates': [
+          {
+            'proceedingType': 'CAO Residence',
+            'dateUsed': 'Not used'
+          }
+        ],
+        'proceedings': [
+          {
+            'id': 'application_8_proceeding_1',
+            'matterType': 'Domestic abuse',
+            'proceedingType': 'Prohibited Steps Order',
+            'meansResult': '',
+            'certificates': [
+              {
+                'id': 'application_8_proceeding_1_certificate_1',
+                'certificateType': 'Substantive certificate',
+                'formOfService': 'Family Help (Higher)',
+                'workProviderCanDo': 'Limited to Family Help (Higher) and to all steps necessary to negotiate and conclude a settlement. To include the issue of proceedings and representation in those proceedings save in relation to or at a contested final hearing.',
+                'meritsResult': ''
+              }
+            ]
+          }
+        ],
+        'costLimitations': [
+          {
+            'certificateType': 'Substantive certificate',
+            'costLimit': '£25,000',
+            'requestedCostLimit': '£25,000',
+            'justification': ''
+          }
+        ],
+        'contributions': [],
+        'documents': [
+          {
+            'title': 'merits_report.pdf',
+            'link': 'https://docs.google.com/document/d/1UG2wQ7d3AAaCEMPjdIiN8HOyWeIt0yLT/edit?usp=sharing&ouid=116296643418406453308&rtpof=true&sd=true',
+            'date': '2020-07-20T00:00:00.000Z'
           }
         ],
         'notes': []

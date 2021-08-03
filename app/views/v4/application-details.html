@@ -180,7 +180,7 @@ Merits decision saved.
           {% for certificate in proceeding['certificates'] %}
           <h2 class="govuk-heading-m">{{ certificate['certificateType'] }}</h2>
           <p><b>Form of service: </b>{{ certificate['formOfService'] }}</p>
-          <p><b>Work the provider can do: </b>{{ certificate['workProviderCanDo'] }}</p>
+          <p><b>Work the provider can do: </b>{{ certificate['workProviderCanDo'] | safe }}</p>
           {% if proceeding['meansResult'] === 'granted' %}
           <p><b>Means decision: </b><strong class="govuk-tag govuk-tag--green">{{ proceeding['meansResult'] }}</strong></p>
           {% endif %}
