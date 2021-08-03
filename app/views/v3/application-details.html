@@ -129,6 +129,7 @@ Application details
       </div>
       {% endif %}
 
+      {% if application['delegatedFunctionsDates'].length > 0 %}
       <table class="govuk-table">
         <caption class="govuk-table__caption govuk-table__caption--m">Delegated functions</caption>
         <tbody class="govuk-table__body">
@@ -140,6 +141,7 @@ Application details
           {% endfor %}
         </tbody>
       </table>
+      {% endif %}
 
       <h2 class="govuk-heading-m">Proceedings</h2>
 
@@ -219,7 +221,7 @@ Application details
       <h2 class="govuk-heading-m">Make a decision</h2>
 
       {% if (application['meritsAssessmentResult'] == 'Not started') or (application['meritsAssessmentResult'] == 'in progress') %}
-      <p>The means decision has been completed. You can view the <a href="#application-history">application history</a> for further details.</p>
+      <p>The means decision has been completed. You can view the <a href="application-history">application history</a> for further details.</p>
 
       <div class="govuk-button-group">
         <form action="merits-assessment-emergency">
@@ -231,7 +233,7 @@ Application details
         </form>
       </div>
       {% else %}
-      <p>The merits and means decisions have been completed. You can view the <a href="#application-history">application history</a> for further details.</p>
+      <p>The merits and means decisions have been completed. You can view the <a href="application-history">application history</a> for further details.</p>
       {% endif %}
       {% endif %}
     </div>
