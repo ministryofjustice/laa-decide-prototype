@@ -664,6 +664,8 @@ router.get('/v3/filter', function(req, res) {
 /////////////////////////////////// V4 /////////////////////////////////////////
 
 router.get('/v4/my-applications', function(req, res) {
+  req.session.data['request-more-information'] = '';
+
   var refNo = req.session.data.refNo;
   var refNoToRemove = req.session.data.refNoToRemove;
 
@@ -731,6 +733,31 @@ router.get('/v4/my-applications', function(req, res) {
   req.session.data.refNoToRemove = null;
 
   res.render('./v4/my-applications');
+});
+
+router.get('/v4/request-info-note', function(req, res) {
+  var application = null;
+
+  // find the application
+  for (const app of req.session.data.applications) {
+    if (app.applicationDetails.refNo === req.session.data.refNo)
+      application = app;
+  }
+
+  // if a request for further info has been made, add an item to the application history
+  if (req.session.data['request-more-information']) {
+    var new_note = {
+                'when': moment().format("dddd MMMM Do YYYY HH:mm"),
+                'who': 'You',
+                'role': null,
+                'title': 'Further information requested',
+                'text': null
+              };
+
+    application.applicationDetails.notes.push(new_note);
+    req.session.data['request-more-information'] = 'display-banner-now';
+  }
+  res.redirect('./application-details');
 });
 
 router.get('/v4/application-details', function(req, res) {
@@ -813,20 +840,6 @@ router.get('/v4/application-details', function(req, res) {
     }
     req.session.data['merits_continue_button'] = '';
     req.session.data['update_all_substantive'] = '';
-  }
-
-  // if a request for further info has been made, add an item to the application history
-  if (req.session.data['request-more-information']) {
-    var new_note = {
-                'when': moment().format("dddd MMMM Do YYYY HH:mm"),
-                'who': 'You',
-                'role': null,
-                'title': 'Further information requested',
-                'text': null
-              };
-
-    application.applicationDetails.notes.push(new_note);
-    req.session.data['request-more-information'] = '';
   }
 
   // update proceeding means results

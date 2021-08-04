@@ -115,10 +115,12 @@ Merits assessment - emergency
               <td class="govuk-table__header">Requested</td>
               <td class="govuk-table__cell">{{ limitation['requestedCostLimit'] }}</td>
             </tr>
+            {% if limitation['justification'] %}
             <tr class="govuk-table__row">
               <td class="govuk-table__header">Justification</td>
               <td class="govuk-table__cell">{{ limitation['justification'] }}</td>
             </tr>
+            {% endif %}
             {% endif %}
             {% endfor %}
           </tbody>
