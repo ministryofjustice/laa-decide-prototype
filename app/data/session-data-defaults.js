@@ -9,7 +9,7 @@ module.exports = {
         'dateLastUpdated': '2021-08-29T00:00:00.000Z',
         'applicationType': 'Initial application',
         'delegatedFunctions': 'Used',
-        'categoryLaw': 'Family law',
+        'categoryLaw': 'Family',
         'meansType': 'Passported',
         'certificateType': 'Emergency and substantive',
         'meansAssessmentResult': 'Passported',
@@ -147,8 +147,7 @@ module.exports = {
           {
             'certificateType': 'Substantive certificate',
             'costLimit': '£25,000',
-            'requestedCostLimit': '£25,000',
-            'justification': 'n/a'
+            'requestedCostLimit': '£25,000'
           }
         ],
         'contributions': [],
@@ -181,7 +180,7 @@ module.exports = {
         'dateLastUpdated': '2021-08-28T00:00:00.000Z',
         'applicationType': 'Initial application',
         'delegatedFunctions': 'Used',
-        'categoryLaw': 'Family law',
+        'categoryLaw': 'Family',
         'meansType': 'Passported',
         'certificateType': 'Emergency and substantive',
         'meansAssessmentResult': 'Passported',
@@ -303,14 +302,12 @@ module.exports = {
           {
             'certificateType': 'Emergency certificate',
             'costLimit': '£1,350',
-            'requestedCostLimit': '£1,350',
-            'justification': ''
+            'requestedCostLimit': '£1,350'
           },
           {
             'certificateType': 'Substantive certificate',
             'costLimit': '£25,000',
-            'requestedCostLimit': '£25,000',
-            'justification': ''
+            'requestedCostLimit': '£25,000'
           }
         ],
         'contributions': [],
@@ -343,7 +340,7 @@ module.exports = {
         'dateLastUpdated': '2021-08-28T00:00:00.000Z',
         'applicationType': 'Initial application',
         'delegatedFunctions': 'Used',
-        'categoryLaw': 'Family law',
+        'categoryLaw': 'Family',
         'meansType': 'Passported',
         'certificateType': 'Emergency and substantive',
         'meansAssessmentResult': 'Passported',
@@ -439,14 +436,12 @@ module.exports = {
           {
             'certificateType': 'Emergency certificate',
             'costLimit': '£1,350',
-            'requestedCostLimit': '£1,350',
-            'justification': ''
+            'requestedCostLimit': '£1,350'
           },
           {
             'certificateType': 'Substantive certificate',
             'costLimit': '£25,000',
-            'requestedCostLimit': '£25,000',
-            'justification': ''
+            'requestedCostLimit': '£25,000'
           }
         ],
         'contributions': [],
@@ -469,7 +464,7 @@ module.exports = {
         'dateLastUpdated': '2021-08-29T00:00:00.000Z',
         'applicationType': 'Initial application',
         'delegatedFunctions': 'Not used',
-        'categoryLaw': 'Family law',
+        'categoryLaw': 'Family',
         'meansType': 'Passported',
         'certificateType': 'Substantive',
         'meansAssessmentResult': 'Passported',
@@ -527,8 +522,7 @@ module.exports = {
           {
             'certificateType': 'Substantive certificate',
             'costLimit': '£25,000',
-            'requestedCostLimit': '£25,000',
-            'justification': ''
+            'requestedCostLimit': '£25,000'
           }
         ],
         'contributions': [],
@@ -556,7 +550,7 @@ module.exports = {
         'dateLastUpdated': '2021-08-30T00:00:00.000Z',
         'applicationType': 'Initial application',
         'delegatedFunctions': 'Used',
-        'categoryLaw': 'Family law',
+        'categoryLaw': 'Family',
         'meansType': 'Passported',
         'certificateType': 'Emergency and substantive',
         'meansAssessmentResult': 'Passported',
@@ -632,14 +626,12 @@ module.exports = {
           {
             'certificateType': 'Emergency certificate',
             'costLimit': '£1,350',
-            'requestedCostLimit': '£1,350',
-            'justification': 'n/a'
+            'requestedCostLimit': '£1,350'
           },
           {
             'certificateType': 'Substantive certificate',
             'costLimit': '£25,000',
-            'requestedCostLimit': '£25,000',
-            'justification': 'n/a'
+            'requestedCostLimit': '£25,000'
           }
         ],
         'contributions': [],
@@ -672,7 +664,7 @@ module.exports = {
         'dateLastUpdated': '2021-08-30T00:00:00.000Z',
         'applicationType': 'Initial application',
         'delegatedFunctions': 'Used',
-        'categoryLaw': 'Family law',
+        'categoryLaw': 'Family',
         'meansType': 'Passported',
         'certificateType': 'Emergency and substantive',
         'meansAssessmentResult': 'Passported',
@@ -735,14 +727,12 @@ module.exports = {
           {
             'certificateType': 'Emergency certificate',
             'costLimit': '£1,350',
-            'requestedCostLimit': '£1,350',
-            'justification': 'n/a'
+            'requestedCostLimit': '£1,350'
           },
           {
             'certificateType': 'Substantive certificate',
             'costLimit': '£25,000',
-            'requestedCostLimit': '£25,000',
-            'justification': 'n/a'
+            'requestedCostLimit': '£25,000'
           }
         ],
         'contributions': [],
@@ -775,7 +765,7 @@ module.exports = {
         'dateLastUpdated': '2021-08-31T00:00:00.000Z',
         'applicationType': 'Initial application',
         'delegatedFunctions': 'Not used',
-        'categoryLaw': 'Family law',
+        'categoryLaw': 'Family',
         'meansType': 'Passported',
         'certificateType': 'Substantive',
         'meansAssessmentResult': 'Passported',
@@ -826,8 +816,7 @@ module.exports = {
           {
             'certificateType': 'Substantive certificate',
             'costLimit': '£25,000',
-            'requestedCostLimit': '£25,000',
-            'justification': 'n/a'
+            'requestedCostLimit': '£25,000'
           }
         ],
         'contributions': [],
@@ -860,7 +849,7 @@ module.exports = {
         'dateLastUpdated': '2021-08-31T00:00:00.000Z',
         'applicationType': 'Initial application',
         'delegatedFunctions': 'Not used',
-        'categoryLaw': 'Family law',
+        'categoryLaw': 'Family',
         'meansType': 'Non passported',
         'certificateType': 'Substantive',
         'meansAssessmentResult': 'Not started',
@@ -926,8 +915,7 @@ module.exports = {
           {
             'certificateType': 'Substantive certificate',
             'costLimit': '£25,000',
-            'requestedCostLimit': '£25,000',
-            'justification': 'n/a'
+            'requestedCostLimit': '£25,000'
           }
         ],
         'contributions': [
