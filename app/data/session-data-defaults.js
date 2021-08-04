@@ -325,7 +325,7 @@ module.exports = {
           {
             'title': 'dv_evidence.pdf',
             'link': 'https://docs.google.com/document/d/1X5_0hXo8q4rmiVU4-ZMwMrEMSsqkyU5F/edit?usp=sharing&ouid=116296643418406453308&rtpof=true&sd=true',
-            'date': '2021-09-03T00:00:00.000Z'
+            'date': '2021-08-28T00:00:00.000Z'
           }
         ],
         'notes': []
@@ -535,7 +535,7 @@ module.exports = {
           {
             'title': 'gateway_evidence.pdf',
             'link': 'https://docs.google.com/document/d/1SCU8hK7P6ByjE6HGFSrLJOeVNsFrgOVG/edit?usp=sharing&ouid=116296643418406453308&rtpof=true&sd=true',
-            'date': '2021-09-05T00:00:00.000Z'
+            'date': '2021-08-29T00:00:00.000Z'
           }
         ],
         'notes': []
