@@ -47,6 +47,19 @@ Merits decision saved.
     </div>
     {% endif %}
 
+    {% if (data['request-more-information'] == 'display-banner-now') %}
+    <div class="govuk-notification-banner govuk-notification-banner--success" role="alert" aria-labelledby="govuk-notification-banner-title" data-module="govuk-notification-banner">
+      <div class="govuk-notification-banner__header">
+        <h2 class="govuk-notification-banner__title" id="govuk-notification-banner-title">
+          Success
+        </h2>
+      </div>
+      <div class="govuk-notification-banner__content">
+        <p class="govuk-notification-banner__heading">Request sent to {{ application['provider']['name'] }}</p>
+      </div>
+    </div>
+    {% endif %}
+
     <div class="govuk-grid-column-two-thirds">
       <h1 class="govuk-heading-xl govuk-!-margin-bottom-4">{{ application['refNo'] }}</h1>
       <p class="govuk-body govuk-!-font-size-36">{{ application['applicant']['name'] }}</p>
