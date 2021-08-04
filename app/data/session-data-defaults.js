@@ -1,12 +1,184 @@
 module.exports = {
   'applications': [
+    // application #4
+    {
+      'applicationDetails':
+      {
+        'refNo': 'L-A1B-C2D',
+        'dateSubmitted': '2021-08-10T00:00:00.000Z',
+        'dateLastUpdated': '2021-08-29T00:00:00.000Z',
+        'applicationType': 'Initial application',
+        'delegatedFunctions': 'Used',
+        'categoryLaw': 'Family law',
+        'meansType': 'Passported',
+        'certificateType': 'Emergency and substantive',
+        'meansAssessmentResult': 'Passported',
+        'meritsAssessmentResult': 'Not started',
+        'applicant':
+        {
+          'name': 'Zero Test',
+          'dob': '1993-03-19T00:00:00.000Z',
+          'nino': 'QQ112233Q',
+          'address':  '1 London Road</br>London</br>SW1A 1AA',
+        },
+        'provider':
+        {
+          'name': 'Provider Zero',
+          'firm': 'Zero & Co',
+          'accountNumber': '0K514R',
+          'address': '2 London Road</br>London</br>SW1A 1AA',
+          'phone': '07123456789'
+        },
+        'opponent':
+        {
+          'name': 'Opponent Zero',
+          'dob': '1987-11-23T00:00:00.000Z',
+          'address': '1 London Road</br>London</br>SW1A 1AA',
+          'relationship': 'Husband'
+        },
+        'children': [
+          {
+            'name': 'Zero Child',
+            'dob': '2007-02-23T00:00:00.000Z',
+            'address': '1 London Road</br>London</br>SW1A 1AA',
+            'relationship': 'Child'
+          }
+        ],
+        'linkedApplications': [
+          {
+            'refNo': 'L-E1F-G2H',
+            'status': 'Pending merits assessment'
+          },
+          {
+            'refNo': 'L-J1K-L2M',
+            'status': 'Pending billing'
+          },
+          {
+            'refNo': 'L-N1P-Q2R',
+            'status': 'Closed'
+          },
+          {
+            'refNo': 'L-S1T-U2V',
+            'status': 'Closed'
+          }
+        ],
+        'delegatedFunctionsDates': [
+          {
+            'proceedingType': 'Non-molestation order',
+            'dateUsed': '2021-08-08T00:00:00.000Z'
+          },
+          {
+            'proceedingType': 'Prohibitive steps order',
+            'dateUsed': 'Not used'
+           },
+          {
+            'proceedingType': 'Occupation order',
+            'dateUsed': '2021-08-08T00:00:00.000Z'
+          }
+        ],
+        'proceedings': [
+          {
+            'id': 'application_4_proceeding_1',
+            'matterType': 'Domestic abuse',
+            'proceedingType': 'Non-molestation order',
+            'meansResult': '',
+            'certificates': [
+              {
+                'id': 'application_4_proceeding_1_certificate_1',
+                'certificateType': 'Emergency certificate',
+                'formOfService': 'Full representation',
+                'workProviderCanDo': 'All steps up to and including the hearing on 21 September 2021.',
+                'meritsResult': ''
+              },
+              {
+                'id': 'application_4_proceeding_1_certificate_2',
+                'certificateType': 'Substantive certificate',
+                'formOfService': 'Full representation',
+                'workProviderCanDo': 'All steps up to and including getting and serving a final order. If the order is breached you can apply for power of arrest. You cannot apply for a warrant of arrest or contempt of court proceedings.',
+                'meritsResult': ''
+              }
+            ]
+          },
+          {
+            'id': 'application_4_proceeding_2',
+            'matterType': 'Domestic abuse',
+            'proceedingType': 'Prohibited steps order',
+            'meansResult': '',
+            'certificates': [
+              {
+                'id': 'application_4_proceeding_2_certificate_1',
+                'certificateType': 'Substantive certificate',
+                'formOfService': 'Family Help (Higher)',
+                'workProviderCanDo': 'Limited to Family Help (Higher) and to all steps necessary to negotiate and conclude a settlement. To include the issue of proceedings and representation in those proceedings save in relation to or at a contested final hearing.',
+                'meritsResult': ''
+              }
+            ]
+          },
+          {
+            'id': 'application_4_proceeding_3',
+            'matterType': 'Domestic abuse',
+            'proceedingType': 'Occupation order',
+            'meansResult': '',
+              'certificates': [
+              {
+                'id': 'application_4_proceeding_3_certificate_1',
+                'certificateType': 'Emergency certificate',
+                'formOfService': 'Family Help (Higher)',
+                'workProviderCanDo': 'Limited to Family Help (Higher) and to all steps necessary to negotiate and conclude a settlement. To include the issue of proceedings and representation in those proceedings save in relation to or at a contested final hearing.',
+                'meritsResult': ''
+              },
+              {
+                'id': 'application_4_proceeding_3_certificate_2',
+                'certificateType': 'Substantive certificate',
+                'formOfService': 'Family Help (Higher)',
+                'workProviderCanDo': 'Limited to Family Help (Higher) and to all steps necessary to negotiate and conclude a settlement. To include the issue of proceedings and representation in those proceedings save in relation to or at a contested final hearing.',
+                'meritsResult': ''
+              }
+            ]
+          }
+        ],
+        'costLimitations': [
+          {
+            'certificateType': 'Emergency certificate',
+            'costLimit': '£1,350',
+            'requestedCostLimit': '£4,500',
+            'justification': 'I want more money'
+          },
+          {
+            'certificateType': 'Substantive certificate',
+            'costLimit': '£25,000',
+            'requestedCostLimit': '£25,000',
+            'justification': 'n/a'
+          }
+        ],
+        'contributions': [],
+        'documents': [
+          {
+            'title': 'means_report.pdf',
+            'link': 'https://drive.google.com/file/d/16V-j11_Na8_bBz4fazl-TP5k8odpPbBX/view',
+            'date': '2021-08-10T00:00:00.000Z'
+          },
+          {
+            'title': 'merits_report.pdf',
+            'link': 'https://drive.google.com/file/d/19TddAL5MpWAPhDqRCsbggQVVngEHCQA5/view',
+            'date': '2021-08-10T00:00:00.000Z'
+          },
+          {
+            'title': 'police_report.pdf',
+            'link': 'https://drive.google.com/file/d/1m2SvoKEuJySNk3wxpjvfIYHqMTZlisQf/view',
+            'date': '2021-08-10T00:00:00.000Z'
+          }
+        ],
+        'notes': []
+      }
+    },
     // application #1 - benefits testing - high complexity
     {
       'applicationDetails':
       {
         'refNo': 'L-D7Q-R2W',
         'dateSubmitted': '2021-08-12:00:00.000Z',
-        'dateLastUpdated': '2021-09-03T00:00:00.000Z',
+        'dateLastUpdated': '2021-08-28T00:00:00.000Z',
         'applicationType': 'Initial application',
         'delegatedFunctions': 'Used',
         'categoryLaw': 'Family law',
@@ -48,15 +220,15 @@ module.exports = {
         'delegatedFunctionsDates': [
           {
             'proceedingType': 'Non-molestation order',
-            'dateUsed': '2020-07-18T00:00:00.000Z'
+            'dateUsed': '2021-08-10T00:00:00.000Z'
           },
           {
             'proceedingType': 'App parental responsibilty order',
-            'dateUsed': '2020-07-19T00:00:00.000Z'
+            'dateUsed': '2021-08-11T00:00:00.000Z'
            },
           {
             'proceedingType': 'CAO contact',
-            'dateUsed': '2020-07-19T00:00:00.000Z'
+            'dateUsed': '2021-08-11T00:00:00.000Z'
           }
         ],
         'proceedings': [
@@ -70,14 +242,14 @@ module.exports = {
                 'id': 'application_1_proceeding_1_certificate_1',
                 'certificateType': 'Emergency certificate',
                 'formOfService': 'Full representation',
-                'workProviderCanDo': 'As to an application under Part IV Family Law Act 1996 limited to all steps necessary to apply for an interim order where application is made without notice to include representation on the return date.<br><br>As to proceedings under Part IV Family Law Act 1996 limited to all steps up to and including obtaining and serving a final order and in the event of breach leading to the exercise of a power of arrest to representation on the consideration.',
+                'workProviderCanDo': 'As to an application under Part IV Family Law Act 1996 limited to all steps necessary to apply for an interim order where application is made without notice to include representation on the return date.',
                 'meritsResult': ''
               },
               {
                 'id': 'application_1_proceeding_1_certificate_2',
                 'certificateType': 'Substantive certificate',
                 'formOfService': 'Full representation',
-                'workProviderCanDo': 'As to an application under Part IV Family Law Act 1996 limited to all steps necessary to apply for an interim order where application is made without notice to include representation on the return date.<br><br>As to proceedings under Part IV Family Law Act 1996 limited to all steps up to and including obtaining and serving a final order and in the event of breach leading to the exercise of a power of arrest to representation on the consideration.',
+                'workProviderCanDo': 'As to proceedings under Part IV Family Law Act 1996 limited to all steps up to and including obtaining and serving a final order and in the event of breach leading to the exercise of a power of arrest to representation on the consideration.',
                 'meritsResult': ''
               }
             ]
@@ -92,14 +264,14 @@ module.exports = {
                 'id': 'application_1_proceeding_2_certificate_1',
                 'certificateType': 'Emergency certificate',
                 'formOfService': 'Family Help (Higher)',
-                'workProviderCanDo': 'Limited to all steps up to and including the hearing on 01/10/2021.<br><br>Limited to Family Help (Higher) and to all steps necessary to negotiate and conclude a settlement. To include the issue of proceedings and representation in those proceedings save in relation to or at a contested final hearing.',
+                'workProviderCanDo': 'Limited to all steps up to and including the hearing on 01 October 2021.',
                 'meritsResult': ''
               },
               {
                 'id': 'application_1_proceeding_2_certificate_2',
                 'certificateType': 'Substantive certificate',
                 'formOfService': 'Family Help (Higher)',
-                'workProviderCanDo': 'Limited to all steps up to and including the hearing on 01/10/2021.<br><br>Limited to Family Help (Higher) and to all steps necessary to negotiate and conclude a settlement. To include the issue of proceedings and representation in those proceedings save in relation to or at a contested final hearing.',
+                'workProviderCanDo': 'Limited to Family Help (Higher) and to all steps necessary to negotiate and conclude a settlement. To include the issue of proceedings and representation in those proceedings save in relation to or at a contested final hearing.',
                 'meritsResult': ''
               }
             ]
@@ -114,14 +286,14 @@ module.exports = {
                 'id': 'application_1_proceeding_3_certificate_1',
                 'certificateType': 'Emergency certificate',
                 'formOfService': 'Family Help (Higher)',
-                'workProviderCanDo': 'Limited to all steps up to and including the hearing on 01/10/2021.<br><br>Limited to Family Help (Higher) and to all steps necessary to negotiate and conclude a settlement. To include the issue of proceedings and representation in those proceedings save in relation to or at a contested final hearing.',
+                'workProviderCanDo': 'Limited to all steps up to and including the hearing on 01 October 2021.',
                 'meritsResult': ''
               },
               {
                 'id': 'application_1_proceeding_3_certificate_2',
                 'certificateType': 'Substantive certificate',
                 'formOfService': 'Family Help (Higher)',
-                'workProviderCanDo': 'Limited to all steps up to and including the hearing on 01/10/2021.<br><br>Limited to Family Help (Higher) and to all steps necessary to negotiate and conclude a settlement. To include the issue of proceedings and representation in those proceedings save in relation to or at a contested final hearing.',
+                'workProviderCanDo': 'Limited to Family Help (Higher) and to all steps necessary to negotiate and conclude a settlement. To include the issue of proceedings and representation in those proceedings save in relation to or at a contested final hearing.',
                 'meritsResult': ''
               }
             ]
@@ -146,17 +318,17 @@ module.exports = {
           {
             'title': 'merits_report.pdf',
             'link': 'https://docs.google.com/document/d/1pDq2iq_PKiw512b_P9-1PagxK2uqwyXv/edit?usp=sharing&ouid=116296643418406453308&rtpof=true&sd=true',
-            'date': '2020-07-20T00:00:00.000Z'
+            'date': '2021-08-12T00:00:00.000Z'
           },
           {
             'title': 'statement_of_case.pdf',
             'link': 'https://docs.google.com/document/d/140HjKAVgNX_BKchnNX8N78zHkDOo5R0i/edit?usp=sharing&ouid=116296643418406453308&rtpof=true&sd=true',
-            'date': '2020-07-20T00:00:00.000Z'
+            'date': '2021-08-12T00:00:00.000Z'
           },
           {
             'title': 'dv_evidence.pdf',
             'link': 'https://docs.google.com/document/d/1X5_0hXo8q4rmiVU4-ZMwMrEMSsqkyU5F/edit?usp=sharing&ouid=116296643418406453308&rtpof=true&sd=true',
-            'date': '2020-07-20T00:00:00.000Z'
+            'date': '2021-09-03T00:00:00.000Z'
           }
         ],
         'notes': []
@@ -168,7 +340,7 @@ module.exports = {
       {
         'refNo': 'L-K2C-F1M',
         'dateSubmitted': '2021-08-16:00:00.000Z',
-        'dateLastUpdated': '2021-09-04T00:00:00.000Z',
+        'dateLastUpdated': '2021-08-28T00:00:00.000Z',
         'applicationType': 'Initial application',
         'delegatedFunctions': 'Used',
         'categoryLaw': 'Family law',
@@ -210,11 +382,11 @@ module.exports = {
         'delegatedFunctionsDates': [
           {
             'proceedingType': 'Prohibited Steps Order',
-            'dateUsed': '2020-07-18T00:00:00.000Z'
+            'dateUsed': '2021-08-14:00:00.000Z'
           },
           {
             'proceedingType': 'Specific Issue Order',
-            'dateUsed': '2020-07-18T00:00:00.000Z'
+            'dateUsed': '2021-08-14:00:00.000Z'
            }
         ],
         'proceedings': [
@@ -228,14 +400,14 @@ module.exports = {
                 'id': 'application_2_proceeding_1_certificate_1',
                 'certificateType': 'Emergency certificate',
                 'formOfService': 'Family Help (Higher)',
-                'workProviderCanDo': 'As to an application under Part IV Family Law Act 1996 limited to all steps necessary to apply for an interim order where application is made without notice to include representation on the return date.<br><br>Limited to Family Help (Higher) and to all steps necessary to negotiate and conclude a settlement. To include the issue of proceedings and representation in those proceedings save in relation to or at a contested final hearing.',
+                'workProviderCanDo': 'As to Section 8 applications limited to all steps necessary to apply for an interim order; where application is made without notice to include representation on the return date.',
                 'meritsResult': ''
               },
               {
                 'id': 'application_2_proceeding_1_certificate_2',
                 'certificateType': 'Substantive certificate',
                 'formOfService': 'Family Help (Higher)',
-                'workProviderCanDo': 'As to an application under Part IV Family Law Act 1996 limited to all steps necessary to apply for an interim order where application is made without notice to include representation on the return date.<br><br>Limited to Family Help (Higher) and to all steps necessary to negotiate and conclude a settlement. To include the issue of proceedings and representation in those proceedings save in relation to or at a contested final hearing.',
+                'workProviderCanDo': 'Limited to Family Help (Higher) and to all steps necessary to negotiate and conclude a settlement. To include the issue of proceedings and representation in those proceedings save in relation to or at a contested final hearing.',
                 'meritsResult': ''
               }
             ]
@@ -250,14 +422,14 @@ module.exports = {
                 'id': 'application_2_proceeding_2_certificate_1',
                 'certificateType': 'Emergency certificate',
                 'formOfService': 'Family Help (Higher)',
-                'workProviderCanDo': 'As to an application under Part IV Family Law Act 1996 limited to all steps necessary to apply for an interim order where application is made without notice to include representation on the return date.<br><br>Limited to Family Help (Higher) and to all steps necessary to negotiate and conclude a settlement. To include the issue of proceedings and representation in those proceedings save in relation to or at a contested final hearing.',
+                'workProviderCanDo': 'As to Section 8 applications limited to all steps necessary to apply for an interim order; where application is made without notice to include representation on the return date.',
                 'meritsResult': ''
               },
               {
                 'id': 'application_2_proceeding_2_certificate_2',
                 'certificateType': 'Substantive certificate',
                 'formOfService': 'Family Help (Higher)',
-                'workProviderCanDo': 'As to an application under Part IV Family Law Act 1996 limited to all steps necessary to apply for an interim order where application is made without notice to include representation on the return date.<br><br>Limited to Family Help (Higher) and to all steps necessary to negotiate and conclude a settlement. To include the issue of proceedings and representation in those proceedings save in relation to or at a contested final hearing.',
+                'workProviderCanDo': 'Limited to Family Help (Higher) and to all steps necessary to negotiate and conclude a settlement. To include the issue of proceedings and representation in those proceedings save in relation to or at a contested final hearing.',
                 'meritsResult': ''
               }
             ]
@@ -282,7 +454,7 @@ module.exports = {
           {
             'title': 'merits_report.pdf',
             'link': 'https://docs.google.com/document/d/1MCheEMZsnzv7DpxPo73q8RdfECFuXoTJ/edit?usp=sharing&ouid=116296643418406453308&rtpof=true&sd=true',
-            'date': '2020-07-20T00:00:00.000Z'
+            'date': '2021-08-16T00:00:00.000Z'
           }
         ],
         'notes': []
@@ -294,7 +466,7 @@ module.exports = {
       {
         'refNo': 'L-A8X-S7G',
         'dateSubmitted': '2021-08-16:00:00.000Z',
-        'dateLastUpdated': '2021-09-05T00:00:00.000Z',
+        'dateLastUpdated': '2021-08-29T00:00:00.000Z',
         'applicationType': 'Initial application',
         'delegatedFunctions': 'Not used',
         'categoryLaw': 'Family law',
@@ -364,179 +536,12 @@ module.exports = {
           {
             'title': 'merits_report.pdf',
             'link': 'https://docs.google.com/document/d/1UG2wQ7d3AAaCEMPjdIiN8HOyWeIt0yLT/edit?usp=sharing&ouid=116296643418406453308&rtpof=true&sd=true',
-            'date': '2020-07-20T00:00:00.000Z'
-          }
-        ],
-        'notes': []
-      }
-    },
-    // application #4
-    {
-      'applicationDetails':
-      {
-        'refNo': 'L-A1B-C2D',
-        'dateSubmitted': '2021-08-29T00:00:00.000Z',
-        'dateLastUpdated': '2021-08-29T00:00:00.000Z',
-        'applicationType': 'Initial application',
-        'delegatedFunctions': 'Used',
-        'categoryLaw': 'Family law',
-        'meansType': 'Passported',
-        'certificateType': 'Emergency and substantive',
-        'meansAssessmentResult': 'Passported',
-        'meritsAssessmentResult': 'Not started',
-        'applicant':
-        {
-          'name': 'Zero Test',
-          'dob': '1993-03-19T00:00:00.000Z',
-          'nino': 'QQ112233Q',
-          'address':  '1 London Road</br>London</br>SW1A 1AA',
-        },
-        'provider':
-        {
-          'name': 'Provider Zero',
-          'firm': 'Zero & Co',
-          'accountNumber': '0K514R',
-          'address': '2 London Road</br>London</br>SW1A 1AA',
-          'phone': '07123456789'
-        },
-        'opponent':
-        {
-          'name': 'Opponent Zero',
-          'dob': '1987-11-23T00:00:00.000Z',
-          'address': '1 London Road</br>London</br>SW1A 1AA',
-          'relationship': 'Husband'
-        },
-        'children': [
-          {
-            'name': 'Zero Child',
-            'dob': '2007-02-23T00:00:00.000Z',
-            'address': '1 London Road</br>London</br>SW1A 1AA',
-            'relationship': 'Child'
-          }
-        ],
-        'linkedApplications': [
-          {
-            'refNo': 'L-E1F-G2H',
-            'status': 'Pending merits assessment'
+            'date': '2021-08-16T00:00:00.000Z'
           },
           {
-            'refNo': 'L-J1K-L2M',
-            'status': 'Pending billing'
-          },
-          {
-            'refNo': 'L-N1P-Q2R',
-            'status': 'Closed'
-          },
-          {
-            'refNo': 'L-S1T-U2V',
-            'status': 'Closed'
-          }
-        ],
-        'delegatedFunctionsDates': [
-          {
-            'proceedingType': 'Non-molestation order',
-            'dateUsed': '2020-03-03T00:00:00.000Z'
-          },
-          {
-            'proceedingType': 'Prohibitive steps order',
-            'dateUsed': 'Not used'
-           },
-          {
-            'proceedingType': 'Occupation order',
-            'dateUsed': '2020-03-03T00:00:00.000Z'
-          }
-        ],
-        'proceedings': [
-          {
-            'id': 'application_4_proceeding_1',
-            'matterType': 'Domestic abuse',
-            'proceedingType': 'Non-molestation order',
-            'meansResult': '',
-            'certificates': [
-              {
-                'id': 'application_4_proceeding_1_certificate_1',
-                'certificateType': 'Emergency certificate',
-                'formOfService': 'Full representation',
-                'workProviderCanDo': 'All steps up to and including the hearing on 21 July 2020.',
-                'meritsResult': ''
-              },
-              {
-                'id': 'application_4_proceeding_1_certificate_2',
-                'certificateType': 'Substantive certificate',
-                'formOfService': 'Full representation',
-                'workProviderCanDo': 'All steps up to and including getting and serving a final order. If the order is breached you can apply for power of arrest. You cannot apply for a warrant of arrest or contempt of court proceedings.',
-                'meritsResult': ''
-              }
-            ]
-          },
-          {
-            'id': 'application_4_proceeding_2',
-            'matterType': 'Domestic abuse',
-            'proceedingType': 'Prohibited steps order',
-            'meansResult': '',
-            'certificates': [
-              {
-                'id': 'application_4_proceeding_2_certificate_1',
-                'certificateType': 'Substantive certificate',
-                'formOfService': 'Family Help (Higher)',
-                'workProviderCanDo': 'Limited to Family Help (Higher) and to all steps necessary to negotiate and conclude a settlement. To include the issue of proceedings and representation in those proceedings save in relation to or at a contested final hearing.',
-                'meritsResult': ''
-              }
-            ]
-          },
-          {
-            'id': 'application_4_proceeding_3',
-            'matterType': 'Domestic abuse',
-            'proceedingType': 'Occupation order',
-            'meansResult': '',
-              'certificates': [
-              {
-                'id': 'application_4_proceeding_3_certificate_1',
-                'certificateType': 'Emergency certificate',
-                'formOfService': 'Family Help (Higher)',
-                'workProviderCanDo': 'Limited to Family Help (Higher) and to all steps necessary to negotiate and conclude a settlement. To include the issue of proceedings and representation in those proceedings save in relation to or at a contested final hearing.',
-                'meritsResult': ''
-              },
-              {
-                'id': 'application_4_proceeding_3_certificate_2',
-                'certificateType': 'Substantive certificate',
-                'formOfService': 'Family Help (Higher)',
-                'workProviderCanDo': 'Limited to Family Help (Higher) and to all steps necessary to negotiate and conclude a settlement. To include the issue of proceedings and representation in those proceedings save in relation to or at a contested final hearing.',
-                'meritsResult': ''
-              }
-            ]
-          }
-        ],
-        'costLimitations': [
-          {
-            'certificateType': 'Emergency certificate',
-            'costLimit': '£1,350',
-            'requestedCostLimit': '£4,500',
-            'justification': 'I want more money'
-          },
-          {
-            'certificateType': 'Substantive certificate',
-            'costLimit': '£25,000',
-            'requestedCostLimit': '£25,000',
-            'justification': 'n/a'
-          }
-        ],
-        'contributions': [],
-        'documents': [
-          {
-            'title': 'means_report.pdf',
-            'link': 'https://drive.google.com/file/d/16V-j11_Na8_bBz4fazl-TP5k8odpPbBX/view',
-            'date': '2020-02-23T00:00:00.000Z'
-          },
-          {
-            'title': 'merits_report.pdf',
-            'link': 'https://drive.google.com/file/d/19TddAL5MpWAPhDqRCsbggQVVngEHCQA5/view',
-            'date': '2020-02-23T00:00:00.000Z'
-          },
-          {
-            'title': 'police_report.pdf',
-            'link': 'https://drive.google.com/file/d/1m2SvoKEuJySNk3wxpjvfIYHqMTZlisQf/view',
-            'date': '2020-03-12T00:00:00.000Z'
+            'title': 'gateway_evidence.pdf',
+            'link': 'https://docs.google.com/document/d/1SCU8hK7P6ByjE6HGFSrLJOeVNsFrgOVG/edit?usp=sharing&ouid=116296643418406453308&rtpof=true&sd=true',
+            'date': '2021-09-05T00:00:00.000Z'
           }
         ],
         'notes': []
@@ -596,7 +601,7 @@ module.exports = {
         'delegatedFunctionsDates': [
           {
             'proceedingType': 'Non-molestation order',
-            'dateUsed': '2020-03-03T00:00:00.000Z'
+            'dateUsed': '2021-08-28T00:00:00.000Z'
           }
         ],
         'proceedings': [
@@ -610,7 +615,7 @@ module.exports = {
                 'id': 'application_5_proceeding_1_certificate_1',
                 'certificateType': 'Emergency certificate',
                 'formOfService': 'Full representation',
-                'workProviderCanDo': 'All steps up to and including the hearing on 21 July 2020.',
+                'workProviderCanDo': 'All steps up to and including the hearing on 21 September 2021.',
                 'meritsResult': ''
               },
               {
@@ -642,17 +647,17 @@ module.exports = {
           {
             'title': 'means_report.pdf',
             'link': 'https://drive.google.com/file/d/16V-j11_Na8_bBz4fazl-TP5k8odpPbBX/view',
-            'date': '2020-02-23T00:00:00.000Z'
+            'date': '2021-08-30T00:00:00.000Z'
           },
           {
             'title': 'merits_report.pdf',
             'link': 'https://drive.google.com/file/d/19TddAL5MpWAPhDqRCsbggQVVngEHCQA5/view',
-            'date': '2020-02-23T00:00:00.000Z'
+            'date': '2021-08-30T00:00:00.000Z'
           },
           {
             'title': 'police_report.pdf',
             'link': 'https://drive.google.com/file/d/1m2SvoKEuJySNk3wxpjvfIYHqMTZlisQf/view',
-            'date': '2020-03-12T00:00:00.000Z'
+            'date': '2021-08-30T00:00:00.000Z'
           }
         ],
         'notes': []
@@ -699,7 +704,7 @@ module.exports = {
         'delegatedFunctionsDates': [
           {
             'proceedingType': 'Non-molestation order',
-            'dateUsed': '2020-03-03T00:00:00.000Z'
+            'dateUsed': '2021-08-28T00:00:00.000Z'
           }
         ],
         'proceedings': [
@@ -713,7 +718,7 @@ module.exports = {
                 'id': 'application_6_proceeding_1_certificate_1',
                 'certificateType': 'Emergency certificate',
                 'formOfService': 'Full representation',
-                'workProviderCanDo': 'All steps up to and including the hearing on 21 July 2020.',
+                'workProviderCanDo': 'All steps up to and including the hearing on 21 September 2021.',
                 'meritsResult': ''
               },
               {
@@ -745,17 +750,17 @@ module.exports = {
           {
             'title': 'means_report.pdf',
             'link': 'https://drive.google.com/file/d/16V-j11_Na8_bBz4fazl-TP5k8odpPbBX/view',
-            'date': '2020-02-23T00:00:00.000Z'
+            'date': '2021-08-30T00:00:00.000Z'
           },
           {
             'title': 'merits_report.pdf',
             'link': 'https://drive.google.com/file/d/19TddAL5MpWAPhDqRCsbggQVVngEHCQA5/view',
-            'date': '2020-02-23T00:00:00.000Z'
+            'date': '2021-08-30T00:00:00.000Z'
           },
           {
             'title': 'police_report.pdf',
             'link': 'https://drive.google.com/file/d/1m2SvoKEuJySNk3wxpjvfIYHqMTZlisQf/view',
-            'date': '2020-03-12T00:00:00.000Z'
+            'date': '2021-08-30T00:00:00.000Z'
           }
         ],
         'notes': []
@@ -830,17 +835,17 @@ module.exports = {
           {
             'title': 'means_report.pdf',
             'link': 'https://drive.google.com/file/d/16V-j11_Na8_bBz4fazl-TP5k8odpPbBX/view',
-            'date': '2020-02-23T00:00:00.000Z'
+            'date': '2021-08-31T00:00:00.000Z'
           },
           {
             'title': 'merits_report.pdf',
             'link': 'https://drive.google.com/file/d/19TddAL5MpWAPhDqRCsbggQVVngEHCQA5/view',
-            'date': '2020-02-23T00:00:00.000Z'
+            'date': '2021-08-31T00:00:00.000Z'
           },
           {
             'title': 'police_report.pdf',
             'link': 'https://drive.google.com/file/d/1m2SvoKEuJySNk3wxpjvfIYHqMTZlisQf/view',
-            'date': '2020-03-12T00:00:00.000Z'
+            'date': '2021-08-31T00:00:00.000Z'
           }
         ],
         'notes': []
@@ -939,17 +944,17 @@ module.exports = {
           {
             'title': 'means_report.pdf',
             'link': 'https://drive.google.com/file/d/16V-j11_Na8_bBz4fazl-TP5k8odpPbBX/view',
-            'date': '2020-02-23T00:00:00.000Z'
+            'date': '2021-08-31T00:00:00.000Z'
           },
           {
             'title': 'merits_report.pdf',
             'link': 'https://drive.google.com/file/d/19TddAL5MpWAPhDqRCsbggQVVngEHCQA5/view',
-            'date': '2020-02-23T00:00:00.000Z'
+            'date': '2021-08-31T00:00:00.000Z'
           },
           {
             'title': 'police_report.pdf',
             'link': 'https://drive.google.com/file/d/1m2SvoKEuJySNk3wxpjvfIYHqMTZlisQf/view',
-            'date': '2020-03-12T00:00:00.000Z'
+            'date': '2021-08-31T00:00:00.000Z'
           }
         ],
         'notes': []
