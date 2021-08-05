@@ -5,12 +5,9 @@ router.get('/my-applications', function(req, res) {
   var refNo = req.session.data.refNo;
   var refNoToRemove = req.session.data.refNoToRemove;
 
-  console.log('here');
-
   // if a refNo exists then we are assigning an application
   if (refNo != null){
     if (!req.session.data.assignedApplications.includes(refNo)){
-        console.log('here');
       req.session.data.assignedApplications.push(refNo);
     }
   }
