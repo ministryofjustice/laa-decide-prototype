@@ -52,7 +52,7 @@ router.get('/my-applications', function(req, res) {
     // add an item to the application history
     var other_reason = '';
     if (req.session.data['removal-reason-other']){
-      other_reason = ' - ' + req.session.data['removal-reason-other']
+      other_reason = ' - ' + req.session.data['removal-reason-other'];
     }
 
     var new_note = {
@@ -85,7 +85,7 @@ router.get('/application-details', function(req, res) {
   for (const proceeding of application['applicationDetails']['proceedings']){
     for (const certificate of proceeding['certificates']){
       if (typeof req.session.data[certificate['id']] !== 'undefined' && req.session.data[certificate['id']] !== null){
-          certificate['meritsResult'] = req.session.data[certificate['id']]
+          certificate['meritsResult'] = req.session.data[certificate['id']];
       }
     }
   }
@@ -111,17 +111,17 @@ router.get('/application-details', function(req, res) {
 
     // if all proceedings have been refused, the application is refused
     if (refusals === total_proceedings){
-      application['applicationDetails']['meritsAssessmentResult'] = 'refused'
+      application['applicationDetails']['meritsAssessmentResult'] = 'refused';
     }
 
     // if all proceedings have been granted, the application is granted
     if (grants === total_proceedings){
-      application['applicationDetails']['meritsAssessmentResult'] = 'granted'
+      application['applicationDetails']['meritsAssessmentResult'] = 'granted';
     }
 
     // if some proceedings have been refused, the application is partially granted
     if ((refusals > 0) && (grants > 0) && (refusals + grants == total_proceedings)){
-      application['applicationDetails']['meritsAssessmentResult'] = 'partially granted'
+      application['applicationDetails']['meritsAssessmentResult'] = 'partially granted';
     }
 
     if ((application['applicationDetails']['meritsAssessmentResult'] != "Not started")
@@ -129,11 +129,11 @@ router.get('/application-details', function(req, res) {
         && (application['applicationDetails']['meritsAssessmentResult'] != "rejected")){
       var note_text = '';
       for(let proceeding of application['applicationDetails']['proceedings']) {
-        note_text = note_text + proceeding['proceedingType'] + '<br><p class="govuk-hint">'
+        note_text = note_text + proceeding['proceedingType'] + '<br><p class="govuk-hint">';
         for(let certificate of proceeding['certificates']) {
-          note_text = note_text + '' + certificate['certificateType'] + ': ' + certificate['meritsResult'] + '<br>'
+          note_text = note_text + '' + certificate['certificateType'] + ': ' + certificate['meritsResult'] + '<br>';
         }
-        note_text = note_text + '</p>'
+        note_text = note_text + '</p>';
       }
 
       // add an item to the application history
@@ -251,13 +251,13 @@ router.post('/merits-assessment-substantive', function(req, res) {
   for (const proceeding of application['applicationDetails']['proceedings']){
     for (const certificate of proceeding['certificates']){
       if (typeof req.session.data[certificate['id']] !== 'undefined' && req.session.data[certificate['id']] !== null){
-          certificate['meritsResult'] = req.session.data[certificate['id']]
+          certificate['meritsResult'] = req.session.data[certificate['id']];
       }
     }
   }
 
   // update overall merits assessment result
-  application['applicationDetails']['meritsAssessmentResult'] = 'in progress'
+  application['applicationDetails']['meritsAssessmentResult'] = 'in progress';
 
   res.locals.data['application'] = application;
 
@@ -290,7 +290,7 @@ router.post('/refuse-application', function(req, res) {
       }
     }
 
-    application['applicationDetails']['meritsAssessmentResult'] = 'in progress'
+    application['applicationDetails']['meritsAssessmentResult'] = 'in progress';
     res.locals.data['application'] = application;
     res.redirect('./application-details');
   }
@@ -304,7 +304,7 @@ router.post('/refuse-application', function(req, res) {
       }
     }
 
-    application['applicationDetails']['meritsAssessmentResult'] = 'in progress'
+    application['applicationDetails']['meritsAssessmentResult'] = 'in progress';
     res.locals.data['application'] = application;
     res.redirect(307, './merits-assessment-substantive');
   }
@@ -345,16 +345,16 @@ router.post('/reject-application', function(req, res) {
       application = app;
   }
 
-  application['applicationDetails']['meritsAssessmentResult'] = 'rejected'
-  application['applicationDetails']['meansAssessmentResult'] = 'rejected'
+  application['applicationDetails']['meritsAssessmentResult'] = 'rejected';
+  application['applicationDetails']['meansAssessmentResult'] = 'rejected';
 
   var other_reason = '';
   if (req.session.data['rejection-reason-other']){
-    other_reason = ' - ' + req.session.data['rejection-reason-other']
+    other_reason = ' - ' + req.session.data['rejection-reason-other'];
   }
   else{
     if (req.session.data['incorrect-means']){
-      other_reason = ' - ' + req.session.data['incorrect-means']
+      other_reason = ' - ' + req.session.data['incorrect-means'];
     }
   }
 
@@ -411,4 +411,4 @@ router.get('/filter', function(req, res) {
   }
 });
 
-module.exports = router
+module.exports = router;
