@@ -39,7 +39,7 @@ router.get('/case-details', function(req, res) {
   for (const proceeding of application['applicationDetails']['proceedings']){
     for (const certificate of proceeding['certificates']){
       if (typeof req.session.data[certificate['id']] !== 'undefined' && req.session.data[certificate['id']] !== null){
-          certificate['meritsResult'] = req.session.data[certificate['id']]
+          certificate['meritsResult'] = req.session.data[certificate['id']];
       }
     }
   }
@@ -66,12 +66,12 @@ router.get('/case-details', function(req, res) {
 
     // if all proceedings have been refused, the application is refused
     if (refusals === total_proceedings){
-      application['applicationDetails']['meritsAssessmentResult'] = 'refused'
+      application['applicationDetails']['meritsAssessmentResult'] = 'refused';
     }
 
     // if all proceedings have been granted, the application is granted
     if (grants === total_proceedings){
-      application['applicationDetails']['meritsAssessmentResult'] = 'granted'
+      application['applicationDetails']['meritsAssessmentResult'] = 'granted';
     }
 
     // if some proceedings have been refused, the application is partially granted
@@ -143,7 +143,7 @@ router.post('/merits-assessment-substantive', function(req, res) {
   for (const proceeding of application['applicationDetails']['proceedings']){
     for (const certificate of proceeding['certificates']){
       if (typeof req.session.data[certificate['id']] !== 'undefined' && req.session.data[certificate['id']] !== null){
-          certificate['meritsResult'] = req.session.data[certificate['id']]
+          certificate['meritsResult'] = req.session.data[certificate['id']];
       }
     }
   }
@@ -238,10 +238,10 @@ router.post('/reject-application', function(req, res) {
       application = app;
   }
 
-  application['applicationDetails']['meritsAssessmentResult'] = 'rejected'
-  application['applicationDetails']['meansAssessmentResult'] = 'rejected'
+  application['applicationDetails']['meritsAssessmentResult'] = 'rejected';
+  application['applicationDetails']['meansAssessmentResult'] = 'rejected';
 
   res.redirect('./case-details');
 });
 
-module.exports = router
+module.exports = router;
