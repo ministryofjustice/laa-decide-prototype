@@ -183,7 +183,7 @@ module.exports = {
           },
           {
             'title': 'Wage slips.pdf',
-            'link': 'https://drive.google.com/file/d/12pZsMsXwwwakMs9YCfmXlo_npzlXG1BH/view?usp=sharing',
+            'link': 'https://drive.google.com/file/d/1QL2OzmGklJQA0GYsd3N7v8A_HXG-sOta/view?usp=sharing',
             'date': '2021-09-02T00:00:00.000Z'
           },
           {
@@ -200,6 +200,11 @@ module.exports = {
             'title': 'Responses to LAA queries.docx',
             'link': 'https://docs.google.com/document/d/1CG8ghhJ2VhBG5DSB189LuZkd9v3a5esR/edit?usp=sharing&ouid=116296643418406453308&rtpof=true&sd=true',
             'date': '2021-09-02T00:00:00.000Z'
+          },
+          {
+            'title': 'Tax Credits.pdf',
+            'link': 'https://drive.google.com/file/d/12bd6RIm_6KXgqnWfhz6WV2zbsK4lV4KY/view?usp=sharing',
+            'date': '2021-09-04T00:00:00.000Z'
           }
         ],
         'notes': []
@@ -336,6 +341,11 @@ module.exports = {
             'date': '2021-09-01T00:00:00.000Z'
           },
           {
+            'title': 'Bank statement 1.pdf',
+            'link': 'https://drive.google.com/file/d/1w-ngJvD9fU18M9jj6yNXXKnd46kzQMms/view?usp=sharing',
+            'date': '2021-09-01T00:00:00.000Z'
+          },
+          {
             'title': 'Bank statement 2.pdf',
             'link': 'https://drive.google.com/file/d/1hJpI7U_mIsaMo87QMZ5hl1NwGk_TZSru/view?usp=sharing',
             'date': '2021-09-01T00:00:00.000Z'
@@ -444,6 +454,11 @@ module.exports = {
           {
             'title': 'Bank statement - account 8127.pdf',
             'link': 'https://drive.google.com/file/d/1KNMmWsnrKtTfHLUQyIZcr91Yx8qTscG-/view?usp=sharing',
+            'date': '2021-09-10T00:00:00.000Z'
+          },
+          {
+            'title': 'Bank statement - account 1768.pdf',
+            'link': 'https://drive.google.com/file/d/1_oAUhQPBlLWolYgm8hRSvExip_jewiRV/view?usp=sharing',
             'date': '2021-09-10T00:00:00.000Z'
           },
           {
