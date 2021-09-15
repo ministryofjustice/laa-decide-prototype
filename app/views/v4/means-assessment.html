@@ -83,7 +83,11 @@ Means assessment
 
         <div>
           <h2 class="govuk-heading-l">Contribution</h2>
-          <p class="govuk-body">This applicant needs to pay towards legal aid</p>
+          {% if application['contributions'].length > 0 %}
+          <p class="govuk-body">This applicant needs to pay towards legal aid.</p>
+          {% else %}
+          <p class="govuk-body">This applicant does not need to pay towards legal aid.</p>
+          {% endif %}
           <ul class="govuk-list govuk-list--bullet">
             {% for contribution in application['contributions'] %}
             <li>

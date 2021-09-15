@@ -10,9 +10,9 @@ module.exports = {
         'applicationType': 'Initial application',
         'delegatedFunctions': 'Used',
         'categoryLaw': 'Family',
-        'meansType': 'Passported',
+        'meansType': 'Non passported',
         'certificateType': 'Emergency and substantive',
-        'meansAssessmentResult': 'Passported',
+        'meansAssessmentResult': 'Not started',
         'meritsAssessmentResult': 'Not started',
         'applicant':
         {
@@ -147,6 +147,11 @@ module.exports = {
             'date': '2021-08-12T00:00:00.000Z'
           },
           {
+            'title': 'means_report.pdf',
+            'link': 'https://drive.google.com/file/d/1hzOKVZNB-2zDNiRJpZkzAx1b_PnNmA5Y/view?usp=sharing',
+            'date': '2021-08-12T00:00:00.000Z'
+          },
+          {
             'title': 'statement_of_case.pdf',
             'link': 'https://docs.google.com/document/d/140HjKAVgNX_BKchnNX8N78zHkDOo5R0i/edit?usp=sharing&ouid=116296643418406453308&rtpof=true&sd=true',
             'date': '2021-08-12T00:00:00.000Z'
@@ -155,6 +160,46 @@ module.exports = {
             'title': 'dv_evidence.pdf',
             'link': 'https://docs.google.com/document/d/1X5_0hXo8q4rmiVU4-ZMwMrEMSsqkyU5F/edit?usp=sharing&ouid=116296643418406453308&rtpof=true&sd=true',
             'date': '2021-08-28T00:00:00.000Z'
+          },
+          {
+            'title': 'Bank statement - account 0171.pdf',
+            'link': 'https://drive.google.com/file/d/1fi2H3Yo7_8P3N52tb5nQzOOccLy4vHAf/view?usp=sharing',
+            'date': '2021-08-29T00:00:00.000Z'
+          },
+          {
+            'title': 'Bank statement - account 2899.pdf',
+            'link': 'https://drive.google.com/file/d/1kLGPPcuHYjpZl--wWwstto9ThPeaxCXE/view?usp=sharing',
+            'date': '2021-08-29T00:00:00.000Z'
+          },
+          {
+            'title': 'Bank statement - account 3466.pdf',
+            'link': 'https://drive.google.com/file/d/1GHAqvZPxnbL2JPNQbzoHSYmJ373tgRgj/view?usp=sharing',
+            'date': '2021-08-29T00:00:00.000Z'
+          },
+          {
+            'title': 'Child bank account statements.pdf',
+            'link': 'https://drive.google.com/file/d/1ZTYWf-F5Wv08dMhjEO-jX3mFBfgM1SSa/view?usp=sharing',
+            'date': '2021-08-29T00:00:00.000Z'
+          },
+          {
+            'title': 'Wage slips.pdf',
+            'link': 'https://drive.google.com/file/d/12pZsMsXwwwakMs9YCfmXlo_npzlXG1BH/view?usp=sharing',
+            'date': '2021-09-02T00:00:00.000Z'
+          },
+          {
+            'title': 'Property valuation.pdf',
+            'link': 'https://drive.google.com/file/d/1Lnd8XLiTujIqdkqYgBPvKfxo9V69R5s1/view?usp=sharing',
+            'date': '2021-09-02T00:00:00.000Z'
+          },
+          {
+            'title': 'Mortgage statement.pdf',
+            'link': 'https://drive.google.com/file/d/1op7NJ9X2daseITNBjgMiPmqRAj_82e18/view?usp=sharing',
+            'date': '2021-09-02T00:00:00.000Z'
+          },
+          {
+            'title': 'Responses to LAA queries.docx',
+            'link': 'https://docs.google.com/document/d/1CG8ghhJ2VhBG5DSB189LuZkd9v3a5esR/edit?usp=sharing&ouid=116296643418406453308&rtpof=true&sd=true',
+            'date': '2021-09-02T00:00:00.000Z'
           }
         ],
         'notes': []
@@ -170,9 +215,9 @@ module.exports = {
         'applicationType': 'Initial application',
         'delegatedFunctions': 'Used',
         'categoryLaw': 'Family',
-        'meansType': 'Passported',
+        'meansType': 'Non passported',
         'certificateType': 'Emergency and substantive',
-        'meansAssessmentResult': 'Passported',
+        'meansAssessmentResult': 'Not started',
         'meritsAssessmentResult': 'Not started',
         'applicant':
         {
@@ -279,6 +324,31 @@ module.exports = {
             'title': 'merits_report.pdf',
             'link': 'https://docs.google.com/document/d/1MCheEMZsnzv7DpxPo73q8RdfECFuXoTJ/edit?usp=sharing&ouid=116296643418406453308&rtpof=true&sd=true',
             'date': '2021-08-16T00:00:00.000Z'
+          },
+          {
+            'title': 'Means Report.pdf',
+            'link': 'https://drive.google.com/file/d/1FQGXVQItVD_Bay-ZqukgkBZBaE6trZgE/view?usp=sharing',
+            'date': '2021-08-17T00:00:00.000Z'
+          },
+          {
+            'title': 'Wage slips.pdf',
+            'link': 'https://drive.google.com/file/d/1OZJsRJEINbsC_yk6BTelsmtdcxy0vzMB/view?usp=sharing',
+            'date': '2021-09-01T00:00:00.000Z'
+          },
+          {
+            'title': 'Bank statement 2.pdf',
+            'link': 'https://drive.google.com/file/d/1hJpI7U_mIsaMo87QMZ5hl1NwGk_TZSru/view?usp=sharing',
+            'date': '2021-09-01T00:00:00.000Z'
+          },
+          {
+            'title': 'Bank statement 3.pdf',
+            'link': 'https://drive.google.com/file/d/1ysMwuiXSiddR6jA15GTdjN5EJf-vpYEO/view?usp=sharing',
+            'date': '2021-09-01T00:00:00.000Z'
+          },
+          {
+            'title': 'Bank statement 4.pdf',
+            'link': 'https://drive.google.com/file/d/1szjILtOGrvq_9y6Q1C8N706TnvBqpZQw/view?usp=sharing',
+            'date': '2021-09-01T00:00:00.000Z'
           }
         ],
         'notes': []
@@ -294,9 +364,9 @@ module.exports = {
         'applicationType': 'Initial application',
         'delegatedFunctions': 'Not used',
         'categoryLaw': 'Family',
-        'meansType': 'Passported',
+        'meansType': 'Non passported',
         'certificateType': 'Substantive',
-        'meansAssessmentResult': 'Passported',
+        'meansAssessmentResult': 'Not started',
         'meritsAssessmentResult': 'Not started',
         'applicant':
         {
@@ -362,9 +432,24 @@ module.exports = {
             'date': '2021-08-16T00:00:00.000Z'
           },
           {
+            'title': 'Means Report.pdf',
+            'link': 'https://drive.google.com/file/d/1s2f04Una3jNMMkOtGKVE5nTTW7EDQRtJ/view?usp=sharing',
+            'date': '2021-08-16T00:00:00.000Z'
+          },
+          {
             'title': 'gateway_evidence.pdf',
             'link': 'https://docs.google.com/document/d/1SCU8hK7P6ByjE6HGFSrLJOeVNsFrgOVG/edit?usp=sharing&ouid=116296643418406453308&rtpof=true&sd=true',
             'date': '2021-08-29T00:00:00.000Z'
+          },
+          {
+            'title': 'Bank statement - account 8127.pdf',
+            'link': 'https://drive.google.com/file/d/1KNMmWsnrKtTfHLUQyIZcr91Yx8qTscG-/view?usp=sharing',
+            'date': '2021-09-10T00:00:00.000Z'
+          },
+          {
+            'title': 'Information regarding transfer activity.pdf',
+            'link': 'https://drive.google.com/file/d/1eORmr_M6MFSwoWxncvIlSb2Xo1DPppTr/view?usp=sharing',
+            'date': '2021-09-10T00:00:00.000Z'
           }
         ],
         'notes': []
