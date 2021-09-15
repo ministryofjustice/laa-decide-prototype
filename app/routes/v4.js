@@ -179,6 +179,22 @@ router.get('/application-details', function(req, res) {
     }
     req.session.data['merits_continue_button'] = '';
     req.session.data['update_all_substantive'] = '';
+    req.session.data['granted-emergency'] = '';
+    req.session.data['emergency-certificate-start-date'] = '';
+    req.session.data['other-emergency-start-date-day'] = '';
+    req.session.data['other-emergency-start-date-month'] = '';
+    req.session.data['other-emergency-start-date-year'] = '';
+    req.session.data['emergency-certificate-end-date'] = '';
+    req.session.data['other-emergency-end-date-day'] = '';
+    req.session.data['other-emergency-end-date-month'] = '';
+    req.session.data['other-emergency-end-date-year'] = '';
+    req.session.data['emergency-note'] = '';
+    req.session.data['granted-substantive'] = '';
+    req.session.data['substantive-certificate-start-date'] = '';
+    req.session.data['other-substantive-start-date-day'] = '';
+    req.session.data['other-substantive-start-date-month'] = '';
+    req.session.data['other-substantive-start-date-year'] = '';
+    req.session.data['substantive-note'] = '';
   }
 
   // update proceeding means results
@@ -235,6 +251,11 @@ router.get('/application-details', function(req, res) {
     application.applicationDetails.notes.push(new_note);
     req.session.data['means_continue_button'] = '';
     req.session.data['update_all_means'] = '';
+    req.session.data['contributionCorrect'] = '';
+    req.session.data['amended-contribution'] = '';
+    req.session.data['amended_contribution_frequency'] = '';
+    req.session.data['means-note'] = '';
+    req.session.data['means-note'] = '';
   }
 
   res.locals.data['application'] = application;
