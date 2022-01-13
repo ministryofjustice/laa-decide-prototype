@@ -49,6 +49,8 @@ metadata:
   name: prototype-ingress
   annotations:
     kubernetes.io/ingress.class: nginx
+    external-dns.alpha.kubernetes.io/set-identifier: prototype-ingress-laa-decide-prototype-blue
+    external-dns.alpha.kubernetes.io/aws-weight: "100"
 spec:
   tls:
   - hosts:
