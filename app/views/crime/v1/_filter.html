@@ -1,0 +1,177 @@
+<form action="filter">
+  <div class="moj-filter-layout__filter">
+    <div class="moj-filter">
+      <div class="moj-filter__header">
+        <div class="moj-filter__header-title">
+          <h2 class="govuk-heading-m">Filter</h2>
+        </div>
+        <div class="moj-filter__header-action">
+        </div>
+      </div>
+      <div class="moj-filter__content">
+        <div class="moj-filter__options">
+          <details class="govuk-details" data-module="govuk-details" open>
+            <summary class="govuk-details__summary">
+              <span class="govuk-details__summary-text">Category of law</span>
+            </summary>
+            <div class="govuk-form-group">
+              <fieldset class="govuk-fieldset">
+                <div class="govuk-checkboxes govuk-checkboxes--small">
+                  <div class="govuk-checkboxes__item">
+                    <input class="govuk-checkboxes__input" id="categoryLaw" name="categoryLaw" type="checkbox" value="Family law" {{ checked("categoryLaw", "Family law") }}>
+                    <label class="govuk-label govuk-checkboxes__label" for="type">
+                      Family
+                    </label>
+                  </div>
+                  <div class="govuk-checkboxes__item">
+                    <input class="govuk-checkboxes__input" id="categoryLaw-2" name="categoryLaw" type="checkbox" value="Housing" {{ checked("categoryLaw", "Housing") }}>
+                    <label class="govuk-label govuk-checkboxes__label" for="categoryLaw-2">
+                      Housing
+                    </label>
+                  </div>
+                </div>
+              </fieldset>
+            </div>
+          </details>
+          <details class="govuk-details" data-module="govuk-details" open>
+            <summary class="govuk-details__summary">
+              <span class="govuk-details__summary-text">Application type</span>
+            </summary>
+            <div class="govuk-form-group">
+              <fieldset class="govuk-fieldset">
+                <div class="govuk-checkboxes govuk-checkboxes--small">
+                  <div class="govuk-checkboxes__item">
+                    <input class="govuk-checkboxes__input" id="applicationType" name="applicationType" type="checkbox" value="Initial application" {{ checked("applicationType", "Initial application") }}>
+                    <label class="govuk-label govuk-checkboxes__label" for="applicationType">
+                      Initial application
+                    </label>
+                  </div>
+                  <div class="govuk-checkboxes__item">
+                    <input class="govuk-checkboxes__input" id="applicationType-2" name="applicationType" type="checkbox" value="Amendment" {{ checked("applicationType", "Amendment") }}>
+                    <label class="govuk-label govuk-checkboxes__label" for="applicationType-2">
+                      Amendment
+                    </label>
+                  </div>
+                </div>
+              </fieldset>
+            </div>
+          </details>
+          <details class="govuk-details" data-module="govuk-details" open>
+            <summary class="govuk-details__summary">
+              <span class="govuk-details__summary-text">Certificate type</span>
+            </summary>
+            <div class="govuk-form-group">
+              <fieldset class="govuk-fieldset">
+                <div class="govuk-checkboxes govuk-checkboxes--small">
+                  <div class="govuk-checkboxes__item">
+                    <input class="govuk-checkboxes__input" id="certificateType" name="certificateType" type="checkbox" value="Emergency certificate" {{ checked("certificateType", "Emergency certificate") }}>
+                    <label class="govuk-label govuk-checkboxes__label" for="certificateType">
+                      Emergency certificate
+                    </label>
+                  </div>
+                  <div class="govuk-checkboxes__item">
+                    <input class="govuk-checkboxes__input" id="certificateType-2" name="certificateType" type="checkbox" value="Substantive certificate" {{ checked("certificateType", "Substantive certificate") }}>
+                    <label class="govuk-label govuk-checkboxes__label" for="certificateType-2">
+                      Substantive certificate
+                    </label>
+                  </div>
+                </div>
+              </fieldset>
+            </div>
+          </details>
+          <details class="govuk-details" data-module="govuk-details" open>
+            <summary class="govuk-details__summary">
+              <span class="govuk-details__summary-text">Delegated functions</span>
+            </summary>
+            <div class="govuk-form-group">
+              <fieldset class="govuk-fieldset">
+                <div class="govuk-checkboxes govuk-checkboxes--small">
+                  <div class="govuk-checkboxes__item">
+                    <input class="govuk-checkboxes__input" id="delegatedFunctions" name="delegatedFunctions" type="checkbox" value="Used" {{ checked("delegatedFunctions", "Used") }}>
+                    <label class="govuk-label govuk-checkboxes__label" for="delegatedFunctions">
+                      Used
+                    </label>
+                  </div>
+                  <div class="govuk-checkboxes__item">
+                    <input class="govuk-checkboxes__input" id="delegatedFunctions-2" name="delegatedFunctions" type="checkbox" value="Not used" {{ checked("delegatedFunctions", "Not used") }}>
+                    <label class="govuk-label govuk-checkboxes__label" for="delegatedFunctions-2">
+                      Not used
+                    </label>
+                  </div>
+                </div>
+              </fieldset>
+            </div>
+          </details>
+          <details class="govuk-details" data-module="govuk-details" open>
+            <summary class="govuk-details__summary">
+              <span class="govuk-details__summary-text">Means type</span>
+            </summary>
+            <div class="govuk-form-group">
+              <fieldset class="govuk-fieldset">
+                <div class="govuk-checkboxes govuk-checkboxes--small">
+                  <div class="govuk-checkboxes__item">
+                    <input class="govuk-checkboxes__input" id="meansType" name="meansType" type="checkbox" value="Business" {{ checked("meansType", "Business") }}>
+                    <label class="govuk-label govuk-checkboxes__label" for="meansType">
+                      Business
+                    </label>
+                  </div>
+                  <div class="govuk-form-group">
+                    <div class="govuk-checkboxes__item">
+                      <input class="govuk-checkboxes__input" id="meansType-2" name="meansType" type="checkbox" value="Passported" {{ checked("meansType", "Passported") }}>
+                      <label class="govuk-label govuk-checkboxes__label" for="meansType-2">
+                        Passported
+                      </label>
+                    </div>
+                    <div class="govuk-checkboxes__item">
+                      <input class="govuk-checkboxes__input" id="meansType-3" name="meansType" type="checkbox" value="Non passported" {{ checked("meansType", "Non passported") }}>
+                      <label class="govuk-label govuk-checkboxes__label" for="meansType-3">
+                        Non passported
+                      </label>
+                    </div>
+                    <div class="govuk-checkboxes__item">
+                      <input class="govuk-checkboxes__input" id="meansType-5" name="meansType" type="checkbox" value="Child means" {{ checked("meansType", "Child means") }}>
+                      <label class="govuk-label govuk-checkboxes__label" for="meansType-5">
+                        Child means
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              </fieldset>
+            </div>
+          </details>
+          <details class="govuk-details" data-module="govuk-details" open>
+            <summary class="govuk-details__summary">
+              <span class="govuk-details__summary-text">Date submitted</span>
+            </summary>
+            <div class="govuk-form-group">
+              <fieldset class="govuk-fieldset">
+                <div class="govuk-grid-row">
+                  <div class="govuk-grid-column-one-half">
+                    <div class="govuk-form-group">
+                      <label class="govuk-label" for="submitted-date-from">
+                        From
+                      </label>
+                      <input class="govuk-input govuk-!-width-full" id="submitted-date-from" name="submitted-date-from" type="text" placeholder="DD/MM/YYY" value={{ data['submitted-date-from'] }}>
+                    </div>
+                  </div>
+                  <div class="govuk-grid-column-one-half">
+                    <div class="govuk-form-group">
+                      <label class="govuk-label" for="submitted-date-to">
+                        To
+                      </label>
+                      <input class="govuk-input govuk-!-width-full" id="submitted-date-to" name="submitted-date-to" type="text" placeholder="DD/MM/YYY" value={{ data['submitted-date-to'] }}>
+                    </div>
+                  </div>
+                </div>
+              </fieldset>
+            </div>
+          </details>
+          <div class="govuk-button-group">
+            <input type="submit" name="filter-button" value="Apply filters" id="apply-filters" class="govuk-button form-button" data-module="govuk-button" data-disable-with="Apply filters">
+            <input type="submit" name="filter-button" value="Clear all" id="clear-all" class="govuk-button form-button govuk-button--secondary govuk-!-margin-left-3" data-module="govuk-button" data-disable-with="Clear all">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</form>
