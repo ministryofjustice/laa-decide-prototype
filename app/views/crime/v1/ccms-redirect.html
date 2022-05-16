@@ -1,0 +1,48 @@
+{% extends "layout.html" %}
+
+{% block pageTitle %}
+You need to review this application in CCMS
+{% endblock %}
+
+{% block beforeContent %}
+{% if data['ccms-source'] == 'application-details' %}
+<a class="govuk-back-link" href="application-details">Back</a>
+{% endif %}
+{% if data['ccms-source'] == 'emergency' %}
+<a class="govuk-back-link" href="merits-assessment-emergency">Back</a>
+{% endif %}
+{% if data['ccms-source'] == 'substantive'%}
+<a class="govuk-back-link" href="merits-assessment-substantive">Back</a>
+{% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="govuk-panel govuk-panel--confirmation" style="text-align: left; background-color:#17539B">
+  <h1 class="govuk-panel__title">You need to review this application in CCMS</h1>
+  <div class="govuk-body" style="color:white">
+    You cannot use this service if you need to:
+    <ul class="govuk-list--bullet">
+      <li>amend application details</li>
+      <li>request more information</li>
+      <li>make a decision on means</li>
+      <li>change the scope</li>
+      <li>change the amount to be granted</li>
+    </ul>
+
+    <form action="laa-online-portal">
+      <button class="govuk-button govuk-button--secondary" data-module="govuk-button">Continue in CCMS</button>
+    </form>
+
+    {% if data['ccms-source'] == 'application-details' %}
+    <a href="application-details" class="govuk-link--inverse">Back to application</a>
+    {% endif %}
+    {% if data['ccms-source'] == 'emergency' %}
+    <a href="merits-assessment-emergency" class="govuk-link--inverse">Back to application</a>
+    {% endif %}
+    {% if data['ccms-source'] == 'substantive'%}
+    <a href="merits-assessment-substantive" class="govuk-link--inverse">Back to application</a>
+    {% endif %}
+  </div>
+</div>
+
+{% endblock %}
