@@ -1,5 +1,12 @@
-const express = require('express');
-const router = express.Router();
+//
+// For guidance on how to create routes see:
+// https://prototype-kit.service.gov.uk/docs/create-routes
+//
+
+const govukPrototypeKit = require('govuk-prototype-kit')
+const router = govukPrototypeKit.requests.setupRouter()
+
+// Add your routes here
 
 router.get('/my-applications', function(req, res) {
   var refNo = req.session.data.refNo;
@@ -244,4 +251,4 @@ router.post('/reject-application', function(req, res) {
   res.redirect('./case-details');
 });
 
-module.exports = router;
+module.exports = router

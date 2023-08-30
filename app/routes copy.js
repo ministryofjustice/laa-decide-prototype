@@ -1,12 +1,5 @@
-//
-// For guidance on how to create routes see:
-// https://prototype-kit.service.gov.uk/docs/create-routes
-//
 const express = require('express');
-const govukPrototypeKit = require('govuk-prototype-kit')
-const router = govukPrototypeKit.requests.setupRouter()
-
-// Add your routes here
+const router = express.Router();
 const v2 = require('./routes/v2.js');
 const v3 = require('./routes/v3.js');
 const v4 = require('./routes/v4.js');
@@ -17,3 +10,5 @@ router.use('/v3', v3);
 router.use('/v4', v4);
 
 router.use('/node_modules', express.static('node_modules'));
+
+module.exports = router
