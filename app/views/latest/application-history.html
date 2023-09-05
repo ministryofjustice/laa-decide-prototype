@@ -1,4 +1,4 @@
-{% extends "legacy_layout.html" %}
+{% extends "layout_workload.html" %}
 
 {% block pageTitle %}
 Application history
@@ -61,107 +61,49 @@ Merits decision saved.
             <a class="moj-sub-navigation__link" href="application-details">Application details</a>
           </li>
           <li class="moj-sub-navigation__item">
-            <a class="moj-sub-navigation__link" aria-current="page" href="people">People</a>
+            <a class="moj-sub-navigation__link" href="people">People</a>
           </li>
           <li class="moj-sub-navigation__item">
-            <a class="moj-sub-navigation__link" href="application-history">Application history</a>
+            <a class="moj-sub-navigation__link" aria-current="page" href="application-history">Application history</a>
           </li>
         </ul>
       </nav>
 
       <table class="govuk-table">
-        <caption class="govuk-table__caption govuk-table__caption--m">Applicant details</caption>
+        <caption class="govuk-table__caption govuk-table__caption--m">Application history</caption>
+        <thead class="govuk-table__head">
+          <tr class="govuk-table__row">
+            <th scope="col" class="govuk-table__header">When</th>
+            <th scope="col" class="govuk-table__header">Who</th>
+            <th scope="col" class="govuk-table__header">What</th>
+          </tr>
+        </thead>
         <tbody class="govuk-table__body">
+          {% for note in application['notes'] | reverse %}
           <tr class="govuk-table__row">
-            <td class="govuk-table__header govuk-!-width-one-half">Name</td>
-            <td class="govuk-table__cell">{{ application['applicant']['name'] }}</td>
+            <td class="govuk-table__cell">{{ note['when'] | history_date }}</td>
+            <td class="govuk-table__cell">{{ note['who'] }}<br>{{ note['role'] }}</td>
+            <td class="govuk-table__cell"><b>{{ note['title'] }}</b><br>{{ note['text'] | safe }}</td>
           </tr>
-          <tr class="govuk-table__row">
-            <td class="govuk-table__header">Date of birth</td>
-            <td class="govuk-table__cell">{{ application['applicant']['dob'] | date }}</td>
-          </tr>
-          <tr class="govuk-table__row">
-            <td class="govuk-table__header">National insurance number</td>
-            <td class="govuk-table__cell">{{ application['applicant']['nino'] }}</td>
-          </tr>
-          <tr class="govuk-table__row">
-            <td class="govuk-table__header">Address</td>
-            <td class="govuk-table__cell">{{ application['applicant']['address']|safe }}</td>
-          </tr>
+          {% endfor %}
         </tbody>
       </table>
 
-      <table class="govuk-table">
-        <caption class="govuk-table__caption govuk-table__caption--m">Provider details</caption>
-        <tbody class="govuk-table__body">
-          <tr class="govuk-table__row">
-            <td class="govuk-table__header govuk-!-width-one-half">Name</td>
-            <td class="govuk-table__cell">{{ application['provider']['name'] }}</td>
-          </tr>
-          <tr class="govuk-table__row">
-            <td class="govuk-table__header">Firm</td>
-            <td class="govuk-table__cell">{{ application['provider']['firm'] }}</td>
-          </tr>
-          <tr class="govuk-table__row">
-            <td class="govuk-table__header">Account number</td>
-            <td class="govuk-table__cell">{{ application['provider']['accountNumber'] }}</td>
-          </tr>
-          <tr class="govuk-table__row">
-            <td class="govuk-table__header">Address</td>
-            <td class="govuk-table__cell">{{ application['provider']['address']|safe }}</td>
-          </tr>
-          <tr class="govuk-table__row">
-            <td class="govuk-table__header">Phone</td>
-            <td class="govuk-table__cell">{{ application['provider']['phone'] }}</td>
-          </tr>
-        </tbody>
-      </table>
-
-      <table class="govuk-table">
-        <caption class="govuk-table__caption govuk-table__caption--m">Opponent details</caption>
-        <tbody class="govuk-table__body">
-          <tr class="govuk-table__row">
-            <td class="govuk-table__header govuk-!-width-one-half">Name</td>
-            <td class="govuk-table__cell">{{ application['opponent']['name'] }}</td>
-          </tr>
-          <tr class="govuk-table__row">
-            <td class="govuk-table__header">Date of birth</td>
-            <td class="govuk-table__cell">{{ application['opponent']['dob']  | date }}</td>
-          </tr>
-          <tr class="govuk-table__row">
-            <td class="govuk-table__header">Address</td>
-            <td class="govuk-table__cell">{{ application['opponent']['address']|safe }}</td>
-          </tr>
-          <tr class="govuk-table__row">
-            <td class="govuk-table__header">Relationship</td>
-            <td class="govuk-table__cell">{{ application['opponent']['relationship'] }}</td>
-          </tr>
-        </tbody>
-      </table>
-
-      {% for child in application['children'] %}
-      <table class="govuk-table">
-        <caption class="govuk-table__caption govuk-table__caption--m">Child details</caption>
-        <tbody class="govuk-table__body">
-          <tr class="govuk-table__row">
-            <td class="govuk-table__header govuk-!-width-one-half">Name</td>
-            <td class="govuk-table__cell">{{ child['name'] }}</td>
-          </tr>
-          <tr class="govuk-table__row">
-            <td class="govuk-table__header">Date of birth</td>
-            <td class="govuk-table__cell">{{ child['dob']  | date }}</td>
-          </tr>
-          <tr class="govuk-table__row">
-            <td class="govuk-table__header">Address</td>
-            <td class="govuk-table__cell">{{ child['address']|safe }}</td>
-          </tr>
-          <tr class="govuk-table__row">
-            <td class="govuk-table__header">Relationship</td>
-            <td class="govuk-table__cell">{{ child['relationship'] }}</td>
-          </tr>
-        </tbody>
-      </table>
-      {% endfor %}
+      {% if data['refNo'] in data['assignedApplications'] %}
+      <form action="add-note" method="POST">
+        <div class="govuk-form-group">
+          <h1 class="govuk-label-wrapper"><label class="govuk-label govuk-label--s" for="note">
+              Add a note to the application history
+            </label>
+          </h1>
+          <div id="note-hint" class="govuk-hint">
+            This information is for internal use only
+          </div>
+          <textarea class="govuk-textarea" name="note" id="note" rows="5"></textarea>
+          <button class="govuk-button" data-module="govuk-button">Add to application history</button>
+        </div>
+      </form>
+      {% endif %}
     </div>
 
     {% if data['refNo'] in data['assignedApplications'] %}

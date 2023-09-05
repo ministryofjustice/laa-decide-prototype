@@ -79,7 +79,7 @@ router.get('/my-applications', function(req, res) {
   req.session.data.refNo = null;
   req.session.data.refNoToRemove = null;
 
-  res.render('./v4/my-applications');
+  res.render('./latest/my-applications');
 });
 
 router.get('/request-info-note', function(req, res) {
@@ -267,7 +267,7 @@ router.get('/application-details', function(req, res) {
   }
 
   res.locals.data['application'] = application;
-  res.render('./v4/application-details');
+  res.render('./latest/application-details');
 });
 
 router.get('/application-history', function(req, res) {
@@ -280,7 +280,7 @@ router.get('/application-history', function(req, res) {
   }
 
   res.locals.data['application'] = application;
-  res.render('./v4/application-history');
+  res.render('./latest/application-history');
 });
 
 router.get('/people', function(req, res) {
@@ -293,7 +293,7 @@ router.get('/people', function(req, res) {
   }
 
   res.locals.data['application'] = application;
-  res.render('./v4/people');
+  res.render('./latest/people');
 });
 
 router.get('/merits-assessment-emergency', function(req, res) {
@@ -308,16 +308,16 @@ router.get('/merits-assessment-emergency', function(req, res) {
   res.locals.data['application'] = application;
 
   if (application['applicationDetails']['certificateType'] === 'Substantive'){
-    res.render('./v4/merits-assessment-substantive');
+    res.render('./latest/merits-assessment-substantive');
   }
   else {
-    res.render('./v4/merits-assessment-emergency');
+    res.render('./latest/merits-assessment-emergency');
   }
 });
 
 router.get('/merits-assessment-substantive', function(req, res) {
   if (req.session.data.update_all_emergency === 'Refuse all'){
-    res.render('./v4/refuse-application');
+    res.render('./latest/refuse-application');
   }
   else if (req.session.data.update_all_emergency === 'Grant all'){
     var application = null;
@@ -339,7 +339,7 @@ router.get('/merits-assessment-substantive', function(req, res) {
 
     application['applicationDetails']['meritsAssessmentResult'] = 'in progress';
     res.locals.data['application'] = application;
-    res.render('./v4/merits-assessment-substantive');
+    res.render('./latest/merits-assessment-substantive');
   }
   else {
     var application = null;
@@ -351,7 +351,7 @@ router.get('/merits-assessment-substantive', function(req, res) {
     }
 
     res.locals.data['application'] = application;
-    res.render('./v4/merits-assessment-substantive');
+    res.render('./latest/merits-assessment-substantive');
   }
 });
 
@@ -380,10 +380,10 @@ router.post('/merits-assessment-substantive', function(req, res) {
 
   // direct to correct page based on button clicked
   if (req.session.data['merits_continue_button'] == "Save and come back later"){
-    res.render('./v4/application-details');
+    res.render('./latest/application-details');
   }
   else {
-    res.render('./v4/merits-assessment-substantive');
+    res.render('./latest/merits-assessment-substantive');
   }
 });
 
@@ -430,7 +430,7 @@ router.post('/refuse-application', function(req, res) {
 
 router.get('/substantive-update-all', function(req, res) {
   if (req.session.data.update_all_substantive === 'Refuse all'){
-    res.render('./v4/refuse-application');
+    res.render('./latest/refuse-application');
   }
   else if (req.session.data.update_all_substantive === 'Grant all'){
     var application = null;
@@ -524,13 +524,13 @@ router.get('/means-assessment', function(req, res) {
 
   res.locals.data['application'] = application;
 
-  res.render('./v4/means-assessment');
+  res.render('./latest/means-assessment');
 });
 
 
 router.get('/means-update-all', function(req, res) {
   if (req.session.data.update_all_means === 'Refuse all'){
-    res.render('./v4/refuse-means');
+    res.render('./latest/refuse-means');
   }
   else if (req.session.data.update_all_means === 'Grant all'){
     var application = null;
