@@ -16,7 +16,7 @@ module.exports = {
         'meritsAssessmentResult': 'Not started',
         'applicant':
         {
-          'name': 'Carin Read',
+          'name': 'Kraig Paul',
           'dob': '1993-03-19T00:00:00.000Z',
           'nino': 'QQ112233Q',
           'address':  '1 London Road</br>London</br>SW1A 1AA',
@@ -187,7 +187,7 @@ module.exports = {
         'meritsAssessmentResult': 'Not started',
         'applicant':
         {
-          'name': 'Two Test',
+          'name': 'Jamal Harding',
           'dob': '2000-05-15T00:00:00.000Z',
           'nino': 'ZZ112233Z',
           'address': '1 High Street</br>London</br>SW1A 1AA',
@@ -301,7 +301,7 @@ module.exports = {
         'meritsAssessmentResult': 'Not started',
         'applicant':
         {
-          'name': 'Three Test',
+          'name': 'Aimee Jenkins',
           'dob': '1978-10-23T00:00:00.000Z',
           'nino': 'XX112233X',
           'address': '1 Any Street</br>Some Town</br>Nowheresville</br>Out in the Sticks</br>SW1A 1AA',
@@ -402,7 +402,7 @@ module.exports = {
         'meritsAssessmentResult': 'Not started',
         'applicant':
         {
-          'name': 'Four Test',
+          'name': 'Doyle Lloyd',
           'dob': '1982-01-22T00:00:00.000Z',
           'nino': 'ZZ112233Z',
           'address': '102 Petty France</br>London</br>SW1H 9AJ',
@@ -486,7 +486,7 @@ module.exports = {
         'meritsAssessmentResult': 'Not started',
         'applicant':
         {
-          'name': 'Five Test',
+          'name': 'Marcus Nicholson',
           'dob': '1981-04-15T00:00:00.000Z',
           'nino': 'AA111111Q',
           'address': '102 Petty France</br>London</br>SW1H 9AJ',
@@ -594,7 +594,7 @@ module.exports = {
         'meritsAssessmentResult': 'Not started',
         'applicant':
         {
-          'name': 'Six Test',
+          'name': 'Claudio Walls',
           'dob': '1981-04-15T00:00:00.000Z',
           'nino': 'AA111111Q',
           'address': '102 Petty France</br>London</br>SW1H 9AJ',
