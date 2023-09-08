@@ -15,13 +15,13 @@ Open applications
     <table class="govuk-table" data-module="moj-sortable-table">
       <thead class="govuk-table__head">
         <tr class="govuk-table__row">
-          <th scope="col" class="govuk-table__header">Ref No. / Applicant</th>
+          <th scope="col" class="govuk-table__header">Reference No./Applicant</th>
           <th scope="col" class="govuk-table__header" aria-sort="descending">Submitted</th>
-          <th scope="col" class="govuk-table__header" aria-sort="none">Updated</th>
-          <th scope="col" class="govuk-table__header" aria-sort="none">Type</th>
+          <th scope="col" class="govuk-table__header" aria-sort="none">Last updated</th>
+          <th scope="col" class="govuk-table__header" aria-sort="none">Application type</th>
           <th scope="col" class="govuk-table__header" aria-sort="none">DF</th>
-          <th scope="col" class="govuk-table__header" aria-sort="none">Category / Matter type</th>
-          <th scope="col" class="govuk-table__header" aria-sort="none">Means</th>
+          <th scope="col" class="govuk-table__header" aria-sort="none">Category of law / Matter type</th>
+          <th scope="col" class="govuk-table__header" aria-sort="none">Means type</th>
           <th scope="col" class="govuk-table__header">Action</th>
         </tr>
       </thead>
@@ -34,7 +34,7 @@ Open applications
           <td class="govuk-table__cell"><input type="hidden" name="date" value="{{ application['applicationDetails']['dateLastUpdated'] }}" />{{ application['applicationDetails']['dateLastUpdated'] | date}}</td>
           <td class="govuk-table__cell">{{ application['applicationDetails']['applicationType'] }}</td>
           <td class="govuk-table__cell">{{ application['applicationDetails']['delegatedFunctions'] }}</td>
-          <td class="govuk-table__cell">{{ application['applicationDetails']['categoryLaw'] }}</td>
+          <td class="govuk-table__cell"><strong>{{ application['applicationDetails']['categoryLaw'] }}</strong> - {{ application['applicationDetails']['categoryMatter'] }}</td>
           <td data-sort-value="{{ application['applicationDetails']['meansType'] }}" class="govuk-table__cell">{{ application['applicationDetails']['meansType'] }}</td>
           <td class="govuk-table__cell">
             {% if application['applicationDetails']['refNo'] not in data['assignedApplications'] %}
@@ -53,3 +53,6 @@ Open applications
   </div>
 </div>
 {% endblock %}
+
+
+{{ application['applicationDetails']['categoryLaw'] }}

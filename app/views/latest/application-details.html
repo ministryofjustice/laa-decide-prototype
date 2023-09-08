@@ -1,4 +1,8 @@
-{% extends "legacy_layout.html" %}
+{% if data['refNo'] in data['assignedApplications'] %}
+  {% extends "layout_workload.html" %}
+{% else %}
+  {% extends "layout_open.html" %}
+{% endif %}
 
 {% block pageTitle %}
 Application details
@@ -17,7 +21,7 @@ Application details
 {% set success_message %}
 {% if ((application['meritsAssessmentResult'] == 'granted') or (application['meritsAssessmentResult'] == 'refused') or (application['meritsAssessmentResult'] == 'partially granted'))
    and ((application['meansAssessmentResult'] == 'granted') or (application['meansAssessmentResult'] == 'refused') or (application['meansAssessmentResult'] == 'partially granted') or (application['meansAssessmentResult'] == 'Passported')) %}
-Means and merits decisions saved and shared with the provider.
+Means and merits decisions saved and shared with the provider. <a class="" href="#">You should now update the status of the case in CCMS</a>
 {% endif %}
 
 {% if ((application['meritsAssessmentResult'] == 'Not started') or (application['meritsAssessmentResult'] == 'in progress'))
@@ -264,6 +268,8 @@ Merits decision saved.
 
       {% if data['refNo'] in data['assignedApplications'] %}
       <h2 class="govuk-heading-m">Make a decision</h2>
+      
+<!-- need to add deciison to application history
       {% if ((application['meritsAssessmentResult'] == 'granted') or (application['meritsAssessmentResult'] == 'refused') or (application['meritsAssessmentResult'] == 'partially granted'))
          and ((application['meansAssessmentResult'] == 'granted') or (application['meansAssessmentResult'] == 'refused') or (application['meansAssessmentResult'] == 'partially granted') or (application['meansAssessmentResult'] == 'Passported')) %}
       <p>The merits and means decisions have been completed. You can view the <a href="application-history">application history</a> for further details.</p>
@@ -278,6 +284,7 @@ Merits decision saved.
          and (application['meansAssessmentResult'] == 'Not started') %}
       <p>The merits decision has been completed. You can view the <a href="application-history">application history</a> for further details.</p>
       {% endif %}
+-->
 
       <div class="govuk-button-group">
         {% if ((application['meritsAssessmentResult'] == 'Not started') or (application['meritsAssessmentResult'] == 'in progress')) %}

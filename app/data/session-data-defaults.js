@@ -5,11 +5,12 @@ module.exports = {
       'applicationDetails':
       {
         'refNo': 'L-A1B-C2D',
-        'dateSubmitted': '2023-09-01T00:00:00.000Z',
-        'dateLastUpdated': '2023-09-01T00:00:00.000Z',
+        'dateSubmitted': '2023-09-11T00:00:00.000Z',
+        'dateLastUpdated': '2023-09-11T00:00:00.000Z',
         'applicationType': 'Initial application',
         'delegatedFunctions': 'Used',
-        'categoryLaw': 'Family<br>Domestic abuse',
+        'categoryLaw': 'Family',
+        'categoryMatter' : 'Domestic Abuse',
         'meansType': 'Passported',
         'certificateType': 'Emergency and substantive',
         'meansAssessmentResult': 'Passported',
@@ -163,7 +164,7 @@ module.exports = {
             'date': '2021-08-18T00:00:00.000Z'
           },
           {
-            'title': 'police_report.pdf',
+            'title': 'gateway_evidence.pdf',
             'link': 'https://drive.google.com/file/d/1m2SvoKEuJySNk3wxpjvfIYHqMTZlisQf/view',
             'date': '2021-08-18T00:00:00.000Z'
           }
@@ -176,11 +177,12 @@ module.exports = {
       'applicationDetails':
       {
         'refNo': 'L-W1X-Y2Z',
-        'dateSubmitted': '2021-08-30T00:00:00.000Z',
-        'dateLastUpdated': '2021-08-30T00:00:00.000Z',
+        'dateSubmitted': '2023-09-10T00:00:00.000Z',
+        'dateLastUpdated': '2023-09-10T00:00:00.000Z',
         'applicationType': 'Initial application',
         'delegatedFunctions': 'Used',
         'categoryLaw': 'Family',
+        'categoryMatter' : 'Domestic Abuse',
         'meansType': 'Passported',
         'certificateType': 'Emergency and substantive',
         'meansAssessmentResult': 'Passported',
@@ -277,7 +279,7 @@ module.exports = {
             'date': '2021-08-30T00:00:00.000Z'
           },
           {
-            'title': 'police_report.pdf',
+            'title': 'gateway_evidence.pdf',
             'link': 'https://drive.google.com/file/d/1m2SvoKEuJySNk3wxpjvfIYHqMTZlisQf/view',
             'date': '2021-08-30T00:00:00.000Z'
           }
@@ -290,11 +292,12 @@ module.exports = {
       'applicationDetails':
       {
         'refNo': 'L-A2G-H4Q',
-        'dateSubmitted': '2021-08-30T00:00:00.000Z',
-        'dateLastUpdated': '2021-08-30T00:00:00.000Z',
+        'dateSubmitted': '2023-08-30T00:00:00.000Z',
+        'dateLastUpdated': '2023-09-01T00:00:00.000Z',
         'applicationType': 'Initial application',
         'delegatedFunctions': 'Used',
-        'categoryLaw': 'Family<br>Domestic abuse',
+        'categoryLaw': 'Family',
+        'categoryMatter' : 'Domestic Abuse',
         'meansType': 'Passported',
         'certificateType': 'Emergency and substantive',
         'meansAssessmentResult': 'Passported',
@@ -378,7 +381,7 @@ module.exports = {
             'date': '2021-08-30T00:00:00.000Z'
           },
           {
-            'title': 'police_report.pdf',
+            'title': 'gateway_evidence.pdf',
             'link': 'https://drive.google.com/file/d/1m2SvoKEuJySNk3wxpjvfIYHqMTZlisQf/view',
             'date': '2021-08-30T00:00:00.000Z'
           }
@@ -391,11 +394,12 @@ module.exports = {
       'applicationDetails':
       {
         'refNo': 'L-F4R-E5M',
-        'dateSubmitted': '2021-08-31T00:00:00.000Z',
-        'dateLastUpdated': '2021-08-31T00:00:00.000Z',
+        'dateSubmitted': '2023-08-31T00:00:00.000Z',
+        'dateLastUpdated': '2023-08-31T00:00:00.000Z',
         'applicationType': 'Initial application',
         'delegatedFunctions': 'Not used',
         'categoryLaw': 'Family',
+        'categoryMatter' : 'Domestic Abuse',
         'meansType': 'Passported',
         'certificateType': 'Substantive',
         'meansAssessmentResult': 'Passported',
@@ -462,7 +466,7 @@ module.exports = {
             'date': '2021-08-31T00:00:00.000Z'
           },
           {
-            'title': 'police_report.pdf',
+            'title': 'gateway_evidence.pdf',
             'link': 'https://drive.google.com/file/d/1m2SvoKEuJySNk3wxpjvfIYHqMTZlisQf/view',
             'date': '2021-08-31T00:00:00.000Z'
           }
@@ -475,11 +479,12 @@ module.exports = {
       'applicationDetails':
       {
         'refNo': 'L-D5A-A6L',
-        'dateSubmitted': '2021-08-31T00:00:00.000Z',
-        'dateLastUpdated': '2021-08-31T00:00:00.000Z',
+        'dateSubmitted': '2023-08-31T00:00:00.000Z',
+        'dateLastUpdated': '2023-08-31T00:00:00.000Z',
         'applicationType': 'Initial application',
         'delegatedFunctions': 'Not used',
         'categoryLaw': 'Family',
+        'categoryMatter' : 'Domestic Abuse',
         'meansType': 'Non passported',
         'certificateType': 'Substantive',
         'meansAssessmentResult': 'Not started',
@@ -570,7 +575,7 @@ module.exports = {
             'date': '2021-08-31T00:00:00.000Z'
           },
           {
-            'title': 'police_report.pdf',
+            'title': 'gateway_evidence.pdf',
             'link': 'https://drive.google.com/file/d/1m2SvoKEuJySNk3wxpjvfIYHqMTZlisQf/view',
             'date': '2021-08-31T00:00:00.000Z'
           }
@@ -583,11 +588,12 @@ module.exports = {
       'applicationDetails':
       {
         'refNo': 'L-B3C-B8G',
-        'dateSubmitted': '2021-08-31T00:00:00.000Z',
-        'dateLastUpdated': '2021-08-31T00:00:00.000Z',
+        'dateSubmitted': '2023-08-31T00:00:00.000Z',
+        'dateLastUpdated': '2023-08-31T00:00:00.000Z',
         'applicationType': 'Initial application',
         'delegatedFunctions': 'Not used',
         'categoryLaw': 'Family',
+        'categoryMatter' : 'Domestic Abuse',
         'meansType': 'Non passported',
         'certificateType': 'Substantive',
         'meansAssessmentResult': 'Not started',
@@ -678,7 +684,303 @@ module.exports = {
             'date': '2021-08-31T00:00:00.000Z'
           },
           {
-            'title': 'police_report.pdf',
+            'title': 'gateway_evidence.pdf',
+            'link': 'https://drive.google.com/file/d/1m2SvoKEuJySNk3wxpjvfIYHqMTZlisQf/view',
+            'date': '2021-08-31T00:00:00.000Z'
+          }
+        ],
+        'notes': []
+      }
+    },
+    // application #7
+    {
+      'applicationDetails':
+      {
+        'refNo': 'L-A2G-H4Q',
+        'dateSubmitted': '2023-08-26T00:00:00.000Z',
+        'dateLastUpdated': '2023-08-30T00:00:00.000Z',
+        'applicationType': 'Initial application',
+        'delegatedFunctions': 'Used',
+        'categoryLaw': 'Family',
+        'categoryMatter' : 'Domestic Abuse',
+        'meansType': 'Passported',
+        'certificateType': 'Emergency and substantive',
+        'meansAssessmentResult': 'Passported',
+        'meritsAssessmentResult': 'Not started',
+        'applicant':
+        {
+          'name': 'Jeannette Daniels',
+          'dob': '1978-10-23T00:00:00.000Z',
+          'nino': 'XX112233X',
+          'address': '1 Any Street</br>Some Town</br>Nowheresville</br>Out in the Sticks</br>SW1A 1AA',
+        },
+        'provider':
+        {
+          'name': 'Provider Seven',
+          'firm': 'Seven & Co',
+          'accountNumber': '0D134K',
+          'address': '2 Any Street</br>Some Town</br>Nowheresville</br>Out in the Sticks</br>SW1A 1AA',
+          'phone': '07111111111'
+        },
+        'opponent':
+        {
+          'name': 'Opponent Seven',
+          'dob': '1980-06-22T00:00:00.000Z',
+          'address': '1 Any Street</br>Some Town</br>Nowheresville</br>Out in the Sticks</br>SW1A 1AA',
+          'relationship': 'Husband'
+        },
+        'children': [],
+        'linkedApplications': [],
+        'delegatedFunctionsDates': [
+          {
+            'proceedingType': 'Non-molestation order',
+            'dateUsed': '2021-08-28T00:00:00.000Z'
+          }
+        ],
+        'proceedings': [
+          {
+            'id': 'application_7_proceeding_1',
+            'matterType': 'Domestic abuse',
+            'proceedingType': 'Non-molestation order',
+            'meansResult': '',
+            'certificates': [
+              {
+                'id': 'application_7_proceeding_1_certificate_1',
+                'certificateType': 'Emergency certificate',
+                'formOfService': 'Full representation',
+                'workProviderCanDo': 'All steps up to and including the hearing on 21 September 2021.',
+                'meritsResult': ''
+              },
+              {
+                'id': 'application_7_proceeding_1_certificate_2',
+                'certificateType': 'Substantive certificate',
+                'formOfService': 'Full representation',
+                'workProviderCanDo': 'All steps up to and including getting and serving a final order. If the order is breached you can apply for power of arrest. You cannot apply for a warrant of arrest or contempt of court proceedings.',
+                'meritsResult': ''
+              }
+            ]
+          }
+        ],
+        'costLimitations': [
+          {
+            'certificateType': 'Emergency certificate',
+            'costLimit': '£1,350',
+            'requestedCostLimit': '£1,350'
+          },
+          {
+            'certificateType': 'Substantive certificate',
+            'costLimit': '£25,000',
+            'requestedCostLimit': '£25,000'
+          }
+        ],
+        'contributions': [],
+        'documents': [
+          {
+            'title': 'means_report.pdf',
+            'link': 'https://drive.google.com/file/d/16V-j11_Na8_bBz4fazl-TP5k8odpPbBX/view',
+            'date': '2021-08-30T00:00:00.000Z'
+          },
+          {
+            'title': 'merits_report.pdf',
+            'link': 'https://drive.google.com/file/d/19TddAL5MpWAPhDqRCsbggQVVngEHCQA5/view',
+            'date': '2021-08-30T00:00:00.000Z'
+          },
+          {
+            'title': 'gateway_evidence.pdf',
+            'link': 'https://drive.google.com/file/d/1m2SvoKEuJySNk3wxpjvfIYHqMTZlisQf/view',
+            'date': '2021-08-30T00:00:00.000Z'
+          }
+        ],
+        'notes': []
+      }
+    },
+    // application #8
+    {
+      'applicationDetails':
+      {
+        'refNo': 'L-F4R-E5M',
+        'dateSubmitted': '2023-08-26T00:00:00.000Z',
+        'dateLastUpdated': '2023-09-11T00:00:00.000Z',
+        'applicationType': 'Initial application',
+        'delegatedFunctions': 'Not used',
+        'categoryLaw': 'Family',
+        'categoryMatter' : 'Domestic Abuse',
+        'meansType': 'Passported',
+        'certificateType': 'Substantive',
+        'meansAssessmentResult': 'Passported',
+        'meritsAssessmentResult': 'Not started',
+        'applicant':
+        {
+          'name': 'Darell Boone',
+          'dob': '1982-01-22T00:00:00.000Z',
+          'nino': 'ZZ112233Z',
+          'address': '102 Petty France</br>London</br>SW1H 9AJ',
+        },
+        'provider':
+        {
+          'name': 'Provider Four',
+          'firm': 'Four & Co',
+          'accountNumber': '0F114J',
+          'address': 'Albany House</br>Petty France</br>London</br>SW1H 9AE',
+          'phone': '07222222222'
+        },
+        'opponent':
+        {
+          'name': 'Opponent Four',
+          'dob': '1991-06-14T00:00:00.000Z',
+          'address': '102 Petty France</br>London</br>SW1H 9AJ',
+          'relationship': 'Wife'
+        },
+        'children': [],
+        'linkedApplications': [],
+        'delegatedFunctionsDates': [],
+        'proceedings': [
+          {
+            'id': 'application_4_proceeding_1',
+            'matterType': 'Domestic abuse',
+            'proceedingType': 'Non-molestation order',
+            'meansResult': '',
+            'certificates': [
+              {
+                'id': 'application_4_proceeding_1_certificate_1',
+                'certificateType': 'Substantive certificate',
+                'formOfService': 'Full representation',
+                'workProviderCanDo': 'All steps up to and including getting and serving a final order. If the order is breached you can apply for power of arrest. You cannot apply for a warrant of arrest or contempt of court proceedings.',
+                'meritsResult': ''
+              }
+            ]
+          }
+        ],
+        'costLimitations': [
+          {
+            'certificateType': 'Substantive certificate',
+            'costLimit': '£25,000',
+            'requestedCostLimit': '£25,000'
+          }
+        ],
+        'contributions': [],
+        'documents': [
+          {
+            'title': 'means_report.pdf',
+            'link': 'https://drive.google.com/file/d/16V-j11_Na8_bBz4fazl-TP5k8odpPbBX/view',
+            'date': '2021-08-31T00:00:00.000Z'
+          },
+          {
+            'title': 'merits_report.pdf',
+            'link': 'https://drive.google.com/file/d/19TddAL5MpWAPhDqRCsbggQVVngEHCQA5/view',
+            'date': '2021-08-31T00:00:00.000Z'
+          },
+          {
+            'title': 'gateway_evidence.pdf',
+            'link': 'https://drive.google.com/file/d/1m2SvoKEuJySNk3wxpjvfIYHqMTZlisQf/view',
+            'date': '2021-08-31T00:00:00.000Z'
+          }
+        ],
+        'notes': []
+      }
+    },
+    // application #9
+    {
+      'applicationDetails':
+      {
+        'refNo': 'L-D5A-A6L',
+        'dateSubmitted': '2023-08-31T00:00:00.000Z',
+        'dateLastUpdated': '2023-09-01T00:00:00.000Z',
+        'applicationType': 'Initial application',
+        'delegatedFunctions': 'Not used',
+        'categoryLaw': 'Family',
+        'categoryMatter' : 'Domestic Abuse',
+        'meansType': 'Non passported',
+        'certificateType': 'Substantive',
+        'meansAssessmentResult': 'Not started',
+        'meritsAssessmentResult': 'Not started',
+        'applicant':
+        {
+          'name': 'Mason Becker',
+          'dob': '1981-04-15T00:00:00.000Z',
+          'nino': 'AA111111Q',
+          'address': '102 Petty France</br>London</br>SW1H 9AJ',
+        },
+        'provider':
+        {
+          'name': 'Provider Five',
+          'firm': 'Five & Co',
+          'accountNumber': '0P345F',
+          'address': 'Albany House</br>Petty France</br>London</br>SW1H 9AE',
+          'phone': '07333333333'
+        },
+        'opponent':
+        {
+          'name': 'Opponent Five',
+          'dob': '1991-06-14T00:00:00.000Z',
+          'address': '102 Petty France</br>London</br>SW1H 9AJ',
+          'relationship': 'Partner'
+        },
+        'children': [],
+        'linkedApplications': [],
+        'delegatedFunctionsDates': [],
+        'proceedings': [
+          {
+            'id': 'application_5_proceeding_1',
+            'matterType': 'Domestic abuse',
+            'proceedingType': 'Non-molestation order',
+            'meansResult': '',
+            'certificates': [
+              {
+                'id': 'application_5_proceeding_1_certificate_1',
+                'certificateType': 'Substantive certificate',
+                'formOfService': 'Full representation',
+                'workProviderCanDo': 'All steps up to and including getting and serving a final order. If the order is breached you can apply for power of arrest. You cannot apply for a warrant of arrest or contempt of court proceedings.',
+                'meritsResult': ''
+              }
+            ]
+          },
+          {
+            'id': 'application_5_proceeding_2',
+            'matterType': 'Domestic abuse',
+            'proceedingType': 'Prohibited steps order',
+            'meansResult': '',
+            'certificates': [
+              {
+                'id': 'application_5_proceeding_2_certificate_1',
+                'certificateType': 'Substantive certificate',
+                'formOfService': 'Family Help (Higher)',
+                'workProviderCanDo': 'Limited to Family Help (Higher) and to all steps necessary to negotiate and conclude a settlement. To include the issue of proceedings and representation in those proceedings save in relation to or at a contested final hearing.',
+                'meritsResult': ''
+              }
+            ]
+          }
+        ],
+        'costLimitations': [
+          {
+            'certificateType': 'Substantive certificate',
+            'costLimit': '£25,000',
+            'requestedCostLimit': '£25,000'
+          }
+        ],
+        'contributions': [
+          {
+            'description': 'per month from their disposable income',
+            'amount': '25.68'
+          },
+          {
+            'description': 'from their disposable capital',
+            'amount': '4,500'
+          }
+        ],
+        'documents': [
+          {
+            'title': 'means_report.pdf',
+            'link': 'https://drive.google.com/file/d/16V-j11_Na8_bBz4fazl-TP5k8odpPbBX/view',
+            'date': '2021-08-31T00:00:00.000Z'
+          },
+          {
+            'title': 'merits_report.pdf',
+            'link': 'https://drive.google.com/file/d/19TddAL5MpWAPhDqRCsbggQVVngEHCQA5/view',
+            'date': '2021-08-31T00:00:00.000Z'
+          },
+          {
+            'title': 'gateway_evidence.pdf',
             'link': 'https://drive.google.com/file/d/1m2SvoKEuJySNk3wxpjvfIYHqMTZlisQf/view',
             'date': '2021-08-31T00:00:00.000Z'
           }
