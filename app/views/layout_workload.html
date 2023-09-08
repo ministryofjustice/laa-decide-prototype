@@ -1,0 +1,43 @@
+{% extends "govuk-prototype-kit/layouts/govuk-branded.njk" %}
+
+{% block header %}
+{{ super() }}
+<div class="govuk-width-container">
+  <div class="govuk-phase-banner">
+    <p class="govuk-phase-banner__content">
+      <strong class="govuk-tag govuk-phase-banner__content__tag">
+        alpha
+      </strong>
+      <span class="govuk-phase-banner__text">
+        This is a new service – your <a class="govuk-link" href="#">feedback</a> will help us to improve it.
+      </span>
+    </p>
+  </div>
+</div>
+{%- from "moj/components/primary-navigation/macro.njk" import mojPrimaryNavigation -%}
+
+{{ mojPrimaryNavigation({
+    label: 'Primary navigation',
+    items: [
+      {
+        href: "home",
+        text: "Home"
+      },
+      {
+        href: "open-applications",
+        text: "Open applications"
+      },
+      {
+        href: "my-applications",
+        text: "My applications",
+        active: true
+      }
+    ]
+  }) }}
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+{% include "includes/scripts.html" %}
+{% block pageScripts %}{% endblock %}
+{% endblock %}
