@@ -269,12 +269,12 @@ Merits decision saved.
       {% if data['refNo'] in data['assignedApplications'] %}
       <h2 class="govuk-heading-m">Make a decision</h2>
       
-<!-- need to add deciison to application history
       {% if ((application['meritsAssessmentResult'] == 'granted') or (application['meritsAssessmentResult'] == 'refused') or (application['meritsAssessmentResult'] == 'partially granted'))
          and ((application['meansAssessmentResult'] == 'granted') or (application['meansAssessmentResult'] == 'refused') or (application['meansAssessmentResult'] == 'partially granted') or (application['meansAssessmentResult'] == 'Passported')) %}
-      <p>The merits and means decisions have been completed. You can view the <a href="application-history">application history</a> for further details.</p>
+      <p>The means and merits decisions have been completed. You can view the <a href="application-history">application history</a> for further details.</p>
       {% endif %}
-
+      
+<!--
       {% if ((application['meritsAssessmentResult'] == 'Not started') or (application['meritsAssessmentResult'] == 'in progress'))
          and ((application['meansAssessmentResult'] == 'granted') or (application['meansAssessmentResult'] == 'refused') or (application['meansAssessmentResult'] == 'partially granted') or (application['meansAssessmentResult'] == 'Passported')) %}
       <p>The means decision has been completed. You can view the <a href="application-history">application history</a> for further details.</p>

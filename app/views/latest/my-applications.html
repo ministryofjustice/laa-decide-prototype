@@ -10,7 +10,7 @@ My applications
     {% include "./_search.html" %}
 
     <h1 class="govuk-heading-l">My applications</h1>
-    <p>{{ data['assignedApplications'].length }} applications</p>
+    <p>Showing <b>1</b> to <b>{{ data['assignedApplications'].length }}</b> of <b>{{ data['assignedApplications'].length }}</b> applications</p>
 
     <div class="moj-filter-layout">
       {% include "./_filter.html" %}
@@ -28,11 +28,11 @@ My applications
                   <th scope="col" class="govuk-table__header">Reference No./Applicant</th>
                   <th scope="col" class="govuk-table__header" aria-sort="none">Submitted</th>
                   <th scope="col" class="govuk-table__header" aria-sort="none">Last updated</th>
-                  <th scope="col" class="govuk-table__header">Application type</th>
-                  <th scope="col" class="govuk-table__header">DF</th>
-                  <th scope="col" class="govuk-table__header">Category of law / Matter type</th>
-                  <th scope="col" class="govuk-table__header">Means type</th>
-                  <th scope="col" class="govuk-table__header">Action</th>
+                  <th scope="col" class="govuk-table__header" aria-sort="none">Application type</th>
+                  <th scope="col" class="govuk-table__header" aria-sort="none">DF</th>
+                  <th scope="col" class="govuk-table__header" aria-sort="none">Category of law / Matter type</th>
+                  <th scope="col" class="govuk-table__header" aria-sort="none">Means type</th>
+                  <th scope="col" class="govuk-table__header" aria-sort="none">Action</th>
                 </tr>
               </thead>
               <tbody class="govuk-table__body">
@@ -58,7 +58,6 @@ My applications
                 {% endfor %}
               </tbody>
             </table>
-            <p>Showing <b>1</b> to <b>{{ data['assignedApplications'].length }}</b> of <b>{{ data['assignedApplications'].length }}</b> results</p>
           </div>
         </div>
       </div>
