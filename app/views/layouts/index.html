@@ -1,0 +1,34 @@
+{% extends "govuk-prototype-kit/layouts/govuk-branded.njk" %}
+
+{% block header %}
+
+{%- from "moj/components/header/macro.njk" import mojHeader -%}
+
+{{ mojHeader({
+  organisationLabel: {
+    text: 'Legal Aid Agency',
+    href: '/'
+  },
+  serviceLabel: {
+    text: 'Prototype',
+    href: '/home'
+  }
+
+}) }}
+<div class="key-details-wrapper">
+  <div class="govuk-width-container">
+  <section class="key-details-bar" aria-label="Key details">
+    <div class="key-details-bar__key-details">
+      <div class="key-details-bar__top-block">
+        <span class="key-details-bar__name"><h1>Design prototypes for the 'Decide if an applicant can get legal aid' service</h1></span>
+        <span class="key-details-bar__nino"></span>
+
+      </div>
+      <div class="key-details-bar__bottom-block">
+        <span class="govuk-body govuk-!-margin-right-6">Last updated: 14/09/2023</span>
+      </div>
+    </div>
+  </section>
+  </div>
+</div>
+{% endblock %}

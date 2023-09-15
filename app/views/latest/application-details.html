@@ -1,7 +1,7 @@
 {% if data['refNo'] in data['assignedApplications'] %}
-  {% extends "layout_workload.html" %}
+  {% extends "layouts/orkload.html" %}
 {% else %}
-  {% extends "layout_open.html" %}
+  {% extends "layouts/open.html" %}
 {% endif %}
 
 {% block pageTitle %}
