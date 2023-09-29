@@ -567,4 +567,10 @@ router.get('/refuse-all-means', function(req, res) {
   res.redirect(307, './application-details');
 });
 
+
+// experimental index re-routing
+router.get('/latest/home', function (req, res) {
+  res.render('/latest/my-applications');
+});
+
 module.exports = router
