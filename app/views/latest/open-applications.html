@@ -12,13 +12,15 @@ Open applications
     <p>Showing <b>1</b> to <b>{{ data['applications'].length }}</b> of <b>{{ data['applications'].length }}</b> applications</p>
 
 
- <div class="moj-filter-layout">
+    <div class="moj-filter-layout">
       {% include "./_filter.html" %}
 
       <div class="moj-filter-layout__content">
         <div class="moj-action-bar">
           <div class="moj-action-bar__filter"></div>
         </div>
+      </div>
+    </div>
 
         <div class="moj-scrollable-pane">
           <div class="moj-scrollable-pane__wrapper">
@@ -63,8 +65,8 @@ Open applications
             </table>
           </div>
         </div>
-      </div>
-    </div>
+
+
   </div>
 </div>
 {% endblock %}

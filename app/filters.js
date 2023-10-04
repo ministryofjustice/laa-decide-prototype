@@ -56,7 +56,7 @@ const addFilter = govukPrototypeKit.views.addFilter
       return dateString;
     }
     else{
-      return moment(dateString).format('DD MMM YYYY');
+      return moment(dateString).format('ddd DD MMM');
     }
   };
 

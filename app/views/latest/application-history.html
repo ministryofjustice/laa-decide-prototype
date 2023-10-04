@@ -1,4 +1,8 @@
-{% extends "layouts/workload.html" %}
+{% if data['refNo'] in data['assignedApplications'] %}
+  {% extends "layouts/workload.html" %}
+{% else %}
+  {% extends "layouts/open.html" %}
+{% endif %}
 
 {% block pageTitle %}
 Application history
