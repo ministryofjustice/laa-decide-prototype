@@ -31,18 +31,18 @@ Open applications
                   <th scope="col" class="govuk-table__header">Reference</th>
                   <th scope="col" class="govuk-table__header" aria-sort="descending">Submitted</th>
                   <th scope="col" class="govuk-table__header" aria-sort="none">Updated</th>
-                  <th scope="col" class="govuk-table__header">Type</th>
-                  <th scope="col" class="govuk-table__header">DF</th>
-                  <th scope="col" class="govuk-table__header">Category</th>
-                  <th scope="col" class="govuk-table__header">Means</th>
-                  <th scope="col" class="govuk-table__header">Action</th>
+                  <th scope="col" class="govuk-table__header" aria-sort="none">Type</th>
+                  <th scope="col" class="govuk-table__header" aria-sort="none">DF</th>
+                  <th scope="col" class="govuk-table__header" aria-sort="none">Category</th>
+                  <th scope="col" class="govuk-table__header" aria-sort="none">Means</th>
+                  <th scope="col" class="govuk-table__header" aria-sort="none">Action</th>
                 </tr>
               </thead>
               <tbody class="govuk-table__body">
                 {% for application in data['applications'] %}
                 <tr class="govuk-table__row">
-                  <td class="govuk-table__cell"><b>{{ application['applicationDetails']['refNo'] }}</b><br>
-                    <a class="govuk_link" href="application-details?refNo={{ application['applicationDetails']['refNo'] }}">{{ application['applicationDetails']['applicant']['name'] }}</a></td>
+                  <td class="govuk-table__cell">
+                    <nobr><a class="govuk_link" href="application-details?refNo={{ application['applicationDetails']['refNo'] }}">{{ application['applicationDetails']['refNo'] }}</a></nobr></td>
                   <td class="govuk-table__cell"><input type="hidden" name="date" value="{{ application['applicationDetails']['dateSubmitted'] }}" />{{ application['applicationDetails']['dateSubmitted'] | application_date}}</td>
                   <td class="govuk-table__cell"><input type="hidden" name="date" value="{{ application['applicationDetails']['dateLastUpdated'] }}" />{{ application['applicationDetails']['dateLastUpdated'] | application_date}}</td>
                   <td class="govuk-table__cell">{{ application['applicationDetails']['applicationType'] }}</td>

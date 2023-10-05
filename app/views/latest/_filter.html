@@ -12,6 +12,7 @@
       <div class="moj-filter__options">
         <div class="govuk-grid-column-one-third">
           <div class="govuk-form-group govuk-!-margin-bottom-4">
+            
           <fieldset class="govuk-fieldset">
             <div class="govuk-checkboxes govuk-checkboxes--small">
               <div class="govuk-checkboxes__item">
@@ -26,7 +27,12 @@
                   Passported
                 </label>
               </div>
-              
+              <div class="govuk-checkboxes__item">
+                <input class="govuk-checkboxes__input" id="status-2" name="status" type="checkbox" value="2" checked>
+                <label class="govuk-label govuk-checkboxes__label" for="status-2">
+                  Unassigned
+                </label>
+              </div>
             </div>
           </fieldset>
         </div>
@@ -35,6 +41,7 @@
         <div class="govuk-grid-column-one-third">
           <div class="govuk-form-group govuk-!-margin-bottom-4">
             <fieldset class="govuk-fieldset">
+              <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">Certificate type</legend>
               <div class="govuk-checkboxes govuk-checkboxes--small">
                 <div class="govuk-checkboxes__item">
                   <input class="govuk-checkboxes__input" id="status" name="status" type="checkbox" value="1" checked>
@@ -56,19 +63,17 @@
         <div class="govuk-grid-column-one-third">
           <div class="govuk-form-group govuk-!-margin-bottom-4">
             <fieldset class="govuk-fieldset">
-              <div class="govuk-checkboxes govuk-checkboxes--small">
+              <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">Category of law</legend>
+              <div class="govuk-checkboxes govuk-checkboxes--small" data-module="govuk-checkboxes">
                 <div class="govuk-checkboxes__item">
-                  <input class="govuk-checkboxes__input" id="status" name="status" type="checkbox" value="1" checked>
-                  <label class="govuk-label govuk-checkboxes__label" for="status">
-                    Assigned to you
-                  </label>
+                  <input class="govuk-checkboxes__input" id="status" name="status" type="checkbox" value="1" checked="">
+                  <label class="govuk-label govuk-checkboxes__label" for="status">Family</label>
                 </div>
+          
                 <div class="govuk-checkboxes__item">
-                  <input class="govuk-checkboxes__input" id="status-2" name="status" type="checkbox" value="2" checked>
-                  <label class="govuk-label govuk-checkboxes__label" for="status-2">
-                    Unassigned
-                  </label>
-                </div>
+                  <input class="govuk-checkboxes__input" id="status-2" name="status" type="checkbox" value="2">
+                  <label class="govuk-label govuk-checkboxes__label" for="status-2">Housing</label>
+                </div>        
               </div>
             </fieldset>
           </div>
