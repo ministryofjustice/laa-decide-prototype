@@ -56,6 +56,15 @@ const addFilter = govukPrototypeKit.views.addFilter
       return dateString;
     }
     else{
+      return moment(dateString).format('DD MMM YYYY');
+    }
+  };
+
+  filters.application_date = function(dateString) {
+    if (moment(dateString).format() === 'Invalid date'){
+      return dateString;
+    }
+    else{
       return moment(dateString).format('ddd DD MMM');
     }
   };

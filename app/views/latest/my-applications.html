@@ -40,8 +40,8 @@ My applications
         <tr class="govuk-table__row">
           <td class="govuk-table__cell">
             <a class="govuk_link" href="/latest/application-details?refNo={{ application['applicationDetails']['refNo'] }}">{{ application['applicationDetails']['applicant']['name'] }}</a><br><span class="govuk-body-s"><strong>{{ application['applicationDetails']['refNo'] }}</strong></span></td>
-          <td class="govuk-table__cell"><input type="hidden" name="date" value="{{ application['applicationDetails']['dateSubmitted'] }}" />{{ application['applicationDetails']['dateSubmitted'] | date}}</td>
-          <td class="govuk-table__cell"><input type="hidden" name="date" value="{{ application['applicationDetails']['dateLastUpdated'] }}" />{{ application['applicationDetails']['dateLastUpdated'] | date}}</td>
+          <td class="govuk-table__cell"><input type="hidden" name="date" value="{{ application['applicationDetails']['dateSubmitted'] }}" />{{ application['applicationDetails']['dateSubmitted'] | application_date}}</td>
+          <td class="govuk-table__cell"><input type="hidden" name="date" value="{{ application['applicationDetails']['dateLastUpdated'] }}" />{{ application['applicationDetails']['dateLastUpdated'] | application_date}}</td>
           <td class="govuk-table__cell">{{ application['applicationDetails']['applicationType'] }}</td>
           <td class="govuk-table__cell">{{ application['applicationDetails']['delegatedFunctions'] }}</td>
           <td class="govuk-table__cell"><strong>{{ application['applicationDetails']['categoryLaw'] }}</strong> - {{ application['applicationDetails']['categoryMatter'] }}</td>
