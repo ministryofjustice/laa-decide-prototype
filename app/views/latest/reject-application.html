@@ -64,7 +64,17 @@ Reject application
           </div>
         </fieldset>
 
-      <button class="govuk-button govuk-button" data-module="govuk-button">Save changes</button>
+        <div class="govuk-button-group">
+          <button class="govuk-button govuk-button" data-module="govuk-button">Send back</button>
+          {% from "govuk/components/button/macro.njk" import govukButton %}
+
+{{ govukButton({
+  text: "Cancel",
+  classes: "govuk-button--secondary",
+  href: "application-details"
+}) }}
+        </div>
+
     </form>
   </div>
 </div>
