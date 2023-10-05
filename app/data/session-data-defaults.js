@@ -154,17 +154,22 @@ module.exports = {
         'contributions': [],
         'documents': [
           {
-            'title': 'means_report.pdf',
+            'title': 'Means report',
             'link': 'https://drive.google.com/file/d/16V-j11_Na8_bBz4fazl-TP5k8odpPbBX/view',
             'date': '2021-08-18T00:00:00.000Z'
           },
           {
-            'title': 'merits_report.pdf',
+            'title': 'Merits report',
             'link': 'https://drive.google.com/file/d/19TddAL5MpWAPhDqRCsbggQVVngEHCQA5/view',
             'date': '2021-08-18T00:00:00.000Z'
           },
           {
-            'title': 'gateway_evidence.pdf',
+            'title': 'Gateway evidence',
+            'link': 'https://drive.google.com/file/d/1m2SvoKEuJySNk3wxpjvfIYHqMTZlisQf/view',
+            'date': '2021-08-18T00:00:00.000Z'
+          },
+          {
+            'title': 'Statement of case',
             'link': 'https://drive.google.com/file/d/1m2SvoKEuJySNk3wxpjvfIYHqMTZlisQf/view',
             'date': '2021-08-18T00:00:00.000Z'
           }
@@ -269,17 +274,17 @@ module.exports = {
         'contributions': [],
         'documents': [
           {
-            'title': 'means_report.pdf',
+            'title': 'Means report',
             'link': 'https://drive.google.com/file/d/16V-j11_Na8_bBz4fazl-TP5k8odpPbBX/view',
             'date': '2021-08-30T00:00:00.000Z'
           },
           {
-            'title': 'merits_report.pdf',
+            'title': 'Merits report',
             'link': 'https://drive.google.com/file/d/19TddAL5MpWAPhDqRCsbggQVVngEHCQA5/view',
             'date': '2021-08-30T00:00:00.000Z'
           },
           {
-            'title': 'gateway_evidence.pdf',
+            'title': 'Gateway evidence',
             'link': 'https://drive.google.com/file/d/1m2SvoKEuJySNk3wxpjvfIYHqMTZlisQf/view',
             'date': '2021-08-30T00:00:00.000Z'
           }
@@ -371,17 +376,17 @@ module.exports = {
         'contributions': [],
         'documents': [
           {
-            'title': 'means_report.pdf',
+            'title': 'Means report',
             'link': 'https://drive.google.com/file/d/16V-j11_Na8_bBz4fazl-TP5k8odpPbBX/view',
             'date': '2021-08-30T00:00:00.000Z'
           },
           {
-            'title': 'merits_report.pdf',
+            'title': 'Merits report',
             'link': 'https://drive.google.com/file/d/19TddAL5MpWAPhDqRCsbggQVVngEHCQA5/view',
             'date': '2021-08-30T00:00:00.000Z'
           },
           {
-            'title': 'gateway_evidence.pdf',
+            'title': 'Gateway evidence',
             'link': 'https://drive.google.com/file/d/1m2SvoKEuJySNk3wxpjvfIYHqMTZlisQf/view',
             'date': '2021-08-30T00:00:00.000Z'
           }
@@ -456,17 +461,17 @@ module.exports = {
         'contributions': [],
         'documents': [
           {
-            'title': 'means_report.pdf',
+            'title': 'Means report',
             'link': 'https://drive.google.com/file/d/16V-j11_Na8_bBz4fazl-TP5k8odpPbBX/view',
             'date': '2021-08-31T00:00:00.000Z'
           },
           {
-            'title': 'merits_report.pdf',
+            'title': 'Merits report',
             'link': 'https://drive.google.com/file/d/19TddAL5MpWAPhDqRCsbggQVVngEHCQA5/view',
             'date': '2021-08-31T00:00:00.000Z'
           },
           {
-            'title': 'gateway_evidence.pdf',
+            'title': 'Gateway evidence',
             'link': 'https://drive.google.com/file/d/1m2SvoKEuJySNk3wxpjvfIYHqMTZlisQf/view',
             'date': '2021-08-31T00:00:00.000Z'
           }
@@ -565,17 +570,17 @@ module.exports = {
         ],
         'documents': [
           {
-            'title': 'means_report.pdf',
+            'title': 'Means report',
             'link': 'https://drive.google.com/file/d/16V-j11_Na8_bBz4fazl-TP5k8odpPbBX/view',
             'date': '2021-08-31T00:00:00.000Z'
           },
           {
-            'title': 'merits_report.pdf',
+            'title': 'Merits report',
             'link': 'https://drive.google.com/file/d/19TddAL5MpWAPhDqRCsbggQVVngEHCQA5/view',
             'date': '2021-08-31T00:00:00.000Z'
           },
           {
-            'title': 'gateway_evidence.pdf',
+            'title': 'Gateway evidence',
             'link': 'https://drive.google.com/file/d/1m2SvoKEuJySNk3wxpjvfIYHqMTZlisQf/view',
             'date': '2021-08-31T00:00:00.000Z'
           }
@@ -674,17 +679,17 @@ module.exports = {
         ],
         'documents': [
           {
-            'title': 'means_report.pdf',
+            'title': 'Means report',
             'link': 'https://drive.google.com/file/d/16V-j11_Na8_bBz4fazl-TP5k8odpPbBX/view',
             'date': '2021-08-31T00:00:00.000Z'
           },
           {
-            'title': 'merits_report.pdf',
+            'title': 'Merits report',
             'link': 'https://drive.google.com/file/d/19TddAL5MpWAPhDqRCsbggQVVngEHCQA5/view',
             'date': '2021-08-31T00:00:00.000Z'
           },
           {
-            'title': 'gateway_evidence.pdf',
+            'title': 'Gateway evidence',
             'link': 'https://drive.google.com/file/d/1m2SvoKEuJySNk3wxpjvfIYHqMTZlisQf/view',
             'date': '2021-08-31T00:00:00.000Z'
           }
@@ -776,17 +781,17 @@ module.exports = {
         'contributions': [],
         'documents': [
           {
-            'title': 'means_report.pdf',
+            'title': 'Means report',
             'link': 'https://drive.google.com/file/d/16V-j11_Na8_bBz4fazl-TP5k8odpPbBX/view',
             'date': '2021-08-30T00:00:00.000Z'
           },
           {
-            'title': 'merits_report.pdf',
+            'title': 'Merits report',
             'link': 'https://drive.google.com/file/d/19TddAL5MpWAPhDqRCsbggQVVngEHCQA5/view',
             'date': '2021-08-30T00:00:00.000Z'
           },
           {
-            'title': 'gateway_evidence.pdf',
+            'title': 'Gateway evidence',
             'link': 'https://drive.google.com/file/d/1m2SvoKEuJySNk3wxpjvfIYHqMTZlisQf/view',
             'date': '2021-08-30T00:00:00.000Z'
           }
@@ -861,17 +866,17 @@ module.exports = {
         'contributions': [],
         'documents': [
           {
-            'title': 'means_report.pdf',
+            'title': 'Means report',
             'link': 'https://drive.google.com/file/d/16V-j11_Na8_bBz4fazl-TP5k8odpPbBX/view',
             'date': '2021-08-31T00:00:00.000Z'
           },
           {
-            'title': 'merits_report.pdf',
+            'title': 'Merits report',
             'link': 'https://drive.google.com/file/d/19TddAL5MpWAPhDqRCsbggQVVngEHCQA5/view',
             'date': '2021-08-31T00:00:00.000Z'
           },
           {
-            'title': 'gateway_evidence.pdf',
+            'title': 'Gateway evidence',
             'link': 'https://drive.google.com/file/d/1m2SvoKEuJySNk3wxpjvfIYHqMTZlisQf/view',
             'date': '2021-08-31T00:00:00.000Z'
           }
@@ -970,17 +975,17 @@ module.exports = {
         ],
         'documents': [
           {
-            'title': 'means_report.pdf',
+            'title': 'Means report',
             'link': 'https://drive.google.com/file/d/16V-j11_Na8_bBz4fazl-TP5k8odpPbBX/view',
             'date': '2021-08-31T00:00:00.000Z'
           },
           {
-            'title': 'merits_report.pdf',
+            'title': 'Merits report',
             'link': 'https://drive.google.com/file/d/19TddAL5MpWAPhDqRCsbggQVVngEHCQA5/view',
             'date': '2021-08-31T00:00:00.000Z'
           },
           {
-            'title': 'gateway_evidence.pdf',
+            'title': 'Gateway evidence',
             'link': 'https://drive.google.com/file/d/1m2SvoKEuJySNk3wxpjvfIYHqMTZlisQf/view',
             'date': '2021-08-31T00:00:00.000Z'
           }
@@ -1079,17 +1084,17 @@ module.exports = {
         ],
         'documents': [
           {
-            'title': 'means_report.pdf',
+            'title': 'Means report',
             'link': 'https://drive.google.com/file/d/16V-j11_Na8_bBz4fazl-TP5k8odpPbBX/view',
             'date': '2021-08-31T00:00:00.000Z'
           },
           {
-            'title': 'merits_report.pdf',
+            'title': 'Merits report',
             'link': 'https://drive.google.com/file/d/19TddAL5MpWAPhDqRCsbggQVVngEHCQA5/view',
             'date': '2021-08-31T00:00:00.000Z'
           },
           {
-            'title': 'gateway_evidence.pdf',
+            'title': 'Gateway evidence',
             'link': 'https://drive.google.com/file/d/1m2SvoKEuJySNk3wxpjvfIYHqMTZlisQf/view',
             'date': '2021-08-31T00:00:00.000Z'
           }
