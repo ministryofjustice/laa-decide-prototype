@@ -234,9 +234,10 @@ Merits decision saved.
 
 
     <h2 class="govuk-heading-l govuk-!-margin-top-9">Proceedings</h2>
+    <ol class="govuk-list govuk-list--number">
     {% for proceeding in application['proceedings'] %}
 <!--    <span class="govuk-caption-m">Default scope</span> -->
-    <h2 class="govuk-heading-m">{{ proceeding['proceedingType'] }}</h2>
+    <li><h2 class="govuk-heading-m">{{ proceeding['proceedingType'] }}</h2>
     
         {% for certificate in proceeding['certificates'] %}
         <div class="govuk-summary-card">
@@ -311,9 +312,9 @@ Merits decision saved.
             </dl>
           </div>
         </div>
-        {% endfor %}
+        {% endfor %}</li>
 
-    {% endfor %}
+    {% endfor %}</ol>
 
     <table class="govuk-table govuk-!-margin-top-9">
       <caption class="govuk-table__caption govuk-table__caption--l">Cost limits</caption>
@@ -331,7 +332,7 @@ Merits decision saved.
     <table class="govuk-table">
       <thead class="govuk-table__head">
         <tr class="govuk-table__row">
-          <th scope="col" class="govuk-table__header">Type</th>
+          <th scope="col" class="govuk-table__header">Category</th>
           <th scope="col" class="govuk-table__header">Date</th>
         </tr>
       </thead>

@@ -13,7 +13,7 @@ Merits assessment - emergency
 {% block content %}
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">
-    <h1 class="govuk-heading-xl govuk-!-margin-bottom-4">Make a decision on merits</h1>
+    <h1 class="govuk-heading-xl govuk-!-margin-bottom-4">Make a merits decision</h1>
     <p class="govuk-!-font-size-36">{{ application['refNo'] }}</p>
     <div class="govuk-!-padding-top-4"></div>
   </div>
@@ -21,39 +21,19 @@ Merits assessment - emergency
 
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">
-    <h2 class="govuk-heading-m">Part 1: Emergency</h2>
+    <h2 class="govuk-heading-l govuk-!-margin-bottom-4">Emergency certificates</h1>
     <form action="merits-assessment-substantive" method="POST">
-      <div class="govuk-form-group">
+
+
+<div class="govuk-form-group">
         {% for proceeding in application['proceedings'] %}
         {% for certificate in proceeding['certificates'] %}
         {% if certificate['certificateType'] === 'Emergency certificate' %}
 
-        {% set hint=application['categoryLaw'] + ' - ' + proceeding['matterType'] +  '<br>' + 'The provider has requested ' + certificate['formOfService']  %}
+        {% set hint=application['categoryLaw'] + ' - ' + proceeding['matterType'] +  '<br>' + 'Form of service: ' + certificate['formOfService']  %}
 
         {% set refuseHtml %}
         {% include "./_refusal_reasons_dropdown.html" %}
-        {% endset -%}
-
-        {% set amendHtml %}
-        {{ govukSelect({
-          idPrefix: certificate['id']+"_amend",
-          name: certificate['id']+"_amend",
-          fieldset: {},
-          items: [
-            {
-              value: "Family help (higher)",
-              text: "Family help (higher)",
-              id: "amended_1",
-              selected: checked(certificate['id']+"_amend", "Family help (higher)")
-            },
-            {
-              value: "Full representation",
-              text: "Full representation",
-              id: "amended_2",
-              selected: checked(certificate['id']+"_amend", "Full representation")
-            }
-          ]
-        })}}
         {% endset -%}
 
         {{ govukRadios({
@@ -76,11 +56,8 @@ Merits assessment - emergency
             },
             {
               value: "amended",
-              text: "Make changes and grant",
-              checked: checked(certificate['id'], "amended"),
-              conditional: {
-                html: amendHtml
-              }
+              text: "Change to default scope and grant",
+              checked: checked(certificate['id'], "amended")
             },
             {
               value: "refused",
@@ -93,206 +70,25 @@ Merits assessment - emergency
           ]
         })}}
 
-        <div class="govuk-!-padding-top-4"></div>
+
+          <h1 class="govuk-label-wrapper">
+            <label class="govuk-label govuk-label--m" for="granted-emergency">
+              How much should be granted for the emergency certificate?
+            </label>
+          </h1>
+
+        <hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible">
         {% endif %}
         {% endfor %}
         {% endfor %}
 
-        <table class="govuk-table">
-          <caption class="govuk-table__caption govuk-table__caption--m">Cost limits</caption>
-          <tbody class="govuk-table__body">
-            {% for limitation in application['costLimitations'] %}
-            {% if limitation['certificateType'] == 'Emergency certificate' %}
-            <tr class="govuk-table__row">
-              <td class="govuk-table__header">Certificate type</td>
-              <td class="govuk-table__cell">{{ limitation['certificateType'] }}</td>
-            </tr>
-            <tr class=" govuk-table__row">
-              <td class="govuk-table__header">Default</td>
-              <td class="govuk-table__cell">{{ limitation['costLimit'] }}</td>
-            </tr>
-            <tr class="govuk-table__row">
-              <td class="govuk-table__header">Requested</td>
-              <td class="govuk-table__cell">{{ limitation['requestedCostLimit'] }}</td>
-            </tr>
-            {% if limitation['justification'] %}
-            <tr class="govuk-table__row">
-              <td class="govuk-table__header">Justification</td>
-              <td class="govuk-table__cell">{{ limitation['justification'] }}</td>
-            </tr>
-            {% endif %}
-            {% endif %}
-            {% endfor %}
-          </tbody>
-        </table>
-
-        <div class="govuk-!-padding-top-4"></div>
-
-        <div class="govuk-form-group">
-          <h1 class="govuk-label-wrapper"><label class="govuk-label govuk-label--m" for="granted-emergency">
-              How much should be granted for the emergency certificate?
-            </label>
-          </h1>
-          <div class="govuk-input__wrapper">
-            <div class="govuk-input__prefix" aria-hidden="true">£</div>
-            <input class="govuk-input govuk-input--width-5" id="granted-emergency" name="granted-emergency" value="{{ data['granted-emergency'] }}" type="text" spellcheck="false">
-          </div>
+        <div class="govuk-button-group">
+          <input type="submit" name="merits_continue_button" value="Save and continue" id="continue" class="govuk-button form-button" data-module="govuk-button" data-disable-with="Save and continue">
+          <input type="submit" name="merits_continue_button" value="Save and come back later" id="continue" class="govuk-button form-button govuk-button--secondary govuk-!-margin-left-3" data-module="govuk-button"
+            data-disable-with="Save and come back later">
         </div>
 
-        <div class="govuk-!-padding-top-4"></div>
-
-        {% set otherStartDateHtml %}
-        {{ govukDateInput({
-          id: "other-emergency-start-date",
-          namePrefix: "other-emergency-start-date",
-          fieldset: {},
-          hint: {},
-          items: [
-            {
-              classes: "govuk-input--width-2",
-              label: "Day",
-              id: "day",
-              name: "day",
-              value: data['other-emergency-start-date-day']
-            },
-            {
-              classes: "govuk-input--width-2",
-              label: "Month",
-              id: "month",
-              name: "month",
-              value: data['other-emergency-start-date-month']
-            },
-            {
-              classes: "govuk-input--width-4",
-              label: "Year",
-              id: "year",
-              name: "year",
-              value: data['other-emergency-start-date-year']
-            }
-          ]
-        }) }}
-        {% endset -%}
-
-        {{ govukRadios({
-          idPrefix: "emergency-certificate-start-date",
-          name: "emergency-certificate-start-date",
-          fieldset: {
-            legend: {
-              text: "When should the emergency certificate be granted from?",
-              classes: "govuk-fieldset__legend--m"
-            }
-          },
-          hint: {},
-          items: [
-            {
-              value: "Today",
-              text: "Today",
-              checked: checked('emergency-certificate-start-date', "Today")
-            },
-            {
-              value: "Date delegated functions were used",
-              text: "Date delegated functions were used",
-              checked: checked('emergency-certificate-start-date', "Date delegated functions were used")
-            },
-            {
-              value: "Other",
-              text: "Other",
-              checked: checked('emergency-certificate-start-date', "Other"),
-              conditional: {
-                html: otherStartDateHtml
-              }
-            }
-          ]
-        })}}
-
-        <div class="govuk-!-padding-top-4"></div>
-
-        {% set otherEndDateHtml %}
-        {{ govukDateInput({
-          id: "other-emergency-end-date",
-          namePrefix: "other-emergency-end-date",
-          fieldset: {},
-          hint: {},
-          items: [
-            {
-              classes: "govuk-input--width-2",
-              label: "Day",
-              id: "day",
-              name: "day",
-              value: data['other-emergency-end-date-day']
-            },
-            {
-              classes: "govuk-input--width-2",
-              label: "Month",
-              id: "month",
-              name: "month",
-              value: data['other-emergency-end-date-month']
-            },
-            {
-              classes: "govuk-input--width-4",
-              label: "Year",
-              id: "year",
-              name: "year",
-              value: data['other-emergency-end-date-year']
-            }
-          ]
-        }) }}
-        {% endset -%}
-
-        {{ govukRadios({
-          idPrefix: "emergency-certificate-end-date",
-          name: "emergency-certificate-end-date",
-          fieldset: {
-            legend: {
-              text: "When should the emergency certificate end?",
-              classes: "govuk-fieldset__legend--m"
-            }
-          },
-          hint: {},
-          items: [
-            {
-              value: "8 weeks from the start date",
-              text: "8 weeks from the start date",
-              checked: checked('emergency-certificate-end-date', "8 weeks from the start date")
-            },
-            {
-              value: "Other",
-              text: "Other",
-              checked: checked('emergency-certificate-end-date', "Other"),
-              conditional: {
-                html: otherEndDateHtml
-              }
-            }
-          ]
-        })}}
-
-        <div class="govuk-!-padding-top-4"></div>
-
-        <div class="govuk-form-group">
-          <label class="govuk-label govuk-label--m" for="emergency-note">
-            Give further details
-          </label>
-          <div id="note-hint" class="govuk-hint">
-            This information is for internal use. It will not be shared with the provider.
-          </div>
-          <textarea class="govuk-textarea" name="emergency-note" id="emergency-note" rows="10">{{ data['emergency-note'] }}</textarea>
-          <div class="govuk-button-group">
-            <input type="submit" name="merits_continue_button" value="Save and continue" id="continue" class="govuk-button form-button" data-module="govuk-button" data-disable-with="Save and continue">
-            <input type="submit" name="merits_continue_button" value="Save and come back later" id="continue" class="govuk-button form-button govuk-button--secondary govuk-!-margin-left-3" data-module="govuk-button"
-              data-disable-with="Save and come back later">
-          </div>
-        </div>
-      </div>
     </form>
   </div>
-
-  <!-- <div class="govuk-grid-column-one-third">
-    <form action="merits-assessment-substantive">
-      <div class="govuk-button-group">
-        <input type="submit" name="update_all_emergency" value="Grant all" id="grant-all-emergency" class="govuk-button form-button govuk-button--secondary" data-module="govuk-button" data-disable-with="Grant all">
-        <input type="submit" name="update_all_emergency" value="Refuse all" id="refuse-all-emergency" class="govuk-button form-button govuk-button--warning govuk-!-margin-left-3" data-module="govuk-button" data-disable-with="Refuse all">
-      </div>
-    </form>
-  </div> -->
 </div>
 {% endblock %}
