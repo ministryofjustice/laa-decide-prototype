@@ -7,19 +7,20 @@ Open applications
 {% block content %}
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-full">
-    {% include "./_search.html" %}
-    <h1 class="govuk-heading-l">Open applications</h1>
+    <h1 class="govuk-heading-xl">Open applications</h1>
 
     <p>Showing <b>1</b> to <b>{{ data['applications'].length }}</b> of <b>{{ data['applications'].length }}</b> applications</p>
 
 
- <div class="moj-filter-layout">
+    <div class="moj-filter-layout">
       {% include "./_filter.html" %}
 
       <div class="moj-filter-layout__content">
         <div class="moj-action-bar">
           <div class="moj-action-bar__filter"></div>
         </div>
+      </div>
+    </div>
 
         <div class="moj-scrollable-pane">
           <div class="moj-scrollable-pane__wrapper">
@@ -27,23 +28,23 @@ Open applications
             <table class="govuk-table" data-module="moj-sortable-table">
               <thead class="govuk-table__head" style="background-color:#f3f2f1">
                 <tr class="govuk-table__row">
-                  <th scope="col" class="govuk-table__header">Reference No./Applicant</th>
+                  <th scope="col" class="govuk-table__header">Reference</th>
                   <th scope="col" class="govuk-table__header" aria-sort="descending">Submitted</th>
-                  <th scope="col" class="govuk-table__header" aria-sort="none">Last updated</th>
-                  <th scope="col" class="govuk-table__header" aria-sort="none">Application type</th>
+                  <th scope="col" class="govuk-table__header" aria-sort="none">Updated</th>
+                  <th scope="col" class="govuk-table__header" aria-sort="none">Type</th>
                   <th scope="col" class="govuk-table__header" aria-sort="none">DF</th>
-                  <th scope="col" class="govuk-table__header" aria-sort="none">Category of law / Matter type</th>
-                  <th scope="col" class="govuk-table__header" aria-sort="none">Means type</th>
+                  <th scope="col" class="govuk-table__header" aria-sort="none">Category</th>
+                  <th scope="col" class="govuk-table__header" aria-sort="none">Means</th>
                   <th scope="col" class="govuk-table__header">Action</th>
                 </tr>
               </thead>
               <tbody class="govuk-table__body">
                 {% for application in data['applications'] %}
                 <tr class="govuk-table__row">
-                  <td class="govuk-table__cell"><b>{{ application['applicationDetails']['refNo'] }}</b><br>
-                    <a class="govuk_link" href="application-details?refNo={{ application['applicationDetails']['refNo'] }}">{{ application['applicationDetails']['applicant']['name'] }}</a></td>
-                  <td class="govuk-table__cell"><input type="hidden" name="date" value="{{ application['applicationDetails']['dateSubmitted'] }}" />{{ application['applicationDetails']['dateSubmitted'] | date}}</td>
-                  <td class="govuk-table__cell"><input type="hidden" name="date" value="{{ application['applicationDetails']['dateLastUpdated'] }}" />{{ application['applicationDetails']['dateLastUpdated'] | date}}</td>
+                  <td class="govuk-table__cell">
+                    <nobr><a class="govuk_link" href="application-details?refNo={{ application['applicationDetails']['refNo'] }}">{{ application['applicationDetails']['refNo'] }}</a></nobr></td>
+                  <td class="govuk-table__cell"><input type="hidden" name="date" value="{{ application['applicationDetails']['dateSubmitted'] }}" />{{ application['applicationDetails']['dateSubmitted'] | application_date}}</td>
+                  <td class="govuk-table__cell"><input type="hidden" name="date" value="{{ application['applicationDetails']['dateLastUpdated'] }}" />{{ application['applicationDetails']['dateLastUpdated'] | application_date}}</td>
                   <td class="govuk-table__cell">{{ application['applicationDetails']['applicationType'] }}</td>
                   <td class="govuk-table__cell">{{ application['applicationDetails']['delegatedFunctions'] }}</td>
                   <td class="govuk-table__cell"><strong>{{ application['applicationDetails']['categoryLaw'] }}</strong> - {{ application['applicationDetails']['categoryMatter'] }}</td>
@@ -51,7 +52,7 @@ Open applications
                   <td class="govuk-table__cell">
                     {% if application['applicationDetails']['refNo'] not in data['assignedApplications'] %}
                     <form action="my-applications">
-                      <button class="govuk-button govuk-button--secondary" data-module="govuk-button">Add to my list</button>
+                      <button class="govuk-button govuk-button--secondary" data-module="govuk-button">Add <span class="govuk-visually-hidden">to my list</span></button>
                       <input type="hidden" name="refNo" value="{{ application['applicationDetails']['refNo'] }}">
                     </form>
                     {% else %}
@@ -64,8 +65,8 @@ Open applications
             </table>
           </div>
         </div>
-      </div>
-    </div>
+
+
   </div>
 </div>
 {% endblock %}

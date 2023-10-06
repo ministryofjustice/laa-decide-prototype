@@ -1,12 +1,37 @@
 {% extends "govuk-prototype-kit/layouts/govuk-branded.njk" %}
 
 {% block header %}
-{{ super() }}
+
+{%- from "moj/components/header/macro.njk" import mojHeader -%}
+
+{{ mojHeader({
+  organisationLabel: {
+    text: 'Legal Aid Agency',
+    href: '/index'
+  },
+  serviceLabel: {
+    text: 'Decide if an applicant can get legal aid',
+    href: 'my-applications'
+  },
+  navigation: {
+    label: 'Account navigation',
+    items: [{
+      text: 'M Bradshaw',
+      href: '#',
+      active: true
+    }, {
+      text: 'Sign out',
+      href: '#'
+    }]
+  }
+
+}) }}
+
 <div class="govuk-width-container">
   <div class="govuk-phase-banner">
     <p class="govuk-phase-banner__content">
       <strong class="govuk-tag govuk-phase-banner__content__tag">
-        alpha
+        beta
       </strong>
       <span class="govuk-phase-banner__text">
         This is a new service – your <a class="govuk-link" href="#">feedback</a> will help us to improve it.
@@ -20,17 +45,16 @@
     label: 'Primary navigation',
     items: [
       {
-        href: "home",
-        text: "Home"
+        href: "my-applications",
+        text: "My applications"
       },
       {
         href: "open-applications",
-        text: "Open applications",
-         active: true
+        text: "Open applications"
       },
       {
-        href: "my-applications",
-        text: "My applications"
+        href: "search-applications",
+        text: "Search"
       }
     ]
   }) }}

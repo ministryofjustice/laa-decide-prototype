@@ -60,6 +60,15 @@ const addFilter = govukPrototypeKit.views.addFilter
     }
   };
 
+  filters.application_date = function(dateString) {
+    if (moment(dateString).format() === 'Invalid date'){
+      return dateString;
+    }
+    else{
+      return moment(dateString).format('ddd DD MMM');
+    }
+  };
+
   filters.history_date = function(dateString) {
     if (moment(dateString).format() === 'Invalid date'){
       return dateString;

@@ -1,4 +1,4 @@
-{% extends "layouts/layout.html" %}
+{% extends "layouts/search.html" %}
 
 {% block pageTitle %}
 Search results
@@ -34,10 +34,8 @@ Search results
 {% block content %}
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-full">
+    <h1 class="govuk-heading-xl">Search results</h1>
     {% include "./_search.html" %}
-
-    <h1 class="govuk-heading-l">Open applications</h1>
-    <p>{{ count }} open applications</p>
 
     <div class="moj-filter-layout">
       {% include "./_filter.html" %}
@@ -52,13 +50,13 @@ Search results
             <table class="govuk-table" data-module="moj-sortable-table">
               <thead class="govuk-table__head">
                 <tr class="govuk-table__row">
-                  <th scope="col" class="govuk-table__header">Reference No./Applicant</th>
+                  <th scope="col" class="govuk-table__header">Applicant</th>
                   <th scope="col" class="govuk-table__header" aria-sort="none">Submitted</th>
-                  <th scope="col" class="govuk-table__header" aria-sort="none">Last updated</th>
-                  <th scope="col" class="govuk-table__header">Application type</th>
+                  <th scope="col" class="govuk-table__header" aria-sort="none">Updated</th>
+                  <th scope="col" class="govuk-table__header">Type</th>
                   <th scope="col" class="govuk-table__header">DF</th>
-                  <th scope="col" class="govuk-table__header">Category of law</th>
-                  <th scope="col" class="govuk-table__header">Means type</th>
+                  <th scope="col" class="govuk-table__header">Category</th>
+                  <th scope="col" class="govuk-table__header">Means</th>
                   <th scope="col" class="govuk-table__header">Action</th>
                 </tr>
               </thead>
@@ -77,7 +75,7 @@ Search results
                   <td class="govuk-table__cell">
                     {% if application['applicationDetails']['refNo'] not in data['assignedApplications'] %}
                     <form action="my-applications">
-                      <button class="govuk-button govuk-button--secondary" data-module="govuk-button">Add to my list</button>
+                      <button class="govuk-button govuk-button--secondary" data-module="govuk-button">Add <span class="govuk-visually-hidden">to my list</span></button>
                       <input type="hidden" name="refNo" value="{{ application['applicationDetails']['refNo'] }}">
                     </form>
                     {% else %}

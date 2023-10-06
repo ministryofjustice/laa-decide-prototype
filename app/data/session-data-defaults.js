@@ -154,17 +154,22 @@ module.exports = {
         'contributions': [],
         'documents': [
           {
-            'title': 'means_report.pdf',
+            'title': 'Means report',
             'link': 'https://drive.google.com/file/d/16V-j11_Na8_bBz4fazl-TP5k8odpPbBX/view',
             'date': '2021-08-18T00:00:00.000Z'
           },
           {
-            'title': 'merits_report.pdf',
+            'title': 'Merits report',
             'link': 'https://drive.google.com/file/d/19TddAL5MpWAPhDqRCsbggQVVngEHCQA5/view',
             'date': '2021-08-18T00:00:00.000Z'
           },
           {
-            'title': 'gateway_evidence.pdf',
+            'title': 'Gateway evidence',
+            'link': 'https://drive.google.com/file/d/1m2SvoKEuJySNk3wxpjvfIYHqMTZlisQf/view',
+            'date': '2021-08-18T00:00:00.000Z'
+          },
+          {
+            'title': 'Statement of case',
             'link': 'https://drive.google.com/file/d/1m2SvoKEuJySNk3wxpjvfIYHqMTZlisQf/view',
             'date': '2021-08-18T00:00:00.000Z'
           }
@@ -269,17 +274,17 @@ module.exports = {
         'contributions': [],
         'documents': [
           {
-            'title': 'means_report.pdf',
+            'title': 'Means report',
             'link': 'https://drive.google.com/file/d/16V-j11_Na8_bBz4fazl-TP5k8odpPbBX/view',
             'date': '2021-08-30T00:00:00.000Z'
           },
           {
-            'title': 'merits_report.pdf',
+            'title': 'Merits report',
             'link': 'https://drive.google.com/file/d/19TddAL5MpWAPhDqRCsbggQVVngEHCQA5/view',
             'date': '2021-08-30T00:00:00.000Z'
           },
           {
-            'title': 'gateway_evidence.pdf',
+            'title': 'Gateway evidence',
             'link': 'https://drive.google.com/file/d/1m2SvoKEuJySNk3wxpjvfIYHqMTZlisQf/view',
             'date': '2021-08-30T00:00:00.000Z'
           }
@@ -371,17 +376,17 @@ module.exports = {
         'contributions': [],
         'documents': [
           {
-            'title': 'means_report.pdf',
+            'title': 'Means report',
             'link': 'https://drive.google.com/file/d/16V-j11_Na8_bBz4fazl-TP5k8odpPbBX/view',
             'date': '2021-08-30T00:00:00.000Z'
           },
           {
-            'title': 'merits_report.pdf',
+            'title': 'Merits report',
             'link': 'https://drive.google.com/file/d/19TddAL5MpWAPhDqRCsbggQVVngEHCQA5/view',
             'date': '2021-08-30T00:00:00.000Z'
           },
           {
-            'title': 'gateway_evidence.pdf',
+            'title': 'Gateway evidence',
             'link': 'https://drive.google.com/file/d/1m2SvoKEuJySNk3wxpjvfIYHqMTZlisQf/view',
             'date': '2021-08-30T00:00:00.000Z'
           }
@@ -456,17 +461,17 @@ module.exports = {
         'contributions': [],
         'documents': [
           {
-            'title': 'means_report.pdf',
+            'title': 'Means report',
             'link': 'https://drive.google.com/file/d/16V-j11_Na8_bBz4fazl-TP5k8odpPbBX/view',
             'date': '2021-08-31T00:00:00.000Z'
           },
           {
-            'title': 'merits_report.pdf',
+            'title': 'Merits report',
             'link': 'https://drive.google.com/file/d/19TddAL5MpWAPhDqRCsbggQVVngEHCQA5/view',
             'date': '2021-08-31T00:00:00.000Z'
           },
           {
-            'title': 'gateway_evidence.pdf',
+            'title': 'Gateway evidence',
             'link': 'https://drive.google.com/file/d/1m2SvoKEuJySNk3wxpjvfIYHqMTZlisQf/view',
             'date': '2021-08-31T00:00:00.000Z'
           }
@@ -565,17 +570,17 @@ module.exports = {
         ],
         'documents': [
           {
-            'title': 'means_report.pdf',
+            'title': 'Means report',
             'link': 'https://drive.google.com/file/d/16V-j11_Na8_bBz4fazl-TP5k8odpPbBX/view',
             'date': '2021-08-31T00:00:00.000Z'
           },
           {
-            'title': 'merits_report.pdf',
+            'title': 'Merits report',
             'link': 'https://drive.google.com/file/d/19TddAL5MpWAPhDqRCsbggQVVngEHCQA5/view',
             'date': '2021-08-31T00:00:00.000Z'
           },
           {
-            'title': 'gateway_evidence.pdf',
+            'title': 'Gateway evidence',
             'link': 'https://drive.google.com/file/d/1m2SvoKEuJySNk3wxpjvfIYHqMTZlisQf/view',
             'date': '2021-08-31T00:00:00.000Z'
           }
@@ -674,17 +679,17 @@ module.exports = {
         ],
         'documents': [
           {
-            'title': 'means_report.pdf',
+            'title': 'Means report',
             'link': 'https://drive.google.com/file/d/16V-j11_Na8_bBz4fazl-TP5k8odpPbBX/view',
             'date': '2021-08-31T00:00:00.000Z'
           },
           {
-            'title': 'merits_report.pdf',
+            'title': 'Merits report',
             'link': 'https://drive.google.com/file/d/19TddAL5MpWAPhDqRCsbggQVVngEHCQA5/view',
             'date': '2021-08-31T00:00:00.000Z'
           },
           {
-            'title': 'gateway_evidence.pdf',
+            'title': 'Gateway evidence',
             'link': 'https://drive.google.com/file/d/1m2SvoKEuJySNk3wxpjvfIYHqMTZlisQf/view',
             'date': '2021-08-31T00:00:00.000Z'
           }
@@ -776,17 +781,17 @@ module.exports = {
         'contributions': [],
         'documents': [
           {
-            'title': 'means_report.pdf',
+            'title': 'Means report',
             'link': 'https://drive.google.com/file/d/16V-j11_Na8_bBz4fazl-TP5k8odpPbBX/view',
             'date': '2021-08-30T00:00:00.000Z'
           },
           {
-            'title': 'merits_report.pdf',
+            'title': 'Merits report',
             'link': 'https://drive.google.com/file/d/19TddAL5MpWAPhDqRCsbggQVVngEHCQA5/view',
             'date': '2021-08-30T00:00:00.000Z'
           },
           {
-            'title': 'gateway_evidence.pdf',
+            'title': 'Gateway evidence',
             'link': 'https://drive.google.com/file/d/1m2SvoKEuJySNk3wxpjvfIYHqMTZlisQf/view',
             'date': '2021-08-30T00:00:00.000Z'
           }
@@ -861,17 +866,17 @@ module.exports = {
         'contributions': [],
         'documents': [
           {
-            'title': 'means_report.pdf',
+            'title': 'Means report',
             'link': 'https://drive.google.com/file/d/16V-j11_Na8_bBz4fazl-TP5k8odpPbBX/view',
             'date': '2021-08-31T00:00:00.000Z'
           },
           {
-            'title': 'merits_report.pdf',
+            'title': 'Merits report',
             'link': 'https://drive.google.com/file/d/19TddAL5MpWAPhDqRCsbggQVVngEHCQA5/view',
             'date': '2021-08-31T00:00:00.000Z'
           },
           {
-            'title': 'gateway_evidence.pdf',
+            'title': 'Gateway evidence',
             'link': 'https://drive.google.com/file/d/1m2SvoKEuJySNk3wxpjvfIYHqMTZlisQf/view',
             'date': '2021-08-31T00:00:00.000Z'
           }
@@ -970,17 +975,126 @@ module.exports = {
         ],
         'documents': [
           {
-            'title': 'means_report.pdf',
+            'title': 'Means report',
             'link': 'https://drive.google.com/file/d/16V-j11_Na8_bBz4fazl-TP5k8odpPbBX/view',
             'date': '2021-08-31T00:00:00.000Z'
           },
           {
-            'title': 'merits_report.pdf',
+            'title': 'Merits report',
             'link': 'https://drive.google.com/file/d/19TddAL5MpWAPhDqRCsbggQVVngEHCQA5/view',
             'date': '2021-08-31T00:00:00.000Z'
           },
           {
-            'title': 'gateway_evidence.pdf',
+            'title': 'Gateway evidence',
+            'link': 'https://drive.google.com/file/d/1m2SvoKEuJySNk3wxpjvfIYHqMTZlisQf/view',
+            'date': '2021-08-31T00:00:00.000Z'
+          }
+        ],
+        'notes': []
+      }
+    },
+    // application #10
+    {
+      'applicationDetails':
+      {
+        'refNo': 'L-B1C-F3V',
+        'dateSubmitted': '2023-08-21T00:00:00.000Z',
+        'dateLastUpdated': '2023-08-22T00:00:00.000Z',
+        'applicationType': 'Initial application',
+        'delegatedFunctions': 'Not used',
+        'categoryLaw': 'Family',
+        'categoryMatter' : 'Domestic Abuse',
+        'meansType': 'Passported',
+        'certificateType': 'Substantive',
+        'meansAssessmentResult': 'Not started',
+        'meritsAssessmentResult': 'Not started',
+        'applicant':
+        {
+          'name': 'Sally-Marie Foster',
+          'dob': '1981-04-15T00:00:00.000Z',
+          'nino': 'AA111111Q',
+          'address': '102 Petty France</br>London</br>SW1H 9AJ',
+        },
+        'provider':
+        {
+          'name': 'Provider Ten',
+          'firm': 'Ten & Co',
+          'accountNumber': '0P345F',
+          'address': 'Albany House</br>Petty France</br>London</br>SW1H 9AE',
+          'phone': '07333333333'
+        },
+        'opponent':
+        {
+          'name': 'Opponent Ten',
+          'dob': '1991-06-14T00:00:00.000Z',
+          'address': '102 Petty France</br>London</br>SW1H 9AJ',
+          'relationship': 'Partner'
+        },
+        'children': [],
+        'linkedApplications': [],
+        'delegatedFunctionsDates': [],
+        'proceedings': [
+          {
+            'id': 'application_10_proceeding_1',
+            'matterType': 'Domestic abuse',
+            'proceedingType': 'Non-molestation order',
+            'meansResult': '',
+            'certificates': [
+              {
+                'id': 'application_10_proceeding_1_certificate_1',
+                'certificateType': 'Substantive certificate',
+                'formOfService': 'Full representation',
+                'workProviderCanDo': 'All steps up to and including getting and serving a final order. If the order is breached you can apply for power of arrest. You cannot apply for a warrant of arrest or contempt of court proceedings.',
+                'meritsResult': ''
+              }
+            ]
+          },
+          {
+            'id': 'application_10_proceeding_2',
+            'matterType': 'Domestic abuse',
+            'proceedingType': 'Prohibited steps order',
+            'meansResult': '',
+            'certificates': [
+              {
+                'id': 'application_10_proceeding_2_certificate_1',
+                'certificateType': 'Substantive certificate',
+                'formOfService': 'Family Help (Higher)',
+                'workProviderCanDo': 'Limited to Family Help (Higher) and to all steps necessary to negotiate and conclude a settlement. To include the issue of proceedings and representation in those proceedings save in relation to or at a contested final hearing.',
+                'meritsResult': ''
+              }
+            ]
+          }
+        ],
+        'costLimitations': [
+          {
+            'certificateType': 'Substantive certificate',
+            'costLimit': '£25,000',
+            'requestedCostLimit': '£25,000'
+          }
+        ],
+        'contributions': [
+          {
+            'description': 'per month from their disposable income',
+            'amount': '25.68'
+          },
+          {
+            'description': 'from their disposable capital',
+            'amount': '4,500'
+          }
+        ],
+        'documents': [
+          {
+            'title': 'Means report',
+            'link': 'https://drive.google.com/file/d/16V-j11_Na8_bBz4fazl-TP5k8odpPbBX/view',
+            'date': '2021-08-31T00:00:00.000Z'
+          },
+          {
+            'title': 'Merits report',
+            'link': 'https://drive.google.com/file/d/19TddAL5MpWAPhDqRCsbggQVVngEHCQA5/view',
+            'date': '2021-08-31T00:00:00.000Z'
+          },
+          {
+            'title': 'Gateway evidence',
             'link': 'https://drive.google.com/file/d/1m2SvoKEuJySNk3wxpjvfIYHqMTZlisQf/view',
             'date': '2021-08-31T00:00:00.000Z'
           }
