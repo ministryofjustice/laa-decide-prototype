@@ -178,19 +178,19 @@ Merits decision saved.
           <td class="govuk-table__header">Means assessment</td>
           <td class="govuk-table__cell">
             {% if (application['meansAssessmentResult'] === 'Not started') %}
-            <strong class="govuk-tag govuk-tag--grey">{{ application['meansAssessmentResult'] }}</strong>
+            <span class="moj-badge moj-badge">{{ application['meansAssessmentResult'] }}</span>
             {% endif %}
             {% if (application['meansAssessmentResult'] === 'refused') or (application['meansAssessmentResult'] === 'rejected') %}
-            <strong class="govuk-tag govuk-tag--red">{{ application['meansAssessmentResult'] }}</strong>
+            <span class="moj-badge moj-badge--red">{{ application['meansAssessmentResult'] }}</span>
             {% endif %}
             {% if application['meansAssessmentResult'] === 'Passported' %}
-            <strong class="govuk-tag govuk-tag--green">{{ application['meansAssessmentResult'] }}</strong>
+            <span class="moj-badge moj-badge--green">{{ application['meansAssessmentResult'] }}</span>
             {% endif %}
             {% if (application['meansAssessmentResult'] === 'granted') %}
-            <strong class="govuk-tag govuk-tag--green">{{ application['meansAssessmentResult'] }}</strong>
+            <span class="moj-badge moj-badge--green">{{ application['meansAssessmentResult'] }}</span>
             {% endif %}
             {% if (application['meansAssessmentResult'] === 'partially granted') %}
-            <strong class="govuk-tag govuk-tag--blue">{{ application['meansAssessmentResult'] }}</strong>
+            <span class="moj-badge moj-badge--blue">{{ application['meansAssessmentResult'] }}</span>
             {% endif %}
           </td>
         </tr>
@@ -198,19 +198,19 @@ Merits decision saved.
           <td class="govuk-table__header">Merits assessment</td>
           <td class="govuk-table__cell">
             {% if (application['meritsAssessmentResult'] === 'Not started') %}
-            <strong class="govuk-tag govuk-tag--grey">{{ application['meritsAssessmentResult'] }}</strong>
+            <span class="moj-badge moj-badge--grey">{{ application['meritsAssessmentResult'] }}</span>
             {% endif %}
             {% if (application['meritsAssessmentResult'] === 'in progress') %}
-            <strong class="govuk-tag govuk-tag--turquoise">{{ application['meritsAssessmentResult'] }}</strong>
+            <span class="moj-badge moj-badge--blue">{{ application['meritsAssessmentResult'] }}</span>
             {% endif %}
             {% if (application['meritsAssessmentResult'] === 'granted') %}
-            <strong class="govuk-tag govuk-tag--green">{{ application['meritsAssessmentResult'] }}</strong>
+            <span class="moj-badge moj-badge--green">{{ application['meritsAssessmentResult'] }}</span>
             {% endif %}
             {% if (application['meritsAssessmentResult'] === 'partially granted') %}
-            <strong class="govuk-tag govuk-tag--blue">{{ application['meritsAssessmentResult'] }}</strong>
+            <span class="moj-badge moj-badge--blue">{{ application['meritsAssessmentResult'] }}</span>
             {% endif %}
             {% if (application['meritsAssessmentResult'] === 'refused') or (application['meritsAssessmentResult'] === 'rejected') %}
-            <strong class="govuk-tag govuk-tag--red">{{ application['meritsAssessmentResult'] }}</strong>
+            <span class="moj-badge moj-badge--red">{{ application['meritsAssessmentResult'] }}</span>
             {% endif %}
           </td>
         </tr>
