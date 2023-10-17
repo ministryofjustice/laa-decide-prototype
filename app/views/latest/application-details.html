@@ -70,21 +70,8 @@ Merits decision saved.
 
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">
-    <h2 class="govuk-heading-xl govuk-!-margin-bottom-2" ><span class="govuk-!-margin-right-2" id="reference-number">L-A1B-C2D</span>
-    <button class="govuk-link--no-visited-state" style="background: none; border: none; color: #1d70b8; text-decoration: underline; cursor: copy;" onclick="copyContent()">Copy reference number</button></h2>
-
-    <script>
-      let text = document.getElementById('reference-number').innerHTML;
-      const copyContent = async () => {
-        try {
-          await navigator.clipboard.writeText(text);
-          console.log('Content copied to clipboard');
-        } catch (err) {
-          console.error('Failed to copy: ', err);
-        }
-      }
-    </script>
-
+    <h2 class="govuk-heading-xl govuk-!-margin-bottom-2" ><span class="govuk-!-margin-right-2">{{ application['refNo'] }}</span>
+    </h2>
     {% if application['linkedApplications'].length > 0 %}
 
     <details class="govuk-details" data-module="govuk-details">
@@ -93,8 +80,8 @@ Merits decision saved.
           Linked applications found
         </span>
       </summary>
-      <div class="govuk-details__text">
-        <table class="govuk-table">
+      <div class="govuk-details__text"> To be confirmed
+ <!--       <table class="govuk-table">
             <thead class="govuk-table__head">
               <tr class="govuk-table__row">
                 <th scope="col" class="govuk-table__header">Reference number</th>
@@ -110,6 +97,7 @@ Merits decision saved.
               {% endfor %}
             </tbody>
           </table>
+-->
       </div>
     </details>
 
@@ -163,6 +151,24 @@ Merits decision saved.
       <caption class="govuk-table__caption govuk-table__caption--l">Overview</caption>
       <tbody class="govuk-table__body">
         <tr class="govuk-table__row">
+          <td class="govuk-table__header govuk-!-width-one-half">CCMS reference number</td>
+          <td class="govuk-table__cell"><span id="reference-number">300000651984</span><button class="govuk-link--no-visited-state" style="background: none; border: none; color: #1d70b8; text-decoration: underline; cursor: copy;" onclick="copyContent()">Copy reference number</button>
+
+            <script>
+              let text = document.getElementById('reference-number').innerHTML;
+              const copyContent = async () => {
+                try {
+                  await navigator.clipboard.writeText(text);
+                  console.log('Content copied to clipboard');
+                } catch (err) {
+                  console.error('Failed to copy: ', err);
+                }
+              }
+            </script>
+
+          </td>
+        </tr>
+         <tr class="govuk-table__row">
           <td class="govuk-table__header govuk-!-width-one-half">Application type</td>
           <td class="govuk-table__cell">{{ application['applicationType'] }}</td>
         </tr>
@@ -178,19 +184,21 @@ Merits decision saved.
           <td class="govuk-table__header">Means assessment</td>
           <td class="govuk-table__cell">
             {% if (application['meansAssessmentResult'] === 'Not started') %}
-            <strong class="govuk-tag govuk-tag--grey">{{ application['meansAssessmentResult'] }}</strong>
+            <span class="moj-badge moj-badge">{{ application['meansAssessmentResult'] }}</span>
             {% endif %}
             {% if (application['meansAssessmentResult'] === 'refused') or (application['meansAssessmentResult'] === 'rejected') %}
-            <strong class="govuk-tag govuk-tag--red">{{ application['meansAssessmentResult'] }}</strong>
+            <span class="moj-badge moj-badge--red">{{ application['meansAssessmentResult'] }}</span>
             {% endif %}
             {% if application['meansAssessmentResult'] === 'Passported' %}
-            <strong class="govuk-tag govuk-tag--green">{{ application['meansAssessmentResult'] }}</strong>
+            <!--<span class="moj-badge moj-badge--green">{{ application['meansAssessmentResult'] }}</span>-->
+            <!-- hot fix https://dsdmoj.atlassian.net/browse/AD-321 -->
+            <span class="moj-badge moj-badge--green">Granted</span>
             {% endif %}
             {% if (application['meansAssessmentResult'] === 'granted') %}
-            <strong class="govuk-tag govuk-tag--green">{{ application['meansAssessmentResult'] }}</strong>
+            <span class="moj-badge moj-badge--green">{{ application['meansAssessmentResult'] }}</span>
             {% endif %}
             {% if (application['meansAssessmentResult'] === 'partially granted') %}
-            <strong class="govuk-tag govuk-tag--blue">{{ application['meansAssessmentResult'] }}</strong>
+            <span class="moj-badge moj-badge--blue">{{ application['meansAssessmentResult'] }}</span>
             {% endif %}
           </td>
         </tr>
@@ -198,19 +206,19 @@ Merits decision saved.
           <td class="govuk-table__header">Merits assessment</td>
           <td class="govuk-table__cell">
             {% if (application['meritsAssessmentResult'] === 'Not started') %}
-            <strong class="govuk-tag govuk-tag--grey">{{ application['meritsAssessmentResult'] }}</strong>
+            <span class="moj-badge moj-badge--grey">{{ application['meritsAssessmentResult'] }}</span>
             {% endif %}
             {% if (application['meritsAssessmentResult'] === 'in progress') %}
-            <strong class="govuk-tag govuk-tag--turquoise">{{ application['meritsAssessmentResult'] }}</strong>
+            <span class="moj-badge moj-badge--blue">{{ application['meritsAssessmentResult'] }}</span>
             {% endif %}
             {% if (application['meritsAssessmentResult'] === 'granted') %}
-            <strong class="govuk-tag govuk-tag--green">{{ application['meritsAssessmentResult'] }}</strong>
+            <span class="moj-badge moj-badge--green">{{ application['meritsAssessmentResult'] }}</span>
             {% endif %}
             {% if (application['meritsAssessmentResult'] === 'partially granted') %}
-            <strong class="govuk-tag govuk-tag--blue">{{ application['meritsAssessmentResult'] }}</strong>
+            <span class="moj-badge moj-badge--blue">{{ application['meritsAssessmentResult'] }}</span>
             {% endif %}
             {% if (application['meritsAssessmentResult'] === 'refused') or (application['meritsAssessmentResult'] === 'rejected') %}
-            <strong class="govuk-tag govuk-tag--red">{{ application['meritsAssessmentResult'] }}</strong>
+            <span class="moj-badge moj-badge--red">{{ application['meritsAssessmentResult'] }}</span>
             {% endif %}
           </td>
         </tr>
@@ -234,9 +242,10 @@ Merits decision saved.
 
 
     <h2 class="govuk-heading-l govuk-!-margin-top-9">Proceedings</h2>
+    <ol class="govuk-list govuk-list--number">
     {% for proceeding in application['proceedings'] %}
 <!--    <span class="govuk-caption-m">Default scope</span> -->
-    <h2 class="govuk-heading-m">{{ proceeding['proceedingType'] }}</h2>
+    <li><h2 class="govuk-heading-m">{{ proceeding['proceedingType'] }}</h2>
     
         {% for certificate in proceeding['certificates'] %}
         <div class="govuk-summary-card">
@@ -247,7 +256,7 @@ Merits decision saved.
             <dl class="govuk-summary-list">
               <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">
-                  Form of service
+                  Level of service
                 </dt>
                 <dd class="govuk-summary-list__value">
                   {{ certificate['formOfService'] }}
@@ -256,10 +265,11 @@ Merits decision saved.
               </div>
               <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">
-                  Work the provider can do
+                  Scope limitations
                 </dt>
                 <dd class="govuk-summary-list__value">
-                  {{ certificate['workProviderCanDo'] | safe }}
+                  <strong>{{ certificate['scopeLimits'] | safe }}</strong>
+                  <br>{{ certificate['workProviderCanDo'] | safe }}
                 </dd>
                 
               </div>
@@ -311,9 +321,9 @@ Merits decision saved.
             </dl>
           </div>
         </div>
-        {% endfor %}
+        {% endfor %}</li>
 
-    {% endfor %}
+    {% endfor %}</ol>
 
     <table class="govuk-table govuk-!-margin-top-9">
       <caption class="govuk-table__caption govuk-table__caption--l">Cost limits</caption>
@@ -331,7 +341,7 @@ Merits decision saved.
     <table class="govuk-table">
       <thead class="govuk-table__head">
         <tr class="govuk-table__row">
-          <th scope="col" class="govuk-table__header">Type</th>
+          <th scope="col" class="govuk-table__header">Category</th>
           <th scope="col" class="govuk-table__header">Date</th>
         </tr>
       </thead>
@@ -367,13 +377,13 @@ Merits decision saved.
       <div class="govuk-button-group">
         {% if ((application['meritsAssessmentResult'] == 'Not started') or (application['meritsAssessmentResult'] == 'in progress')) %}
         <form action="merits-assessment-emergency">
-          <button class="govuk-button" data-module="govuk-button">Merits decision</button>
+          <button class="govuk-button" data-module="govuk-button">Merits assessment</button>
         </form>
         {% endif %}
 
         {% if (application['meansAssessmentResult'] == 'Not started') %}
         <form action="means-assessment">
-          <button class="govuk-button" data-module="govuk-button">Means decision</button>
+          <button class="govuk-button" data-module="govuk-button">Means assessment</button>
         </form>
         {% endif %}
 

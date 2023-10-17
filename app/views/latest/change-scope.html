@@ -1,0 +1,121 @@
+{% extends "layouts/layout.html" %}
+
+{% block pageTitle %}
+Make merits changes
+{% endblock %}
+
+{% block beforeContent %}
+<a class="govuk-back-link" href="merits-assessment-substantive">Back to merits assessment</a>
+{% endblock %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    <h1 class="govuk-heading-xl govuk-!-margin-bottom-4">Change the scope limitations</h1>
+    <p class="govuk-!-font-size-36">L-A1B-C2D</p>
+    <div class="govuk-!-padding-top-4"></div>
+  </div>
+</div>
+
+
+<div class="govuk-grid-row">  
+<div class="govuk-grid-column-two-thirds">
+    <form action="merits-assessment-substantive" method="post" novalidate="">
+
+      <div class="govuk-form-group">
+        <fieldset class="govuk-fieldset" aria-describedby="contact-hint">
+          <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
+            <h1 class="govuk-fieldset__heading">
+              Non-molestation order
+            </h1>
+          </legend>
+          <p><strong>Current scope:</strong> Hearing/adjournment</p>
+          <h2 class="govuk-heading-m govuk-!-margin-top-1">Select the new scope limitations</h2>
+
+          <div class="govuk-form-group">
+            <fieldset class="govuk-fieldset" aria-describedby="waste-hint">
+              <!-- <legend class="govuk-fieldset__legend govuk-fieldset__legend--s govuk-!-font-weight-regular">
+                Select scope
+              </legend> -->
+              <div id="waste-hint" class="govuk-hint">
+                Select all that apply.
+              </div>
+              <div class="govuk-checkboxes" data-module="govuk-checkboxes">
+                <div class="govuk-checkboxes__item">
+                  <input class="govuk-checkboxes__input" id="scope-1" name="scope" type="checkbox" value="Blood or DNA tests">
+                  <label class="govuk-label govuk-checkboxes__label" for="scope-1">
+                    Blood or DNA tests
+                  </label>
+                </div>
+
+                <div class="govuk-checkboxes__item">
+                  <input class="govuk-checkboxes__input" id="scope-3" name="scope" type="checkbox" value="Final hearing (CAFCASS rept) priv law only">
+                  <label class="govuk-label govuk-checkboxes__label" for="scope-3">
+                    Cafcass report: final hearing (private law only)
+                  </label>
+                </div>
+
+                <div class="govuk-checkboxes__item">
+                  <input class="govuk-checkboxes__input" id="scope-3" name="scope" type="checkbox" value="Counsel's Opinion">
+                  <label class="govuk-label govuk-checkboxes__label" for="scope-3">
+                    Counsel's Opinion
+                  </label>
+                </div>
+
+                <div class="govuk-checkboxes__item">
+                  <input class="govuk-checkboxes__input" id="scope-2" name="scope" type="checkbox" value="Exchange of Evidence">
+                  <label class="govuk-label govuk-checkboxes__label" for="scope-2">
+                    Exchange of evidence
+                  </label>
+                </div>
+
+                <div class="govuk-checkboxes__item">
+                  <input class="govuk-checkboxes__input" id="scope-2" name="scope" type="checkbox" value="FHH Children">
+                  <label class="govuk-label govuk-checkboxes__label" for="scope-2">
+                    FHH Children
+                  </label>
+                </div>
+
+                <div class="govuk-checkboxes__item">
+                  <input class="govuk-checkboxes__input" id="hearing" name="scope" type="checkbox" value="Hearing">
+                  <label class="govuk-label govuk-checkboxes__label" for="hearing">
+                    Hearing
+                  </label>
+                </div>
+                <div class="govuk-checkboxes__item">
+                  <input class="govuk-checkboxes__input" id="scope-6" name="scope" type="checkbox" value="Hearing/Adjournment">
+                  <label class="govuk-label govuk-checkboxes__label" for="scope-6">
+                    Hearing/adjournment
+                  </label>
+                </div>
+                <div class="govuk-checkboxes__item">
+                  <input class="govuk-checkboxes__input" id="scope-7" name="scope" type="checkbox" value="Interim order including return date">
+                  <label class="govuk-label govuk-checkboxes__label" for="scope-7">
+                    Interim order including return date
+                  </label>
+                </div>
+                <div class="govuk-checkboxes__item">
+                  <input class="govuk-checkboxes__input" id="scope-5" name="scope" type="checkbox" value="Section 37 Report">
+                  <label class="govuk-label govuk-checkboxes__label" for="scope-5">
+                    Section 37 Report
+                  </label>
+                </div>
+
+              </div>
+            </div>
+        {% from "govuk/components/button/macro.njk" import govukButton %}
+
+          <div class="govuk-button-group">
+            {{ govukButton({
+              text: "Save and continue"
+            }) }}
+
+            {{ govukButton({
+              text: "Cancel",
+              classes: "govuk-button--secondary",
+              href: "merits-assessment-substantive"
+            }) }}
+      </form>
+    </div>
+</div>
+{% endblock %}
