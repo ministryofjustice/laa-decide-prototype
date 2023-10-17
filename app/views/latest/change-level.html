@@ -1,0 +1,70 @@
+{% extends "layouts/layout.html" %}
+
+{% block pageTitle %}
+Make merits changes
+{% endblock %}
+
+{% block beforeContent %}
+<a class="govuk-back-link" href="merits-assessment-emergency">Back to merits assessment</a>
+{% endblock %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    <h1 class="govuk-heading-xl govuk-!-margin-bottom-4">Change the level of service</h1>
+    <p class="govuk-!-font-size-36">L-A1B-C2D</p>
+    <div class="govuk-!-padding-top-4"></div>
+  </div>
+</div>
+
+
+<div class="govuk-grid-row">  
+<div class="govuk-grid-column-two-thirds">
+    <form action="merits-assessment-emergency" method="post" novalidate="">
+
+      <div class="govuk-form-group">
+        <fieldset class="govuk-fieldset" aria-describedby="contact-hint">
+          <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
+            <h1 class="govuk-fieldset__heading">
+              Non-molestation order
+            </h1>
+          </legend>
+          <p>Current level: Full representation</p>
+          <h2 class="govuk-heading-m govuk-!-margin-top-1">Select the new level of service</h2>
+        </fieldset>
+
+        <div class="govuk-radios" data-module="govuk-radios">
+            <div class="govuk-radios__item">
+              <input class="govuk-radios__input" id="emergency-LOS" name="substantiveLOS" type="radio" value="Family help (higher)" data-aria-controls="conditional-emergency-LOS">
+              <label class="govuk-label govuk-radios__label" for="emergency-LOS">
+                Family help (higher)
+              </label>
+            </div>
+
+            <div class="govuk-radios__item">
+              <input class="govuk-radios__input" id="emergency-LOS-2" name="substantiveLOS" type="radio" value="Full representation" data-aria-controls="conditional-emergency-LOS-2" aria-describedby="conditional-emergency-LOS-2">
+              <label class="govuk-label govuk-radios__label" for="emergency-LOS-2">
+                Full representation
+              </label>
+            </div>
+
+          </div>
+      </div>
+
+                
+        {% from "govuk/components/button/macro.njk" import govukButton %}
+
+          <div class="govuk-button-group">
+            {{ govukButton({
+              text: "Save and continue"
+            }) }}
+
+            {{ govukButton({
+              text: "Cancel",
+              classes: "govuk-button--secondary",
+              href: "merits-assessment-emergency"
+            }) }}
+      </form>
+    </div>
+</div>
+{% endblock %}

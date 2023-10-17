@@ -13,7 +13,7 @@ Merits assessment - emergency
 {% block content %}
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">
-    <h1 class="govuk-heading-xl govuk-!-margin-bottom-4">Make a merits decision</h1>
+    <h1 class="govuk-heading-xl govuk-!-margin-bottom-4">Make a merits assessment</h1>
     <p class="govuk-!-font-size-36">{{ application['refNo'] }}</p>
     <div class="govuk-!-padding-top-4"></div>
   </div>
@@ -21,7 +21,7 @@ Merits assessment - emergency
 
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">
-    <h2 class="govuk-heading-l govuk-!-margin-bottom-4">Emergency certificates</h1>
+    <h2 class="govuk-heading-l govuk-!-margin-bottom-4">Emergency proceedings</h1>
     <form action="merits-assessment-substantive" method="POST">
 
 
@@ -30,34 +30,103 @@ Merits assessment - emergency
         {% for certificate in proceeding['certificates'] %}
         {% if certificate['certificateType'] === 'Emergency certificate' %}
 
-        {% set hint=application['categoryLaw'] + ' - ' + proceeding['matterType'] +  '<br>' + 'Form of service: ' + certificate['formOfService']  %}
+        <h2 class="govuk-heading-m">{{ proceeding['proceedingType'] }}</h2>
+        {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+
+        {{ govukSummaryList({
+        classes: "govuk-!-margin-bottom-5",
+        rows: [
+          {
+            key: {
+              text: "Category"
+            },
+            value: {
+              text: application['categoryLaw'] + ' - ' + proceeding['matterType']
+            },
+            actions: {
+              
+            }
+          },
+          {
+            key: {
+              text: "Scope limitations"
+            },
+            value: {
+              text: 'Hearing/adjournment'
+            },
+            actions: {
+              items: [
+                {
+                  href: "change-scope",
+                  text: "Change",
+                  visuallyHiddenText: "contact details"
+                }
+              ]
+            }
+          },
+          {
+            key: {
+              text: "Level of service"
+            },
+            value: {
+              text: certificate['formOfService']
+            },
+            actions: {
+              items: [
+                {
+                  href: "change-level",
+                  text: "Change",
+                  visuallyHiddenText: "contact details"
+                }
+              ]
+            }
+          }
+        ]
+      }) }}
+
+
+        {% set grantHtml %}
+        {% from "govuk/components/date-input/macro.njk" import govukDateInput %}
+
+        {{ govukDateInput({
+          id: "passport-issued",
+          namePrefix: "passport-issued",
+          fieldset: {
+            legend: {
+              text: "When should the emergency certificate be granted from?",
+              classes: "govuk-fieldset__legend--s"
+            }
+          }
+        }) }}
+
+        {{ govukDateInput({
+          id: "passport-issued",
+          namePrefix: "passport-issued",
+          fieldset: {
+            legend: {
+              text: "When should the emergency certificate end?",
+              classes: "govuk-fieldset__legend--s"
+            }
+          }
+        }) }}
+        {% endset -%}
 
         {% set refuseHtml %}
         {% include "./_refusal_reasons_dropdown.html" %}
         {% endset -%}
 
         {{ govukRadios({
+          classes: "govuk-!-margin-bottom-9",
           idPrefix: certificate['id']+"_decision",
           name: certificate['id'],
-          fieldset: {
-            legend: {
-              text: proceeding['proceedingType'],
-              classes: "govuk-fieldset__legend--m"
-            }
-          },
-          hint: {
-            text: hint | safe
-          },
           items: [
             {
               value: "granted",
               text: "Grant",
-              checked: checked(certificate['id'], "granted")
-            },
-            {
-              value: "amended",
-              text: "Change to default scope and grant",
-              checked: checked(certificate['id'], "amended")
+              checked: checked(certificate['id'], "granted"),
+              conditional: {
+                html: grantHtml
+              }
             },
             {
               value: "refused",
@@ -70,17 +139,76 @@ Merits assessment - emergency
           ]
         })}}
 
-
-          <h1 class="govuk-label-wrapper">
-            <label class="govuk-label govuk-label--m" for="granted-emergency">
-              How much should be granted for the emergency certificate?
-            </label>
-          </h1>
-
-        <hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible">
         {% endif %}
         {% endfor %}
         {% endfor %}
+
+
+         <table class="govuk-table govuk-!-margin-top-9">
+          <caption class="govuk-table__caption govuk-table__caption--m">Cost limits</caption>
+          <tbody class="govuk-table__body">
+            {% for limitation in application['costLimitations'] %}
+            {% if limitation['certificateType'] == 'Emergency certificate' %}
+            <tr class="govuk-table__row">
+              <td class="govuk-table__header">Certificate type</td>
+              <td class="govuk-table__cell">{{ limitation['certificateType'] }}</td>
+            </tr>
+            <tr class=" govuk-table__row">
+              <td class="govuk-table__header">Default</td>
+              <td class="govuk-table__cell">{{ limitation['costLimit'] }}</td>
+            </tr>
+            <tr class="govuk-table__row">
+              <td class="govuk-table__header">Requested</td>
+              <td class="govuk-table__cell">{{ limitation['requestedCostLimit'] }}</td>
+            </tr>
+            {% if limitation['justification'] %}
+            <tr class="govuk-table__row">
+              <td class="govuk-table__header">Justification</td>
+              <td class="govuk-table__cell">{{ limitation['justification'] }}</td>
+            </tr>
+            {% endif %}
+            {% endif %}
+            {% endfor %}
+          </tbody>
+        </table>
+
+        {% from "govuk/components/radios/macro.njk" import govukRadios %}
+        {% from "govuk/components/input/macro.njk" import govukInput %}
+
+        {% set limitHtml %}
+        <div class="govuk-input__wrapper">
+                    <div class="govuk-input__prefix" aria-hidden="true">£</div>
+                    <input class="govuk-input govuk-input--width-5" id="granted-emergency" name="granted-emergency" value="{{ data['granted-emergency'] }}" type="text" spellcheck="false">
+                  </div>
+        {% endset -%}
+
+        {{ govukRadios({
+          name: "contact",
+          fieldset: {
+            legend: {
+              text: "How much should be granted for the emergency certificate?",
+              isPageHeading: true,
+              classes: "govuk-fieldset__legend--s"
+            }
+          },
+          items: [
+            {
+              value: "Default limit (amount)",
+              text: "Default limit"
+            },
+            {
+              value: "Requested limit (amount)",
+              text: "Requested limit"
+            },
+            {
+              value: "New limit set by assessor (amount)",
+              text: "New limit",
+              conditional: {
+                html: limitHtml
+              }
+            }
+          ]
+        }) }}
 
         <div class="govuk-button-group">
           <input type="submit" name="merits_continue_button" value="Save and continue" id="continue" class="govuk-button form-button" data-module="govuk-button" data-disable-with="Save and continue">

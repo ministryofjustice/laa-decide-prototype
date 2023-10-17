@@ -19,7 +19,7 @@ Merits assessment - substantive
 {% block content %}
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">
-    <h1 class="govuk-heading-xl govuk-!-margin-bottom-4">Make a decision on merits</h1>
+    <h1 class="govuk-heading-xl govuk-!-margin-bottom-4">Make a merits assessment</h1>
     <p class="govuk-!-font-size-36">{{ application['refNo'] }}</p>
     <div class="govuk-!-padding-top-4"></div>
   </div>
@@ -27,65 +27,96 @@ Merits assessment - substantive
 
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">
-    <h2 class="govuk-heading-m">Part {{ part }}: Substantive</h2>
+    <h2 class="govuk-heading-l">Substantive proceedings</h2>
     <form action="application-details" method="POST">
       <div class="govuk-form-group">
         {% for proceeding in application['proceedings'] %}
         {% for certificate in proceeding['certificates'] %}
         {% if certificate['certificateType'] === 'Substantive certificate' %}
+         <h2 class="govuk-heading-m">{{ proceeding['proceedingType'] }}</h2>
+        {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 
-        {% set hint=application['categoryLaw'] + ' - ' + proceeding['matterType'] +  '<br>' + 'The provider has requested ' + certificate['formOfService']  %}
+        {{ govukSummaryList({
+        classes: "govuk-!-margin-bottom-5",
+        rows: [
+          {
+            key: {
+              text: "Category"
+            },
+            value: {
+              text: application['categoryLaw'] + ' - ' + proceeding['matterType']
+            },
+            actions: {
+              
+            }
+          },
+          {
+            key: {
+              text: "Scope limitations"
+            },
+            value: {
+              text: 'Hearing/adjournment'
+            },
+            actions: {
+              items: [
+                {
+                  href: "#",
+                  text: "Change",
+                  visuallyHiddenText: "contact details"
+                }
+              ]
+            }
+          },
+          {
+            key: {
+              text: "Level of service"
+            },
+            value: {
+              text: certificate['formOfService']
+            },
+            actions: {
+              items: [
+                {
+                  href: "#",
+                  text: "Change",
+                  visuallyHiddenText: "contact details"
+                }
+              ]
+            }
+          }
+        ]
+      }) }}
+
+        {% set grantHtml %}
+        {% from "govuk/components/date-input/macro.njk" import govukDateInput %}
+
+        {{ govukDateInput({
+          id: "substantive-issued",
+          namePrefix: "substantive-issued",
+          fieldset: {
+            legend: {
+              text: "When should the substantive certificate be granted from?",
+              classes: "govuk-fieldset__legend--s"
+            }
+          }
+        }) }}
+        {% endset -%}
 
         {% set refuseHtml %}
         {% include "./_refusal_reasons_dropdown.html" %}
         {% endset -%}
 
-        {% set amendHtml %}
-        {{ govukSelect({
-          idPrefix: certificate['id']+"_amend",
-          name: certificate['id']+"_amend",
-          fieldset: {},
-          items: [
-            {
-              value: "Family help (higher)",
-              text: "Family help (higher)",
-              id: "amended_1",
-              selected: checked(certificate['id']+"_amend", "Family help (higher)")
-            },
-            {
-              value: "Full representation",
-              text: "Full representation",
-              id: "amended_2",
-              selected: checked(certificate['id']+"_amend", "Full representation")
-            }
-          ]
-        })}}
-        {% endset -%}
-
         {{ govukRadios({
+          classes: "govuk-!-margin-bottom-9",
           idPrefix: certificate['id']+"_decision",
           name: certificate['id'],
-          fieldset: {
-            legend: {
-              text: proceeding['proceedingType'],
-              classes: "govuk-fieldset__legend--m"
-            }
-          },
-          hint: {
-            text: hint | safe
-          },
           items: [
             {
               value: "granted",
               text: "Grant",
-              checked: checked(certificate['id'], "granted")
-            },
-            {
-              value: "amended",
-              text: "Make changes and grant",
-              checked: checked(certificate['id'], "amended"),
+              checked: checked(certificate['id'], "granted"),
               conditional: {
-                html: amendHtml
+                html: grantHtml
               }
             },
             {
@@ -99,13 +130,12 @@ Merits assessment - substantive
           ]
         })}}
 
-        <div class="govuk-!-padding-top-4"></div>
         {% endif %}
         {% endfor %}
         {% endfor %}
       </div>
 
-      <table class="govuk-table">
+      <table class="govuk-table govuk-!-margin-top-9">
         <caption class="govuk-table__caption govuk-table__caption--m">Cost limits</caption>
         <tbody class="govuk-table__body">
           {% for limitation in application['costLimitations'] %}
@@ -133,79 +163,43 @@ Merits assessment - substantive
         </tbody>
       </table>
 
-      <div class="govuk-!-padding-top-4"></div>
+      {% from "govuk/components/radios/macro.njk" import govukRadios %}
+        {% from "govuk/components/input/macro.njk" import govukInput %}
 
-      <div class="govuk-form-group">
-        <h1 class="govuk-label-wrapper"><label class="govuk-label govuk-label--m" for="granted-substantive">
-            How much should be granted for the substantive certificate?
-          </label>
-        </h1>
+        {% set limitHtml %}
         <div class="govuk-input__wrapper">
-          <div class="govuk-input__prefix" aria-hidden="true">£</div>
-          <input class="govuk-input govuk-input--width-5" id="granted-substantive" name="granted-substantive" value="{{ data['granted-substantive'] }}" type="text" spellcheck="false">
-        </div>
-      </div>
+                    <div class="govuk-input__prefix" aria-hidden="true">£</div>
+                    <input class="govuk-input govuk-input--width-5" id="granted-emergency" name="granted-emergency" value="{{ data['granted-emergency'] }}" type="text" spellcheck="false">
+                  </div>
+        {% endset -%}
 
-      <div class="govuk-!-padding-top-4"></div>
-
-      {% set otherStartDateHtml %}
-      {{ govukDateInput({
-        id: "other-substantive-start-date",
-        namePrefix: "other-substantive-start-date",
-        fieldset: {},
-        hint: {},
-        items: [
-          {
-            classes: "govuk-input--width-2",
-            label: "Day",
-            id: "day",
-            name: "day",
-            value: data['other-substantive-start-date-day']
-          },
-          {
-            classes: "govuk-input--width-2",
-            label: "Month",
-            id: "month",
-            name: "month",
-            value: data['other-substantive-start-date-month']
-          },
-          {
-            classes: "govuk-input--width-4",
-            label: "Year",
-            id: "year",
-            name: "year",
-            value: data['other-substantive-start-date-year']
-          }
-        ]
-      }) }}
-      {% endset -%}
-
-      {{ govukRadios({
-        idPrefix: "substantive-certificate-start-date",
-        name: "substantive-certificate-start-date",
-        fieldset: {
-          legend: {
-            text: "When should the substantive certificate be granted from?",
-            classes: "govuk-fieldset__legend--m"
-          }
-        },
-        hint: {},
-        items: [
-          {
-            value: "Today",
-            text: "Today",
-            checked: checked('substantive-certificate-start-date', "Today")
-          },
-          {
-            value: "Other",
-            text: "Other",
-            checked: checked('substantive-certificate-start-date', "Other"),
-            conditional: {
-              html: otherStartDateHtml
+        {{ govukRadios({
+          name: "contact",
+          fieldset: {
+            legend: {
+              text: "How much should be granted for the emergency certificate?",
+              isPageHeading: true,
+              classes: "govuk-fieldset__legend--s"
             }
-          }
-        ]
-      })}}
+          },
+          items: [
+            {
+              value: "Default limit (amount)",
+              text: "Default limit"
+            },
+            {
+              value: "Requested limit (amount)",
+              text: "Requested limit"
+            },
+            {
+              value: "New limit set by assessor (amount)",
+              text: "New limit",
+              conditional: {
+                html: limitHtml
+              }
+            }
+          ]
+        }) }}
 
       <div class="govuk-!-padding-top-4"></div>
 
