@@ -175,9 +175,6 @@ router.get('/application-details', function(req, res) {
 
         
         // Jo note update
-        if (req.session.data['emergency-note'].length > 0) {
-          note_text = note_text + 'Decision note<p class="govuk-hint">' + req.session.data['emergency-note'] + '</p>'
-        }
         if (req.session.data['substantive-note'].length > 0) {
           note_text = note_text + 'Decision note<p class="govuk-hint">' + req.session.data['substantive-note'] + '</p>'
         }
