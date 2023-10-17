@@ -1,5 +1,163 @@
 module.exports = {
   'applications': [
+// realistic application
+    {
+      'applicationDetails':
+      {
+        'refNo': 'L-I2Z-I3P',
+        'dateSubmitted': '2023-10-30T00:00:00.000Z',
+        'dateLastUpdated': '2023-10-30T00:00:00.000Z',
+        'applicationType': 'Initial application',
+        'delegatedFunctions': 'Used',
+        'categoryLaw': 'Family',
+        'categoryMatter' : 'Domestic Abuse',
+        'meansType': 'Passported',
+        'certificateType': 'Emergency and substantive',
+        'meansAssessmentResult': 'Passported',
+        'meritsAssessmentResult': 'Not started',
+        'applicant':
+        {
+          'name': 'David George Barr',
+          'dob': '1980-05-04T00:00:00.000Z',
+          'nino': 'JT351585B',
+          'address':  'Buckingham Palace</br>London</br>SW1A 1AA',
+        },
+        'provider':
+        {
+          'name': 'David Gray LLP',
+          'firm': 'Gray and Associates at Law',
+          'accountNumber': '0K514R',
+          'address': 'Armitage House</br>108 Petty France</br>London</br>SW2 8QT',
+          'phone': '07123456789'
+        },
+        'opponent':
+        {
+          'name': 'Ellie Ann Barr',
+          'dob': '1987-11-23T00:00:00.000Z',
+          'address': '1 London Road</br>London</br>SW1A 1AA',
+          'relationship': 'Spouse'
+        },
+        'children': [
+          {
+            'name': 'Somerset Michael Morris Barr',
+            'dob': '2020-12-20T00:00:00.000Z',
+            'address': 'Buckingham Palace</br>London</br>SW1A 1AA',
+            'relationship': 'Child'
+          }
+        ],
+        'linkedApplications': [
+          {
+            'refNo': 'L-E1F-G2H',
+            'status': 'Pending merits assessment'
+          },
+          {
+            'refNo': 'L-J1K-L2M',
+            'status': 'Pending billing'
+          },
+          {
+            'refNo': 'L-N1P-Q2R',
+            'status': 'Closed'
+          },
+          {
+            'refNo': 'L-S1T-U2V',
+            'status': 'Closed'
+          }
+        ],
+        'delegatedFunctionsDates': [
+          {
+            'proceedingType': 'Non-molestation order',
+            'dateUsed': '2023-10-16T00:00:00.000Z'
+          },
+          {
+            'proceedingType': 'Child arrangements order (contact)',
+            'dateUsed': 'Not used'
+           }
+        ],
+        'proceedings': [
+          {
+            'id': 'application_1_proceeding_1',
+            'matterType': 'Domestic abuse',
+            'proceedingType': 'Non-molestation order',
+            'meansResult': '',
+            'certificates': [
+              {
+                'id': 'application_1_proceeding_1_certificate_1',
+                'certificateType': 'Emergency certificate',
+                'formOfService': 'Full representation',
+                'scopeLimits' : 'Interim order inc. return date.',
+                'workProviderCanDo': 'Limited to all steps necessary to apply for an interim order; where application is made without notice to include representation on the return date.',
+                'meritsResult': ''
+              },
+              {
+                'id': 'application_1_proceeding_1_certificate_2',
+                'certificateType': 'Substantive certificate',
+                'formOfService': 'Full representation',
+                'scopeLimits' : 'Injunction FLA-to final hearing',
+                'workProviderCanDo': 'As to proceedings under Part IV Family Law Act1996 limited to all steps up to and including obtaining and serving a final order and in the event of breach leading to the exercise of a power of arrest to representation on the consideration of the breach by the court (but excluding applying for a warrant of arrest, if not attached, and representation in contempt proceedings).',
+                'meritsResult': ''
+              }
+            ]
+          },
+          {
+            'id': 'application_1_proceeding_2',
+            'matterType': 'Domestic abuse',
+            'proceedingType': 'Child arrangements order (contact)',
+            'meansResult': '',
+            'certificates': [
+              {
+                'id': 'application_1_proceeding_2_certificate_1',
+                'certificateType': 'Substantive certificate',
+                'formOfService': 'Full representation',
+                'scopeLimits' : 'Hearing-children',
+                'workProviderCanDo': 'Limited to all steps up to and including trial/final hearing and any action necessary to implement (but not enforce) the judgment or order.',
+                'meritsResult': ''
+              }
+            ]
+          }
+        ],
+        'costLimitations': [
+          {
+            'certificateType': 'Emergency certificate',
+            'costLimit': '£2,250',
+            'requestedCostLimit': '£5,000',
+            'justification': 'I will need to do more work on this case to allow me to complete everything successfully.'
+          },
+          {
+            'certificateType': 'Substantive certificate',
+            'costLimit': '£25,000',
+            'requestedCostLimit': '£25,000'
+          }
+        ],
+        'contributions': [],
+        'documents': [
+          {
+            'title': 'Means report',
+            'link': 'https://drive.google.com/file/d/16V-j11_Na8_bBz4fazl-TP5k8odpPbBX/view',
+            'date': '2021-08-18T00:00:00.000Z'
+          },
+          {
+            'title': 'Merits report',
+            'link': 'https://drive.google.com/file/d/19TddAL5MpWAPhDqRCsbggQVVngEHCQA5/view',
+            'date': '2021-08-18T00:00:00.000Z'
+          },
+          {
+            'title': 'Gateway evidence',
+            'link': 'https://drive.google.com/file/d/1m2SvoKEuJySNk3wxpjvfIYHqMTZlisQf/view',
+            'date': '2021-08-18T00:00:00.000Z'
+          },
+          {
+            'title': 'Statement of case',
+            'link': 'https://drive.google.com/file/d/1m2SvoKEuJySNk3wxpjvfIYHqMTZlisQf/view',
+            'date': '2021-08-18T00:00:00.000Z'
+          }
+        ],
+        'notes': []
+      }
+    },
+
+
+
+
     // application #1
     {
       'applicationDetails':

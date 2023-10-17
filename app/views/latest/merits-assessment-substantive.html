@@ -55,12 +55,12 @@ Merits assessment - substantive
               text: "Level of service"
             },
             value: {
-              text: certificate['formOfService']
+              text: data['substantiveLOS'] or certificate['formOfService']
             },
             actions: {
               items: [
                 {
-                  href: "#",
+                  href: "change-level",
                   text: "Change",
                   visuallyHiddenText: "contact details"
                 }
@@ -72,12 +72,12 @@ Merits assessment - substantive
               text: "Scope limitations"
             },
             value: {
-              text: 'Hearing/adjournment'
+              text: data['scope'] or certificate['scopeLimits']
             },
             actions: {
               items: [
                 {
-                  href: "#",
+                  href: "change-scope",
                   text: "Change",
                   visuallyHiddenText: "contact details"
                 }

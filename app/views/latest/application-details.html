@@ -70,7 +70,7 @@ Merits decision saved.
 
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">
-    <h2 class="govuk-heading-xl govuk-!-margin-bottom-2" ><span class="govuk-!-margin-right-2">L-A1B-C2D</span>
+    <h2 class="govuk-heading-xl govuk-!-margin-bottom-2" ><span class="govuk-!-margin-right-2">{{ application['refNo'] }}</span>
     </h2>
     {% if application['linkedApplications'].length > 0 %}
 
@@ -268,7 +268,8 @@ Merits decision saved.
                   Scope limitations
                 </dt>
                 <dd class="govuk-summary-list__value">
-                  {{ certificate['workProviderCanDo'] | safe }}
+                  <strong>{{ certificate['scopeLimits'] | safe }}</strong>
+                  <br>{{ certificate['workProviderCanDo'] | safe }}
                 </dd>
                 
               </div>

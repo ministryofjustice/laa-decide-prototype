@@ -5,7 +5,7 @@ Make merits changes
 {% endblock %}
 
 {% block beforeContent %}
-<a class="govuk-back-link" href="merits-assessment-emergency">Back to merits assessment</a>
+<a class="govuk-back-link" href="merits-assessment-substantive">Back to merits assessment</a>
 {% endblock %}
 
 {% block content %}
@@ -20,7 +20,7 @@ Make merits changes
 
 <div class="govuk-grid-row">  
 <div class="govuk-grid-column-two-thirds">
-    <form action="merits-assessment-emergency" method="post" novalidate="">
+    <form action="merits-assessment-substantive" method="post" novalidate="">
 
       <div class="govuk-form-group">
         <fieldset class="govuk-fieldset" aria-describedby="contact-hint">
@@ -56,6 +56,13 @@ Make merits changes
                 </div>
 
                 <div class="govuk-checkboxes__item">
+                  <input class="govuk-checkboxes__input" id="scope-3" name="scope" type="checkbox" value="Counsel's Opinion">
+                  <label class="govuk-label govuk-checkboxes__label" for="scope-3">
+                    Counsel's Opinion
+                  </label>
+                </div>
+
+                <div class="govuk-checkboxes__item">
                   <input class="govuk-checkboxes__input" id="scope-2" name="scope" type="checkbox" value="Exchange of Evidence">
                   <label class="govuk-label govuk-checkboxes__label" for="scope-2">
                     Exchange of evidence
@@ -63,56 +70,16 @@ Make merits changes
                 </div>
 
                 <div class="govuk-checkboxes__item">
-                  <input class="govuk-checkboxes__input" id="hearing" name="scope" type="checkbox" value="email" aria-controls="conditional-hearing" aria-expanded="false">
-                  <label class="govuk-label govuk-checkboxes__label" for="hearing">
-                    Hearing
+                  <input class="govuk-checkboxes__input" id="scope-2" name="scope" type="checkbox" value="FHH Children">
+                  <label class="govuk-label govuk-checkboxes__label" for="scope-2">
+                    FHH Children
                   </label>
-                </div>
-                <div class="govuk-checkboxes__conditional govuk-checkboxes__conditional--hidden" id="conditional-hearing">
-                  <div class="govuk-form-group">
-                    <fieldset class="govuk-fieldset" role="group" aria-describedby="passport-issued-hint">
-                      <legend class="govuk-fieldset__legend govuk-body">
-                        <h3 class="govuk-fieldset__heading">
-                          Enter the date
-                        </h3>
-                      </legend>
-                      <div id="passport-issued-hint" class="govuk-hint">
-                        For example, 27 3 2007.
-                      </div>
-                      <div class="govuk-date-input" id="passport-issued">
-                        <div class="govuk-date-input__item">
-                          <div class="govuk-form-group">
-                            <label class="govuk-label govuk-date-input__label" for="passport-issued-day">
-                              Day
-                            </label>
-                            <input class="govuk-input govuk-date-input__input govuk-input--width-2" id="passport-issued-day" name="passport-issued-day" type="text" inputmode="numeric">
-                          </div>
-                        </div>
-                        <div class="govuk-date-input__item">
-                          <div class="govuk-form-group">
-                            <label class="govuk-label govuk-date-input__label" for="passport-issued-month">
-                              Month
-                            </label>
-                            <input class="govuk-input govuk-date-input__input govuk-input--width-2" id="passport-issued-month" name="passport-issued-month" type="text" inputmode="numeric">
-                          </div>
-                        </div>
-                        <div class="govuk-date-input__item">
-                          <div class="govuk-form-group">
-                            <label class="govuk-label govuk-date-input__label" for="passport-issued-year">
-                              Year
-                            </label>
-                            <input class="govuk-input govuk-date-input__input govuk-input--width-4" id="passport-issued-year" name="passport-issued-year" type="text" inputmode="numeric">
-                          </div>
-                        </div>
-                      </div>
-                    </fieldset>
-                  </div>
                 </div>
 
                 <div class="govuk-checkboxes__item">
-                  <input class="govuk-checkboxes__input" id="scope-5" name="scope" type="checkbox" value="Hearing-children">
-                  <label class="govuk-label govuk-checkboxes__label" for="scope-5">
-                    Hearing: children
+                  <input class="govuk-checkboxes__input" id="hearing" name="scope" type="checkbox" value="Hearing">
+                  <label class="govuk-label govuk-checkboxes__label" for="hearing">
+                    Hearing
                   </label>
                 </div>
                 <div class="govuk-checkboxes__item">
@@ -125,6 +92,12 @@ Make merits changes
                   <input class="govuk-checkboxes__input" id="scope-7" name="scope" type="checkbox" value="Interim order including return date">
                   <label class="govuk-label govuk-checkboxes__label" for="scope-7">
                     Interim order including return date
+                  </label>
+                </div>
+                <div class="govuk-checkboxes__item">
+                  <input class="govuk-checkboxes__input" id="scope-5" name="scope" type="checkbox" value="Section 37 Report">
+                  <label class="govuk-label govuk-checkboxes__label" for="scope-5">
+                    Section 37 Report
                   </label>
                 </div>
 
@@ -140,7 +113,7 @@ Make merits changes
             {{ govukButton({
               text: "Cancel",
               classes: "govuk-button--secondary",
-              href: "merits-assessment-emergency"
+              href: "merits-assessment-substantive"
             }) }}
       </form>
     </div>
