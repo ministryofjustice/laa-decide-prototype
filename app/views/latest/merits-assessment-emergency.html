@@ -49,23 +49,6 @@ Merits assessment - emergency
           },
           {
             key: {
-              text: "Scope limitations"
-            },
-            value: {
-              text: 'Hearing/adjournment'
-            },
-            actions: {
-              items: [
-                {
-                  href: "change-scope",
-                  text: "Change",
-                  visuallyHiddenText: "contact details"
-                }
-              ]
-            }
-          },
-          {
-            key: {
               text: "Level of service"
             },
             value: {
@@ -75,6 +58,23 @@ Merits assessment - emergency
               items: [
                 {
                   href: "change-level",
+                  text: "Change",
+                  visuallyHiddenText: "contact details"
+                }
+              ]
+            }
+          },
+          {
+            key: {
+              text: "Scope limitations"
+            },
+            value: {
+              text: 'Hearing/adjournment'
+            },
+            actions: {
+              items: [
+                {
+                  href: "change-scope",
                   text: "Change",
                   visuallyHiddenText: "contact details"
                 }
@@ -145,7 +145,7 @@ Merits assessment - emergency
 
 
          <table class="govuk-table govuk-!-margin-top-9">
-          <caption class="govuk-table__caption govuk-table__caption--m">Cost limits</caption>
+          <caption class="govuk-table__caption govuk-table__caption--l">Cost limits</caption>
           <tbody class="govuk-table__body">
             {% for limitation in application['costLimitations'] %}
             {% if limitation['certificateType'] == 'Emergency certificate' %}

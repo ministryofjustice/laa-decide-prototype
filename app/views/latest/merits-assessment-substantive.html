@@ -52,10 +52,10 @@ Merits assessment - substantive
           },
           {
             key: {
-              text: "Scope limitations"
+              text: "Level of service"
             },
             value: {
-              text: 'Hearing/adjournment'
+              text: certificate['formOfService']
             },
             actions: {
               items: [
@@ -69,10 +69,10 @@ Merits assessment - substantive
           },
           {
             key: {
-              text: "Level of service"
+              text: "Scope limitations"
             },
             value: {
-              text: certificate['formOfService']
+              text: 'Hearing/adjournment'
             },
             actions: {
               items: [
@@ -136,7 +136,7 @@ Merits assessment - substantive
       </div>
 
       <table class="govuk-table govuk-!-margin-top-9">
-        <caption class="govuk-table__caption govuk-table__caption--m">Cost limits</caption>
+        <caption class="govuk-table__caption govuk-table__caption--l">Cost limits</caption>
         <tbody class="govuk-table__body">
           {% for limitation in application['costLimitations'] %}
           {% if limitation['certificateType'] == 'Substantive certificate' %}
@@ -204,7 +204,7 @@ Merits assessment - substantive
       <div class="govuk-!-padding-top-4"></div>
 
       <div class="govuk-form-group">
-        <label class="govuk-label govuk-label--m" for="substantive-note">
+        <label class="govuk-label govuk-label--l" for="substantive-note">
           Give further details
         </label>
         <div id="note-hint" class="govuk-hint">
