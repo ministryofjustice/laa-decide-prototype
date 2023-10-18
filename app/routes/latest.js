@@ -6,10 +6,12 @@
 const govukPrototypeKit = require('govuk-prototype-kit')
 const router = govukPrototypeKit.requests.setupRouter()
 
+// Add your services here
+
+const { NoteService } = require("../services");
+
+
 // Add your routes here
-
-const moment = require('moment');
-
 router.get('/my-applications', function(req, res) {
   req.session.data['request-more-information'] = '';
 
@@ -32,17 +34,15 @@ router.get('/my-applications', function(req, res) {
 
     if (refNoToRemove == null){
       // add an item to the application history
-      var new_note = {
-                  'when': moment(),
-                  'who': 'You',
-                  'role': null,
-                  'title': 'Application added to workload',
-                  'text': null
-                };
-
+      // this keeps being added
+          let new_note =  NoteService.createNote(
+          'You',
+          'Application added to workload',
+          null );
       application.applicationDetails.notes.push(new_note);
     }
   }
+
 
   // if a refNoToRemove exists then we are unassigning an application
   if (refNoToRemove != null){
@@ -65,15 +65,11 @@ router.get('/my-applications', function(req, res) {
       other_reason = ' - ' + req.session.data['removal-reason-other'];
     }
 
-    var new_note = {
-                'when': moment(),
-                'who': 'You',
-                'role': null,
-                'title': 'Application removed from workload',
-                'text': req.session.data['removal-reason'] + other_reason
-              };
 
-    application.applicationDetails.notes.push(new_note);
+    application.applicationDetails.notes.push(NoteService.createNote(
+        'You',
+        'Application removed from workload',
+        req.session.data['removal-reason'] + other_reason ));
   }
 
   req.session.data.refNo = null;
@@ -93,15 +89,11 @@ router.get('/request-info-note', function(req, res) {
 
   // if a request for further info has been made, add an item to the application history
   if (req.session.data['request-more-information']) {
-    var new_note = {
-                'when': moment(),
-                'who': 'You',
-                'role': null,
-                'title': 'Further information requested',
-                'text': null
-              };
 
-    application.applicationDetails.notes.push(new_note);
+
+    application.applicationDetails.notes.push(NoteService.createNote('You',
+        'Further information requested',
+        null ));
     req.session.data['request-more-information'] = 'display-banner-now';
   }
   res.redirect('./application-details');
@@ -174,22 +166,18 @@ router.get('/application-details', function(req, res) {
         }
 
         
-        // Jo note update
-        if (req.session.data['substantive-note'].length > 0) {
+        // note update
+        if (req.session.data['emergency-note'] && req.session.data['emergency-note'].length>0) {
+          note_text = note_text + 'Decision note<p class="govuk-hint">' + req.session.data['emergency-note'] + '</p>'
+        }
+        if (req.session.data['substantive-note'] && req.session.data['substantive-note'].length > 0) {
           note_text = note_text + 'Decision note<p class="govuk-hint">' + req.session.data['substantive-note'] + '</p>'
         }
 
-
-        // add an item to the application history
-        var new_note = {
-                    'when': moment(),
-                    'who': 'You',
-                    'role': null,
-                    'title': 'Merits decision made',
-                    'text': note_text
-                  };
-
-        application.applicationDetails.notes.push(new_note);
+        application.applicationDetails.notes.push(NoteService.createNote(
+            'You',
+            'Merits decision made',
+            note_text ));
       }
     }
     req.session.data['merits_continue_button'] = '';
@@ -255,15 +243,11 @@ router.get('/application-details', function(req, res) {
       note_text = note_text + proceeding['proceedingType'] + ': ' + proceeding['meansResult'] + '<br>';
     }
 
-    var new_note = {
-                'when': moment(),
-                'who': 'You',
-                'role': null,
-                'title': 'Means decision made',
-                'text': note_text
-              };
+    application.applicationDetails.notes.push(NoteService.createNote(
+        'You',
+        'Means decision made',
+        note_text ));
 
-    application.applicationDetails.notes.push(new_note);
     req.session.data['means_continue_button'] = '';
     req.session.data['update_all_means'] = '';
     req.session.data['contributionCorrect'] = '';
@@ -274,8 +258,20 @@ router.get('/application-details', function(req, res) {
   }
 
   res.locals.data['application'] = application;
-  res.render('./latest/application-details');
-});
+  // redirect to a final decision page if necessary
+  const application_details = application['applicationDetails']
+  const decided_states = ['granted', 'refused', 'partially granted', 'Passported']
+  if (decided_states.includes(application_details['meritsAssessmentResult']) &&
+      decided_states.includes(application_details['meansAssessmentResult'])
+      && res.locals.data['merits_continue_button'] =='Save and continue' || res.locals.data['means_continue_button'] =='Save and continue')
+  {
+    res.render('./latest/open-applications');
+  }
+  else{
+    res.render('./latest/application-details');}
+
+}
+);
 
 router.get('/application-history', function(req, res) {
   var application = null;
@@ -484,16 +480,12 @@ router.post('/reject-application', function(req, res) {
   }
 
   // add an item to the application history
-  var new_note = {
-              'when': moment(),
-              'who': 'You',
-              'role': null,
-              'title': 'Application sent back to provider',
-              'text': req.session.data['rejection-reason'] + other_reason
-            };
 
-  application.applicationDetails.notes.push(new_note);
 
+  application.applicationDetails.notes.push(NoteService.createNote(
+      'You',
+      'Application sent back to provider',
+      req.session.data['rejection-reason'] + other_reason ));
   res.redirect('./application-details');
 });
 
@@ -507,16 +499,11 @@ router.post('/add-note', function(req, res) {
   }
 
   // add an item to the application history
-  var new_note = {
-              'when': moment(),
-              'who': 'You',
-              'role': null,
-              'title': 'User note',
-              'text': req.session.data['note']
-            };
 
-  application.applicationDetails.notes.push(new_note);
-
+  application.applicationDetails.notes.push(NoteService.createNote(
+      'You',
+      'User note',
+      req.session.data['note']));
   res.redirect('./application-history');
 });
 
