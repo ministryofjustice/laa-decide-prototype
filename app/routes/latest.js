@@ -11,7 +11,7 @@ const router = govukPrototypeKit.requests.setupRouter()
 const { ApplicationService } = require("../services");
 
 // Add your routes here
-router.get('/my-applications', function(req, res) {
+router.get('/my-applications', async function(req, res) {
   req.session.data['request-more-information'] = '';
 
   var refNo = req.session.data.refNo;
@@ -19,12 +19,12 @@ router.get('/my-applications', function(req, res) {
 
 
   if (refNo != null){
-    ApplicationService.assign_application(req)
+    const is_assigned = await ApplicationService.assign_application(req)
   }
 
   // if a refNoToRemove exists then we are un-assigning an application
   if (refNoToRemove != null){
-      ApplicationService.unassign_application(req)
+    const is_unassigned = await ApplicationService.unassign_application(req)
   }
 
   req.session.data.refNo = null;
