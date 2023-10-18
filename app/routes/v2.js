@@ -169,6 +169,7 @@ router.post('/merits-assessment-substantive', function(req, res) {
   }
 });
 
+//this route is not used beyond v4
 router.post('/refuse-application', function(req, res) {
   var application = null;
 
@@ -209,6 +210,7 @@ router.post('/refuse-application', function(req, res) {
     res.redirect(307, './merits-assessment-substantive');
   }
 });
+
 
 router.get('/substantive-update-all', function(req, res) {
   if (req.session.data.update_all_substantive === 'Refuse all'){

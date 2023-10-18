@@ -2,7 +2,6 @@
   * this is where we create a note that can be pushed to the application stack
 */
 const moment = require('moment');
-const {ApplicationService} = require("./index");
 
 const create_note =  (user_display_name, title, content) => {
     try {
@@ -61,8 +60,19 @@ const unassign_application = async (req) => {
     } catch (e) {
     throw new Error(e.message)
 }
+    }
+
+const update_merits_results = async (req) => {
+    for (const proceeding of find_application(req)['applicationDetails']['proceedings']) {
+        for (const certificate of proceeding['certificates']) {
+            if (typeof req.session.data[certificate['id']] !== 'undefined' && req.session.data[certificate['id']] !== null) {
+                certificate['meritsResult'] = req.session.data[certificate['id']];
+            }
+        }
 
     }
+    return true;
+}
 
 
 
@@ -70,5 +80,6 @@ module.exports = {
     create_note,
     find_application,
     assign_application,
-    unassign_application
+    unassign_application,
+    update_merits_results
 }
