@@ -8,8 +8,7 @@ const router = govukPrototypeKit.requests.setupRouter()
 
 // Add your services here
 
-const { NoteService } = require("../services");
-
+const { ApplicationService } = require("../services");
 
 // Add your routes here
 router.get('/my-applications', function(req, res) {
@@ -18,58 +17,14 @@ router.get('/my-applications', function(req, res) {
   var refNo = req.session.data.refNo;
   var refNoToRemove = req.session.data.refNoToRemove;
 
-  // if a refNo exists then we are assigning an application
+
   if (refNo != null){
-    if (!req.session.data.assignedApplications.includes(refNo)){
-      req.session.data.assignedApplications.push(refNo);
-    }
-
-    var application = null;
-
-    // find the application
-    for (const app of req.session.data.applications) {
-      if (app.applicationDetails.refNo === req.session.data.refNo)
-        application = app;
-    }
-
-    if (refNoToRemove == null){
-      // add an item to the application history
-      // this keeps being added
-          let new_note =  NoteService.createNote(
-          'You',
-          'Application added to workload',
-          null );
-      application.applicationDetails.notes.push(new_note);
-    }
+    ApplicationService.assign_application(req)
   }
 
-
-  // if a refNoToRemove exists then we are unassigning an application
+  // if a refNoToRemove exists then we are un-assigning an application
   if (refNoToRemove != null){
-    const index = req.session.data.assignedApplications.indexOf(refNoToRemove);
-    if (index > -1) {
-      req.session.data.assignedApplications.splice(index, 1);
-    }
-
-    var application = null;
-
-    // find the application
-    for (const app of req.session.data.applications) {
-      if (app.applicationDetails.refNo === req.session.data.refNo)
-        application = app;
-    }
-
-    // add an item to the application history
-    var other_reason = '';
-    if (req.session.data['removal-reason-other']){
-      other_reason = ' - ' + req.session.data['removal-reason-other'];
-    }
-
-
-    application.applicationDetails.notes.push(NoteService.createNote(
-        'You',
-        'Application removed from workload',
-        req.session.data['removal-reason'] + other_reason ));
+      ApplicationService.unassign_application(req)
   }
 
   req.session.data.refNo = null;
@@ -91,7 +46,7 @@ router.get('/request-info-note', function(req, res) {
   if (req.session.data['request-more-information']) {
 
 
-    application.applicationDetails.notes.push(NoteService.createNote('You',
+    application.applicationDetails.notes.push(ApplicationService.createNote('You',
         'Further information requested',
         null ));
     req.session.data['request-more-information'] = 'display-banner-now';
@@ -165,16 +120,11 @@ router.get('/application-details', function(req, res) {
           note_text = note_text + '</p>';
         }
 
-        
-        // note update
-        if (req.session.data['emergency-note'] && req.session.data['emergency-note'].length>0) {
-          note_text = note_text + 'Decision note<p class="govuk-hint">' + req.session.data['emergency-note'] + '</p>'
-        }
         if (req.session.data['substantive-note'] && req.session.data['substantive-note'].length > 0) {
           note_text = note_text + 'Decision note<p class="govuk-hint">' + req.session.data['substantive-note'] + '</p>'
         }
 
-        application.applicationDetails.notes.push(NoteService.createNote(
+        application.applicationDetails.notes.push(ApplicationService.createNote(
             'You',
             'Merits decision made',
             note_text ));
@@ -243,7 +193,7 @@ router.get('/application-details', function(req, res) {
       note_text = note_text + proceeding['proceedingType'] + ': ' + proceeding['meansResult'] + '<br>';
     }
 
-    application.applicationDetails.notes.push(NoteService.createNote(
+    application.applicationDetails.notes.push(ApplicationService.createNote(
         'You',
         'Means decision made',
         note_text ));
@@ -482,7 +432,7 @@ router.post('/reject-application', function(req, res) {
   // add an item to the application history
 
 
-  application.applicationDetails.notes.push(NoteService.createNote(
+  application.applicationDetails.notes.push(ApplicationService.createNote(
       'You',
       'Application sent back to provider',
       req.session.data['rejection-reason'] + other_reason ));
@@ -500,7 +450,7 @@ router.post('/add-note', function(req, res) {
 
   // add an item to the application history
 
-  application.applicationDetails.notes.push(NoteService.createNote(
+  application.applicationDetails.notes.push(ApplicationService.createNote(
       'You',
       'User note',
       req.session.data['note']));
