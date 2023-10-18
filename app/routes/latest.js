@@ -39,7 +39,6 @@ router.get('/my-applications', function(req, res) {
           'You',
           'Application added to workload',
           null );
-          console.log(new_note);
       application.applicationDetails.notes.push(new_note);
     }
   }
@@ -167,8 +166,11 @@ router.get('/application-details', function(req, res) {
         }
 
         
-        // Jo note update
-        if (req.session.data['substantive-note'].length > 0) {
+        // note update
+        if (req.session.data['emergency-note'] && req.session.data['emergency-note'].length>0) {
+          note_text = note_text + 'Decision note<p class="govuk-hint">' + req.session.data['emergency-note'] + '</p>'
+        }
+        if (req.session.data['substantive-note'] && req.session.data['substantive-note'].length > 0) {
           note_text = note_text + 'Decision note<p class="govuk-hint">' + req.session.data['substantive-note'] + '</p>'
         }
 
@@ -246,7 +248,6 @@ router.get('/application-details', function(req, res) {
         'Means decision made',
         note_text ));
 
-    // application.applicationDetails.notes.push(new_note);
     req.session.data['means_continue_button'] = '';
     req.session.data['update_all_means'] = '';
     req.session.data['contributionCorrect'] = '';
@@ -257,8 +258,20 @@ router.get('/application-details', function(req, res) {
   }
 
   res.locals.data['application'] = application;
-  res.render('./latest/application-details');
-});
+  // redirect to a final decision page if necessary
+  const application_details = application['applicationDetails']
+  const decided_states = ['granted', 'refused', 'partially granted', 'Passported']
+  if (decided_states.includes(application_details['meritsAssessmentResult']) &&
+      decided_states.includes(application_details['meansAssessmentResult'])
+      && res.locals.data['merits_continue_button'] =='Save and continue' || res.locals.data['means_continue_button'] =='Save and continue')
+  {
+    res.render('./latest/open-applications');
+  }
+  else{
+    res.render('./latest/application-details');}
+
+}
+);
 
 router.get('/application-history', function(req, res) {
   var application = null;
