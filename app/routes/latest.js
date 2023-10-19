@@ -17,7 +17,7 @@ router.get('/my-applications', async function(req, res) {
   var refNo = req.session.data.refNo;
   var refNoToRemove = req.session.data.refNoToRemove;
 
-
+//if a refNo exists then we "may" be assigning, usually only if we came from open applications
   if (refNo != null){
     const is_assigned = await ApplicationService.assign_application(req)
   }
@@ -38,7 +38,8 @@ router.get('/request-info-note', function(req, res) {
 
   // if a request for further info has been made, add an item to the application history
   if (req.session.data['request-more-information']) {
-    application.applicationDetails.notes.push(ApplicationService.create_note('You',
+    application.applicationDetails.notes.push(
+        ApplicationService.create_note('You',
         'Further information requested',
         null ));
     req.session.data['request-more-information'] = 'display-banner-now';
@@ -59,7 +60,6 @@ router.get('/application-details', async function(req, res) {
       var grants = 0;
       var refusals = 0;
       var total_proceedings = 0;
-      let application = ApplicationService.find_application(req);
       for (const proceeding of application['applicationDetails']['proceedings']){
         for (const certificate of proceeding['certificates']){
           if ((certificate['meritsResult'] == 'granted') || (certificate['meritsResult'] == 'amended')){
@@ -333,28 +333,8 @@ router.get('/substantive-update-all', function(req, res) {
   }
 });
 
-router.post('/reject-application', function(req, res) {
-  let application = ApplicationService.find_application(req);
-
-  application['applicationDetails']['meritsAssessmentResult'] = 'rejected';
-  application['applicationDetails']['meansAssessmentResult'] = 'rejected';
-
-  var other_reason = '';
-  if (req.session.data['rejection-reason-other']){
-    other_reason = ' - ' + req.session.data['rejection-reason-other'];
-  }
-  else{
-    if (req.session.data['incorrect-means']){
-      other_reason = ' - ' + req.session.data['incorrect-means'];
-    }
-  }
-
-  // add an item to the application history
-
-  application.applicationDetails.notes.push(ApplicationService.create_note(
-      'You',
-      'Application sent back to provider',
-      req.session.data['rejection-reason'] + other_reason ));
+router.post('/reject-application', async function(req, res) {
+  const application_rejected = await ApplicationService.return_application_to_provider(req)
   res.redirect('./application-details');
 });
 
