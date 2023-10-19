@@ -299,6 +299,19 @@ router.get('/people', function(req, res) {
   res.render('./latest/people');
 });
 
+router.get('/decision', function(req, res) {
+  var application = null;
+
+  // find the application
+  for (const app of req.session.data.applications) {
+    if (app.applicationDetails.refNo === req.session.data.refNo)
+      application = app;
+  }
+
+  res.locals.data['application'] = application;
+  res.render('./latest/decision');
+});
+
 router.get('/merits-assessment-emergency', function(req, res) {
   var application = null;
 

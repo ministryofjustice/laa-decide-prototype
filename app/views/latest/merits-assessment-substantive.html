@@ -169,15 +169,15 @@ Merits assessment - substantive
         {% set limitHtml %}
         <div class="govuk-input__wrapper">
                     <div class="govuk-input__prefix" aria-hidden="true">£</div>
-                    <input class="govuk-input govuk-input--width-5" id="granted-emergency" name="granted-emergency" value="{{ data['granted-emergency'] }}" type="text" spellcheck="false">
+                    <input class="govuk-input govuk-input--width-5" id="substantiveCostAmount" name="substantiveCostAmount" value="{{ data['substantiveCostAmount'] }}" type="text" spellcheck="false">
                   </div>
         {% endset -%}
 
         {{ govukRadios({
-          name: "contact",
+          name: "substantiveCost",
           fieldset: {
             legend: {
-              text: "How much should be granted for the emergency certificate?",
+              text: "How much should be granted for the substantive certificate?",
               isPageHeading: true,
               classes: "govuk-fieldset__legend--s"
             }

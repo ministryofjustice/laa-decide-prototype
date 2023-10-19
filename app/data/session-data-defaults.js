@@ -246,6 +246,7 @@ module.exports = {
                 'id': 'application_1_proceeding_1_certificate_1',
                 'certificateType': 'Emergency certificate',
                 'formOfService': 'Full representation',
+                'scopeLimits' : 'Example scope',
                 'workProviderCanDo': 'All steps up to and including the hearing on 21 September 2021.',
                 'meritsResult': ''
               },
@@ -253,6 +254,7 @@ module.exports = {
                 'id': 'application_1_proceeding_1_certificate_2',
                 'certificateType': 'Substantive certificate',
                 'formOfService': 'Full representation',
+                'scopeLimits' : 'Example scope',
                 'workProviderCanDo': 'All steps up to and including getting and serving a final order. If the order is breached you can apply for power of arrest. You cannot apply for a warrant of arrest or contempt of court proceedings.',
                 'meritsResult': ''
               }
@@ -268,6 +270,7 @@ module.exports = {
                 'id': 'application_1_proceeding_2_certificate_1',
                 'certificateType': 'Substantive certificate',
                 'formOfService': 'Family Help (Higher)',
+                'scopeLimits' : 'Example scope',
                 'workProviderCanDo': 'Limited to Family Help (Higher) and to all steps necessary to negotiate and conclude a settlement. To include the issue of proceedings and representation in those proceedings save in relation to or at a contested final hearing.',
                 'meritsResult': ''
               }
@@ -283,6 +286,7 @@ module.exports = {
                 'id': 'application_1_proceeding_3_certificate_1',
                 'certificateType': 'Emergency certificate',
                 'formOfService': 'Family Help (Higher)',
+                'scopeLimits' : 'Example scope',
                 'workProviderCanDo': 'Limited to Family Help (Higher) and to all steps necessary to negotiate and conclude a settlement. To include the issue of proceedings and representation in those proceedings save in relation to or at a contested final hearing.',
                 'meritsResult': ''
               },
@@ -290,6 +294,7 @@ module.exports = {
                 'id': 'application_1_proceeding_3_certificate_2',
                 'certificateType': 'Substantive certificate',
                 'formOfService': 'Family Help (Higher)',
+                'scopeLimits' : 'Example scope',
                 'workProviderCanDo': 'Limited to Family Help (Higher) and to all steps necessary to negotiate and conclude a settlement. To include the issue of proceedings and representation in those proceedings save in relation to or at a contested final hearing.',
                 'meritsResult': ''
               }
@@ -404,6 +409,7 @@ module.exports = {
                 'id': 'application_2_proceeding_1_certificate_1',
                 'certificateType': 'Emergency certificate',
                 'formOfService': 'Full representation',
+                'scopeLimits' : 'Example scope',
                 'workProviderCanDo': 'All steps up to and including the hearing on 21 September 2021.',
                 'meritsResult': ''
               },
@@ -411,6 +417,7 @@ module.exports = {
                 'id': 'application_2_proceeding_1_certificate_2',
                 'certificateType': 'Substantive certificate',
                 'formOfService': 'Full representation',
+                'scopeLimits' : 'Example scope',
                 'workProviderCanDo': 'All steps up to and including getting and serving a final order. If the order is breached you can apply for power of arrest. You cannot apply for a warrant of arrest or contempt of court proceedings.',
                 'meritsResult': ''
               }
@@ -506,6 +513,7 @@ module.exports = {
                 'id': 'application_3_proceeding_1_certificate_1',
                 'certificateType': 'Emergency certificate',
                 'formOfService': 'Full representation',
+                'scopeLimits' : 'Example scope',
                 'workProviderCanDo': 'All steps up to and including the hearing on 21 September 2021.',
                 'meritsResult': ''
               },
@@ -513,6 +521,7 @@ module.exports = {
                 'id': 'application_3_proceeding_1_certificate_2',
                 'certificateType': 'Substantive certificate',
                 'formOfService': 'Full representation',
+                'scopeLimits' : 'Example scope',
                 'workProviderCanDo': 'All steps up to and including getting and serving a final order. If the order is breached you can apply for power of arrest. You cannot apply for a warrant of arrest or contempt of court proceedings.',
                 'meritsResult': ''
               }
@@ -603,6 +612,7 @@ module.exports = {
                 'id': 'application_4_proceeding_1_certificate_1',
                 'certificateType': 'Substantive certificate',
                 'formOfService': 'Full representation',
+                'scopeLimits' : 'Example scope',
                 'workProviderCanDo': 'All steps up to and including getting and serving a final order. If the order is breached you can apply for power of arrest. You cannot apply for a warrant of arrest or contempt of court proceedings.',
                 'meritsResult': ''
               }
@@ -641,7 +651,7 @@ module.exports = {
     {
       'applicationDetails':
       {
-        'refNo': 'L-D5A-A6L',
+        'refNo': 'L-C6Z-B7K',
         'dateSubmitted': '2023-08-31T00:00:00.000Z',
         'dateLastUpdated': '2023-08-31T00:00:00.000Z',
         'applicationType': 'Initial application',
@@ -688,6 +698,7 @@ module.exports = {
                 'id': 'application_5_proceeding_1_certificate_1',
                 'certificateType': 'Substantive certificate',
                 'formOfService': 'Full representation',
+                'scopeLimits' : 'Example scope',
                 'workProviderCanDo': 'All steps up to and including getting and serving a final order. If the order is breached you can apply for power of arrest. You cannot apply for a warrant of arrest or contempt of court proceedings.',
                 'meritsResult': ''
               }
@@ -703,6 +714,7 @@ module.exports = {
                 'id': 'application_5_proceeding_2_certificate_1',
                 'certificateType': 'Substantive certificate',
                 'formOfService': 'Family Help (Higher)',
+                'scopeLimits' : 'Example scope',
                 'workProviderCanDo': 'Limited to Family Help (Higher) and to all steps necessary to negotiate and conclude a settlement. To include the issue of proceedings and representation in those proceedings save in relation to or at a contested final hearing.',
                 'meritsResult': ''
               }
@@ -797,6 +809,7 @@ module.exports = {
                 'id': 'application_6_proceeding_1_certificate_1',
                 'certificateType': 'Substantive certificate',
                 'formOfService': 'Full representation',
+                'scopeLimits' : 'Example scope',
                 'workProviderCanDo': 'All steps up to and including getting and serving a final order. If the order is breached you can apply for power of arrest. You cannot apply for a warrant of arrest or contempt of court proceedings.',
                 'meritsResult': ''
               }
@@ -812,6 +825,7 @@ module.exports = {
                 'id': 'application_6_proceeding_2_certificate_1',
                 'certificateType': 'Substantive certificate',
                 'formOfService': 'Family Help (Higher)',
+                'scopeLimits' : 'Example scope',
                 'workProviderCanDo': 'Limited to Family Help (Higher) and to all steps necessary to negotiate and conclude a settlement. To include the issue of proceedings and representation in those proceedings save in relation to or at a contested final hearing.',
                 'meritsResult': ''
               }
@@ -859,7 +873,7 @@ module.exports = {
     {
       'applicationDetails':
       {
-        'refNo': 'L-A2G-H4Q',
+        'refNo': 'L-B3H-J8L',
         'dateSubmitted': '2023-08-26T00:00:00.000Z',
         'dateLastUpdated': '2023-08-30T00:00:00.000Z',
         'applicationType': 'Initial application',
@@ -911,6 +925,7 @@ module.exports = {
                 'id': 'application_7_proceeding_1_certificate_1',
                 'certificateType': 'Emergency certificate',
                 'formOfService': 'Full representation',
+                'scopeLimits' : 'Example scope',
                 'workProviderCanDo': 'All steps up to and including the hearing on 21 September 2021.',
                 'meritsResult': ''
               },
@@ -918,6 +933,7 @@ module.exports = {
                 'id': 'application_7_proceeding_1_certificate_2',
                 'certificateType': 'Substantive certificate',
                 'formOfService': 'Full representation',
+                'scopeLimits' : 'Example scope',
                 'workProviderCanDo': 'All steps up to and including getting and serving a final order. If the order is breached you can apply for power of arrest. You cannot apply for a warrant of arrest or contempt of court proceedings.',
                 'meritsResult': ''
               }
@@ -961,7 +977,7 @@ module.exports = {
     {
       'applicationDetails':
       {
-        'refNo': 'L-F4R-E5M',
+        'refNo': 'L-E3S-D6N',
         'dateSubmitted': '2023-08-26T00:00:00.000Z',
         'dateLastUpdated': '2023-09-11T00:00:00.000Z',
         'applicationType': 'Initial application',
@@ -1008,6 +1024,7 @@ module.exports = {
                 'id': 'application_4_proceeding_1_certificate_1',
                 'certificateType': 'Substantive certificate',
                 'formOfService': 'Full representation',
+                'scopeLimits' : 'Example scope',
                 'workProviderCanDo': 'All steps up to and including getting and serving a final order. If the order is breached you can apply for power of arrest. You cannot apply for a warrant of arrest or contempt of court proceedings.',
                 'meritsResult': ''
               }
@@ -1093,6 +1110,7 @@ module.exports = {
                 'id': 'application_5_proceeding_1_certificate_1',
                 'certificateType': 'Substantive certificate',
                 'formOfService': 'Full representation',
+                'scopeLimits' : 'Example scope',
                 'workProviderCanDo': 'All steps up to and including getting and serving a final order. If the order is breached you can apply for power of arrest. You cannot apply for a warrant of arrest or contempt of court proceedings.',
                 'meritsResult': ''
               }
@@ -1108,6 +1126,7 @@ module.exports = {
                 'id': 'application_5_proceeding_2_certificate_1',
                 'certificateType': 'Substantive certificate',
                 'formOfService': 'Family Help (Higher)',
+                'scopeLimits' : 'Example scope',
                 'workProviderCanDo': 'Limited to Family Help (Higher) and to all steps necessary to negotiate and conclude a settlement. To include the issue of proceedings and representation in those proceedings save in relation to or at a contested final hearing.',
                 'meritsResult': ''
               }
@@ -1202,6 +1221,7 @@ module.exports = {
                 'id': 'application_10_proceeding_1_certificate_1',
                 'certificateType': 'Substantive certificate',
                 'formOfService': 'Full representation',
+                'scopeLimits' : 'Example scope',
                 'workProviderCanDo': 'All steps up to and including getting and serving a final order. If the order is breached you can apply for power of arrest. You cannot apply for a warrant of arrest or contempt of court proceedings.',
                 'meritsResult': ''
               }
@@ -1217,6 +1237,7 @@ module.exports = {
                 'id': 'application_10_proceeding_2_certificate_1',
                 'certificateType': 'Substantive certificate',
                 'formOfService': 'Family Help (Higher)',
+                'scopeLimits' : 'Example scope',
                 'workProviderCanDo': 'Limited to Family Help (Higher) and to all steps necessary to negotiate and conclude a settlement. To include the issue of proceedings and representation in those proceedings save in relation to or at a contested final hearing.',
                 'meritsResult': ''
               }
