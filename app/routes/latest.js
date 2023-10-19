@@ -5,7 +5,8 @@
 
 const govukPrototypeKit = require('govuk-prototype-kit')
 const router = govukPrototypeKit.requests.setupRouter()
-
+const DECIDED_STATES = ['granted', 'refused', 'partially granted', 'Passported']
+const NOT_DECIDED_STATES = ['Not started', 'In progress', 'rejected']
 // Add your services here
 
 const { ApplicationService } = require("../services");
@@ -48,29 +49,36 @@ router.get('/request-info-note', function(req, res) {
   res.redirect('./application-details');
 });
 
-router.get('/application-details', async function(req, res) {
+router.get('/application-details', async function(req, res)
+{
   //update substantive proceeding merits results if have come from the merits page
   let application = ApplicationService.find_application(req);
   const considered_merits = await ApplicationService.update_merits_certificate_decisions(req);
-  //so update_all_substantive not being used in latest (beyond v4),
-      // merits_continue button is on both emergency and substantive pages
-  if ((req.session.data['merits_continue_button']) || (req.session.data['update_all_substantive'])){
-    if (req.session.data['merits_continue_button'] != "Save and come back later"){
+  //so update_all_substantive not being used in latest (beyond v4)
+  // merits_continue button is on both emergency and substantive pages
+  if ((req.session.data['merits_continue_button']) || (req.session.data['update_all_substantive']))
+  {
+    if (req.session.data['merits_continue_button'] != "Save and come back later")
+    {
       const merit_result_updated = await ApplicationService.update_overall_decision(req, 'merit');
-      if ((application['applicationDetails']['meritsAssessmentResult'] != "Not started")
-          && (application['applicationDetails']['meritsAssessmentResult'] != "In progress")
-          && (application['applicationDetails']['meritsAssessmentResult'] != "rejected")){
 
-        var note_text = '';
-        for(let proceeding of application['applicationDetails']['proceedings']) {
+      if (!NOT_DECIDED_STATES.includes(application['applicationDetails']['meritsAssessmentResult']))
+      {
+        //create an application note if merits decision made,
+        // rejected application already sends a note so not needed
+        let note_text = '';
+        for(let proceeding of application['applicationDetails']['proceedings'])
+        {
           note_text = note_text + proceeding['proceedingType'] + '<br><p class="govuk-hint">';
-          for(let certificate of proceeding['certificates']) {
+          for(let certificate of proceeding['certificates'])
+          {
             note_text = note_text + '' + certificate['certificateType'] + ': ' + certificate['meritsResult'] + '<br>';
           }
           note_text = note_text + '</p>';
         }
 
-        if (req.session.data['substantive-note'] && req.session.data['substantive-note'].length > 0) {
+        if (req.session.data['substantive-note'] && req.session.data['substantive-note'].length > 0)
+        {
           note_text = note_text + 'Decision note<p class="govuk-hint">' + req.session.data['substantive-note'] + '</p>'
         }
 
@@ -80,6 +88,7 @@ router.get('/application-details', async function(req, res) {
             note_text ));
       }
     }
+  }
     req.session.data['merits_continue_button'] = '';
     req.session.data['update_all_substantive'] = '';
     req.session.data['granted-emergency'] = '';
@@ -98,7 +107,6 @@ router.get('/application-details', async function(req, res) {
     req.session.data['other-substantive-start-date-month'] = '';
     req.session.data['other-substantive-start-date-year'] = '';
     req.session.data['substantive-note'] = '';
-  }
 
   // update proceeding means results
 
@@ -130,9 +138,8 @@ router.get('/application-details', async function(req, res) {
   res.locals.data['application'] = application;
   // redirect to a final decision page if necessary
   const application_details = application['applicationDetails']
-  const decided_states = ['granted', 'refused', 'partially granted', 'Passported']
-  if (decided_states.includes(application_details['meritsAssessmentResult']) &&
-      decided_states.includes(application_details['meansAssessmentResult'])
+  if (DECIDED_STATES.includes(application_details['meritsAssessmentResult']) &&
+      DECIDED_STATES.includes(application_details['meansAssessmentResult'])
       && res.locals.data['merits_continue_button'] =='Save and continue' || res.locals.data['means_continue_button'] =='Save and continue')
   {
     res.render('./latest/open-applications');

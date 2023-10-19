@@ -67,10 +67,10 @@ const return_application_to_provider = async (req) => {
     }
     else
     {
-            application['applicationDetails']['meritsAssessmentResult'] = 'RFI';
-            application['applicationDetails']['meansAssessmentResult'] = 'RFI';
-            //display the banner to say more information has been requested
-            req.session.data['request-more-information'] = 'display-banner-now';
+        application['applicationDetails']['meritsAssessmentResult'] = 'RFI';
+        application['applicationDetails']['meansAssessmentResult'] = 'RFI';
+        //display the banner to say more information has been requested
+        req.session.data['request-more-information'] = 'display-banner-now';
     }
 
     let note = req.session.data['rejection-reason'];
