@@ -86,11 +86,14 @@ const return_application_to_provider = async (req) => {
         note));
 }
 
-const update_merits_results = async (req) =>
+const update_merits_certificate_decisions = async (req) =>
 {
-    for (const proceeding of find_application(req)['applicationDetails']['proceedings']) {
+    const application = find_application(req);
+    for (const proceeding of application['applicationDetails']['proceedings'])
+    {
         for (const certificate of proceeding['certificates']) {
-            if (typeof req.session.data[certificate['id']] !== 'undefined' && req.session.data[certificate['id']] !== null) {
+            if (typeof req.session.data[certificate['id']] !== 'undefined' && req.session.data[certificate['id']] !== null)
+            {
                 certificate['meritsResult'] = req.session.data[certificate['id']];
             }
         }
@@ -99,12 +102,89 @@ const update_merits_results = async (req) =>
     return true;
 }
 
+const update_means_certificate_decisions = async (req) =>
+{
+    const application = find_application(req);
+    for (const proceeding of application['applicationDetails']['proceedings']) {
+        if (typeof req.session.data[proceeding['id']] !== 'undefined' && req.session.data[proceeding['id']] !== null) {
+            proceeding['meansResult'] = req.session.data[proceeding['id']];
+        }
+    }
+    return true;
+}
+const update_overall_decision = async (req, type) =>
+{
+    // update overall results
+    // count the number of granted and refused proceedings
+    let grants = 0;
+    let refusals = 0;
+    let total_proceedings = 0;
+    let certificate_type = null;
+    let overall_type = null;
+    const application = find_application(req);
+
+    if (type=='merit')
+    {
+        certificate_type = 'meritsResult';
+        overall_type = 'meritsAssessmentResult';
+        for (const proceeding of application['applicationDetails']['proceedings']){
+            for (const certificate of proceeding['certificates']){
+                if ((certificate[certificate_type] == 'granted') || (certificate[certificate_type] == 'amended')){
+                    grants = grants + 1;
+                }
+                if (certificate[certificate_type] == 'refused'){
+                    refusals = refusals + 1;
+                }
+                total_proceedings = total_proceedings + 1;
+            }
+        }
+    }
+
+    if (type=='means')
+    {
+        certificate_type = 'meansResult';
+        overall_type = 'meansAssessmentResult';
+        // count the number of granted and refused proceedings
+        for (const proceeding of application['applicationDetails']['proceedings']){
+          if (proceeding['meansResult'] == 'granted') {
+              grants = grants + 1;
+          }
+          if (proceeding['meansResult'] == 'refused'){
+            refusals = refusals + 1;
+          }
+          total_proceedings = total_proceedings + 1;
+        }
+
+    }
+
+    // if all proceedings have been refused, the application is refused
+    if (refusals === total_proceedings)
+    {
+        application['applicationDetails'][overall_type] = 'refused';
+    }
+
+    // if all proceedings have been granted, the application is granted
+    if (grants === total_proceedings)
+    {
+        application['applicationDetails'][overall_type] = 'granted';
+    }
+
+    // if some proceedings have been refused, the application is partially granted
+    if ((refusals > 0) && (grants > 0) && (refusals + grants == total_proceedings))
+    {
+        application['applicationDetails'][overall_type] = 'partially granted';
+    }
+
+    return true;
+}
 
 module.exports = {
     create_note,
     find_application,
     assign_application,
     unassign_application,
-    update_merits_results,
+    update_merits_certificate_decisions,
+    update_means_certificate_decisions,
+    update_overall_decision,
     return_application_to_provider
 }

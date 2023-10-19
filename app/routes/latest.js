@@ -34,6 +34,7 @@ router.get('/my-applications', async function(req, res) {
 });
 
 router.get('/request-info-note', function(req, res) {
+  //this is no longer being used as it is done via the reject page
   let application = ApplicationService.find_application(req);
 
   // if a request for further info has been made, add an item to the application history
@@ -50,43 +51,12 @@ router.get('/request-info-note', function(req, res) {
 router.get('/application-details', async function(req, res) {
   //update substantive proceeding merits results if have come from the merits page
   let application = ApplicationService.find_application(req);
-  const can_continue = await ApplicationService.update_merits_results(req);
+  const considered_merits = await ApplicationService.update_merits_certificate_decisions(req);
   //so update_all_substantive not being used in latest (beyond v4),
-      // merits_continue on both emergency and substantive pages
+      // merits_continue button is on both emergency and substantive pages
   if ((req.session.data['merits_continue_button']) || (req.session.data['update_all_substantive'])){
     if (req.session.data['merits_continue_button'] != "Save and come back later"){
-      // update overall merits results
-      // count the numner of granted and refused proceedings
-      var grants = 0;
-      var refusals = 0;
-      var total_proceedings = 0;
-      for (const proceeding of application['applicationDetails']['proceedings']){
-        for (const certificate of proceeding['certificates']){
-          if ((certificate['meritsResult'] == 'granted') || (certificate['meritsResult'] == 'amended')){
-            grants = grants + 1;
-          }
-          if (certificate['meritsResult'] == 'refused'){
-            refusals = refusals + 1;
-          }
-          total_proceedings = total_proceedings + 1;
-        }
-      }
-
-      // if all proceedings have been refused, the application is refused
-      if (refusals === total_proceedings){
-        application['applicationDetails']['meritsAssessmentResult'] = 'refused';
-      }
-
-      // if all proceedings have been granted, the application is granted
-      if (grants === total_proceedings){
-        application['applicationDetails']['meritsAssessmentResult'] = 'granted';
-      }
-
-      // if some proceedings have been refused, the application is partially granted
-      if ((refusals > 0) && (grants > 0) && (refusals + grants == total_proceedings)){
-        application['applicationDetails']['meritsAssessmentResult'] = 'partially granted';
-      }
-
+      const merit_result_updated = await ApplicationService.update_overall_decision(req, 'merit');
       if ((application['applicationDetails']['meritsAssessmentResult'] != "Not started")
           && (application['applicationDetails']['meritsAssessmentResult'] != "In progress")
           && (application['applicationDetails']['meritsAssessmentResult'] != "rejected")){
@@ -131,42 +101,12 @@ router.get('/application-details', async function(req, res) {
   }
 
   // update proceeding means results
-  if ((req.session.data['means_continue_button'] === "Save decision") || (req.session.data['update_all_means'])) {
-    for (const proceeding of application['applicationDetails']['proceedings']){
-      if (typeof req.session.data[proceeding['id']] !== 'undefined' && req.session.data[proceeding['id']] !== null){
-          proceeding['meansResult'] = req.session.data[proceeding['id']];
-      }
-    }
 
-    // count the number of granted and refused proceedings
-    var grants = 0;
-    var refusals = 0;
-    var total_proceedings = 0;
-
-    for (const proceeding of application['applicationDetails']['proceedings']){
-      if (proceeding['meansResult'] == 'granted') {
-          grants = grants + 1;
-      }
-      if (proceeding['meansResult'] == 'refused'){
-        refusals = refusals + 1;
-      }
-      total_proceedings = total_proceedings + 1;
-    }
-
-    // if all proceedings have been refused, the application is refused
-    if (refusals === total_proceedings){
-      application['applicationDetails']['meansAssessmentResult'] = 'refused';
-    }
-
-    // if all proceedings have been granted, the application is granted
-    if (grants === total_proceedings){
-      application['applicationDetails']['meansAssessmentResult'] = 'granted';
-    }
-
-    // if some proceedings have been refused, the application is partially granted
-    if ((refusals > 0) && (grants > 0) && (refusals + grants == total_proceedings)){
-      application['applicationDetails']['meansAssessmentResult'] = 'partially granted';
-    }
+  if ((req.session.data['means_continue_button'] === "Save decision") || (req.session.data['update_all_means']))
+  {
+    const considered_means = await ApplicationService.update_means_certificate_decisions(req);
+    //update overall means decision
+    const considered_overall_means_decision = await ApplicationService.update_overall_decision(req, 'means')
 
     var note_text = '';
     for(let proceeding of application['applicationDetails']['proceedings']) {
@@ -260,7 +200,7 @@ router.get('/merits-assessment-substantive', function(req, res) {
 router.post('/merits-assessment-substantive', async function(req, res) {
   let application = ApplicationService.find_application(req);
   // update emergency proceeding merits results
-  const can_continue = await ApplicationService.update_merits_results(req);
+  const can_continue = await ApplicationService.update_merits_certificate_decisions(req);
 
   // update overall merits assessment result
   application['applicationDetails']['meritsAssessmentResult'] = 'in progress';
