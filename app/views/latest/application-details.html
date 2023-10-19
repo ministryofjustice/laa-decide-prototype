@@ -186,7 +186,7 @@ Merits decision saved.
             {% if (application['meansAssessmentResult'] === 'Not started') %}
             <span class="moj-badge moj-badge">{{ application['meansAssessmentResult'] }}</span>
             {% endif %}
-            {% if (application['meansAssessmentResult'] === 'refused') or (application['meansAssessmentResult'] === 'rejected') %}
+            {% if (application['meansAssessmentResult'] === 'refused') or (application['meansAssessmentResult'] === 'rejected') or (application['meansAssessmentResult'] === 'RFI')%}
             <span class="moj-badge moj-badge--red">{{ application['meansAssessmentResult'] }}</span>
             {% endif %}
             {% if application['meansAssessmentResult'] === 'Passported' %}
@@ -217,7 +217,7 @@ Merits decision saved.
             {% if (application['meritsAssessmentResult'] === 'partially granted') %}
             <span class="moj-badge moj-badge--blue">{{ application['meritsAssessmentResult'] }}</span>
             {% endif %}
-            {% if (application['meritsAssessmentResult'] === 'refused') or (application['meritsAssessmentResult'] === 'rejected') %}
+            {% if (application['meritsAssessmentResult'] === 'refused') or (application['meritsAssessmentResult'] === 'rejected') or (application['meritsAssessmentResult'] === 'RFI')%}
             <span class="moj-badge moj-badge--red">{{ application['meritsAssessmentResult'] }}</span>
             {% endif %}
           </td>

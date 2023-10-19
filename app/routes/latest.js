@@ -5,71 +5,27 @@
 
 const govukPrototypeKit = require('govuk-prototype-kit')
 const router = govukPrototypeKit.requests.setupRouter()
-
+const DECIDED_STATES = ['granted', 'refused', 'partially granted', 'Passported']
+const NOT_DECIDED_STATES = ['Not started', 'In progress', 'rejected']
 // Add your services here
 
-const { NoteService } = require("../services");
-
+const { ApplicationService } = require("../services");
 
 // Add your routes here
-router.get('/my-applications', function(req, res) {
+router.get('/my-applications', async function(req, res) {
   req.session.data['request-more-information'] = '';
 
   var refNo = req.session.data.refNo;
   var refNoToRemove = req.session.data.refNoToRemove;
 
-  // if a refNo exists then we are assigning an application
+//if a refNo exists then we "may" be assigning, usually only if we came from open applications
   if (refNo != null){
-    if (!req.session.data.assignedApplications.includes(refNo)){
-      req.session.data.assignedApplications.push(refNo);
-    }
-
-    var application = null;
-
-    // find the application
-    for (const app of req.session.data.applications) {
-      if (app.applicationDetails.refNo === req.session.data.refNo)
-        application = app;
-    }
-
-    if (refNoToRemove == null){
-      // add an item to the application history
-      // this keeps being added
-          let new_note =  NoteService.createNote(
-          'You',
-          'Application added to workload',
-          null );
-      application.applicationDetails.notes.push(new_note);
-    }
+    const is_assigned = await ApplicationService.assign_application(req)
   }
 
-
-  // if a refNoToRemove exists then we are unassigning an application
+  // if a refNoToRemove exists then we are un-assigning an application
   if (refNoToRemove != null){
-    const index = req.session.data.assignedApplications.indexOf(refNoToRemove);
-    if (index > -1) {
-      req.session.data.assignedApplications.splice(index, 1);
-    }
-
-    var application = null;
-
-    // find the application
-    for (const app of req.session.data.applications) {
-      if (app.applicationDetails.refNo === req.session.data.refNo)
-        application = app;
-    }
-
-    // add an item to the application history
-    var other_reason = '';
-    if (req.session.data['removal-reason-other']){
-      other_reason = ' - ' + req.session.data['removal-reason-other'];
-    }
-
-
-    application.applicationDetails.notes.push(NoteService.createNote(
-        'You',
-        'Application removed from workload',
-        req.session.data['removal-reason'] + other_reason ));
+    const is_unassigned = await ApplicationService.unassign_application(req)
   }
 
   req.session.data.refNo = null;
@@ -79,19 +35,13 @@ router.get('/my-applications', function(req, res) {
 });
 
 router.get('/request-info-note', function(req, res) {
-  var application = null;
-
-  // find the application
-  for (const app of req.session.data.applications) {
-    if (app.applicationDetails.refNo === req.session.data.refNo)
-      application = app;
-  }
+  //this is no longer being used as it is done via the reject page
+  let application = ApplicationService.find_application(req);
 
   // if a request for further info has been made, add an item to the application history
   if (req.session.data['request-more-information']) {
-
-
-    application.applicationDetails.notes.push(NoteService.createNote('You',
+    application.applicationDetails.notes.push(
+        ApplicationService.create_note('You',
         'Further information requested',
         null ));
     req.session.data['request-more-information'] = 'display-banner-now';
@@ -99,87 +49,46 @@ router.get('/request-info-note', function(req, res) {
   res.redirect('./application-details');
 });
 
-router.get('/application-details', function(req, res) {
-  var application = null;
+router.get('/application-details', async function(req, res)
+{
+  //update substantive proceeding merits results if have come from the merits page
+  let application = ApplicationService.find_application(req);
+  const considered_merits = await ApplicationService.update_merits_certificate_decisions(req);
+  //so update_all_substantive not being used in latest (beyond v4)
+  // merits_continue button is on both emergency and substantive pages
+  if ((req.session.data['merits_continue_button']) || (req.session.data['update_all_substantive']))
+  {
+    if (req.session.data['merits_continue_button'] != "Save and come back later")
+    {
+      const merit_result_updated = await ApplicationService.update_overall_decision(req, 'merit');
 
-  // find the application
-  for (const app of req.session.data.applications) {
-    if (app.applicationDetails.refNo === req.session.data.refNo)
-      application = app;
-  }
-
-  // update substantive proceeding merits results
-  for (const proceeding of application['applicationDetails']['proceedings']){
-    for (const certificate of proceeding['certificates']){
-      if (typeof req.session.data[certificate['id']] !== 'undefined' && req.session.data[certificate['id']] !== null){
-          certificate['meritsResult'] = req.session.data[certificate['id']];
-      }
-    }
-  }
-
-  if ((req.session.data['merits_continue_button']) || (req.session.data['update_all_substantive'])){
-    if (req.session.data['merits_continue_button'] != "Save and come back later"){
-      // update overall merits results
-      // count the numner of granted and refused proceedings
-      var grants = 0;
-      var refusals = 0;
-      var total_proceedings = 0;
-
-      for (const proceeding of application['applicationDetails']['proceedings']){
-        for (const certificate of proceeding['certificates']){
-          if ((certificate['meritsResult'] == 'granted') || (certificate['meritsResult'] == 'amended')){
-            grants = grants + 1;
-          }
-          if (certificate['meritsResult'] == 'refused'){
-            refusals = refusals + 1;
-          }
-          total_proceedings = total_proceedings + 1;
-        }
-      }
-
-      // if all proceedings have been refused, the application is refused
-      if (refusals === total_proceedings){
-        application['applicationDetails']['meritsAssessmentResult'] = 'refused';
-      }
-
-      // if all proceedings have been granted, the application is granted
-      if (grants === total_proceedings){
-        application['applicationDetails']['meritsAssessmentResult'] = 'granted';
-      }
-
-      // if some proceedings have been refused, the application is partially granted
-      if ((refusals > 0) && (grants > 0) && (refusals + grants == total_proceedings)){
-        application['applicationDetails']['meritsAssessmentResult'] = 'partially granted';
-      }
-
-      if ((application['applicationDetails']['meritsAssessmentResult'] != "Not started")
-          && (application['applicationDetails']['meritsAssessmentResult'] != "In progress")
-          && (application['applicationDetails']['meritsAssessmentResult'] != "rejected")){
-
-        var note_text = '';
-        for(let proceeding of application['applicationDetails']['proceedings']) {
+      if (!NOT_DECIDED_STATES.includes(application['applicationDetails']['meritsAssessmentResult']))
+      {
+        //create an application note if merits decision made,
+        // rejected application already sends a note so not needed
+        let note_text = '';
+        for(let proceeding of application['applicationDetails']['proceedings'])
+        {
           note_text = note_text + proceeding['proceedingType'] + '<br><p class="govuk-hint">';
-          for(let certificate of proceeding['certificates']) {
+          for(let certificate of proceeding['certificates'])
+          {
             note_text = note_text + '' + certificate['certificateType'] + ': ' + certificate['meritsResult'] + '<br>';
           }
           note_text = note_text + '</p>';
         }
 
-        
-        // note update
-        if (req.session.data['emergency-note'] && req.session.data['emergency-note'].length>0) {
-          note_text = note_text + 'Decision note<p class="govuk-hint">' + req.session.data['emergency-note'] + '</p>'
-        }
-        if (req.session.data['substantive-note'] && req.session.data['substantive-note'].length > 0) {
+        if (req.session.data['substantive-note'] && req.session.data['substantive-note'].length > 0)
+        {
           note_text = note_text + 'Decision note<p class="govuk-hint">' + req.session.data['substantive-note'] + '</p>'
         }
 
-        application.applicationDetails.notes.push(NoteService.createNote(
+        application.applicationDetails.notes.push(ApplicationService.create_note(
             'You',
             'Merits decision made',
             note_text ));
       }
     }
+  }
     req.session.data['merits_continue_button'] = '';
     req.session.data['update_all_substantive'] = '';
     req.session.data['granted-emergency'] = '';
@@ -198,52 +107,21 @@ router.get('/application-details', function(req, res) {
     req.session.data['other-substantive-start-date-month'] = '';
     req.session.data['other-substantive-start-date-year'] = '';
     req.session.data['substantive-note'] = '';
-  }
 
   // update proceeding means results
-  if ((req.session.data['means_continue_button'] === "Save decision") || (req.session.data['update_all_means'])) {
-    for (const proceeding of application['applicationDetails']['proceedings']){
-      if (typeof req.session.data[proceeding['id']] !== 'undefined' && req.session.data[proceeding['id']] !== null){
-          proceeding['meansResult'] = req.session.data[proceeding['id']];
-      }
-    }
 
-    // count the number of granted and refused proceedings
-    var grants = 0;
-    var refusals = 0;
-    var total_proceedings = 0;
-
-    for (const proceeding of application['applicationDetails']['proceedings']){
-      if (proceeding['meansResult'] == 'granted') {
-          grants = grants + 1;
-      }
-      if (proceeding['meansResult'] == 'refused'){
-        refusals = refusals + 1;
-      }
-      total_proceedings = total_proceedings + 1;
-    }
-
-    // if all proceedings have been refused, the application is refused
-    if (refusals === total_proceedings){
-      application['applicationDetails']['meansAssessmentResult'] = 'refused';
-    }
-
-    // if all proceedings have been granted, the application is granted
-    if (grants === total_proceedings){
-      application['applicationDetails']['meansAssessmentResult'] = 'granted';
-    }
-
-    // if some proceedings have been refused, the application is partially granted
-    if ((refusals > 0) && (grants > 0) && (refusals + grants == total_proceedings)){
-      application['applicationDetails']['meansAssessmentResult'] = 'partially granted';
-    }
+  if ((req.session.data['means_continue_button'] === "Save decision") || (req.session.data['update_all_means']))
+  {
+    const considered_means = await ApplicationService.update_means_certificate_decisions(req);
+    //update overall means decision
+    const considered_overall_means_decision = await ApplicationService.update_overall_decision(req, 'means')
 
     var note_text = '';
     for(let proceeding of application['applicationDetails']['proceedings']) {
       note_text = note_text + proceeding['proceedingType'] + ': ' + proceeding['meansResult'] + '<br>';
     }
 
-    application.applicationDetails.notes.push(NoteService.createNote(
+    application.applicationDetails.notes.push(ApplicationService.create_note(
         'You',
         'Means decision made',
         note_text ));
@@ -260,9 +138,8 @@ router.get('/application-details', function(req, res) {
   res.locals.data['application'] = application;
   // redirect to a final decision page if necessary
   const application_details = application['applicationDetails']
-  const decided_states = ['granted', 'refused', 'partially granted', 'Passported']
-  if (decided_states.includes(application_details['meritsAssessmentResult']) &&
-      decided_states.includes(application_details['meansAssessmentResult'])
+  if (DECIDED_STATES.includes(application_details['meritsAssessmentResult']) &&
+      DECIDED_STATES.includes(application_details['meansAssessmentResult'])
       && res.locals.data['merits_continue_button'] =='Save and continue' || res.locals.data['means_continue_button'] =='Save and continue')
   {
     res.render('./latest/open-applications');
@@ -274,39 +151,17 @@ router.get('/application-details', function(req, res) {
 );
 
 router.get('/application-history', function(req, res) {
-  var application = null;
-
-  // find the application
-  for (const app of req.session.data.applications) {
-    if (app.applicationDetails.refNo === req.session.data.refNo)
-      application = app;
-  }
-
-  res.locals.data['application'] = application;
+  res.locals.data['application'] = ApplicationService.find_application(req);
   res.render('./latest/application-history');
 });
 
 router.get('/people', function(req, res) {
-  var application = null;
-
-  // find the application
-  for (const app of req.session.data.applications) {
-    if (app.applicationDetails.refNo === req.session.data.refNo)
-      application = app;
-  }
-
-  res.locals.data['application'] = application;
+  res.locals.data['application'] = ApplicationService.find_application(req);
   res.render('./latest/people');
 });
 
 router.get('/merits-assessment-emergency', function(req, res) {
-  var application = null;
-
-  // find the application
-  for (const app of req.session.data.applications) {
-    if (app.applicationDetails.refNo === req.session.data.refNo)
-      application = app;
-  }
+  let application = ApplicationService.find_application(req);
 
   res.locals.data['application'] = application;
 
@@ -319,62 +174,40 @@ router.get('/merits-assessment-emergency', function(req, res) {
 });
 
 router.get('/merits-assessment-substantive', function(req, res) {
-  if (req.session.data.update_all_emergency === 'Refuse all'){
-    res.render('./latest/refuse-application');
+  if (!["Refuse all", "Grant all"].includes(req.session.data.update_all_emergency))
+  {
+    res.locals.data['application'] = ApplicationService.find_application(req);
+    res.render('./latest/merits-assessment-substantive');
   }
-  else if (req.session.data.update_all_emergency === 'Grant all'){
-    var application = null;
-
-    // find the application
-    for (const app of req.session.data.applications) {
-      if (app.applicationDetails.refNo === req.session.data.refNo)
-        application = app;
+  else
+  {// update_all_emergency is likely not used beyond v4, so put that logic below
+    if (req.session.data.update_all_emergency === 'Refuse all'){
+      res.render('./latest/refuse-application');
     }
-
-    // grant all emergency proceeding merits results
-    for (const proceeding of application['applicationDetails']['proceedings']){
-      for (const certificate of proceeding['certificates']){
-        if (certificate['certificateType'] == 'Emergency certificate'){
-          certificate['meritsResult'] = 'granted';
+    else if (req.session.data.update_all_emergency === 'Grant all')
+    {
+      let application = ApplicationService.find_application(req);
+      // grant all emergency proceeding merits results
+      for (const proceeding of application['applicationDetails']['proceedings']){
+        for (const certificate of proceeding['certificates']){
+          if (certificate['certificateType'] == 'Emergency certificate'){
+            certificate['meritsResult'] = 'granted';
+          }
         }
       }
+
+      application['applicationDetails']['meritsAssessmentResult'] = 'in progress';
+      res.locals.data['application'] = application;
+      res.render('./latest/merits-assessment-substantive');
     }
-
-    application['applicationDetails']['meritsAssessmentResult'] = 'in progress';
-    res.locals.data['application'] = application;
-    res.render('./latest/merits-assessment-substantive');
   }
-  else {
-    var application = null;
 
-    // find the application
-    for (const app of req.session.data.applications) {
-      if (app.applicationDetails.refNo === req.session.data.refNo)
-        application = app;
-    }
-
-    res.locals.data['application'] = application;
-    res.render('./latest/merits-assessment-substantive');
-  }
 });
 
-router.post('/merits-assessment-substantive', function(req, res) {
-  var application = null;
-
-  // find the application
-  for (const app of req.session.data.applications) {
-    if (app.applicationDetails.refNo === req.session.data.refNo)
-      application = app;
-  }
-
+router.post('/merits-assessment-substantive', async function(req, res) {
+  let application = ApplicationService.find_application(req);
   // update emergency proceeding merits results
-  for (const proceeding of application['applicationDetails']['proceedings']){
-    for (const certificate of proceeding['certificates']){
-      if (typeof req.session.data[certificate['id']] !== 'undefined' && req.session.data[certificate['id']] !== null){
-          certificate['meritsResult'] = req.session.data[certificate['id']];
-      }
-    }
-  }
+  const can_continue = await ApplicationService.update_merits_certificate_decisions(req);
 
   // update overall merits assessment result
   application['applicationDetails']['meritsAssessmentResult'] = 'in progress';
@@ -390,14 +223,9 @@ router.post('/merits-assessment-substantive', function(req, res) {
   }
 });
 
+//not used beyond version 4
 router.post('/refuse-application', function(req, res) {
-  var application = null;
-
-  // find the application
-  for (const app of req.session.data.applications) {
-    if (app.applicationDetails.refNo === req.session.data.refNo)
-      application = app;
-  }
+  let application = ApplicationService.find_application(req);
 
   if (req.session.data['update_all_substantive'] === "Refuse all") {
 
@@ -431,18 +259,13 @@ router.post('/refuse-application', function(req, res) {
   }
 });
 
+//not used beyond v4?
 router.get('/substantive-update-all', function(req, res) {
   if (req.session.data.update_all_substantive === 'Refuse all'){
     res.render('./latest/refuse-application');
   }
   else if (req.session.data.update_all_substantive === 'Grant all'){
-    var application = null;
-
-    // find the application
-    for (const app of req.session.data.applications) {
-      if (app.applicationDetails.refNo === req.session.data.refNo)
-        application = app;
-    }
+    let application = ApplicationService.find_application(req);
 
     // grant all substantive proceeding merits results
     for (const proceeding of application['applicationDetails']['proceedings']){
@@ -457,50 +280,17 @@ router.get('/substantive-update-all', function(req, res) {
   }
 });
 
-router.post('/reject-application', function(req, res) {
-  var application = null;
-
-  // find the application
-  for (const app of req.session.data.applications) {
-    if (app.applicationDetails.refNo === req.session.data.refNo)
-      application = app;
-  }
-
-  application['applicationDetails']['meritsAssessmentResult'] = 'rejected';
-  application['applicationDetails']['meansAssessmentResult'] = 'rejected';
-
-  var other_reason = '';
-  if (req.session.data['rejection-reason-other']){
-    other_reason = ' - ' + req.session.data['rejection-reason-other'];
-  }
-  else{
-    if (req.session.data['incorrect-means']){
-      other_reason = ' - ' + req.session.data['incorrect-means'];
-    }
-  }
-
-  // add an item to the application history
-
-
-  application.applicationDetails.notes.push(NoteService.createNote(
-      'You',
-      'Application sent back to provider',
-      req.session.data['rejection-reason'] + other_reason ));
+router.post('/reject-application', async function(req, res) {
+  const application_rejected = await ApplicationService.return_application_to_provider(req)
   res.redirect('./application-details');
 });
 
 router.post('/add-note', function(req, res) {
-  var application = null;
-
-  // find the application
-  for (const app of req.session.data.applications) {
-    if (app.applicationDetails.refNo === req.session.data.refNo)
-      application = app;
-  }
+  let application = ApplicationService.find_application(req);
 
   // add an item to the application history
 
-  application.applicationDetails.notes.push(NoteService.createNote(
+  application.applicationDetails.notes.push(ApplicationService.create_note(
       'You',
       'User note',
       req.session.data['note']));
@@ -508,13 +298,7 @@ router.post('/add-note', function(req, res) {
 });
 
 router.get('/means-assessment', function(req, res) {
-  var application = null;
-
-  // find the application
-  for (const app of req.session.data.applications) {
-    if (app.applicationDetails.refNo === req.session.data.refNo)
-      application = app;
-  }
+  let application = ApplicationService.find_application(req);
 
   res.locals.data['application'] = application;
 
@@ -527,13 +311,7 @@ router.get('/means-update-all', function(req, res) {
     res.render('./latest/refuse-means');
   }
   else if (req.session.data.update_all_means === 'Grant all'){
-    var application = null;
-
-    // find the application
-    for (const app of req.session.data.applications) {
-      if (app.applicationDetails.refNo === req.session.data.refNo)
-        application = app;
-    }
+    let application = ApplicationService.find_application(req);
 
     // grant all proceeding means results
     for (const proceeding of application['applicationDetails']['proceedings']){
@@ -545,13 +323,7 @@ router.get('/means-update-all', function(req, res) {
 });
 
 router.get('/refuse-all-means', function(req, res) {
-  var application = null;
-
-  // find the application
-  for (const app of req.session.data.applications) {
-    if (app.applicationDetails.refNo === req.session.data.refNo)
-      application = app;
-  }
+  let application = ApplicationService.find_application(req);
 
   // refuse all proceeding means results
   for (const proceeding of application['applicationDetails']['proceedings']){
