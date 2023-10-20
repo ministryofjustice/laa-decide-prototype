@@ -265,7 +265,7 @@ router.get('/application-details', function(req, res) {
       decided_states.includes(application_details['meansAssessmentResult'])
       && res.locals.data['merits_continue_button'] =='Save and continue' || res.locals.data['means_continue_button'] =='Save and continue')
   {
-    res.render('./latest/open-applications');
+    res.render('./latest/decision');
   }
   else{
     res.render('./latest/application-details');}
