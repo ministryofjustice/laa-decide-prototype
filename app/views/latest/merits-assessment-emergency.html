@@ -89,8 +89,8 @@ Merits assessment - emergency
         {% from "govuk/components/date-input/macro.njk" import govukDateInput %}
 
         {{ govukDateInput({
-          id: "passport-issued",
-          namePrefix: "passport-issued",
+          id: "emergency-start",
+          namePrefix: "emergency-start",
           fieldset: {
             legend: {
               text: "When should the emergency certificate be granted from?",
@@ -100,8 +100,8 @@ Merits assessment - emergency
         }) }}
 
         {{ govukDateInput({
-          id: "passport-issued",
-          namePrefix: "passport-issued",
+          id: "emergency-end",
+          namePrefix: "emergency-end",
           fieldset: {
             legend: {
               text: "When should the emergency certificate end?",
@@ -178,12 +178,13 @@ Merits assessment - emergency
         {% set limitHtml %}
         <div class="govuk-input__wrapper">
                     <div class="govuk-input__prefix" aria-hidden="true">£</div>
-                    <input class="govuk-input govuk-input--width-5" id="granted-emergency" name="granted-emergency" value="{{ data['granted-emergency'] }}" type="text" spellcheck="false">
+                    <label name="costLabel" for="emergencyCostAmount" class="govuk-visually-hidden">New cost limit</label>
+                    <input class="govuk-input govuk-input--width-5" id="emergencyCostAmount" describedby="costLabel" name="emergencyCostAmount" value="{{ data['granted-emergency'] }}" type="text" spellcheck="false">
                   </div>
         {% endset -%}
 
         {{ govukRadios({
-          name: "contact",
+          name: "emergencyCost",
           fieldset: {
             legend: {
               text: "How much should be granted for the emergency certificate?",

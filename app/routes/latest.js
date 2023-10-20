@@ -142,7 +142,7 @@ router.get('/application-details', async function(req, res)
       DECIDED_STATES.includes(application_details['meansAssessmentResult'])
       && res.locals.data['merits_continue_button'] =='Save and continue' || res.locals.data['means_continue_button'] =='Save and continue')
   {
-    res.render('./latest/open-applications');
+    res.render('./latest/decision');
   }
   else{
     res.render('./latest/application-details');}
@@ -158,6 +158,19 @@ router.get('/application-history', function(req, res) {
 router.get('/people', function(req, res) {
   res.locals.data['application'] = ApplicationService.find_application(req);
   res.render('./latest/people');
+});
+
+router.get('/decision', function(req, res) {
+  var application = null;
+
+  // find the application
+  for (const app of req.session.data.applications) {
+    if (app.applicationDetails.refNo === req.session.data.refNo)
+      application = app;
+  }
+
+  res.locals.data['application'] = application;
+  res.render('./latest/decision');
 });
 
 router.get('/merits-assessment-emergency', function(req, res) {
