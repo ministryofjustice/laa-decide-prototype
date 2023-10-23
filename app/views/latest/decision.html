@@ -169,7 +169,12 @@ Merits decision saved.
                   Level of service
                 </dt>
                 <dd class="govuk-summary-list__value">
-                  {{ data['substantiveLOS'] or certificate['formOfService'] }}
+                  {% if certificate['certificateType'] === 'Emergency certificate' %}
+                  {{ data['emergencyLOS'] if (certificate['id'] === data['cert_id_to_change'] and data['emergencyLOS']) else certificate['formOfService'] }}
+                  {% else %}
+                  {{ data['substantiveLOS'] if (certificate['id'] === data['cert_id_to_change'] and data['substantiveLOS']) else certificate['formOfService'] }}
+                  {% endif %}
+
                 </dd>
                
               </div>
@@ -178,7 +183,11 @@ Merits decision saved.
                   Scope limitations
                 </dt>
                 <dd class="govuk-summary-list__value">
-                  {{ certificate['scopeLimits'] | safe }}
+                  {% if certificate['certificateType'] === 'Emergency certificate' %}
+                  {{ data['emergency-scope'] if (certificate['id'] === data['cert_id_to_change'] and data['emergency-scope']) else certificate['scopeLimits'] }}
+                  {% else %}
+                  {{ data['scope'] if (certificate['id'] === data['cert_id_to_change'] and data['scope']) else certificate['scopeLimits'] }}
+                  {% endif %}
                 </dd>
                 
               </div>

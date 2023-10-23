@@ -9,6 +9,7 @@ Merits assessment - substantive
 {% endblock %}
 
 {% set application = data['application']['applicationDetails'] %}
+{% set cert_id_to_change = data['cert_id_to_change'] %}
 
 {% if application['certificateType'] === 'Substantive' %}
 {% set part = '1' %}
@@ -33,6 +34,7 @@ Merits assessment - substantive
         {% for proceeding in application['proceedings'] %}
         {% for certificate in proceeding['certificates'] %}
         {% if certificate['certificateType'] === 'Substantive certificate' %}
+
          <h2 class="govuk-heading-m">{{ proceeding['proceedingType'] }}</h2>
         {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 
@@ -55,12 +57,12 @@ Merits assessment - substantive
               text: "Level of service"
             },
             value: {
-              text: data['substantiveLOS'] or certificate['formOfService']
+              text: data['substantiveLOS'] if (certificate['id'] === data['cert_id_to_change'] and data['substantiveLOS']) else certificate['formOfService']
             },
             actions: {
               items: [
                 {
-                  href: "change-level-substantive",
+                  href: "change-level-substantive?cert_id_to_change=" + certificate['id'] + "&proc_type=" + proceeding['proceedingType'],
                   text: "Change",
                   visuallyHiddenText: "Level of service"
                 }
@@ -72,12 +74,12 @@ Merits assessment - substantive
               text: "Scope limitations"
             },
             value: {
-              text: data['scope'] or certificate['scopeLimits']
+              text: data['scope'] if (certificate['id'] === data['cert_id_to_change'] and data['scope']) else certificate['scopeLimits']
             },
             actions: {
               items: [
                 {
-                  href: "change-scope-substantive",
+                  href: "change-scope-substantive?cert_id_to_change=" + certificate['id'] + "&proc_type=" + proceeding['proceedingType'],
                   text: "Change",
                   visuallyHiddenText: "Scope limitations"
                 }

@@ -190,7 +190,7 @@ router.get('/change-level-substantive', function(req, res) {
   let application = ApplicationService.find_application(req);
   res.locals.data['application'] = application;
   res.locals.data['cert_to_change'] = find_certificate(application, res.locals.data['cert_id_to_change']);
-  res.render('./latest/change-level-emergency');
+  res.render('./latest/change-level-substantive');
 });
 
 router.get('/merits-assessment-emergency', function(req, res) {
@@ -204,8 +204,6 @@ router.get('/merits-assessment-emergency', function(req, res) {
   else {
     res.render('./latest/merits-assessment-emergency');
   }
-  req.session.data['emergencyLOS'] = '';
-  req.session.data['emergency-scope'] = '';
 });
 
 router.get('/merits-assessment-substantive', function(req, res) {
@@ -234,8 +232,6 @@ router.get('/merits-assessment-substantive', function(req, res) {
       application['applicationDetails']['meritsAssessmentResult'] = 'in progress';
       res.locals.data['application'] = application;
       res.render('./latest/merits-assessment-substantive');
-      req.session.data['substantiveLOS'] = '';
-      req.session.data['scope'] = '';
     }
   }
 
