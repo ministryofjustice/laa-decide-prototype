@@ -53,7 +53,7 @@ Merits assessment - emergency
               text: "Level of service"
             },
             value: {
-              text: data['emergencyLOS'] if (certificate['id'] === data['cert_id_to_change'] and data['emergencyLOS']) else certificate['formOfService']
+              text: certificate['formOfService']
             },
             actions: {
               items: [
@@ -70,7 +70,7 @@ Merits assessment - emergency
               text: "Scope limitations"
             },
             value: {
-              text: data['emergency-scope'] if (certificate['id'] === data['cert_id_to_change'] and data['emergency-scope']) else certificate['scopeLimits']
+              text: certificate['scopeLimits']
             },
             actions: {
               items: [

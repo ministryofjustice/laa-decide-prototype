@@ -57,7 +57,7 @@ Merits assessment - substantive
               text: "Level of service"
             },
             value: {
-              text: data['substantiveLOS'] if (certificate['id'] === data['cert_id_to_change'] and data['substantiveLOS']) else certificate['formOfService']
+              text: certificate['formOfService']
             },
             actions: {
               items: [
@@ -74,7 +74,7 @@ Merits assessment - substantive
               text: "Scope limitations"
             },
             value: {
-              text: data['scope'] if (certificate['id'] === data['cert_id_to_change'] and data['scope']) else certificate['scopeLimits']
+              text: certificate['scopeLimits']
             },
             actions: {
               items: [

@@ -85,6 +85,8 @@ module.exports = {
                         "certificateType": "Emergency certificate",
                         "formOfService": "Full representation",
                         "scopeLimits" : "Interim order inc. return date.",
+                          "formOfService_requested": "Full representation",
+                          "scopeLimits_requested" : "Interim order inc. return date.",
                         "workProviderCanDo": "Limited to all steps necessary to apply for an interim order; where application is made without notice to include representation on the return date.",
                         "meritsResult": ""
                       },
@@ -93,6 +95,8 @@ module.exports = {
                         "certificateType": "Substantive certificate",
                         "formOfService": "Full representation",
                         "scopeLimits" : "Injunction FLA-to final hearing",
+                          "formOfService_requested": "Full representation",
+                          "scopeLimits_requested" : "Injunction FLA-to final hearing",
                         "workProviderCanDo": "As to proceedings under Part IV Family Law Act1996 limited to all steps up to and including obtaining and serving a final order and in the event of breach leading to the exercise of a power of arrest to representation on the consideration of the breach by the court (but excluding applying for a warrant of arrest, if not attached, and representation in contempt proceedings).",
                         "meritsResult": ""
                       }
@@ -109,6 +113,8 @@ module.exports = {
                         "certificateType": "Substantive certificate",
                         "formOfService": "Full representation",
                         "scopeLimits" : "Hearing-children",
+                          "formOfService_requested": "Full representation",
+                          "scopeLimits_requested" : "Hearing-children",
                         "workProviderCanDo": "Limited to all steps up to and including trial/final hearing and any action necessary to implement (but not enforce) the judgment or order.",
                         "meritsResult": ""
                       }
@@ -120,11 +126,13 @@ module.exports = {
                     "certificateType": "Emergency certificate",
                     "costLimit": "£2,250",
                     "requestedCostLimit": "£5,000",
+                      "requestedCostLimit_orig": "£5,000",
                     "justification": "I will need to do more work on this case to allow me to complete everything successfully."
                   },
                   {
                     "certificateType": "Substantive certificate",
                     "costLimit": "£25,000",
+                      "requestedCostLimit_orig": "£25,000",
                     "requestedCostLimit": "£25,000"
                   }
                 ],
@@ -242,6 +250,8 @@ module.exports = {
                         "certificateType": "Emergency certificate",
                         "formOfService": "Full representation",
                         "scopeLimits" : "Example scope",
+                          "formOfService_requested": "Full representation",
+                          "scopeLimits_requested" : "Example scope",
                         "workProviderCanDo": "All steps up to and including the hearing on 21 September 2021.",
                         "meritsResult": ""
                       },
@@ -250,6 +260,8 @@ module.exports = {
                         "certificateType": "Substantive certificate",
                         "formOfService": "Full representation",
                         "scopeLimits" : "Example scope",
+                          "formOfService_requested": "Full representation",
+                          "scopeLimits_requested" : "Example scope",
                         "workProviderCanDo": "All steps up to and including getting and serving a final order. If the order is breached you can apply for power of arrest. You cannot apply for a warrant of arrest or contempt of court proceedings.",
                         "meritsResult": ""
                       }
@@ -266,6 +278,8 @@ module.exports = {
                         "certificateType": "Substantive certificate",
                         "formOfService": "Family Help (Higher)",
                         "scopeLimits" : "Example scope",
+                          "formOfService_requested": "Family Help (Higher)",
+                          "scopeLimits_requested" : "Example scope",
                         "workProviderCanDo": "Limited to Family Help (Higher) and to all steps necessary to negotiate and conclude a settlement. To include the issue of proceedings and representation in those proceedings save in relation to or at a contested final hearing.",
                         "meritsResult": ""
                       }
@@ -282,7 +296,9 @@ module.exports = {
                         "certificateType": "Emergency certificate",
                         "formOfService": "Family Help (Higher)",
                         "scopeLimits" : "Example scope",
-                        "workProviderCanDo": "Limited to Family Help (Higher) and to all steps necessary to negotiate and conclude a settlement. To include the issue of proceedings and representation in those proceedings save in relation to or at a contested final hearing.",
+                          "formOfService_requested": "Family Help (Higher)",
+                          "scopeLimits_requested" : "Example scope",
+                          "workProviderCanDo": "Limited to Family Help (Higher) and to all steps necessary to negotiate and conclude a settlement. To include the issue of proceedings and representation in those proceedings save in relation to or at a contested final hearing.",
                         "meritsResult": ""
                       },
                       {
@@ -290,6 +306,8 @@ module.exports = {
                         "certificateType": "Substantive certificate",
                         "formOfService": "Family Help (Higher)",
                         "scopeLimits" : "Example scope",
+                          "formOfService_requested": "Family Help (Higher)",
+                          "scopeLimits_requested" : "Example scope",
                         "workProviderCanDo": "Limited to Family Help (Higher) and to all steps necessary to negotiate and conclude a settlement. To include the issue of proceedings and representation in those proceedings save in relation to or at a contested final hearing.",
                         "meritsResult": ""
                       }
@@ -301,12 +319,14 @@ module.exports = {
                     "certificateType": "Emergency certificate",
                     "costLimit": "£1,350",
                     "requestedCostLimit": "£4,500",
+                      "requestedCostLimit_orig": "£4,500",
                     "justification": "I want more money"
                   },
                   {
                     "certificateType": "Substantive certificate",
                     "costLimit": "£25,000",
-                    "requestedCostLimit": "£25,000"
+                    "requestedCostLimit": "£25,000",
+                      "requestedCostLimit_orig": "£25,000"
                   }
                 ],
                 "contributions": [],
@@ -404,6 +424,8 @@ module.exports = {
                         "certificateType": "Emergency certificate",
                         "formOfService": "Full representation",
                         "scopeLimits" : "Example scope",
+                          "formOfService_requested": "Full representation",
+                          "scopeLimits_requested" : "Example scope",
                         "workProviderCanDo": "All steps up to and including the hearing on 21 September 2021.",
                         "meritsResult": ""
                       },
@@ -412,7 +434,9 @@ module.exports = {
                         "certificateType": "Substantive certificate",
                         "formOfService": "Full representation",
                         "scopeLimits" : "Example scope",
-                        "workProviderCanDo": "All steps up to and including getting and serving a final order. If the order is breached you can apply for power of arrest. You cannot apply for a warrant of arrest or contempt of court proceedings.",
+                          "formOfService_requested": "Full representation",
+                          "scopeLimits_requested" : "Example scope",
+                          "workProviderCanDo": "All steps up to and including getting and serving a final order. If the order is breached you can apply for power of arrest. You cannot apply for a warrant of arrest or contempt of court proceedings.",
                         "meritsResult": ""
                       }
                     ]
@@ -422,12 +446,14 @@ module.exports = {
                   {
                     "certificateType": "Emergency certificate",
                     "costLimit": "£1,350",
-                    "requestedCostLimit": "£1,350"
+                    "requestedCostLimit": "£1,350",
+                      "requestedCostLimit_orig": "£1,350"
                   },
                   {
                     "certificateType": "Substantive certificate",
                     "costLimit": "£25,000",
-                    "requestedCostLimit": "£25,000"
+                    "requestedCostLimit": "£25,000",
+                      "requestedCostLimit_orig": "£25,000"
                   }
                 ],
                 "contributions": [],
@@ -507,6 +533,8 @@ module.exports = {
                         "certificateType": "Emergency certificate",
                         "formOfService": "Full representation",
                         "scopeLimits" : "Example scope",
+                          "formOfService_requested": "Full representation",
+                          "scopeLimits_requested" : "Example scope",
                         "workProviderCanDo": "All steps up to and including the hearing on 21 September 2021.",
                         "meritsResult": ""
                       },
@@ -515,6 +543,8 @@ module.exports = {
                         "certificateType": "Substantive certificate",
                         "formOfService": "Full representation",
                         "scopeLimits" : "Example scope",
+                          "formOfService_requested": "Full representation",
+                          "scopeLimits_requested" : "Example scope",
                         "workProviderCanDo": "All steps up to and including getting and serving a final order. If the order is breached you can apply for power of arrest. You cannot apply for a warrant of arrest or contempt of court proceedings.",
                         "meritsResult": ""
                       }
@@ -525,12 +555,14 @@ module.exports = {
                   {
                     "certificateType": "Emergency certificate",
                     "costLimit": "£1,350",
-                    "requestedCostLimit": "£1,350"
+                    "requestedCostLimit": "£1,350",
+                      "requestedCostLimit_orig": "£1,350"
                   },
                   {
                     "certificateType": "Substantive certificate",
                     "costLimit": "£25,000",
-                    "requestedCostLimit": "£25,000"
+                    "requestedCostLimit": "£25,000",
+                      "requestedCostLimit_orig": "£25,000"
                   }
                 ],
                 "contributions": [],
@@ -605,6 +637,8 @@ module.exports = {
                         "certificateType": "Substantive certificate",
                         "formOfService": "Full representation",
                         "scopeLimits" : "Example scope",
+                          "formOfService_requested": "Full representation",
+                          "scopeLimits_requested" : "Example scope",
                         "workProviderCanDo": "All steps up to and including getting and serving a final order. If the order is breached you can apply for power of arrest. You cannot apply for a warrant of arrest or contempt of court proceedings.",
                         "meritsResult": ""
                       }
@@ -615,7 +649,8 @@ module.exports = {
                   {
                     "certificateType": "Substantive certificate",
                     "costLimit": "£25,000",
-                    "requestedCostLimit": "£25,000"
+                    "requestedCostLimit": "£25,000",
+                      "requestedCostLimit_orig": "£25,000"
                   }
                 ],
                 "contributions": [],
@@ -690,6 +725,8 @@ module.exports = {
                         "certificateType": "Substantive certificate",
                         "formOfService": "Full representation",
                         "scopeLimits" : "Example scope",
+                          "formOfService_requested": "Full representation",
+                          "scopeLimits_requested" : "Example scope",
                         "workProviderCanDo": "All steps up to and including getting and serving a final order. If the order is breached you can apply for power of arrest. You cannot apply for a warrant of arrest or contempt of court proceedings.",
                         "meritsResult": ""
                       }
@@ -706,6 +743,8 @@ module.exports = {
                         "certificateType": "Substantive certificate",
                         "formOfService": "Family Help (Higher)",
                         "scopeLimits" : "Example scope",
+                          "formOfService_requested": "Family Help (Higher)",
+                          "scopeLimits_requested" : "Example scope",
                         "workProviderCanDo": "Limited to Family Help (Higher) and to all steps necessary to negotiate and conclude a settlement. To include the issue of proceedings and representation in those proceedings save in relation to or at a contested final hearing.",
                         "meritsResult": ""
                       }
@@ -716,7 +755,8 @@ module.exports = {
                   {
                     "certificateType": "Substantive certificate",
                     "costLimit": "£25,000",
-                    "requestedCostLimit": "£25,000"
+                    "requestedCostLimit": "£25,000",
+                      "requestedCostLimit_orig": "£25,000"
                   }
                 ],
                 "contributions": [
@@ -800,6 +840,8 @@ module.exports = {
                         "certificateType": "Substantive certificate",
                         "formOfService": "Full representation",
                         "scopeLimits" : "Example scope",
+                          "formOfService_requested": "Full representation",
+                          "scopeLimits_requested" : "Example scope",
                         "workProviderCanDo": "All steps up to and including getting and serving a final order. If the order is breached you can apply for power of arrest. You cannot apply for a warrant of arrest or contempt of court proceedings.",
                         "meritsResult": ""
                       }
@@ -816,6 +858,8 @@ module.exports = {
                         "certificateType": "Substantive certificate",
                         "formOfService": "Family Help (Higher)",
                         "scopeLimits" : "Example scope",
+                          "formOfService_requested": "Family Help (Higher)",
+                          "scopeLimits_requested" : "Example scope",
                         "workProviderCanDo": "Limited to Family Help (Higher) and to all steps necessary to negotiate and conclude a settlement. To include the issue of proceedings and representation in those proceedings save in relation to or at a contested final hearing.",
                         "meritsResult": ""
                       }
@@ -826,7 +870,8 @@ module.exports = {
                   {
                     "certificateType": "Substantive certificate",
                     "costLimit": "£25,000",
-                    "requestedCostLimit": "£25,000"
+                    "requestedCostLimit": "£25,000",
+                      "requestedCostLimit_orig": "£25,000"
                   }
                 ],
                 "contributions": [
@@ -915,6 +960,8 @@ module.exports = {
                         "certificateType": "Emergency certificate",
                         "formOfService": "Full representation",
                         "scopeLimits" : "Example scope",
+                          "formOfService_requested": "Full representation",
+                          "scopeLimits_requested" : "Example scope",
                         "workProviderCanDo": "All steps up to and including the hearing on 21 September 2021.",
                         "meritsResult": ""
                       },
@@ -923,6 +970,8 @@ module.exports = {
                         "certificateType": "Substantive certificate",
                         "formOfService": "Full representation",
                         "scopeLimits" : "Example scope",
+                          "formOfService_requested": "Full representation",
+                          "scopeLimits_requested" : "Example scope",
                         "workProviderCanDo": "All steps up to and including getting and serving a final order. If the order is breached you can apply for power of arrest. You cannot apply for a warrant of arrest or contempt of court proceedings.",
                         "meritsResult": ""
                       }
@@ -933,12 +982,14 @@ module.exports = {
                   {
                     "certificateType": "Emergency certificate",
                     "costLimit": "£1,350",
-                    "requestedCostLimit": "£1,350"
+                    "requestedCostLimit": "£1,350",
+                      "requestedCostLimit_orig": "£1,350"
                   },
                   {
                     "certificateType": "Substantive certificate",
                     "costLimit": "£25,000",
-                    "requestedCostLimit": "£25,000"
+                    "requestedCostLimit": "£25,000",
+                      "requestedCostLimit_orig": "£25,000"
                   }
                 ],
                 "contributions": [],
@@ -1013,6 +1064,8 @@ module.exports = {
                         "certificateType": "Substantive certificate",
                         "formOfService": "Full representation",
                         "scopeLimits" : "Example scope",
+                          "formOfService_requested": "Full representation",
+                          "scopeLimits_requested" : "Example scope",
                         "workProviderCanDo": "All steps up to and including getting and serving a final order. If the order is breached you can apply for power of arrest. You cannot apply for a warrant of arrest or contempt of court proceedings.",
                         "meritsResult": ""
                       }
@@ -1023,7 +1076,8 @@ module.exports = {
                   {
                     "certificateType": "Substantive certificate",
                     "costLimit": "£25,000",
-                    "requestedCostLimit": "£25,000"
+                    "requestedCostLimit": "£25,000",
+                      "requestedCostLimit_orig": "£25,000"
                   }
                 ],
                 "contributions": [],
@@ -1098,6 +1152,8 @@ module.exports = {
                         "certificateType": "Substantive certificate",
                         "formOfService": "Full representation",
                         "scopeLimits" : "Example scope",
+                          "formOfService_requested": "Full representation",
+                          "scopeLimits_requested" : "Example scope",
                         "workProviderCanDo": "All steps up to and including getting and serving a final order. If the order is breached you can apply for power of arrest. You cannot apply for a warrant of arrest or contempt of court proceedings.",
                         "meritsResult": ""
                       }
@@ -1114,6 +1170,8 @@ module.exports = {
                         "certificateType": "Substantive certificate",
                         "formOfService": "Family Help (Higher)",
                         "scopeLimits" : "Example scope",
+                          "formOfService_requested": "Family Help (Higher)",
+                          "scopeLimits_requested" : "Example scope",
                         "workProviderCanDo": "Limited to Family Help (Higher) and to all steps necessary to negotiate and conclude a settlement. To include the issue of proceedings and representation in those proceedings save in relation to or at a contested final hearing.",
                         "meritsResult": ""
                       }
@@ -1124,7 +1182,8 @@ module.exports = {
                   {
                     "certificateType": "Substantive certificate",
                     "costLimit": "£25,000",
-                    "requestedCostLimit": "£25,000"
+                    "requestedCostLimit": "£25,000",
+                      "requestedCostLimit_orig": "£25,000"
                   }
                 ],
                 "contributions": [
@@ -1208,6 +1267,8 @@ module.exports = {
                         "certificateType": "Substantive certificate",
                         "formOfService": "Full representation",
                         "scopeLimits" : "Example scope",
+                          "formOfService_requested": "Full representation",
+                          "scopeLimits_requested" : "Example scope",
                         "workProviderCanDo": "All steps up to and including getting and serving a final order. If the order is breached you can apply for power of arrest. You cannot apply for a warrant of arrest or contempt of court proceedings.",
                         "meritsResult": ""
                       }
@@ -1224,6 +1285,8 @@ module.exports = {
                         "certificateType": "Substantive certificate",
                         "formOfService": "Family Help (Higher)",
                         "scopeLimits" : "Example scope",
+                          "formOfService_requested": "Family Help (Higher)",
+                          "scopeLimits_requested" : "Example scope",
                         "workProviderCanDo": "Limited to Family Help (Higher) and to all steps necessary to negotiate and conclude a settlement. To include the issue of proceedings and representation in those proceedings save in relation to or at a contested final hearing.",
                         "meritsResult": ""
                       }
@@ -1234,7 +1297,8 @@ module.exports = {
                   {
                     "certificateType": "Substantive certificate",
                     "costLimit": "£25,000",
-                    "requestedCostLimit": "£25,000"
+                    "requestedCostLimit": "£25,000",
+                      "requestedCostLimit_orig": "£25,000"
                   }
                 ],
                 "contributions": [

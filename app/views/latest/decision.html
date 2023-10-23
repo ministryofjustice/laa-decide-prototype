@@ -107,35 +107,27 @@ Merits decision saved.
 
         <h2 class="govuk-heading-m">Cost details</h2>
         <dl class="govuk-summary-list govuk-!-margin-bottom-2">
+          {% for limitation in application['costLimitations'] %}
           <div class="govuk-summary-list__row">
             <dt class="govuk-summary-list__key">
-              Emergency cost limit
+              {{limitation['certificateType']}}
             </dt>
             <dd class="govuk-summary-list__value">
-              £2000
-              <!--{{ data['emergencyCost'] }} {{ data['emergencyCostAmount'] }} -->
+              {{limitation['requestedCostLimit']}}
             </dd>
             <dd class="govuk-summary-list__actions">
-                            {%- from "moj/components/badge/macro.njk" import mojBadge -%}
+              {% if not(limitation['requestedCostLimit_orig'] === limitation['requestedCostLimit']) %}
+              {%- from "moj/components/badge/macro.njk" import mojBadge -%}
 
               {{ mojBadge({
                 text: 'Changed',
                 classes: 'moj-badge--black'
               }) }}
+              {% endif %}
             </dd>
+
           </div>
-          <div class="govuk-summary-list__row">
-            <dt class="govuk-summary-list__key">
-              Substantive cost limit
-            </dt>
-            <dd class="govuk-summary-list__value">
-              £25,000
-               <!-- {{ data['substantiveCost'] }} {{ data['substantiveCostAmount'] }} -->
-            </dd>
-            <dd class="govuk-summary-list__actions">
-              
-            </dd>
-          </div>
+          {% endfor %}
         </dl>
         {% from "govuk/components/textarea/macro.njk" import govukTextarea %}
 
@@ -169,12 +161,7 @@ Merits decision saved.
                   Level of service
                 </dt>
                 <dd class="govuk-summary-list__value">
-                  {% if certificate['certificateType'] === 'Emergency certificate' %}
-                  {{ data['emergencyLOS'] if (certificate['id'] === data['cert_id_to_change'] and data['emergencyLOS']) else certificate['formOfService'] }}
-                  {% else %}
-                  {{ data['substantiveLOS'] if (certificate['id'] === data['cert_id_to_change'] and data['substantiveLOS']) else certificate['formOfService'] }}
-                  {% endif %}
-
+                  {{ certificate['formOfService'] }}
                 </dd>
                
               </div>
@@ -183,11 +170,7 @@ Merits decision saved.
                   Scope limitations
                 </dt>
                 <dd class="govuk-summary-list__value">
-                  {% if certificate['certificateType'] === 'Emergency certificate' %}
-                  {{ data['emergency-scope'] if (certificate['id'] === data['cert_id_to_change'] and data['emergency-scope']) else certificate['scopeLimits'] }}
-                  {% else %}
-                  {{ data['scope'] if (certificate['id'] === data['cert_id_to_change'] and data['scope']) else certificate['scopeLimits'] }}
-                  {% endif %}
+                  {{ certificate['scopeLimits'] }}
                 </dd>
                 
               </div>
