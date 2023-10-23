@@ -143,7 +143,7 @@ Merits decision saved.
             <time datetime="2019-06-14T14:01:00.000Z">{{ note['when'] | history_date }}</time>
           </p>
           <div class="moj-timeline__description">
-            <p>{{ note['text'] | safe }}</p>
+            {{ note['text'] | safe }}
           </div>
         </div>
         {% endfor %}
