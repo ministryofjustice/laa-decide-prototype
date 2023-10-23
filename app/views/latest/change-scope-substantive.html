@@ -7,6 +7,9 @@ Make merits changes
 {% block beforeContent %}
 <a class="govuk-back-link" href="merits-assessment-substantive">Back to merits assessment</a>
 {% endblock %}
+{% set application = data['application']['applicationDetails'] %}
+{% set cert_to_change = data['cert_to_change']%}
+{% set proc_type = data['proc_type']%}
 
 {% block content %}
 <div class="govuk-grid-row">
@@ -26,10 +29,10 @@ Make merits changes
         <fieldset class="govuk-fieldset" aria-describedby="contact-hint">
           <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
             <h1 class="govuk-fieldset__heading">
-              Non-molestation order
+              {{ data['proc_type'] }}
             </h1>
           </legend>
-          <p><strong>Current scope:</strong> Hearing/adjournment</p>
+          <p><strong>Current scope:</strong> {{ cert_to_change['scopeLimits'] }}</p>
           <h2 class="govuk-heading-m govuk-!-margin-top-1">Select the new scope limitations</h2>
 
           <div class="govuk-form-group">

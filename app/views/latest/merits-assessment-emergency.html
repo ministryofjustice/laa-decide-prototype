@@ -52,14 +52,14 @@ Merits assessment - emergency
               text: "Level of service"
             },
             value: {
-              text: certificate['formOfService']
+              text: data['emergencyLOS'] or certificate['formOfService']
             },
             actions: {
               items: [
                 {
-                  href: "change-level",
+                  href: "change-level-emergency?cert_id_to_change=" + certificate['id'] + "&proc_type=" + proceeding['proceedingType'],
                   text: "Change",
-                  visuallyHiddenText: "contact details"
+                  visuallyHiddenText: "Level of service"
                 }
               ]
             }
@@ -69,14 +69,14 @@ Merits assessment - emergency
               text: "Scope limitations"
             },
             value: {
-              text: certificate['scopeLimits']
+              text: data['emergency-scope'] or certificate['scopeLimits']
             },
             actions: {
               items: [
                 {
-                  href: "change-scope",
+                  href: "change-scope-emergency?cert_id_to_change=" + certificate['id'],
                   text: "Change",
-                  visuallyHiddenText: "contact details"
+                  visuallyHiddenText: "Scope limitations"
                 }
               ]
             }

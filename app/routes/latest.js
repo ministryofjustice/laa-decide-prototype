@@ -11,6 +11,19 @@ const NOT_DECIDED_STATES = ['Not started', 'In progress', 'rejected']
 
 const { ApplicationService } = require("../services");
 
+const find_certificate = (application, id) => {
+  return find_proceeding(application, id).certificates.find(find_cert);
+  function find_cert(cert) {
+    return cert.id == id;
+  }
+}
+const find_proceeding = (application, id) =>{
+  return application.applicationDetails.proceedings.find(current_proceeding);
+  function current_proceeding(proceeding) {
+    for (const certificate of proceeding.certificates){
+      return certificate.id === id;}
+  }
+}
 // Add your routes here
 router.get('/my-applications', async function(req, res) {
   req.session.data['request-more-information'] = '';
@@ -161,16 +174,23 @@ router.get('/people', function(req, res) {
 });
 
 router.get('/decision', function(req, res) {
-  var application = null;
-
-  // find the application
-  for (const app of req.session.data.applications) {
-    if (app.applicationDetails.refNo === req.session.data.refNo)
-      application = app;
-  }
-
+  let application = ApplicationService.find_application(req);
   res.locals.data['application'] = application;
   res.render('./latest/decision');
+});
+
+router.get('/change-level-emergency', function(req, res) {
+  let application = ApplicationService.find_application(req);
+  res.locals.data['application'] = application;
+  res.locals.data['cert_to_change'] = find_certificate(application, res.locals.data['cert_id_to_change']);
+  res.render('./latest/change-level-emergency');
+});
+
+router.get('/change-level-substantive', function(req, res) {
+  let application = ApplicationService.find_application(req);
+  res.locals.data['application'] = application;
+  res.locals.data['cert_to_change'] = find_certificate(application, res.locals.data['cert_id_to_change']);
+  res.render('./latest/change-level-emergency');
 });
 
 router.get('/merits-assessment-emergency', function(req, res) {
@@ -184,6 +204,8 @@ router.get('/merits-assessment-emergency', function(req, res) {
   else {
     res.render('./latest/merits-assessment-emergency');
   }
+  req.session.data['emergencyLOS'] = '';
+  req.session.data['emergency-scope'] = '';
 });
 
 router.get('/merits-assessment-substantive', function(req, res) {
@@ -212,6 +234,8 @@ router.get('/merits-assessment-substantive', function(req, res) {
       application['applicationDetails']['meritsAssessmentResult'] = 'in progress';
       res.locals.data['application'] = application;
       res.render('./latest/merits-assessment-substantive');
+      req.session.data['substantiveLOS'] = '';
+      req.session.data['scope'] = '';
     }
   }
 
