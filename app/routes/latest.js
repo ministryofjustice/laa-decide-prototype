@@ -11,6 +11,16 @@ const NOT_DECIDED_STATES = ['Not started', 'In progress', 'rejected']
 
 const { ApplicationService } = require("../services");
 
+const find_certificate = (application, id) => {
+  for (const proceeding of application.applicationDetails.proceedings){
+    for (const cert of proceeding.certificates){
+      if (cert['id'] === id){
+        return cert
+      }
+    }
+
+  }
+  }
 // Add your routes here
 router.get('/my-applications', async function(req, res) {
   req.session.data['request-more-information'] = '';
@@ -54,6 +64,23 @@ router.get('/application-details', async function(req, res)
   //update substantive proceeding merits results if have come from the merits page
   let application = ApplicationService.find_application(req);
   const considered_merits = await ApplicationService.update_merits_certificate_decisions(req);
+  for (const cost of application['applicationDetails']['costLimitations']) {
+    if (cost['certificateType'] === 'Substantive certificate'){
+      if (typeof req.session.data['substantiveCost'] !== 'undefined' && req.session.data['substantiveCost'] !== null) {
+        switch (req.session.data['substantiveCost']) {
+          case "Requested limit (amount)":
+            break;
+          case "Default limit (amount)":
+            cost['requestedCostLimit'] = cost['costLimit'];
+            break;
+          case "New limit set by assessor (amount)":
+            cost['requestedCostLimit'] = req.session.data['substantiveCostAmount'];
+            break;
+        }
+    }
+
+    }
+  }
   //so update_all_substantive not being used in latest (beyond v4)
   // merits_continue button is on both emergency and substantive pages
   if ((req.session.data['merits_continue_button']) || (req.session.data['update_all_substantive']))
@@ -142,7 +169,7 @@ router.get('/application-details', async function(req, res)
       DECIDED_STATES.includes(application_details['meansAssessmentResult'])
       && res.locals.data['merits_continue_button'] =='Save and continue' || res.locals.data['means_continue_button'] =='Save and continue')
   {
-    res.render('./latest/decision');
+    res.render('./latest/decision-communication');
   }
   else{
     res.render('./latest/application-details');}
@@ -160,18 +187,71 @@ router.get('/people', function(req, res) {
   res.render('./latest/people');
 });
 
-router.get('/decision', function(req, res) {
-  var application = null;
-
-  // find the application
-  for (const app of req.session.data.applications) {
-    if (app.applicationDetails.refNo === req.session.data.refNo)
-      application = app;
-  }
-
+router.get('/decision-communication', function(req, res) {
+  let application = ApplicationService.find_application(req);
   res.locals.data['application'] = application;
-  res.render('./latest/decision');
+  res.render('./latest/decision-communication');
 });
+
+router.get('/change-level-emergency', function(req, res) {
+  let application = ApplicationService.find_application(req);
+  res.locals.data['application'] = application;
+  res.locals.data['cert_to_change'] = find_certificate(application, res.locals.data['cert_id_to_change']);
+  res.render('./latest/change-level-emergency');
+});
+
+router.post('/change-emergency', function(req, res) {
+  let application = ApplicationService.find_application(req);
+  res.locals.data['application'] = application;
+  res.locals.data['cert_to_change'] = find_certificate(application, res.locals.data['cert_id_to_change']);
+  //update the emergency values
+  for (const proceeding of application['applicationDetails']['proceedings']) {
+    for (let certificate of proceeding['certificates']) {
+      if (certificate['id'] === res.locals.data['cert_id_to_change']) {
+        if (typeof req.session.data['emergencyLOS'] !== 'undefined' && req.session.data['emergencyLOS']!== null)
+        {
+          certificate['formOfService'] = req.session.data['emergencyLOS']
+        }
+        if (typeof req.session.data['emergency-scope'] !== 'undefined' && req.session.data['emergency-scope']!== null){
+          certificate['scopeLimits'] = req.session.data['emergency-scope']
+        }
+
+      }
+    }
+  }
+  req.session.data['cert_id_to_change'] = '';
+  res.render('./latest/merits-assessment-emergency');
+});
+
+router.get('/change-level-substantive', function(req, res) {
+  let application = ApplicationService.find_application(req);
+  res.locals.data['application'] = application;
+  res.locals.data['cert_to_change'] = find_certificate(application, res.locals.data['cert_id_to_change']);
+  res.render('./latest/change-level-substantive');
+});
+
+router.post('/change-substantive', function(req, res) {
+  let application = ApplicationService.find_application(req);
+  res.locals.data['application'] = application;
+  res.locals.data['cert_to_change'] = find_certificate(application, res.locals.data['cert_id_to_change']);
+  //update the values we need
+  for (const proceeding of application['applicationDetails']['proceedings']) {
+    for (let certificate of proceeding['certificates']) {
+      if (certificate['id'] === res.locals.data['cert_id_to_change']) {
+        if (typeof req.session.data['substantiveLOS'] !== 'undefined' && req.session.data['substantiveLOS']!== null)
+        {
+          certificate['formOfService'] = req.session.data['substantiveLOS']
+        }
+        if (typeof req.session.data['scope'] !== 'undefined' && req.session.data['scope']!== null){
+          certificate['scopeLimits'] = req.session.data['scope']
+        }
+
+      }
+    }
+  }
+  res.render('./latest/merits-assessment-substantive');
+});
+
 
 router.get('/merits-assessment-emergency', function(req, res) {
   let application = ApplicationService.find_application(req);
@@ -221,7 +301,28 @@ router.post('/merits-assessment-substantive', async function(req, res) {
   let application = ApplicationService.find_application(req);
   // update emergency proceeding merits results
   const can_continue = await ApplicationService.update_merits_certificate_decisions(req);
+  //update the costs
+  for (const cost of application['applicationDetails']['costLimitations'])
+  {
+    if (cost['certificateType'] === 'Emergency certificate')
+    {
+      if (typeof req.session.data['emergencyCost'] !== 'undefined' && req.session.data['emergencyCost'] !== null)
+      {
+        switch (req.session.data['emergencyCost'])
+        {
+          case "Requested limit (amount)":
+            break;
+          case "Default limit (amount)":
+            cost['requestedCostLimit'] = cost['costLimit'];
+            break;
+          case "New limit set by assessor (amount)":
+            cost['requestedCostLimit'] = req.session.data['emergencyCostAmount'];
+            break;
+        }
 
+      }
+    }
+  }
   // update overall merits assessment result
   application['applicationDetails']['meritsAssessmentResult'] = 'in progress';
 

@@ -9,6 +9,7 @@ Merits assessment - emergency
 {% endblock %}
 
 {% set application = data['application']['applicationDetails'] %}
+{% set cert_id_to_change = data['cert_id_to_change'] %}
 
 {% block content %}
 <div class="govuk-grid-row">
@@ -57,9 +58,9 @@ Merits assessment - emergency
             actions: {
               items: [
                 {
-                  href: "change-level",
+                  href: "change-level-emergency?cert_id_to_change=" + certificate['id'] + "&proc_type=" + proceeding['proceedingType'],
                   text: "Change",
-                  visuallyHiddenText: "contact details"
+                  visuallyHiddenText: "Level of service"
                 }
               ]
             }
@@ -74,9 +75,9 @@ Merits assessment - emergency
             actions: {
               items: [
                 {
-                  href: "change-scope",
+                  href: "change-scope-emergency?cert_id_to_change=" + certificate['id'] + "&proc_type=" + proceeding['proceedingType'],
                   text: "Change",
-                  visuallyHiddenText: "contact details"
+                  visuallyHiddenText: "Scope limitations"
                 }
               ]
             }

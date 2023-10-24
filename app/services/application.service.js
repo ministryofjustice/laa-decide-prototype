@@ -94,6 +94,7 @@ const update_merits_certificate_decisions = async (req) =>
         for (const certificate of proceeding['certificates']) {
             if (typeof req.session.data[certificate['id']] !== 'undefined' && req.session.data[certificate['id']] !== null)
             {
+                //in here we could update the value of the certificate scope and los
                 certificate['meritsResult'] = req.session.data[certificate['id']];
             }
         }

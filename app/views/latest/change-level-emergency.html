@@ -5,8 +5,12 @@ Make merits changes
 {% endblock %}
 
 {% block beforeContent %}
-<a class="govuk-back-link" href="merits-assessment-substantive">Back to merits assessment</a>
+<a class="govuk-back-link" href="merits-assessment-emergency">Back to merits assessment</a>
 {% endblock %}
+
+{% set application = data['application']['applicationDetails'] %}
+{% set cert_to_change = data['cert_to_change']%}
+{% set proc_type = data['proc_type']%}
 
 {% block content %}
 <div class="govuk-grid-row">
@@ -20,29 +24,29 @@ Make merits changes
 
 <div class="govuk-grid-row">  
 <div class="govuk-grid-column-two-thirds">
-    <form action="merits-assessment-substantive" method="post" novalidate="">
+    <form action="change-emergency" method="post" novalidate="">
 
       <div class="govuk-form-group">
         <fieldset class="govuk-fieldset" aria-describedby="contact-hint">
           <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
             <h1 class="govuk-fieldset__heading">
-              Non-molestation order
+              {{ data['proc_type'] }}
             </h1>
           </legend>
-          <p>Current level: Full representation</p>
+          <p>Current level: {{ cert_to_change['formOfService'] }}</p>
           <h2 class="govuk-heading-m govuk-!-margin-top-1">Select the new level of service</h2>
         </fieldset>
 
         <div class="govuk-radios" data-module="govuk-radios">
             <div class="govuk-radios__item">
-              <input class="govuk-radios__input" id="emergency-LOS" name="substantiveLOS" type="radio" value="Family help (higher)" data-aria-controls="conditional-emergency-LOS">
+              <input class="govuk-radios__input" id="emergency-LOS" name="emergencyLOS" type="radio" value="Family help (higher)" data-aria-controls="conditional-emergency-LOS">
               <label class="govuk-label govuk-radios__label" for="emergency-LOS">
                 Family help (higher)
               </label>
             </div>
 
             <div class="govuk-radios__item">
-              <input class="govuk-radios__input" id="emergency-LOS-2" name="substantiveLOS" type="radio" value="Full representation" data-aria-controls="conditional-emergency-LOS-2" aria-describedby="conditional-emergency-LOS-2">
+              <input class="govuk-radios__input" id="emergency-LOS-2" name="emergencyLOS" type="radio" value="Full representation" data-aria-controls="conditional-emergency-LOS-2" aria-describedby="conditional-emergency-LOS-2">
               <label class="govuk-label govuk-radios__label" for="emergency-LOS-2">
                 Full representation
               </label>
@@ -62,7 +66,7 @@ Make merits changes
             {{ govukButton({
               text: "Cancel",
               classes: "govuk-button--secondary",
-              href: "merits-assessment-substantive"
+              href: "merits-assessment-emergency"
             }) }}
       </form>
     </div>
