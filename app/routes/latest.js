@@ -169,7 +169,7 @@ router.get('/application-details', async function(req, res)
       DECIDED_STATES.includes(application_details['meansAssessmentResult'])
       && res.locals.data['merits_continue_button'] =='Save and continue' || res.locals.data['means_continue_button'] =='Save and continue')
   {
-    res.render('./latest/decision');
+    res.render('./latest/decision-communication');
   }
   else{
     res.render('./latest/application-details');}
@@ -187,10 +187,10 @@ router.get('/people', function(req, res) {
   res.render('./latest/people');
 });
 
-router.get('/decision', function(req, res) {
+router.get('/decision-communication', function(req, res) {
   let application = ApplicationService.find_application(req);
   res.locals.data['application'] = application;
-  res.render('./latest/decision');
+  res.render('./latest/decision-communication');
 });
 
 router.get('/change-level-emergency', function(req, res) {
@@ -301,7 +301,7 @@ router.post('/merits-assessment-substantive', async function(req, res) {
   let application = ApplicationService.find_application(req);
   // update emergency proceeding merits results
   const can_continue = await ApplicationService.update_merits_certificate_decisions(req);
-  //update the costs we need
+  //update the costs
   for (const cost of application['applicationDetails']['costLimitations'])
   {
     if (cost['certificateType'] === 'Emergency certificate')
