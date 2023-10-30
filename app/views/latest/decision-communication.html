@@ -58,7 +58,7 @@ Merits decision saved.
 
           </td>
         </tr>
-        
+ <!-- ONLY MERITS OR MEANS NOT BOTH       
         <tr class="govuk-table__row">
           <td class="govuk-table__header">Means assessment</td>
           <td class="govuk-table__cell">
@@ -69,8 +69,6 @@ Merits decision saved.
             <span class="moj-badge moj-badge--red">{{ application['meansAssessmentResult'] }}</span>
             {% endif %}
             {% if application['meansAssessmentResult'] === 'Passported' %}
-            <!--<span class="moj-badge moj-badge--green">{{ application['meansAssessmentResult'] }}</span>-->
-            <!-- hot fix https://dsdmoj.atlassian.net/browse/AD-321 -->
             <span class="moj-badge moj-badge--green">Granted</span>
             {% endif %}
             {% if (application['meansAssessmentResult'] === 'granted') %}
@@ -81,6 +79,7 @@ Merits decision saved.
             {% endif %}
           </td>
         </tr>
+-->
         <tr class="govuk-table__row">
           <td class="govuk-table__header">Merits assessment</td>
           <td class="govuk-table__cell">
@@ -296,7 +295,7 @@ Merits decision saved.
     {% from "govuk/components/button/macro.njk" import govukButton %}
 
     {{ govukButton({
-      text: "Submit decision reasons",
+      text: "Save and continue",
       href: "application-complete"
     }) }}
 
