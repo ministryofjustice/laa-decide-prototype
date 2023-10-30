@@ -33,6 +33,11 @@ Means decision saved.
    and (application['meansAssessmentResult'] == 'Not started') %}
 Merits decision saved.
 {% endif %}
+
+{% if ((application['meritsAssessmentResult'] == 'rejected'))
+   and (application['meansAssessmentResult'] == 'rejected') %}
+Application rejected.
+{% endif %}
 {% endset %}
 
 {% block content %}
@@ -64,6 +69,20 @@ Merits decision saved.
       </div>
     </div>
     {% endif %}
+
+    {% if application['meritsAssessmentResult'] == 'rejected-temporarily-disabled' %}
+    <div class="govuk-notification-banner" role="alert" aria-labelledby="govuk-notification-banner-title" data-module="govuk-notification-banner">
+      <div class="govuk-notification-banner__header">
+        <h2 class="govuk-notification-banner__title" id="govuk-notification-banner-title">
+          Important
+        </h2>
+      </div>
+      <div class="govuk-notification-banner__content">
+        <p class="govuk-notification-banner__heading">{{ success_message | safe}}</p>
+      </div>
+    </div>
+    {% endif %}
+
   </div>
 </div>
 
