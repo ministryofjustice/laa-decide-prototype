@@ -305,7 +305,7 @@ router.post('/add-note', function(req, res) {
 
   application.applicationDetails.notes.push(ApplicationService.create_note(
       'You',
-      'General note',
+      'Caseworker note added',
       req.session.data['note']));
   res.redirect('./application-history');
 });
