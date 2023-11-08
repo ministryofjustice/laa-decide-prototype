@@ -21,7 +21,7 @@ Application history
 {% set success_message %}
 {% if ((application['meritsAssessmentResult'] == 'granted') or (application['meritsAssessmentResult'] == 'refused') or (application['meritsAssessmentResult'] == 'partially granted'))
    and ((application['meansAssessmentResult'] == 'granted') or (application['meansAssessmentResult'] == 'refused') or (application['meansAssessmentResult'] == 'partially granted') or (application['meansAssessmentResult'] == 'Passported')) %}
-Means and merits decisions saved and shared with the provider. <a class="" href="#">You should now update the status of the case in CCMS</a>.
+Means and merits decisions saved and shared with the provider.
 {% endif %}
 
 {% if ((application['meritsAssessmentResult'] == 'Not started') or (application['meritsAssessmentResult'] == 'in progress'))
@@ -131,25 +131,23 @@ Merits decision saved.
         </ul>
       </nav>
 
-      <table class="govuk-table">
-        <caption class="govuk-table__caption govuk-table__caption--m">Application history</caption>
-        <thead class="govuk-table__head">
-          <tr class="govuk-table__row">
-            <th scope="col" class="govuk-table__header">When</th>
-            <th scope="col" class="govuk-table__header">Who</th>
-            <th scope="col" class="govuk-table__header">What</th>
-          </tr>
-        </thead>
-        <tbody class="govuk-table__body">
-          {% for note in application['notes'] | reverse %}
-          <tr class="govuk-table__row">
-            <td class="govuk-table__cell">{{ note['when'] | history_date }}</td>
-            <td class="govuk-table__cell">{{ note['who'] }}<br>{{ note['role'] }}</td>
-            <td class="govuk-table__cell"><b>{{ note['title'] }}</b><br>{{ note['text'] | safe }}</td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
+      <!-- <h2 class="govuk-heading-l">Application history</h2> -->
+      <div class="moj-timeline">
+        {% for note in application['notes'] | reverse %}      
+        <div class="moj-timeline__item">
+          <div class="moj-timeline__header">
+            <h2 class="moj-timeline__title">{{ note['title'] }}</h2>
+            <p class="moj-timeline__byline">by <!--{{ note['who'] }}--> Mo Bradshaw <!--{{ note['role'] }}--></p>
+          </div>
+          <p class="moj-timeline__date">
+            <time datetime="2019-06-14T14:01:00.000Z">{{ note['when'] | history_date }}</time>
+          </p>
+          <div class="moj-timeline__description">
+            {{ note['text'] | safe }}
+          </div>
+        </div>
+        {% endfor %}
+      </div>
 
       {% if data['refNo'] in data['assignedApplications'] %}
       <form action="add-note" method="POST">
