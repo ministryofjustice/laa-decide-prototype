@@ -53,14 +53,14 @@ Merits decision saved.
     {% endif %}
 
     {% if (data['request-more-information'] == 'display-banner-now') %}
-    <div class="govuk-notification-banner govuk-notification-banner--success" role="alert" aria-labelledby="govuk-notification-banner-title" data-module="govuk-notification-banner">
+    <div class="govuk-notification-banner" role="alert" aria-labelledby="govuk-notification-banner-title" data-module="govuk-notification-banner">
       <div class="govuk-notification-banner__header">
         <h2 class="govuk-notification-banner__title" id="govuk-notification-banner-title">
-          Success
+          Information
         </h2>
       </div>
       <div class="govuk-notification-banner__content">
-        <p class="govuk-notification-banner__heading">Request sent to {{ application['provider']['name'] }}</p>
+        <p class="govuk-notification-banner__heading">Request sent to {{ application['provider']['name'] }}. This application now needs to <a href="#">be assessed on CCMS</a>.</p>
       </div>
     </div>
     {% endif %}
@@ -184,14 +184,9 @@ Merits decision saved.
           <td class="govuk-table__header">Means assessment</td>
           <td class="govuk-table__cell">
             {% if (application['meansAssessmentResult'] === 'Not started') %}
-            <span class="moj-badge moj-badge">{{ application['meansAssessmentResult'] }}</span>
-            {% endif %}
-            {% if (application['meansAssessmentResult'] === 'refused') or (application['meansAssessmentResult'] === 'rejected') or (application['meansAssessmentResult'] === 'RFI')%}
-            <span class="moj-badge moj-badge--red">{{ application['meansAssessmentResult'] }}</span>
+            <span class="moj-badge moj-badge--grey">{{ application['meansAssessmentResult'] }}</span>
             {% endif %}
             {% if application['meansAssessmentResult'] === 'Passported' %}
-            <!--<span class="moj-badge moj-badge--green">{{ application['meansAssessmentResult'] }}</span>-->
-            <!-- hot fix https://dsdmoj.atlassian.net/browse/AD-321 -->
             <span class="moj-badge moj-badge--green">Granted</span>
             {% endif %}
             {% if (application['meansAssessmentResult'] === 'granted') %}
@@ -199,6 +194,19 @@ Merits decision saved.
             {% endif %}
             {% if (application['meansAssessmentResult'] === 'partially granted') %}
             <span class="moj-badge moj-badge--blue">{{ application['meansAssessmentResult'] }}</span>
+            {% endif %}
+            {% if (application['meansAssessmentResult'] === 'refused')%}
+            <span class="moj-badge moj-badge--red">{{ application['meansAssessmentResult'] }}</span>
+            {% endif %}
+            {% if (application['meansAssessmentResult'] === 'rejected')%}
+            <span class="moj-badge moj-badge--red">{{ application['meansAssessmentResult'] }}</span>
+            {% endif %}
+            {% if (application['meansAssessmentResult'] === 'RFI')%}
+            <span class="moj-badge moj-badge--blue">Further information requested</span>
+            {% endif %}
+
+            {% if (application['meansAssessmentResult'] === 'Withdraw') %}
+            <span class="moj-badge moj-badge">{{ application['meansAssessmentResult'] }}</span>
             {% endif %}
           </td>
         </tr>
@@ -217,8 +225,18 @@ Merits decision saved.
             {% if (application['meritsAssessmentResult'] === 'partially granted') %}
             <span class="moj-badge moj-badge--blue">{{ application['meritsAssessmentResult'] }}</span>
             {% endif %}
-            {% if (application['meritsAssessmentResult'] === 'refused') or (application['meritsAssessmentResult'] === 'rejected') or (application['meritsAssessmentResult'] === 'RFI')%}
+            {% if (application['meritsAssessmentResult'] === 'refused')%}
             <span class="moj-badge moj-badge--red">{{ application['meritsAssessmentResult'] }}</span>
+            {% endif %}
+            {% if (application['meritsAssessmentResult'] === 'rejected')%}
+            <span class="moj-badge moj-badge--red">{{ application['meritsAssessmentResult'] }}</span>
+            {% endif %}
+            {% if (application['meritsAssessmentResult'] === 'RFI')%}
+            <span class="moj-badge moj-badge--blue">Further information requested</span>
+            {% endif %}
+
+             {% if (application['meritsAssessmentResult'] === 'Withdraw') %}
+            <span class="moj-badge moj-badge--grey">{{ application['meritsAssessmentResult'] }}</span>
             {% endif %}
           </td>
         </tr>
@@ -280,7 +298,7 @@ Merits decision saved.
                   Means decision
                 </dt>
                 <dd class="govuk-summary-list__value">
-                  <strong class="govuk-tag govuk-tag--green">{{ proceeding['meansResult'] }}</strong>
+                  <span class="moj-badge moj-badge--green">{{ proceeding['meansResult'] }}</span>
                 </dd>           
               </div>
               {% endif %}
@@ -291,7 +309,7 @@ Merits decision saved.
                   Merits decision
                 </dt>
                 <dd class="govuk-summary-list__value">
-                  <strong class="govuk-tag govuk-tag--green">{{ certificate['meritsResult'] }}</strong>
+                  <span class="moj-badge moj-badge--green">{{ certificate['meritsResult'] }}</span>
                 </dd>           
               </div>
               {% endif %}
@@ -302,7 +320,7 @@ Merits decision saved.
                   Means decision
                 </dt>
                 <dd class="govuk-summary-list__value">
-                  <strong class="govuk-tag govuk-tag--red">{{ proceeding['meansResult'] }}</strong>
+                  <span class="moj-badge moj-badge--red">{{ proceeding['meansResult'] }}</span>
                 </dd>           
               </div>
               {% endif %}
@@ -313,7 +331,7 @@ Merits decision saved.
                   Merits decision
                 </dt>
                 <dd class="govuk-summary-list__value">
-                  <strong class="govuk-tag govuk-tag--red">{{ certificate['meritsResult'] }}</strong>
+                  <span class="moj-badge moj-badge--red">{{ certificate['meritsResult'] }}</span>
                 </dd>           
               </div>
               {% endif %}

@@ -1,0 +1,24 @@
+{% extends "layouts/layout.html" %}
+
+{% block content %}
+  <div class="flash-card">
+    <header>
+      <h1 class="govuk-heading-l">Use CCMS for this application</h1>
+    </header>
+
+    <div class="govuk-body" style="color:white">
+      You cannot use this service if the applcation:
+      <ul class="govuk-list--bullet">
+        <li>does not have passported Means</li>
+        <li>needs further information from the provider</li>
+        <li>has scope limitations and/or level of service outside of the default</li>
+      </ul>
+
+      <form action="#">
+        <button class="govuk-button govuk-button--secondary" data-module="govuk-button">Assess in CCMS</button>
+      </form>
+
+      <a href="/latest/my-applications" class="govuk-link--inverse">Back to your list</a>
+    </div>
+  </div>
+{% endblock %}
