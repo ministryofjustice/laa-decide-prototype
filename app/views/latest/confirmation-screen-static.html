@@ -1,0 +1,39 @@
+{% if data['refNo'] in data['assignedApplications'] %}
+  {% extends "layouts/workload.html" %}
+{% else %}
+  {% extends "layouts/open.html" %}
+{% endif %}
+
+{% block pageTitle %}
+Application history
+{% endblock %}
+
+{% block beforeContent %}
+{% if data['refNo'] in data['assignedApplications'] %}
+<a class="govuk-back-link" href="my-applications">Back to my applications</a>
+{% else %}
+<a class="govuk-back-link" href="open-applications">Back to open applications</a>
+{% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    <div class="govuk-panel govuk-panel--confirmation">
+      <h1 class="govuk-panel__title">
+        Application sent back to provider
+      </h1>
+      <div class="govuk-panel__body">
+        Reference number<br><strong>HDJ-212-13F</strong>
+      </div>
+    </div>
+    <h2 class="govuk-heading-m">What happens next</h2>
+    <p class="govuk-body">
+      We’ve sent your request for further information to Provder Name.
+    </p>
+    <p class="govuk-body">
+      You will need to continue processing this case in CCMS.
+    </p>
+  </div>
+</div>
+{% endblock %}

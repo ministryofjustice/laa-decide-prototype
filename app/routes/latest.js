@@ -448,9 +448,18 @@ router.get('/refuse-all-means', function(req, res) {
 });
 
 
-// experimental index re-routing
-router.get('/latest/home', function (req, res) {
-  res.render('/latest/my-applications');
-});
+// multiple add on open applications
+router.get('/add-applications', async function(req, res) {
+  req.session.data['request-more-information'] = '';
 
+  var refNo = req.session.data.refNo;
+
+//if a refNo exists then we "may" be assigning, usually only if we came from open applications
+  if (refNo != null){
+    const is_assigned = await ApplicationService.assign_application(req)
+  }
+  req.session.data.refNo = null;
+  
+  res.render('./latest/open-applications');
+});
 module.exports = router
