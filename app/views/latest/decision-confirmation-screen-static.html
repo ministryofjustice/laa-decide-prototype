@@ -21,7 +21,7 @@ Application history
   <div class="govuk-grid-column-two-thirds">
     <div class="govuk-panel govuk-panel--confirmation">
       <h1 class="govuk-panel__title">
-        Application sent back to provider
+        Application for civil legal aid assessed completely
       </h1>
       <div class="govuk-panel__body">
         Reference number<br><strong>{{ application['refNo'] or 'E-X4M-P7E'}}</strong>
@@ -29,11 +29,13 @@ Application history
     </div>
     <h2 class="govuk-heading-m">What happens next</h2>
     <p class="govuk-body">
-      We’ve sent your request for further information to Provider Name.
+      We’ve saved your decision, and the provider will be informed.
     </p>
-    <p class="govuk-body">
-      You will need to continue processing this case in CCMS.
-    </p>
+        {% from "govuk/components/button/macro.njk" import govukButton %}
+    {{ govukButton({
+      text: "View my applications",
+      href: "my-applications"
+    }) }}
   </div>
 </div>
 {% endblock %}

@@ -1,0 +1,126 @@
+// HOME OFFICE - Interruption card styles
+
+.flash-card {
+  padding: 30px;
+  background: #005EA5;
+  color: #FFF;
+
+  header {
+    background-color: inherit;
+  }
+
+  p, ul, h2, a, h1 {
+    color: #FFF;
+  }
+
+  .govuk-button {
+    background: #FFF;
+    color: #005EA5;
+  }
+
+  ul {
+
+    h2 {
+      margin: 0;
+      margin-bottom: 0;
+      padding: 0;
+      font-size: 28px;
+    }
+
+    li {
+      margin-bottom: 5px;
+    }
+  }
+
+  h1 {
+    &:first-of-type {
+      margin-top: 0 !important;
+    }
+  }
+
+  a {
+    &:visited, &:hover, &:active {
+      color: #FFF;
+    }
+    &:hover {
+      opacity: 80%;
+    }
+  }
+  details {
+    // margin-bottom: 1em;
+    summary {
+      color: #FFF;
+    }
+    .panel {
+      border-left-color: #FFF;
+    }
+  }
+}
+
+@media (min-width: 769px) {
+  .flash-card {
+    margin-top: 0em;
+    padding: 60px 60px;
+  }
+}
+
+.blocked .app-task-list__task-name a {
+  display: inline-block;
+  pointer-events: none;
+  text-decoration: none;
+  color: #0b0c0c;
+}
+
+.inline-form {
+  display: inline;
+  float: left;
+  padding-left: 15px;
+}
+
+.button-left {
+  float: left;
+}
+
+.greyed-out {
+  color: lightgrey;
+}
+
+// Search list styles
+
+div.proceeding-list {
+  padding: 0px;
+  border-bottom: 1px solid #ccc;
+}
+
+div.proceeding-list:hover {
+  background-color: #e7f4fb;
+}
+
+div.no-results {
+  margin-left: 0px;
+  font-family: "nta", Arial;
+  font-size: 19px;
+  padding-bottom: 20px;
+}
+
+ul#offences-list {
+  padding: 0px;
+  margin-top: 22px;
+  li {
+    display: inline-block;
+  }
+}
+
+ul#courts-list {
+  padding: 0px;
+  margin-top: 22px;
+  li {
+    display: block;
+    list-style-type: none;
+    margin-bottom: 10px;
+  }
+}
+
+div.clear-search {
+  padding-top: 8px;
+}

@@ -448,6 +448,18 @@ router.get('/refuse-all-means', function(req, res) {
 });
 
 
+router.post('/decision-check', function(request, response) {
+
+    var decisionCheck = request.session.data['overall-decision']
+    if (decisionCheck == "refuse") {
+        response.redirect("/latest/application-complete-error")
+    }  else {
+      response.redirect("/application-history")
+    }
+});
+
+
+
 // multiple add on open applications
 router.get('/add-applications', async function(req, res) {
   req.session.data['request-more-information'] = '';
