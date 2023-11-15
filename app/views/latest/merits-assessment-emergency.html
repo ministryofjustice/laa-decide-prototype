@@ -23,10 +23,10 @@ Merits assessment - emergency
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">
     <h2 class="govuk-heading-l govuk-!-margin-bottom-4">Emergency proceedings</h1>
+
     <form action="merits-assessment-substantive" method="POST">
 
-
-<div class="govuk-form-group">
+      <div class="govuk-form-group">
         {% for proceeding in application['proceedings'] %}
         {% for certificate in proceeding['certificates'] %}
         {% if certificate['certificateType'] === 'Emergency certificate' %}
@@ -97,30 +97,80 @@ Merits assessment - emergency
       }) }}
 
 
-        {% set grantHtml %}
-        {% from "govuk/components/date-input/macro.njk" import govukDateInput %}
 
+        {% from "govuk/components/radios/macro.njk" import govukRadios %}
+        {% from "govuk/components/date-input/macro.njk" import govukDateInput %}
+        
+        {% set otherDate %}
         {{ govukDateInput({
-          id: "emergency-start",
-          namePrefix: "emergency-start",
+          id: "emergency-date",
+          namePrefix: "emergency-date"
+        }) }}
+
+        {% endset -%}
+
+        {% set otherDateEnd %}
+        {{ govukDateInput({
+          id: "emergency-date-end",
+          namePrefix: "emergency-date-end"
+        }) }}
+
+        {% endset -%}
+
+        {% set grantHtml %}
+
+        {{ govukRadios({
+          name: "emergencyDateStart",
           fieldset: {
             legend: {
               text: "When should the emergency certificate be granted from?",
+              isPageHeading: true,
               classes: "govuk-fieldset__legend--s"
             }
-          }
+          },
+          items: [
+            {
+              value: "df-day",
+              text: "Date delegated functions were used"
+            },
+            {
+              value: "today",
+              text: "Today"
+            },
+            {
+              value: "other",
+              text: "Another date",
+              conditional: {
+                html: otherDate
+              }
+            }
+          ]
         }) }}
 
-        {{ govukDateInput({
-          id: "emergency-end",
-          namePrefix: "emergency-end",
+        {{ govukRadios({
+          name: "emergencyDateEnd",
           fieldset: {
             legend: {
               text: "When should the emergency certificate end?",
+              isPageHeading: true,
               classes: "govuk-fieldset__legend--s"
             }
-          }
+          },
+          items: [
+            {
+              value: "8weeks",
+              text: "8 weeks from the start date"
+            },
+            {
+              value: "other",
+              text: "Another date",
+              conditional: {
+                html: otherDateEnd
+              }
+            }
+          ]
         }) }}
+
         {% endset -%}
 
         {% set refuseHtml %}
