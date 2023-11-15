@@ -37,7 +37,7 @@ Merits assessment - substantive
 
          <h2 class="govuk-heading-m">{{ proceeding['proceedingType'] }}</h2>
         {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
-
+        {% from "govuk/components/date-input/macro.njk" import govukDateInput %}
         {{ govukSummaryList({
         classes: "govuk-!-margin-bottom-5",
         rows: [
@@ -47,6 +47,17 @@ Merits assessment - substantive
             },
             value: {
               text: application['categoryLaw'] + ' - ' + proceeding['matterType']
+            },
+            actions: {
+              
+            }
+          },
+          {
+            key: {
+              text: "Delegated functions"
+            },
+            value: {
+              text: "16 Oct 2023"
             },
             actions: {
               
@@ -89,7 +100,11 @@ Merits assessment - substantive
         ]
       }) }}
 
-        {% set grantHtml %}
+      {% set refuseHtml %}
+        {% include "./_refusal_reasons_dropdown.html" %}
+        {% endset -%}
+
+      {% set grantHtml %}
         {% from "govuk/components/date-input/macro.njk" import govukDateInput %}
 
         {{ govukDateInput({
@@ -102,10 +117,6 @@ Merits assessment - substantive
             }
           }
         }) }}
-        {% endset -%}
-
-        {% set refuseHtml %}
-        {% include "./_refusal_reasons_dropdown.html" %}
         {% endset -%}
 
         {{ govukRadios({
@@ -130,7 +141,7 @@ Merits assessment - substantive
               }
             }
           ]
-        })}}
+        }) }}
 
         {% endif %}
         {% endfor %}
