@@ -23,10 +23,9 @@ Make merits changes
 
 
 <div class="govuk-grid-row">  
-<div class="govuk-grid-column-two-thirds">
+  <div class="govuk-grid-column-two-thirds">
     <form action="change-substantive" method="post" novalidate="">
-
-      <div class="govuk-form-group">
+      <div class="govuk-form-group">  
         <fieldset class="govuk-fieldset" aria-describedby="contact-hint">
           <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
             <h1 class="govuk-fieldset__heading">
@@ -38,37 +37,31 @@ Make merits changes
         </fieldset>
 
         <div class="govuk-radios" data-module="govuk-radios">
-            <div class="govuk-radios__item">
-              <input class="govuk-radios__input" id="emergency-LOS" name="substantiveLOS" type="radio" value="Family help (higher)" data-aria-controls="conditional-emergency-LOS">
-              <label class="govuk-label govuk-radios__label" for="emergency-LOS">
-                Family help (higher)
-              </label>
-            </div>
-
-            <div class="govuk-radios__item">
-              <input class="govuk-radios__input" id="emergency-LOS-2" name="substantiveLOS" type="radio" value="Full representation" data-aria-controls="conditional-emergency-LOS-2" aria-describedby="conditional-emergency-LOS-2">
-              <label class="govuk-label govuk-radios__label" for="emergency-LOS-2">
-                Full representation
-              </label>
-            </div>
-
+          <div class="govuk-radios__item">
+            <input class="govuk-radios__input" id="emergency-LOS" name="substantiveLOS" type="radio" value="Family help (higher)" data-aria-controls="conditional-emergency-LOS">
+            <label class="govuk-label govuk-radios__label" for="emergency-LOS">
+              Family help (higher)
+            </label>
           </div>
+
+          <div class="govuk-radios__item">
+            <input class="govuk-radios__input" id="emergency-LOS-2" name="substantiveLOS" type="radio" value="Full representation" data-aria-controls="conditional-emergency-LOS-2" aria-describedby="conditional-emergency-LOS-2">
+            <label class="govuk-label govuk-radios__label" for="emergency-LOS-2">
+              Full representation
+            </label>
+          </div>
+        </div>
+
       </div>
-
-                
+      <div class="govuk-button-group">
         {% from "govuk/components/button/macro.njk" import govukButton %}
+          {{ govukButton({
+            text: "Save and continue"
+          }) }}
 
-          <div class="govuk-button-group">
-            {{ govukButton({
-              text: "Save and continue"
-            }) }}
-
-            {{ govukButton({
-              text: "Cancel",
-              classes: "govuk-button--secondary",
-              href: "merits-assessment-substantive"
-            }) }}
-      </form>
-    </div>
+        <a class="govuk-link" href="merits-assessment-substantive">Cancel</a>
+      </div>
+    </form>
+  </div>
 </div>
 {% endblock %}

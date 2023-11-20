@@ -62,13 +62,7 @@ Reject application
 
         <div class="govuk-button-group">
           <button class="govuk-button govuk-button" data-module="govuk-button">Send</button>
-          {% from "govuk/components/button/macro.njk" import govukButton %}
-
-{{ govukButton({
-  text: "Cancel",
-  classes: "govuk-button--secondary",
-  href: "application-details"
-}) }}
+          <a class="govuk-link" href="application-details">Cancel</a>
         </div>
 
     </form>
