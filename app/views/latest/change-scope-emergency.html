@@ -105,18 +105,16 @@ Make merits changes
 
               </div>
             </div>
-        {% from "govuk/components/button/macro.njk" import govukButton %}
+        
 
           <div class="govuk-button-group">
+            {% from "govuk/components/button/macro.njk" import govukButton %}
             {{ govukButton({
               text: "Save and continue"
             }) }}
 
-            {{ govukButton({
-              text: "Cancel",
-              classes: "govuk-button--secondary",
-              href: "merits-assessment-emergency"
-            }) }}
+            <a class="govuk-link" href="merits-assessment-emergency">Cancel</a>
+          </div>
       </form>
     </div>
 </div>

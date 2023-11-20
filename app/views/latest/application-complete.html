@@ -125,11 +125,16 @@ Application details
         ]
       }) }}
 
-      {% from "govuk/components/button/macro.njk" import govukButton %}
+      <div class="govuk-button-group">
 
-      {{ govukButton({
-        text: "Submit"
-      }) }}
+        {% from "govuk/components/button/macro.njk" import govukButton %}
+
+          {{ govukButton({
+            text: "Submit"
+          }) }}
+
+        <a class="govuk-link" href="application-details">Cancel</a>
+      </div>
     </form>
   </div>
 </div>
