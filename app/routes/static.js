@@ -8,13 +8,15 @@ const router = govukPrototypeKit.requests.setupRouter()
 
 // add an item to the application history
 
-router.post('/decision-check', function(request, response) {
+router.post('/send-back-check', function(request, response) {
 
-    var decisionCheck = request.session.data['overall-decision']
-    if (decisionCheck == "refuse") {
-        response.redirect("/latest/application-complete-error")
+    var sendbackCheck = request.session.data['rejection-reason']
+    if (sendbackCheck == "rfi") {
+        response.redirect("/static/my-applications-rfi")
+    }  else if (sendbackCheck == "withdraw") {
+      response.redirect("/static/my-applications-withdraw")
     }  else {
-      response.redirect("/application-history")
+      response.redirect("/static/my-applications-rejected")
     }
 });
 
