@@ -25,15 +25,11 @@ Merits decision saved.
 {% endset %}
 
 {% block content %}
-<a href="#" class="govuk-back-link">Back</a>
-<br>
-<br>
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">
-    <span class="govuk-caption-xl">Merits</span>
-    <h1 class="govuk-heading-xl govuk-!-margin-bottom-4">Confirm your decision</h1>
-    <p class="govuk-!-font-size-36">L-B3H-J8L</p>
-    <p class="govuk-!-margin-bottom-8">Explain to the provider any changes made to the proceedings or costs.</p>
+    <h1 class="govuk-heading-xl govuk-!-margin-bottom-4">Communicate your decision</h1>
+    <p class="govuk-!-font-size-36">{{ application['refNo'] }}</p>
+    <p class="govuk-!-margin-bottom-8">Use this section to provide more detail about your decision. This will be shared with the provider and recorded in the application history.</p>
 
   </div>
 </div>
@@ -62,101 +58,104 @@ Merits decision saved.
 
           </td>
         </tr>
-
-<tr class="govuk-table__row">
-  <td class="govuk-table__header">Merits assessment</td>
-  <td class="govuk-table__cell">
-    
-    
-    
-    
-    <span class="moj-badge moj-badge--blue">partially granted</span>
-    
-    
-  </td>
-</tr>
-<td class="govuk-table__header">Means assessment</td>
-<td class="govuk-table__cell">
-  
-  
-  
-  
-  <span class="moj-badge moj-badge--green">granted</span>
-  
-  
-</td>
-</tr>
-</tbody>
+ <!-- ONLY MERITS OR MEANS NOT BOTH       
+        <tr class="govuk-table__row">
+          <td class="govuk-table__header">Means assessment</td>
+          <td class="govuk-table__cell">
+            {% if (application['meansAssessmentResult'] === 'Not started') %}
+            <span class="moj-badge moj-badge">{{ application['meansAssessmentResult'] }}</span>
+            {% endif %}
+            {% if (application['meansAssessmentResult'] === 'refused') or (application['meansAssessmentResult'] === 'rejected') %}
+            <span class="moj-badge moj-badge--red">{{ application['meansAssessmentResult'] }}</span>
+            {% endif %}
+            {% if application['meansAssessmentResult'] === 'Passported' %}
+            <span class="moj-badge moj-badge--green">Granted</span>
+            {% endif %}
+            {% if (application['meansAssessmentResult'] === 'granted') %}
+            <span class="moj-badge moj-badge--green">{{ application['meansAssessmentResult'] }}</span>
+            {% endif %}
+            {% if (application['meansAssessmentResult'] === 'partially granted') %}
+            <span class="moj-badge moj-badge--blue">{{ application['meansAssessmentResult'] }}</span>
+            {% endif %}
+          </td>
+        </tr>
+-->
+        <tr class="govuk-table__row">
+          <td class="govuk-table__header">Merits assessment</td>
+          <td class="govuk-table__cell">
+            {% if (application['meritsAssessmentResult'] === 'Not started') %}
+            <span class="moj-badge moj-badge--grey">{{ application['meritsAssessmentResult'] }}</span>
+            {% endif %}
+            {% if (application['meritsAssessmentResult'] === 'in progress') %}
+            <span class="moj-badge moj-badge--blue">{{ application['meritsAssessmentResult'] }}</span>
+            {% endif %}
+            {% if (application['meritsAssessmentResult'] === 'granted') %}
+            <span class="moj-badge moj-badge--green">{{ application['meritsAssessmentResult'] }}</span>
+            {% endif %}
+            {% if (application['meritsAssessmentResult'] === 'partially granted') %}
+            <span class="moj-badge moj-badge--blue">{{ application['meritsAssessmentResult'] }}</span>
+            {% endif %}
+            {% if (application['meritsAssessmentResult'] === 'refused') or (application['meritsAssessmentResult'] === 'rejected') %}
+            <span class="moj-badge moj-badge--red">{{ application['meritsAssessmentResult'] }}</span>
+            {% endif %}
+          </td>
+        </tr>
+      </tbody>
     </table>
 
-        <h2 class="govuk-heading-m">Cost limits</h2>
+        <h2 class="govuk-heading-m">Cost details</h2>
         <dl class="govuk-summary-list govuk-!-margin-bottom-2">
-          
+          {% for limitation in application['costLimitations'] %}
           <div class="govuk-summary-list__row">
             <dt class="govuk-summary-list__key">
-              Emergency certificate
+              {{limitation['certificateType']}}
             </dt>
             <dd class="govuk-summary-list__value">
-              £500
+              {{limitation['requestedCostLimit']}}
             </dd>
             <dd class="govuk-summary-list__actions">
-              
-              <span class="moj-badge moj-badge--blue">Changed</span>
-
-              
+              {% if not(limitation['requestedCostLimit_orig'] === limitation['requestedCostLimit']) %}
+              {% set costs_changed = "True" %}
+              {%- from "moj/components/badge/macro.njk" import mojBadge -%}
+                {{ mojBadge
+                ({
+                  text: 'Changed',
+                  classes: 'moj-badge--black'
+                })
+                }}
+              {% endif %}
             </dd>
 
           </div>
-          
-          <div class="govuk-summary-list__row">
-            <dt class="govuk-summary-list__key">
-              Substantive certificate
-            </dt>
-            <dd class="govuk-summary-list__value">
-              £25,000
-            </dd>
-            <dd class="govuk-summary-list__actions">
-              
-            </dd>
-
-          </div>
-          
+          {% endfor %}
         </dl>
-            
-        
+      {% if costs_changed === 'True' %}
+        {% from "govuk/components/textarea/macro.njk" import govukTextarea %}
 
-        
-
-<div class="govuk-form-group">
-  <h3 class="govuk-label-wrapper">
-    <label class="govuk-label govuk-label--s" for="more-detail">
-      Give reasons
-    </label>
-    </h3>
-
-    <div id="more-detail-hint" class="govuk-hint">
-      Explain why the requested cost limit was not accepted 
-    </div>
-
-  
-  
-
-
-
-  <textarea class="govuk-textarea" id="more-detail" name="moreDetailCost" rows="5" aria-describedby="more-detail-hint"></textarea>
-</div>
-        
+        {{ govukTextarea({
+          name: "moreDetailCost",
+          id: "more-detail",
+          label: {
+            text: "Can you provide more detail?",
+            classes: "govuk-label--s",
+            isPageHeading: true
+          },
+          hint: {
+            text: "Provide reasons for changing the cost limit."
+          }
+        }) }}
+    {% endif %}
 
         <h2 class="govuk-heading-l govuk-!-margin-top-9">Proceedings</h2>
         <ol class="govuk-list govuk-list--number">
-        
-          
-        <h3 class="govuk-heading-m">Non-molestation order</h3>
+        {% for proceeding in application['proceedings'] %}
+          {% set proceedings_changed = "False" %}
+        <li><h2 class="govuk-heading-m">{{ proceeding['proceedingType'] }}</h2>
     
-        
+        {% for certificate in proceeding['certificates'] %}
         <div class="govuk-summary-card">
           <div class="govuk-summary-card__title-wrapper">
-            <h4 class="govuk-summary-card__title">Emergency certificate</h4>
+            <h2 class="govuk-summary-card__title">{{ certificate['certificateType'] }}</h2>
           </div>
           <div class="govuk-summary-card__content">
             <dl class="govuk-summary-list">
@@ -165,10 +164,19 @@ Merits decision saved.
                   Level of service
                 </dt>
                 <dd class="govuk-summary-list__value">
-                  Full representation
+                  {{ certificate['formOfService'] }}
                 </dd>
                 <dd class="govuk-summary-list__actions">
-                  
+                  {% if not (certificate['formOfService_requested'] === certificate['formOfService']) %}
+                  {% set proceedings_changed = "True" %}
+                  {%- from "moj/components/badge/macro.njk" import mojBadge -%}
+                  {{ mojBadge
+                  ({
+                  text: 'Changed',
+                  classes: 'moj-badge--black'
+                  })
+                  }}
+                  {% endif %}
                 </dd>
               </div>
               <div class="govuk-summary-list__row">
@@ -176,37 +184,68 @@ Merits decision saved.
                   Scope limitations
                 </dt>
                 <dd class="govuk-summary-list__value">
-                  Example scope
+                  {{ certificate['scopeLimits'] }}
                 </dd>
                 <dd class="govuk-summary-list__actions">
-                  
+                  {% if not (certificate['scopeLimits_requested'] === certificate['scopeLimits']) %}
+                  {% set proceedings_changed = "True" %}
+                  {%- from "moj/components/badge/macro.njk" import mojBadge -%}
+                  {{ mojBadge
+                  ({
+                  text: 'Changed',
+                  classes: 'moj-badge--black'
+                  })
+                  }}
+                  {% endif %}
                 </dd>
               </div>
 
-              
-
-              
-              <div class="govuk-summary-list__row">
-                <dt class="govuk-summary-list__key">
-                  Merits decision
-                </dt>
-                <dd class="govuk-summary-list__value">
-                  <span class="moj-badge moj-badge--green">granted</span>
-                </dd>           
-              </div>
-              
+              {% if proceeding['meansResult'] === 'granted' %}
               <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">
                   Means decision
                 </dt>
                 <dd class="govuk-summary-list__value">
-                  <span class="moj-badge moj-badge--green">granted</span>
+                  <span class="moj-badge moj-badge--green">{{ proceeding['meansResult'] }}</span>
                 </dd>           
               </div>
+              {% endif %}
 
-              
+              {% if certificate['meritsResult'] === 'granted' %}
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">
+                  Merits decision
+                </dt>
+                <dd class="govuk-summary-list__value">
+                  <span class="moj-badge moj-badge--green">{{ certificate['meritsResult'] }}</span>
+                </dd>           
+              </div>
+              {% endif %}
 
-              
+              {% if proceeding['meansResult'] === 'refused' %}
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">
+                  Means decision
+                </dt>
+                <dd class="govuk-summary-list__value">
+                  <span class="moj-badge moj-badge--red">{{ proceeding['meansResult'] }}</span><br>
+                  Evidence does not justify legal aid
+                </dd>           
+              </div>
+              {% endif %}
+
+              {% if certificate['meritsResult'] === 'refused' %}
+              {% set proceedings_changed = "True" %}
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">
+                  Merits decision
+                </dt>
+                <dd class="govuk-summary-list__value">
+                  <span class="moj-badge moj-badge--red">{{ certificate['meritsResult'] }}</span><br>
+                  Low chance of success
+                </dd>           
+              </div>
+              {% endif %}
 
                <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">
@@ -217,7 +256,7 @@ Merits decision saved.
                 </dd>
                 
               </div>
-              
+              {% if certificate['certificateType'] === 'Emergency certificate' %}
               <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">
                   Certificate end
@@ -227,127 +266,40 @@ Merits decision saved.
                 </dd>
                 
               </div>
-              
+              {% endif %}
 
             </dl>
             <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible govuk-!-margin-top-0">
-            
+            {% if proceedings_changed === 'True' %}
+            {% from "govuk/components/textarea/macro.njk" import govukTextarea %}
+
+              {{ govukTextarea({
+                name: "moreDetailProceedings",
+                id: "more-detail",
+                label: {
+                  text: "Can you provide more detail?",
+                  classes: "govuk-label--s",
+                  isPageHeading: true
+                },
+                hint: {
+                  text: "Use this to explain any changes you've made and provide more detail if you have refused a certificate or made a change to the proceedings. This will be shared with the provider."
+                }
+              }) }}
+            {% endif %}
           </div>
         </div>
-        
-        <div class="govuk-summary-card">
-          <div class="govuk-summary-card__title-wrapper">
-            <h4 class="govuk-summary-card__title">Substantive certificate</h4>
-          </div>
-          <div class="govuk-summary-card__content">
-            <dl class="govuk-summary-list">
-              <div class="govuk-summary-list__row">
-                <dt class="govuk-summary-list__key">
-                  Level of service
-                </dt>
-                <dd class="govuk-summary-list__value">
-                  Full representation
-                </dd>
-                <dd class="govuk-summary-list__actions">
-                  
-                </dd>
-              </div>
-              <div class="govuk-summary-list__row">
-                <dt class="govuk-summary-list__key">
-                  Scope limitations
-                </dt>
-                <dd class="govuk-summary-list__value">
-                  Example scope
-                </dd>
-                <dd class="govuk-summary-list__actions">
-                  
-                </dd>
-              </div>
+        {% endfor %}</li>
 
-              
-
-              
-
-              
-
-              
-              
-              <div class="govuk-summary-list__row">
-                <dt class="govuk-summary-list__key">
-                  Merits decision
-                </dt>
-                <dd class="govuk-summary-list__value">
-                  <span class="moj-badge moj-badge--red">refused</span><br>
-                  Low chance of success
-                </dd>           
-              </div>
-              <div class="govuk-summary-list__row">
-                <dt class="govuk-summary-list__key">
-                  Means decision
-                </dt>
-                <dd class="govuk-summary-list__value">
-                  <span class="moj-badge moj-badge--green">granted</span>
-                </dd>           
-              </div>
-
-               <div class="govuk-summary-list__row">
-                <dt class="govuk-summary-list__key">
-                  Certificate start
-                </dt>
-                <dd class="govuk-summary-list__value">
-                  23/10/2023
-                </dd>
-                
-              </div>
-              
-
-            </dl>
-            <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible govuk-!-margin-top-0">
-            
-            
-
-              
-
-<div class="govuk-form-group">
-  <h3 class="govuk-label-wrapper">
-    <label class="govuk-label govuk-label--s" for="more-detail">
-      Give reasons
-    </label>
-    </h3>
-
-    <div id="more-detail-hint" class="govuk-hint">
-      Explain why this proceeding has been changed or refused
-    </div>
-  
-  
-
-
-  <textarea class="govuk-textarea" id="more-detail" name="moreDetailProceedings" rows="5" aria-describedby="more-detail-hint"></textarea>
-</div>
-
-            
-          </div>
-        </div>
-        
-      </ol>
-
-
+    {% endfor %}</ol>
 
     {% from "govuk/components/button/macro.njk" import govukButton %}
 
-    <div class="govuk-button-group">
-      {{ govukButton({
-        text: "Confirm and send"
-      }) }}
-    
-      {{ govukButton({
-        text: "Save as draft",
-        classes: "govuk-button--secondary"
-      }) }}
+    {{ govukButton({
+      text: "Save and continue",
+      href: "application-complete"
+    }) }}
 
-      <a class="govuk-link" href="#">Cancel</a>
-    </div>
-  
+  </div>
 </div>
 
 
