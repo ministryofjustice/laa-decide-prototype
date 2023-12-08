@@ -1,0 +1,62 @@
+{% extends "layouts/layout.html" %}
+
+{% block pageTitle %}
+Merits assessment - substantive
+{% endblock %}
+
+{% block beforeContent %}
+<a class="govuk-back-link" href="application-details">Back to application details</a>
+{% endblock %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    <h1 class="govuk-heading-xl govuk-!-margin-bottom-4">Make a merits assessment</h1>
+    <p class="govuk-!-font-size-36">L-I2Z-I3P</p>
+    <div class="govuk-!-padding-top-4"></div>
+  </div>
+</div>
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    <h2 class="govuk-heading-l">Substantive proceedings</h2>
+    <form action="application-details" method="POST">
+      <div class="govuk-form-group">
+
+
+         <h2 class="govuk-heading-m">Non-molestation order</h2>
+        
+
+      </div>
+
+
+
+      <div class="govuk-!-padding-top-4"></div>
+
+      <div class="govuk-form-group">
+        <label class="govuk-label govuk-label--l" for="substantive-note">
+          Give further details
+        </label>
+        <div id="note-hint" class="govuk-hint">
+          This information is for internal use. It will not be shared with the provider.
+        </div>
+        <textarea class="govuk-textarea" name="substantive-note" id="substantive-note" rows="10">{{ data['substantive-note'] }}</textarea>
+        <div class="govuk-button-group">
+          <input type="submit" name="merits_continue_button" value="Save and continue" id="continue" class="govuk-button form-button" data-module="govuk-button" data-disable-with="Save and continue">
+          <input type="submit" name="merits_continue_button" value="Save and come back later" id="continue" class="govuk-button form-button govuk-button--secondary govuk-!-margin-left-3" data-module="govuk-button"
+            data-disable-with="Save and come back later">
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <!-- <div class="govuk-grid-column-one-third">
+    <form action="substantive-update-all">
+      <div class="govuk-button-group">
+        <input type="submit" name="update_all_substantive" value="Grant all" id="grant-all-substantive" class="govuk-button form-button govuk-button--secondary" data-module="govuk-button" data-disable-with="Grant all">
+        <input type="submit" name="update_all_substantive" value="Refuse all" id="refuse-all-substantive" class="govuk-button form-button govuk-button--warning govuk-!-margin-left-3" data-module="govuk-button" data-disable-with="Refuse all">
+      </div>
+    </form>
+  </div> -->
+</div>
+{% endblock %}

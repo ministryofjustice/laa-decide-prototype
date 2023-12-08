@@ -20,4 +20,15 @@ router.post('/send-back-check', function(request, response) {
     }
 });
 
+router.post('/merits-check', function(request, response) {
+
+    var meritsCheck = request.session.data['application_2_proceeding_1_certificate_1']
+    if (meritsCheck == "granted") {
+        response.redirect("/static/merits-assessment-emergency-costs")
+    } else {
+      response.redirect("/static/merits-assessment-substantive")
+    }
+});
+
+
 module.exports = router
