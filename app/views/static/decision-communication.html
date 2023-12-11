@@ -1,39 +1,16 @@
 
-{% extends "layouts/layout.html" %}
+{% extends "layouts/workload.html" %}
 
 {% block pageTitle %}
 Application decision
 {% endblock %}
 
-{% set application = data['application']['applicationDetails'] %}
-{% set costs_changed = 'False' %}
-{% set success_message %}
-{% if ((application['meritsAssessmentResult'] == 'granted') or (application['meritsAssessmentResult'] == 'refused') or (application['meritsAssessmentResult'] == 'partially granted'))
-   and ((application['meansAssessmentResult'] == 'granted') or (application['meansAssessmentResult'] == 'refused') or (application['meansAssessmentResult'] == 'partially granted') or (application['meansAssessmentResult'] == 'Passported')) %}
-Means and merits decisions saved and shared with the provider. <a class="" href="#">You should now update the status of the case in CCMS</a>
-{% endif %}
-
-{% if ((application['meritsAssessmentResult'] == 'Not started') or (application['meritsAssessmentResult'] == 'in progress'))
-   and ((application['meansAssessmentResult'] == 'granted') or (application['meansAssessmentResult'] == 'refused') or (application['meansAssessmentResult'] == 'partially granted') or (application['meansAssessmentResult'] == 'Passported')) %}
-Means decision saved.
-{% endif %}
-
-{% if ((application['meritsAssessmentResult'] == 'granted') or (application['meritsAssessmentResult'] == 'refused') or (application['meritsAssessmentResult'] == 'partially granted'))
-   and (application['meansAssessmentResult'] == 'Not started') %}
-Merits decision saved.
-{% endif %}
-{% endset %}
-
 {% block content %}
-<a href="#" class="govuk-back-link">Back</a>
-<br>
-<br>
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">
-    <span class="govuk-caption-xl">Merits</span>
-    <h1 class="govuk-heading-xl govuk-!-margin-bottom-4">Confirm your decision</h1>
-    <p class="govuk-!-font-size-36">L-B3H-J8L</p>
-    <p class="govuk-!-margin-bottom-8">Explain to the provider any changes made to the proceedings or costs.</p>
+    <h1 class="govuk-heading-xl govuk-!-margin-bottom-4">Communicate your merits decision</h1>
+    <p class="govuk-!-font-size-36">L-12Z-13P</p>
+    <p class="govuk-!-margin-bottom-8">Use this section to provide more detail about your decision. This will be shared with the provider and recorded in the application history.</p>
 
   </div>
 </div>
@@ -63,51 +40,29 @@ Merits decision saved.
           </td>
         </tr>
 
-<tr class="govuk-table__row">
-  <td class="govuk-table__header">Merits assessment</td>
-  <td class="govuk-table__cell">
-    
-    
-    
-    
-    <span class="moj-badge moj-badge--blue">partially granted</span>
-    
-    
-  </td>
-</tr>
-<td class="govuk-table__header">Means assessment</td>
-<td class="govuk-table__cell">
-  
-  
-  
-  
-  <span class="moj-badge moj-badge--green">granted</span>
-  
-  
-</td>
-</tr>
-</tbody>
+        <tr class="govuk-table__row">
+          <td class="govuk-table__header">Merits assessment</td>
+          <td class="govuk-table__cell govuk-table__cell--numeric">
+            <span class="moj-badge moj-badge--blue">Partially granted</span>
+          </td>
+        </tr>
+      </tbody>
     </table>
 
-        <h2 class="govuk-heading-m">Cost limits</h2>
+        <h2 class="govuk-heading-m">Cost details</h2>
         <dl class="govuk-summary-list govuk-!-margin-bottom-2">
-          
           <div class="govuk-summary-list__row">
             <dt class="govuk-summary-list__key">
               Emergency certificate
             </dt>
             <dd class="govuk-summary-list__value">
-              £500
+              £2,250
             </dd>
             <dd class="govuk-summary-list__actions">
-              
-              <span class="moj-badge moj-badge--blue">Changed</span>
-
-              
             </dd>
 
           </div>
-          
+
           <div class="govuk-summary-list__row">
             <dt class="govuk-summary-list__key">
               Substantive certificate
@@ -116,47 +71,48 @@ Merits decision saved.
               £25,000
             </dd>
             <dd class="govuk-summary-list__actions">
-              
+
+
+              {%- from "moj/components/badge/macro.njk" import mojBadge -%}
+                {{ mojBadge
+                ({
+                  text: 'Changed',
+                  classes: 'moj-badge--black'
+                })
+                }}
+
             </dd>
 
           </div>
-          
+
         </dl>
-            
-        
 
-        
+        {% from "govuk/components/textarea/macro.njk" import govukTextarea %}
 
-<div class="govuk-form-group">
-  <h3 class="govuk-label-wrapper">
-    <label class="govuk-label govuk-label--s" for="more-detail">
-      Give reasons
-    </label>
-    </h3>
+        {{ govukTextarea({
+          name: "moreDetailCost",
+          id: "more-detail",
+          label: {
+            text: "Can you provide more detail?",
+            classes: "govuk-label--s",
+            isPageHeading: true
+          },
+          hint: {
+            text: "Provide reasons for changing the cost limit."
+          }
+        }) }}
 
-    <div id="more-detail-hint" class="govuk-hint">
-      Explain why the requested cost limit was not accepted 
-    </div>
-
-  
-  
-
-
-
-  <textarea class="govuk-textarea" id="more-detail" name="moreDetailCost" rows="5" aria-describedby="more-detail-hint"></textarea>
-</div>
-        
 
         <h2 class="govuk-heading-l govuk-!-margin-top-9">Proceedings</h2>
         <ol class="govuk-list govuk-list--number">
         
           
-        <h3 class="govuk-heading-m">Non-molestation order</h3>
+        <li><h2 class="govuk-heading-m">Non-molestation order</h2>
     
         
         <div class="govuk-summary-card">
           <div class="govuk-summary-card__title-wrapper">
-            <h4 class="govuk-summary-card__title">Emergency certificate</h4>
+            <h2 class="govuk-summary-card__title">Emergency certificate</h2>
           </div>
           <div class="govuk-summary-card__content">
             <dl class="govuk-summary-list">
@@ -176,7 +132,7 @@ Merits decision saved.
                   Scope limitations
                 </dt>
                 <dd class="govuk-summary-list__value">
-                  Example scope
+                  Interim order inc. return date.
                 </dd>
                 <dd class="govuk-summary-list__actions">
                   
@@ -195,14 +151,6 @@ Merits decision saved.
                 </dd>           
               </div>
               
-              <div class="govuk-summary-list__row">
-                <dt class="govuk-summary-list__key">
-                  Means decision
-                </dt>
-                <dd class="govuk-summary-list__value">
-                  <span class="moj-badge moj-badge--green">granted</span>
-                </dd>           
-              </div>
 
               
 
@@ -237,7 +185,7 @@ Merits decision saved.
         
         <div class="govuk-summary-card">
           <div class="govuk-summary-card__title-wrapper">
-            <h4 class="govuk-summary-card__title">Substantive certificate</h4>
+            <h2 class="govuk-summary-card__title">Substantive certificate</h2>
           </div>
           <div class="govuk-summary-card__content">
             <dl class="govuk-summary-list">
@@ -257,7 +205,7 @@ Merits decision saved.
                   Scope limitations
                 </dt>
                 <dd class="govuk-summary-list__value">
-                  Example scope
+                  Injunction FLA-to final hearing
                 </dd>
                 <dd class="govuk-summary-list__actions">
                   
@@ -281,14 +229,7 @@ Merits decision saved.
                   Low chance of success
                 </dd>           
               </div>
-              <div class="govuk-summary-list__row">
-                <dt class="govuk-summary-list__key">
-                  Means decision
-                </dt>
-                <dd class="govuk-summary-list__value">
-                  <span class="moj-badge moj-badge--green">granted</span>
-                </dd>           
-              </div>
+              
 
                <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">
@@ -309,17 +250,17 @@ Merits decision saved.
               
 
 <div class="govuk-form-group">
-  <h3 class="govuk-label-wrapper">
+  <h1 class="govuk-label-wrapper">
     <label class="govuk-label govuk-label--s" for="more-detail">
-      Give reasons
+      Can you provide more detail?
     </label>
-    </h3>
+    </h1>
 
-    <div id="more-detail-hint" class="govuk-hint">
-      Explain why this proceeding has been changed or refused
-    </div>
   
   
+  <div id="more-detail-hint" class="govuk-hint">
+    Use this to explain any changes you've made and provide more detail if you have refused a certificate or made a change to the proceedings. This will be shared with the provider.
+  </div>
 
 
   <textarea class="govuk-textarea" id="more-detail" name="moreDetailProceedings" rows="5" aria-describedby="more-detail-hint"></textarea>
@@ -328,26 +269,90 @@ Merits decision saved.
             
           </div>
         </div>
+        </li>
+
+    
+          
+        <li><h2 class="govuk-heading-m">Child arrangements order (contact)</h2>
+    
         
-      </ol>
+        <div class="govuk-summary-card">
+          <div class="govuk-summary-card__title-wrapper">
+            <h2 class="govuk-summary-card__title">Substantive certificate</h2>
+          </div>
+          <div class="govuk-summary-card__content">
+            <dl class="govuk-summary-list">
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">
+                  Level of service
+                </dt>
+                <dd class="govuk-summary-list__value">
+                  Full representation
+                </dd>
+                <dd class="govuk-summary-list__actions">
+                  
+                </dd>
+              </div>
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">
+                  Scope limitations
+                </dt>
+                <dd class="govuk-summary-list__value">
+                  Hearing-children
+                </dd>
+                <dd class="govuk-summary-list__actions">
+                  
+                </dd>
+              </div>
+
+              
+
+              
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">
+                  Merits decision
+                </dt>
+                <dd class="govuk-summary-list__value">
+                  <span class="moj-badge moj-badge--green">granted</span>
+                </dd>           
+              </div>
+              
+
+              
+
+              
+
+               <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">
+                  Certificate start
+                </dt>
+                <dd class="govuk-summary-list__value">
+                  23/10/2023
+                </dd>
+                
+              </div>
+              
+
+            </dl>
+            <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible govuk-!-margin-top-0">
+            
+          </div>
+        </div>
+        </li>
+
+    </ol>
+
 
 
 
     {% from "govuk/components/button/macro.njk" import govukButton %}
 
-    <div class="govuk-button-group">
-      {{ govukButton({
-        text: "Confirm and send"
-      }) }}
-    
-      {{ govukButton({
-        text: "Save as draft",
-        classes: "govuk-button--secondary"
-      }) }}
+    {{ govukButton({
+      text: "Save and continue",
+      href: "overall-decision"
+    }) }}
 
-      <a class="govuk-link" href="#">Cancel</a>
-    </div>
-  
+  </div>
 </div>
 
 
