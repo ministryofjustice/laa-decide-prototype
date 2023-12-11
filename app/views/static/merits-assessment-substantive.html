@@ -20,7 +20,7 @@ Merits assessment - substantive
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">
     <h2 class="govuk-heading-l">Substantive proceedings</h2>
-    <form action="decision-communication" method="POST">
+    <form action="/merits-check2" method="POST">
       <div class="govuk-form-group">
         
         
@@ -601,10 +601,15 @@ Merits assessment - substantive
         
       </div>
 
-
-
-
       <div class="govuk-form-group">
+        <div class="govuk-form-group">
+        <label class="govuk-label govuk-label--l" for="substantive-note">
+          Give further details
+        </label>
+        <div id="note-hint" class="govuk-hint">
+          This information is for internal use. It will not be shared with the provider.
+        </div>
+        <textarea class="govuk-textarea" name="substantive-note" id="substantive-note" rows="10">{{ data['substantive-note'] }}</textarea>
 
         <div class="govuk-button-group">
           <input type="submit" name="merits_continue_button" value="Save and continue" id="continue" class="govuk-button form-button" data-module="govuk-button" data-disable-with="Save and continue">

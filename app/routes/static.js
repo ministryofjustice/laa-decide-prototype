@@ -30,5 +30,25 @@ router.post('/merits-check', function(request, response) {
     }
 });
 
+router.post('/merits-check2', function(request, response) {
+
+    var meritsCheck2 = request.session.data['application_1_proceeding_1_certificate_2']
+    if (meritsCheck2 == "granted") {
+        response.redirect("/static/merits-assessment-substantive-costs")
+    } else {
+      response.redirect("/static/decision-communication")
+    }
+});
+
+router.post('/decision-check', function(request, response) {
+
+    var decisionCheck = request.session.data['overall-decision']
+    if (decisionCheck == "refuse") {
+        response.redirect("/static/overall-decision-error")
+    }  else {
+      response.redirect("/static/confirmation-screen")
+    }
+});
+
 
 module.exports = router
