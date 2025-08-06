@@ -1,0 +1,133 @@
+{% extends "layouts/open.html" %}
+
+{% block pageTitle %}
+Application tasks
+{% endblock %}
+
+{% block content %}
+      
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      <h1 class="govuk-heading-xl">
+        L-B3H-J8L
+      </h1>
+
+      <h2 class="govuk-heading-s govuk-!-margin-bottom-2">Application incomplete</h2>
+      <p class="govuk-body govuk-!-margin-bottom-7">You have completed 3 of 8 sections.</p>
+
+      <ol class="app-task-list">
+        <li>
+          <h2 class="app-task-list__section">
+            <span class="app-task-list__section-number">1. </span> Read documents
+          </h2>
+      <table class="govuk-table">
+        <thead class="govuk-table__head">
+          <tr class="govuk-table__row">
+            <th scope="col" class="govuk-table__header">Document</th>
+            <th scope="col" class="govuk-table__header">Date</th>
+          </tr>
+        </thead>
+        <tbody class="govuk-table__body">
+          
+          <tr class="govuk-table__row">
+            <td class="govuk-table__cell govuk-!-width-one-half"><a href="https://drive.google.com/file/d/16V-j11_Na8_bBz4fazl-TP5k8odpPbBX/view" class="govuk-link" rel="noreferrer noopener" target="_blank">Means report</a></td>
+            <td class="govuk-table__cell">30 Aug 2021</td>
+          </tr>
+          
+          <tr class="govuk-table__row">
+            <td class="govuk-table__cell govuk-!-width-one-half"><a href="https://drive.google.com/file/d/19TddAL5MpWAPhDqRCsbggQVVngEHCQA5/view" class="govuk-link" rel="noreferrer noopener" target="_blank">Merits report</a></td>
+            <td class="govuk-table__cell">30 Aug 2021</td>
+          </tr>
+          
+          <tr class="govuk-table__row">
+            <td class="govuk-table__cell govuk-!-width-one-half"><a href="https://drive.google.com/file/d/1m2SvoKEuJySNk3wxpjvfIYHqMTZlisQf/view" class="govuk-link" rel="noreferrer noopener" target="_blank">Gateway evidence</a></td>
+            <td class="govuk-table__cell">30 Aug 2021</td>
+          </tr>
+          
+          <tr class="govuk-table__row">
+            <td class="govuk-table__cell govuk-!-width-one-half"><a href="https://drive.google.com/file/d/11iq0Auzzlbmz2IqLmgatDaqeg_ct_y2z/view" class="govuk-link" rel="noreferrer noopener" target="_blank">Statement of case</a></td>
+            <td class="govuk-table__cell">18 Aug 2021</td>
+          </tr>
+          
+        </tbody>
+      </table>
+
+  
+
+      <ol class="app-task-list">
+        <li>
+          <h2 class="app-task-list__section">
+            <span class="app-task-list__section-number">2. </span> Means Assessment
+          </h2>
+          <h3 class="app-task-list__section">
+            <span class="app-task-list__section-number"></span>Non-molestation order
+          </h3>
+          <ul class="app-task-list__items">
+            <li class="app-task-list__item">
+              <span class="app-task-list__task-name">
+                <a href="https://prototype-kit.service.gov.uk/v12/docs/templates/task-list#" aria-describedby="eligibility-status">
+                  Emergency proceeding
+                </a>
+              </span>
+              <strong class="govuk-tag app-task-list__tag" id="eligibility-status">Completed</strong>
+            </li>
+            <li class="app-task-list__item">
+              <span class="app-task-list__task-name">
+                <a href="https://prototype-kit.service.gov.uk/v12/docs/templates/task-list#" aria-describedby="read-declaration-status">
+                  Substantive proceeding
+                </a>
+              </span>
+              <strong class="govuk-tag app-task-list__tag" id="read-declaration-status">Completed</strong>
+            </li>
+          </ul>
+        </li>
+
+        <li>
+          <h2 class="app-task-list__section">
+            <span class="app-task-list__section-number">3. </span> Merits assessment
+          </h2>
+          <h3 class="app-task-list__section">
+            <span class="app-task-list__section-number"></span>Non-molestation order
+          </h3>
+          <ul class="app-task-list__items">
+            <li class="app-task-list__item">
+              <span class="app-task-list__task-name">
+                <a href="https://prototype-kit.service.gov.uk/v12/docs/templates/task-list#" aria-describedby="eligibility-status">
+                  Emergency proceeding
+                </a>
+              </span>
+              <strong class="govuk-tag app-task-list__tag" id="eligibility-status">Completed</strong>
+            </li>
+            <li class="app-task-list__item">
+              <span class="app-task-list__task-name">
+                <a href="https://prototype-kit.service.gov.uk/v12/docs/templates/task-list#" aria-describedby="read-declaration-status">
+                  Substantive proceeding
+                </a>
+              </span>
+              <strong class="govuk-tag govuk-tag--grey app-task-list__tag" id="financial-evidence-status">Cannot start yet</strong>
+            </li>
+          </ul>
+        </li>
+
+      
+
+        <div class="govuk-button-group">
+
+        
+          <form action="https://laa-decide-prototype.apps.live.cloud-platform.service.justice.gov.uk/latest/merits-assessment-emergency">
+            <button class="govuk-button" data-module="govuk-button">Confirm and send</button>
+          </form>
+          
+          
+          <form action="https://laa-decide-prototype.apps.live.cloud-platform.service.justice.gov.uk/latest/reject-application">
+            <button class="govuk-button govuk-button--warning" data-module="govuk-button">Send back to provider</button>
+          </form>
+          
+        </div>
+      </ol>
+    </div>
+  </div>
+
+          
+  {% endblock %}

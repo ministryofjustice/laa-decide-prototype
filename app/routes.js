@@ -12,11 +12,13 @@ const latest = require('./routes/latest.js');
 const v2 = require('./routes/v2.js');
 const v3 = require('./routes/v3.js');
 const v4 = require('./routes/v4.js');
+const v5 = require('./routes/v5.js');
 
 // Call in routes file from routes folder to keep routes.js cleaner
 router.use('/v2', v2);
 router.use('/v3', v3);
 router.use('/v4', v4);
+router.use('/v5', v5);
 router.use('/latest', latest);
 router.use('/static', static);
 

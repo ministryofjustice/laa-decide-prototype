@@ -1,0 +1,33 @@
+
+{% extends "layouts/layout.html" %}
+
+{% block pageTitle %}
+Confirmation screen
+{% endblock %}
+
+{% block beforeContent %}
+<a class="govuk-back-link" href="open-applications">Back to your list</a>
+{% endblock %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    <div class="govuk-panel govuk-panel--confirmation">
+      <h1 class="govuk-panel__title">
+        Application for civil legal aid assessed completely
+      </h1>
+      <div class="govuk-panel__body">
+        CCMS reference number: <strong>300000651984</strong><br>
+      Apply reference number: <strong>L-I2Z-I3P</strong>
+        
+      </div>
+    </div>
+    <h2 class="govuk-heading-m">What happens next</h2>
+    <p class="govuk-body">
+      We’ve saved your decision, and the provider will be informed.
+    </p>
+    <a href="my-applications-added" role="button" draggable="false" class="govuk-button" data-module="govuk-button">
+  View your list</a>
+  </div>
+</div>
+{% endblock %}

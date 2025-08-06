@@ -1,0 +1,103 @@
+
+{% extends "layouts/workload.html" %}
+
+
+{% block pageTitle %}
+Application history
+{% endblock %}
+
+{% block beforeContent %}
+<a class="govuk-back-link" href="my-applications">Back to your list</a>
+{% endblock %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    <h2 class="govuk-heading-xl govuk-!-margin-bottom-2" ><span class="govuk-!-margin-right-2">L-12Z-13P</span></h2>
+  </div>
+</div>
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-one-half">
+    <p class="govuk-body-m">
+      <strong>Date submitted: </strong>{{ date | date }}<br>
+      <strong>Assigned to: </strong>Mo Bradshaw
+    </p>
+  </div>
+</div>
+
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+      <nav class="moj-sub-navigation" aria-label="Sub navigation">
+        <ul class="moj-sub-navigation__list">
+          <li class="moj-sub-navigation__item">
+            <a class="moj-sub-navigation__link" href="application-details-added">Application details</a>
+          </li>
+          <li class="moj-sub-navigation__item">
+            <a class="moj-sub-navigation__link" href="people">People</a>
+          </li>
+          <li class="moj-sub-navigation__item">
+            <a class="moj-sub-navigation__link" aria-current="page" href="application-history">Application history</a>
+          </li>
+        </ul>
+      </nav>
+
+      <table class="govuk-table">
+        <caption class="govuk-table__caption govuk-table__caption--m">Application history</caption>
+        <thead class="govuk-table__head">
+          <tr class="govuk-table__row">
+            <th scope="col" class="govuk-table__header">When</th>
+            <th scope="col" class="govuk-table__header">Who</th>
+            <th scope="col" class="govuk-table__header">What</th>
+          </tr>
+        </thead>
+        <tbody class="govuk-table__body">
+          <tr class="govuk-table__row">
+            <td class="govuk-table__cell">27 Nov 2023 09:07</td>
+            <td class="govuk-table__cell">Mo Bradshaw<br></td>
+            <td class="govuk-table__cell"><b>Application added to workload</b><br></td>
+          </tr>
+
+          <tr class="govuk-table__row">
+            <td class="govuk-table__cell">24 Nov 2023 15:22</td>
+            <td class="govuk-table__cell">Robin Crane<br></td>
+            <td class="govuk-table__cell"><b>Application removed from workload</b><br></td>
+          </tr>
+
+           <tr class="govuk-table__row">
+            <td class="govuk-table__cell">27 Nov 2023 09:09</td>
+            <td class="govuk-table__cell">Mo Bradshaw<br></td>
+            <td class="govuk-table__cell"><b>Caseworker note added</b><br>Example: Sometimes a single status is enough. For example if you need to tell users which parts of an application they’ve finished and which they have not, you may only need a ‘Completed’ tag. Because the user understands that if something does not have a tag, that means it’s incomplete. The task list pattern has an example of how to show one status using tags. Or it can make sense to have two statuses. For example you may find that there’s a need to have one tag for ‘Active’ users and one for ‘Inactive’ users.</td>
+          </tr>
+
+          <tr class="govuk-table__row">
+            <td class="govuk-table__cell">24 Nov 2023 15:22</td>
+            <td class="govuk-table__cell">Robin Crane<br></td>
+            <td class="govuk-table__cell"><b>Means decision made</b><br>Non-molestation order<br><p class="govuk-hint">Emergency certificate: granted<br>Substantive certificate: granted<br></p>Child arrangements order (contact)<br><p class="govuk-hint">Substantive certificate: granted<br></p></td>
+          </tr>
+
+          <tr class="govuk-table__row">
+            <td class="govuk-table__cell">24 Nov 2023 09:07</td>
+            <td class="govuk-table__cell">Robin Crane<br></td>
+            <td class="govuk-table__cell"><b>Application added to workload</b><br></td>
+          </tr>
+          
+        </tbody>
+      </table>
+
+      <div class="govuk-form-group">
+        <h1 class="govuk-label-wrapper"><label class="govuk-label govuk-label--s" for="note">
+            Add a note to the application history
+          </label>
+        </h1>
+        <div id="note-hint" class="govuk-hint">
+          This information is for internal use only
+        </div>
+        <textarea class="govuk-textarea" name="note" id="note" rows="5"></textarea>
+        <button class="govuk-button" data-module="govuk-button">Add to application history</button>
+      </div>
+
+  </div>
+</div>
+{% endblock %}
