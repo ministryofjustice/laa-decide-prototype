@@ -10,5 +10,6 @@ Password: prototype
 
 ## Local Development
 
-Run `npm run dev` to spin up locally 
+Install dependencies using `yarn install`
+Run `yarn run dev` to spin up locally 
 
