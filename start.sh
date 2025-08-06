@@ -2,4 +2,4 @@
 
 set -eu pipefail
 
-npm run serve
+yarn run serve
