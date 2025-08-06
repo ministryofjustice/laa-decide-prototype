@@ -1,4 +1,4 @@
-{% extends "layouts/layout.html" %}
+{% extends "legacy_layout.html" %}
 
 {% block pageTitle %}
 Means assessment
@@ -98,79 +98,61 @@ Means assessment
           <div class="govuk-!-padding-top-4"></div>
         </div>
 
-        {% set amendContributionHtml %}
-        <div class="govuk-form-group">
-          <h1 class="govuk-label-wrapper"><label class="govuk-label govuk-body" for="amended-contribution">
-              How much should they contribute in total?
-            </label>
-          </h1>
-          <div class="govuk-input__wrapper">
-            <div class="govuk-input__prefix" aria-hidden="true">£</div>
-            <input class="govuk-input govuk-input--width-5" id="amended-contribution" name="amended-contribution" value="{{ data['amended-contribution'] }}" type="text" spellcheck="false">
+        <h2 class="govuk-heading-m">How much should the applicant pay towards legal aid?</h2>
+        
+        <dl class="govuk-summary-list govuk-!-margin-bottom-9">
+          <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">
+              Monthly from disposable income
+            </dt>
+            <dd class="govuk-summary-list__value">
+              £25.68
+            </dd>
+            <dd class="govuk-summary-list__actions">
+              <a class="govuk-link" href="#">
+                Change<span class="govuk-visually-hidden">monthly</span>
+              </a>
+            </dd>
           </div>
-        </div>
+          <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">
+              One off from disposable capital
+            </dt>
+            <dd class="govuk-summary-list__value">
+              £4500
+            </dd>
+            <dd class="govuk-summary-list__actions">
+              <a class="govuk-link" href="#">
+                Change<span class="govuk-visually-hidden">one off</span>
+              </a>
+            </dd>
+          </div>
+     
+        
+         
+        </dl>
 
-        {{ govukRadios({
-          idPrefix: "amended_contribution_frequency",
-          name: "amended_contribution_frequency",
-          fieldset: {
-            legend: {
-              text: "How should they pay?",
-              classes: "govuk-body"
-            }
-          },
-          items: [
-            {
-              value: "Monthly instalments",
-              text: "Monthly instalments",
-              id: "amended_contribution_frequency_1",
-              checked: checked("amended_contribution_frequency", "Monthly instalments")
-            },
-            {
-              value: "One off payment",
-              text: "One off payment",
-              id: "amended_contribution_frequency_2",
-              checked: checked("amended_contribution_frequency", "One off payment")
-            }
-          ]
-        })}}
-        {% endset -%}
 
-        {{ govukRadios({
-          idPrefix: 'contributionCorrect',
-          name: 'contributionCorrect',
-          fieldset: {
-            legend: {
-              text: "Is this correct?",
-              classes: "govuk-fieldset__legend--m"
-            }
-          },
-          hint: {},
-          items: [
-            {
-              value: "Yes",
-              text: "Yes",
-              checked: checked('contributionCorrect', "Yes")
-            },
-            {
-              value: "No",
-              text: "No",
-              checked: checked('contributionCorrect', "No"),
-              conditional: {
-                html: amendContributionHtml
-              }
-            }
-          ]
-        })}}
 
         <div class="govuk-!-padding-top-4"></div>
 
         <div class="govuk-form-group">
           <label class="govuk-label govuk-label--m" for="means-note">
-            Give further details
+            Explain to the provider why you have refused the means
           </label>
           <div id="note-hint" class="govuk-hint">
-            This information is for internal use. It will not be shared with the provider.
+           This will be shared with the provider and saved in the application history
+          </div>
+          <textarea class="govuk-textarea" name="means-note" id="means-note" rows="10">{{ data['means-note'] }}</textarea>
+         
+        </div>
+
+        <div class="govuk-form-group">
+          <label class="govuk-label govuk-label--m" for="means-note">
+            Add a note to the application history
+          </label>
+          <div id="note-hint" class="govuk-hint">
+            This is for internal use. It will not be shared with the provider
           </div>
           <textarea class="govuk-textarea" name="means-note" id="means-note" rows="10">{{ data['means-note'] }}</textarea>
           <div class="govuk-button-group">

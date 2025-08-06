@@ -1,45 +1,17 @@
-{% if data['refNo'] in data['assignedApplications'] %}
-  {% extends "layouts/workload.html" %}
-{% else %}
-  {% extends "layouts/open.html" %}
-{% endif %}
+{% extends "layouts/workload.html" %}
 
 {% block pageTitle %}
 Application history
 {% endblock %}
 
 {% block beforeContent %}
-{% if data['refNo'] in data['assignedApplications'] %}
 <a class="govuk-back-link" href="my-applications">Back to my applications</a>
-{% else %}
-<a class="govuk-back-link" href="open-applications">Back to open applications</a>
-{% endif %}
 {% endblock %}
 
 {% block content %}
 <div class="govuk-grid-row">
-  <div class="govuk-grid-column-full">
-
-<!-- unsure
-    <div class="govuk-notification-banner govuk-notification-banner--success" role="alert" aria-labelledby="govuk-notification-banner-title" data-module="govuk-notification-banner">
-      <div class="govuk-notification-banner__header">
-        <h2 class="govuk-notification-banner__title" id="govuk-notification-banner-title">
-          Success
-        </h2>
-      </div>
-      <div class="govuk-notification-banner__content">
-        <p class="govuk-notification-banner__heading">
-          Means and merits decisions saved and shared with the provider.
-        </p>
-      </div>
-    </div>
-  </div>
-</div>
--->
-
-<div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">
-    <h2 class="govuk-heading-xl govuk-!-margin-bottom-2" ><span class="govuk-!-margin-right-2">E-X4M-P7E</span></h2>
+    <h2 class="govuk-heading-xl govuk-!-margin-bottom-2" ><span class="govuk-!-margin-right-2">L-I2Z-I3P</span></h2>
     <details class="govuk-details" data-module="govuk-details">
       <summary class="govuk-details__summary">
         <span class="govuk-details__summary-text">
@@ -49,32 +21,13 @@ Application history
       <div class="govuk-details__text">TBC
       </div>
     </details>
-
   </div>
-  {% if data['refNo'] in data['assignedApplications'] %}
-  <div class="govuk-grid-column-one-third">
-    <form action="remove-from-my-list">
-      <button class="govuk-button govuk-button--secondary" data-module="govuk-button">Remove from my list</button>
-      <input type="hidden" name="refNoToRemove" value="{{ application['refNo'] }}">
-    </form>
-  </div>
-  {% else %}
-  <div class="govuk-grid-column-one-third">
-    <form action="my-applications">
-      <button class="govuk-button govuk-button--secondary" data-module="govuk-button">Add to my list</button>
-      <input type="hidden" name="refNo" value="{{ data['refNo'] }}">
-    </form>
-  </div>
-  {% endif %}
 </div>
 
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-one-half">
     <p class="govuk-body-m">
       <strong>Date submitted: </strong>{{ application['dateSubmitted'] | date }}<br>
-    {% if data['refNo'] in data['assignedApplications'] %}
-      <strong>Assigned to: </strong>Mo Bradshaw
-    {% endif %}
     </p>
   </div>
 </div>
@@ -85,7 +38,7 @@ Application history
       <nav class="moj-sub-navigation" aria-label="Sub navigation">
         <ul class="moj-sub-navigation__list">
           <li class="moj-sub-navigation__item">
-            <a class="moj-sub-navigation__link" href="application-details">Application details</a>
+            <a class="moj-sub-navigation__link" href="application-details-added">Application details</a>
           </li>
           <li class="moj-sub-navigation__item">
             <a class="moj-sub-navigation__link" href="people">People</a>

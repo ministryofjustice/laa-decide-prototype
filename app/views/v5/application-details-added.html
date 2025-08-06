@@ -1,4 +1,4 @@
-{% extends "layouts/open.html" %}
+{% extends "layouts/workload.html" %}
 
 
 {% block pageTitle %}
@@ -44,11 +44,12 @@ Application details
 
   </div>
   <div class="govuk-grid-column-one-third">
-    {% from "govuk/components/button/macro.njk" import govukButton %}
+        {% from "govuk/components/button/macro.njk" import govukButton %}
 
     {{ govukButton({
-      text: "Add to your list",
-      href: "application-details-added"
+      text: "Remove from your list",
+      classes: "govuk-button--secondary",
+      href: "remove-from-my-list"
     }) }}
   </div>
 </div>
@@ -57,9 +58,7 @@ Application details
   <div class="govuk-grid-column-one-half">
     <p class="govuk-body-m">
       <strong>Date submitted: </strong>{{ application['dateSubmitted'] | date }}<br>
-<!--
       <strong>Assigned to: </strong>Mo Bradshaw
--->
     </p>
   </div>
 </div>
@@ -312,6 +311,20 @@ Application details
 
       </tbody>
     </table>
+  </div>
+</div>
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      <div class="govuk-button-group govuk-!-margin-top-9">
+        <form action="merits-assessment-emergency">
+          <button class="govuk-button" data-module="govuk-button">Merits assessment</button>
+        </form>
+        <form action="send-back">
+          <button class="govuk-button govuk-button--secondary" data-module="govuk-button">Send back to provider</button>
+        </form>
+      </div>
+    </div>
   </div>
 </div>
 {% endblock %}

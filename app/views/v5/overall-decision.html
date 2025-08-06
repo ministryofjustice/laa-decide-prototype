@@ -1,19 +1,8 @@
-{% if data['refNo'] in data['assignedApplications'] %}
-  {% extends "layouts/workload.html" %}
-{% else %}
-  {% extends "layouts/open.html" %}
-{% endif %}
+
+{% extends "layouts/workload.html" %}
 
 {% block pageTitle %}
-Application details
-{% endblock %}
-
-{% block beforeContent %}
-{% if data['refNo'] in data['assignedApplications'] %}
-<a class="govuk-back-link" href="my-applications">Back to my applications</a>
-{% else %}
-<a class="govuk-back-link" href="open-applications">Back to open applications</a>
-{% endif %}
+Submit overall decision
 {% endblock %}
 
 {% set application = data['application']['applicationDetails'] %}
@@ -21,21 +10,6 @@ Application details
 {% block content %}
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">
-
-    {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
-
-{{ govukErrorSummary({
-  titleText: "There is a problem",
-  errorList: [
-    {
-      text: "The overall decision does not match the results of the assessments",
-      href: "#"
-    }
-  ]
-}) }}
-
-
-
     <h1 class="govuk-heading-xl govuk-!-margin-bottom-4">Submit overall decision</h1>
     <p class="govuk-!-font-size-36">{{ application['refNo'] or 'L-I2Z-I3P'}}</p>
     <p class="govuk-!-margin-bottom-8">Use this section to make the overall application decision. <br/>
@@ -116,45 +90,41 @@ Application details
         </tr>
       </tbody>
     </table>
+    <form action="/decision-check" method="POST">
+      {% from "govuk/components/radios/macro.njk" import govukRadios %}
 
-    {% from "govuk/components/radios/macro.njk" import govukRadios %}
-
-{{ govukRadios({
-  name: "whereDoYouLive",
-  fieldset: {
-    legend: {
-      text: "What is your overall decision?",
-      isPageHeading: true,
-      classes: "govuk-fieldset__legend--l"
-    }
-  },
-  errorMessage: {
-    text: "The overall decision does not match the results of the assessments"
-  },
-  items: [
-    {
-      value: "grant",
-      text: "Grant"
-    },
-    {
-      value: "refuse",
-      text: "Refuse",
-      checked: "checked"
-    }
-  ]
-}) }}
+      {{ govukRadios({
+        name: "overall-decision",
+        fieldset: {
+          legend: {
+            text: "What is your overall decision?",
+            isPageHeading: true,
+            classes: "govuk-fieldset__legend--l"
+          }
+        },
+        items: [
+          {
+            value: "grant",
+            text: "Grant"
+          },
+          {
+            value: "refuse",
+            text: "Refuse"
+          }
+        ]
+      }) }}
 
       <div class="govuk-button-group">
 
         {% from "govuk/components/button/macro.njk" import govukButton %}
 
           {{ govukButton({
-            text: "Submit",
-            href: "application-history"
+            text: "Submit"
           }) }}
 
         <a class="govuk-link" href="application-details">Cancel</a>
       </div>
+    </form>
   </div>
 </div>
 

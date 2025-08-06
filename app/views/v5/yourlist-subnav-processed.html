@@ -1,0 +1,133 @@
+{% extends "layouts/open.html" %}
+
+{% block pageTitle %}
+Your list
+{% endblock %}
+
+{% block content %}
+
+    <h1 class="govuk-heading-xl">Your list</h1>
+   
+    <nav class="moj-sub-navigation" aria-label="Sub navigation">
+      <ul class="moj-sub-navigation__list">
+        <li class="moj-sub-navigation__item">
+          <a class="moj-sub-navigation__link" href="yourlist-subnav-unprocessed.html">Unprocessed (3)</a>
+        </li>
+    
+        <li class="moj-sub-navigation__item">
+          <a class="moj-sub-navigation__link" href="yourlist-subnav-saved.html">Saved (12)</a>
+        </li>
+    
+        <li class="moj-sub-navigation__item">
+          <a class="moj-sub-navigation__link" aria-current="page" href="yourlist-subnav-processed.html">Processed (5)</a>
+        </li>
+      </ul>
+    
+    </nav>
+        
+
+<table class="govuk-table">
+  <caption class="govuk-table__caption govuk-table__caption--l">Processed applications</caption>
+  <thead class="govuk-table__head">
+    <tr class="govuk-table__row">
+      <th scope="col" class="govuk-table__header">Reference</th>
+      <th scope="col" class="govuk-table__header">Submitted</th>
+      <th scope="col" class="govuk-table__header">Processed</th>
+     
+     
+      <th scope="col" class="govuk-table__header">Merits decision</th>
+      <th scope="col" class="govuk-table__header">Means decision</th>
+      <th scope="col" class="govuk-table__header">Outcome</th>
+    </tr>
+  </thead>
+  <tbody class="govuk-table__body">
+    
+    
+  <tr class="govuk-table__row">
+      <td class="govuk-table__cell">
+        <nobr><a class="govuk_link" href="https://laa-decide-prototype.apps.live.cloud-platform.service.justice.gov.uk/latest/application-details?refNo=L-C6Z-B7K">L-C6Z-B7K</a></nobr></td>
+      <td class="govuk-table__cell"><input type="hidden" name="date" value="2023-08-31T00:00:00.000Z">Thu 31 Aug</td>
+      <td class="govuk-table__cell"><input type="hidden" name="date" value="2023-08-31T00:00:00.000Z">Thu 31 Aug</td>
+      
+      
+      <td class="govuk-table__cell">Non-molestation order<p class="govuk-hint">Substantive certificate <span class="moj-badge moj-badge--green">granted</span><br></p>Prohibited steps order<br><p class="govuk-hint">Substantive certificate <span class="moj-badge moj-badge--green">granted</span><br></td>
+      <td class="govuk-table__cell">Non-molestation order <p class="govuk-hint"><span class="moj-badge moj-badge--green">granted</span></p><p>Prohibited steps order</p><p class="govuk-hint"><span class="moj-badge moj-badge--green">granted</span></p></td>
+       <td class="govuk-table__cell">
+        <strong class="govuk-tag govuk-tag--green">
+          Granted
+        </strong>
+       </td>
+    </tr><tr class="govuk-table__row">
+      <td class="govuk-table__cell">
+        <nobr><a class="govuk_link" href="https://laa-decide-prototype.apps.live.cloud-platform.service.justice.gov.uk/latest/application-details?refNo=L-D5A-A6L">L-D5A-A6L</a></nobr></td>
+      <td class="govuk-table__cell"><input type="hidden" name="date" value="2023-08-31T00:00:00.000Z">Thu 31 Aug</td>
+      <td class="govuk-table__cell"><input type="hidden" name="date" value="2023-09-01T00:00:00.000Z">Fri 01 Sep</td>
+     
+      
+      <td class="govuk-table__cell">Non-molestation order<p class="govuk-hint">Substantive certificate<span class="moj-badge moj-badge--grey">not started</span><br></p>Prohibited steps order<br><p class="govuk-hint">Substantive certificate<span class="moj-badge moj-badge--grey">not started</span><br></td>
+        <td class="govuk-table__cell">Non-molestation order<span class="moj-badge moj-badge--grey">not started</span><p>Prohibited steps order</p><span class="moj-badge moj-badge--grey">not started</span></td>
+       <td class="govuk-table__cell">
+        <strong class="govuk-tag govuk-tag--yellow">
+          Information requested
+        </strong>
+       </td>
+    </tr><tr class="govuk-table__row">
+      <td class="govuk-table__cell">
+        <nobr><a class="govuk_link" href="https://laa-decide-prototype.apps.live.cloud-platform.service.justice.gov.uk/latest/application-details?refNo=L-W1X-Y2Z">L-W1X-Y2Z</a></nobr></td>
+      <td class="govuk-table__cell"><input type="hidden" name="date" value="2023-09-10T00:00:00.000Z">Sun 10 Sep</td>
+      <td class="govuk-table__cell"><input type="hidden" name="date" value="2023-09-10T00:00:00.000Z">Sun 10 Sep</td>
+      
+      <td class="govuk-table__cell">Non-molestation order<p class="govuk-hint">Substantive certificate<span class="moj-badge moj-badge--grey">not started</span><br></p>Prohibited steps order<br><p class="govuk-hint">Substantive certificate<span class="moj-badge moj-badge--grey">not started</span><br></td>
+        <td class="govuk-table__cell">Non-molestation order<span class="moj-badge moj-badge--grey">not started</span><p>Prohibited steps order</p><span class="moj-badge moj-badge--grey">not started</span></td>
+       <td class="govuk-table__cell">
+        <strong class="govuk-tag govuk-tag--yellow">
+          Rejected
+        </strong>
+       </td>
+      </tr><tr class="govuk-table__row">
+        <td class="govuk-table__cell">
+          <nobr><a class="govuk_link" href="https://laa-decide-prototype.apps.live.cloud-platform.service.justice.gov.uk/latest/application-details?refNo=L-W1X-Y2Z">L-W1X-Y2Z</a></nobr></td>
+        <td class="govuk-table__cell"><input type="hidden" name="date" value="2023-09-10T00:00:00.000Z">Sun 10 Sep</td>
+        <td class="govuk-table__cell"><input type="hidden" name="date" value="2023-09-10T00:00:00.000Z">Sun 10 Sep</td>
+     
+        
+        <td class="govuk-table__cell">Non-molestation order<p class="govuk-hint">Substantive certificate<br><span class="moj-badge moj-badge--red">refused</span></p>Prohibited steps order<br><p class="govuk-hint">Substantive certificate <span class="moj-badge moj-badge--green">granted</span><br></td>
+          <td class="govuk-table__cell">Non-molestation order <p class="govuk-hint"><span class="moj-badge moj-badge--green">granted</span></p><p>Prohibited steps order</p><p class="govuk-hint"><span class="moj-badge moj-badge--green">granted</span></p></td>
+         <td class="govuk-table__cell">
+          <strong class="govuk-tag govuk-tag--turquoise">
+            Partially granted
+          </strong>
+         </td>
+        </tr><tr class="govuk-table__row">
+          <td class="govuk-table__cell">
+            <nobr><a class="govuk_link" href="https://laa-decide-prototype.apps.live.cloud-platform.service.justice.gov.uk/latest/application-details?refNo=L-W1X-Y2Z">L-W1X-Y2Z</a></nobr></td>
+          <td class="govuk-table__cell"><input type="hidden" name="date" value="2023-09-10T00:00:00.000Z">Sun 10 Sep</td>
+          <td class="govuk-table__cell"><input type="hidden" name="date" value="2023-09-10T00:00:00.000Z">Sun 10 Sep</td>
+        
+          <td class="govuk-table__cell">Non-molestation order<p class="govuk-hint">Substantive certificate<span class="moj-badge moj-badge--grey">not started</span><br></p>Prohibited steps order<br><p class="govuk-hint">Substantive certificate<span class="moj-badge moj-badge--grey">not started</span><br></td>
+            <td class="govuk-table__cell">Non-molestation order<span class="moj-badge moj-badge--grey">not started</span><p>Prohibited steps order</p><span class="moj-badge moj-badge--grey">not started</span></td>
+           <td class="govuk-table__cell">
+            <strong class="govuk-tag govuk-tag--orange">
+              Withdrawn
+            </strong>
+           </td>
+          </tr><tr class="govuk-table__row">
+            <td class="govuk-table__cell">
+              <nobr><a class="govuk_link" href="https://laa-decide-prototype.apps.live.cloud-platform.service.justice.gov.uk/latest/application-details?refNo=L-W1X-Y2Z">L-W1X-Y2Z</a></nobr></td>
+            <td class="govuk-table__cell"><input type="hidden" name="date" value="2023-09-10T00:00:00.000Z">Sun 10 Sep</td>
+            <td class="govuk-table__cell"><input type="hidden" name="date" value="2023-09-10T00:00:00.000Z">Sun 10 Sep</td>
+
+            <td class="govuk-table__cell">Non-molestation order<p class="govuk-hint">Substantive certificate <span class="moj-badge moj-badge--red">refused</span><br></p>Prohibited steps order<br><p class="govuk-hint">Substantive certificate <span class="moj-badge moj-badge--red">refused</span><br></td>
+              <td class="govuk-table__cell">Non-molestation order <p class="govuk-hint"><span class="moj-badge moj-badge--red">refused</span></p><p>Prohibited steps order</p><p class="govuk-hint"><span class="moj-badge moj-badge--red">refused</span></p></td>
+             <td class="govuk-table__cell">
+              <strong class="govuk-tag govuk-tag--red">
+                Refused
+              </strong>
+             </td>
+    </tr></tbody>
+</table>
+
+
+        
+      </div>
+      {% endblock %}

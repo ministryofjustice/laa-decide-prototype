@@ -15,263 +15,189 @@ Merits assessment - emergency
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">
     <h1 class="govuk-heading-xl govuk-!-margin-bottom-4">Make a merits assessment</h1>
-    <p class="govuk-!-font-size-36">{{ application['refNo'] }}</p>
+    <p class="govuk-!-font-size-36">L-I2Z-I3P</p>
     <div class="govuk-!-padding-top-4"></div>
   </div>
 </div>
 
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">
-    <h2 class="govuk-heading-l govuk-!-margin-bottom-4">Emergency proceedings</h1>
-
-    <form action="merits-assessment-substantive" method="POST">
+    <h2 class="govuk-heading-l govuk-!-margin-bottom-4">Emergency proceedings</h2>
+    <form action="/merits-check" method="POST">
 
       <div class="govuk-form-group">
-        {% for proceeding in application['proceedings'] %}
-        {% for certificate in proceeding['certificates'] %}
-        {% if certificate['certificateType'] === 'Emergency certificate' %}
+        <h2 class="govuk-heading-m">Non-molestation order</h2>
+        <dl class="govuk-summary-list govuk-!-margin-bottom-5">
+          <div class="govuk-summary-list__row govuk-summary-list__row--no-actions">
+            <dt class="govuk-summary-list__key">Category</dt>
+            <dd class="govuk-summary-list__value">Family - Domestic abuse</dd>
+          </div>
 
-        <h2 class="govuk-heading-m">{{ proceeding['proceedingType'] }}</h2>
-        {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+          <div class="govuk-summary-list__row govuk-summary-list__row--no-actions">
+            <dt class="govuk-summary-list__key">Delegated functions</dt>
+            <dd class="govuk-summary-list__value">16 Dec 2023</dd>
+          </div>
 
-        {{ govukSummaryList({
-        classes: "govuk-!-margin-bottom-5",
-        rows: [
-          {
-            key: {
-              text: "Category"
-            },
-            value: {
-              text: application['categoryLaw'] + ' - ' + proceeding['matterType']
-            },
-            actions: {
-              
-            }
-          },
-          {
-            key: {
-              text: "Delegated functions"
-            },
-            value: {
-              text: "16 Oct 2023"
-            },
-            actions: {
-              
-            }
-          },
-          {
-            key: {
-              text: "Level of service"
-            },
-            value: {
-              text: certificate['formOfService']
-            },
-            actions: {
-              items: [
-                {
-                  href: "change-level-emergency?cert_id_to_change=" + certificate['id'] + "&proc_type=" + proceeding['proceedingType'],
-                  text: "Change",
-                  visuallyHiddenText: "Level of service"
-                }
-              ]
-            }
-          },
-          {
-            key: {
-              text: "Scope limitations"
-            },
-            value: {
-              text: certificate['scopeLimits']
-            },
-            actions: {
-              items: [
-                {
-                  href: "change-scope-emergency?cert_id_to_change=" + certificate['id'] + "&proc_type=" + proceeding['proceedingType'],
-                  text: "Change",
-                  visuallyHiddenText: "Scope limitations"
-                }
-              ]
-            }
-          }
-        ]
-      }) }}
+          <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">Level of service</dt>
+            <dd class="govuk-summary-list__value">{{ data['emergencyLOS'] or "Full representation"}}</dd>
+            <dd class="govuk-summary-list__actions">
+              <a class="govuk-link" href="change-level-emergency">Change<span class="govuk-visually-hidden"> Level of service</span></a></dd>  
+          </div>
 
+          <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">Scope limitations</dt>
+            <dd class="govuk-summary-list__value">{{ data['emergency-scope'] or "Interim order inc. return date"}}</dd>
+            <dd class="govuk-summary-list__actions">
+              <a class="govuk-link" href="change-scope-emergency">Change<span class="govuk-visually-hidden"> Scope limitations</span></a></dd>
+          </div>
+        </dl>
+      </div>
 
+      <div class="govuk-form-group">
+        <div class="govuk-radios govuk-!-margin-bottom-9" data-module="govuk-radios">
+          <div class="govuk-radios__item">
+            <input class="govuk-radios__input" id="application_2_proceeding_1_certificate_1_decision" name="application_2_proceeding_1_certificate_1" type="radio" value="granted" aria-controls="conditional-application_2_proceeding_1_certificate_1_decision" aria-expanded="false">
+            <label class="govuk-label govuk-radios__label" for="application_2_proceeding_1_certificate_1_decision">Grant</label>
+          </div>
+          <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-application_2_proceeding_1_certificate_1_decision">
+            <div class="govuk-form-group">
 
-        {% from "govuk/components/radios/macro.njk" import govukRadios %}
-        {% from "govuk/components/date-input/macro.njk" import govukDateInput %}
-        
-        {% set otherDate %}
-        {{ govukDateInput({
-          id: "emergency-date",
-          namePrefix: "emergency-date"
-        }) }}
+              <fieldset class="govuk-fieldset">
+                <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
+                  <h1 class="govuk-fieldset__heading">When should the emergency certificate be granted from?</h1>
+                </legend>
 
-        {% endset -%}
-
-        {% set otherDateEnd %}
-        {{ govukDateInput({
-          id: "emergency-date-end",
-          namePrefix: "emergency-date-end"
-        }) }}
-
-        {% endset -%}
-
-        {% set grantHtml %}
-
-        {{ govukRadios({
-          name: "emergencyDateStart",
-          fieldset: {
-            legend: {
-              text: "When should the emergency certificate be granted from?",
-              isPageHeading: true,
-              classes: "govuk-fieldset__legend--s"
-            }
-          },
-          items: [
-            {
-              value: "df-day",
-              text: "Date delegated functions were used"
-            },
-            {
-              value: "today",
-              text: "Today"
-            },
-            {
-              value: "other",
-              text: "Another date",
-              conditional: {
-                html: otherDate
-              }
-            }
-          ]
-        }) }}
-
-        {{ govukRadios({
-          name: "emergencyDateEnd",
-          fieldset: {
-            legend: {
-              text: "When should the emergency certificate end?",
-              isPageHeading: true,
-              classes: "govuk-fieldset__legend--s"
-            }
-          },
-          items: [
-            {
-              value: "8weeks",
-              text: "8 weeks from the start date"
-            },
-            {
-              value: "other",
-              text: "Another date",
-              conditional: {
-                html: otherDateEnd
-              }
-            }
-          ]
-        }) }}
-
-        {% endset -%}
-
-        {% set refuseHtml %}
-        {% include "./_refusal_reasons_dropdown.html" %}
-        {% endset -%}
-
-        {{ govukRadios({
-          classes: "govuk-!-margin-bottom-9",
-          idPrefix: certificate['id']+"_decision",
-          name: certificate['id'],
-          items: [
-            {
-              value: "granted",
-              text: "Grant",
-              checked: checked(certificate['id'], "granted"),
-              conditional: {
-                html: grantHtml
-              }
-            },
-            {
-              value: "refused",
-              text: "Refuse",
-              checked: checked(certificate['id'], "refused"),
-              conditional: {
-                html: refuseHtml
-              }
-            }
-          ]
-        })}}
-
-        {% endif %}
-        {% endfor %}
-        {% endfor %}
-
-
-         <table class="govuk-table govuk-!-margin-top-9">
-          <caption class="govuk-table__caption govuk-table__caption--l">Cost limits</caption>
-          <tbody class="govuk-table__body">
-            {% for limitation in application['costLimitations'] %}
-            {% if limitation['certificateType'] == 'Emergency certificate' %}
-            <tr class="govuk-table__row">
-              <td class="govuk-table__header">Certificate type</td>
-              <td class="govuk-table__cell">{{ limitation['certificateType'] }}</td>
-            </tr>
-            <tr class=" govuk-table__row">
-              <td class="govuk-table__header">Default</td>
-              <td class="govuk-table__cell">{{ limitation['costLimit'] }}</td>
-            </tr>
-            <tr class="govuk-table__row">
-              <td class="govuk-table__header">Requested</td>
-              <td class="govuk-table__cell">{{ limitation['requestedCostLimit'] }}</td>
-            </tr>
-            {% if limitation['justification'] %}
-            <tr class="govuk-table__row">
-              <td class="govuk-table__header">Justification</td>
-              <td class="govuk-table__cell">{{ limitation['justification'] }}</td>
-            </tr>
-            {% endif %}
-            {% endif %}
-            {% endfor %}
-          </tbody>
-        </table>
-
-        {% from "govuk/components/radios/macro.njk" import govukRadios %}
-        {% from "govuk/components/input/macro.njk" import govukInput %}
-
-        {% set limitHtml %}
-        <div class="govuk-input__wrapper">
-                    <div class="govuk-input__prefix" aria-hidden="true">£</div>
-                    <label name="costLabel" for="emergencyCostAmount" class="govuk-visually-hidden">New cost limit</label>
-                    <input class="govuk-input govuk-input--width-5" id="emergencyCostAmount" describedby="costLabel" name="emergencyCostAmount" value="{{ data['granted-emergency'] }}" type="text" spellcheck="false">
+                <div class="govuk-radios" data-module="govuk-radios">
+                  <div class="govuk-radios__item">
+                    <input class="govuk-radios__input" id="emergencyDateStart" name="emergencyDateStart" type="radio" value="df-day">
+                    <label class="govuk-label govuk-radios__label" for="emergencyDateStart">Date delegated functions were used</label>
                   </div>
-        {% endset -%}
 
-        {{ govukRadios({
-          name: "emergencyCost",
-          fieldset: {
-            legend: {
-              text: "How much should be granted for the emergency certificate?",
-              isPageHeading: true,
-              classes: "govuk-fieldset__legend--s"
-            }
-          },
-          items: [
-            {
-              value: "Default limit (amount)",
-              text: "Default limit"
-            },
-            {
-              value: "Requested limit (amount)",
-              text: "Requested limit"
-            },
-            {
-              value: "New limit set by assessor (amount)",
-              text: "New limit",
-              conditional: {
-                html: limitHtml
-              }
-            }
-          ]
-        }) }}
+                  <div class="govuk-radios__item">
+                    <input class="govuk-radios__input" id="emergencyDateStart-2" name="emergencyDateStart" type="radio" value="today">
+                    <label class="govuk-label govuk-radios__label" for="emergencyDateStart-2">Today</label>
+                  </div>
+
+                  <div class="govuk-radios__item">
+                    <input class="govuk-radios__input" id="emergencyDateStart-3" name="emergencyDateStart" type="radio" value="other" aria-controls="conditional-emergencyDateStart-3" aria-expanded="false">
+                    <label class="govuk-label govuk-radios__label" for="emergencyDateStart-3">Another date</label>
+                  </div>
+
+                  <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-emergencyDateStart-3">
+                    <div class="govuk-form-group">
+
+                      <div class="govuk-date-input" id="emergency-date">
+
+                        <div class="govuk-date-input__item">
+                          <div class="govuk-form-group">
+                            <label class="govuk-label govuk-date-input__label" for="emergency-date-day">Day</label>
+                            <input class="govuk-input govuk-date-input__input govuk-input--width-2" id="emergency-date-day" name="emergency-date-day" type="text" inputmode="numeric">
+                          </div>
+                        </div>
+
+                        <div class="govuk-date-input__item">
+                          <div class="govuk-form-group">
+                            <label class="govuk-label govuk-date-input__label" for="emergency-date-month">Month</label>
+                            <input class="govuk-input govuk-date-input__input govuk-input--width-2" id="emergency-date-month" name="emergency-date-month" type="text" inputmode="numeric">
+                          </div>
+                        </div>
+
+                        <div class="govuk-date-input__item">
+                          <div class="govuk-form-group">
+                            <label class="govuk-label govuk-date-input__label" for="emergency-date-year">Year</label>
+                            <input class="govuk-input govuk-date-input__input govuk-input--width-4" id="emergency-date-year" name="emergency-date-year" type="text" inputmode="numeric">
+                          </div>
+                        </div>
+
+                      </div>
+
+                    </div>
+                  </div>
+
+                </div>
+              </fieldset>
+            </div>
+
+            <div class="govuk-form-group">
+              <fieldset class="govuk-fieldset">
+                <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
+                  <h1 class="govuk-fieldset__heading">When should the emergency certificate end?</h1>
+                </legend>
+                <div class="govuk-radios" data-module="govuk-radios">
+                  <div class="govuk-radios__item">
+                    <input class="govuk-radios__input" id="emergencyDateEnd" name="emergencyDateEnd" type="radio" value="8weeks">
+                    <label class="govuk-label govuk-radios__label" for="emergencyDateEnd">8 weeks from the start date</label>
+                  </div>
+
+                  <div class="govuk-radios__item">
+                    <input class="govuk-radios__input" id="emergencyDateEnd-2" name="emergencyDateEnd" type="radio" value="other" aria-controls="conditional-emergencyDateEnd-2" aria-expanded="false">
+                    <label class="govuk-label govuk-radios__label" for="emergencyDateEnd-2">Another date</label>
+                  </div>
+
+                  <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-emergencyDateEnd-2">
+                    <div class="govuk-form-group">
+                      <div class="govuk-date-input" id="emergency-date-end">
+                        <div class="govuk-date-input__item">
+                          <div class="govuk-form-group">
+                            <label class="govuk-label govuk-date-input__label" for="emergency-date-end-day">Day</label>
+                            <input class="govuk-input govuk-date-input__input govuk-input--width-2" id="emergency-date-end-day" name="emergency-date-end-day" type="text" inputmode="numeric">
+                          </div>
+                        </div>
+
+                        <div class="govuk-date-input__item">
+                          <div class="govuk-form-group">
+                            <label class="govuk-label govuk-date-input__label" for="emergency-date-end-month">Month</label>
+                            <input class="govuk-input govuk-date-input__input govuk-input--width-2" id="emergency-date-end-month" name="emergency-date-end-month" type="text" inputmode="numeric">
+                          </div>
+                        </div>
+  
+                        <div class="govuk-date-input__item">
+                          <div class="govuk-form-group">
+                            <label class="govuk-label govuk-date-input__label" for="emergency-date-end-year">Year</label>
+                            <input class="govuk-input govuk-date-input__input govuk-input--width-4" id="emergency-date-end-year" name="emergency-date-end-year" type="text" inputmode="numeric">
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </fieldset>
+            </div>
+
+          </div>
+
+          <div class="govuk-radios__item">
+            <input class="govuk-radios__input" id="application_2_proceeding_1_certificate_1_decision-2" name="application_2_proceeding_1_certificate_1" type="radio" value="refused" aria-controls="conditional-application_2_proceeding_1_certificate_1_decision-2" aria-expanded="false">
+            <label class="govuk-label govuk-radios__label" for="application_2_proceeding_1_certificate_1_decision-2">Refuse</label>
+          </div>
+          <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-application_2_proceeding_1_certificate_1_decision-2">
+            <div class="govuk-form-group">
+              <select class="govuk-select" id="" name="application_2_proceeding_1_certificate_1_reason">
+                <option value="Evidence does not justify legal aid">Evidence does not justify legal aid</option>
+                <option value="Insufficient information has been provided">Insufficient information has been provided</option>
+                <option value="No attempt to settle has been made">No attempt to settle has been made</option>
+                <option value="Applicant has a live certificate that can be amended">Applicant has a live certificate that can be amended</option>
+                <option value="The reasonable private paying individual test has not been satisfied">The reasonable private paying individual test has not been satisfied</option>
+                <option value="Low chances of success">Low chances of success</option>
+                <option value="The proportionality test has not been satisfied">The proportionality test has not been satisfied</option>
+                <option value="The nature or timeframe of the incident does not justify legal aid">The nature or timeframe of the incident does not justify legal aid</option>
+                <option value="No genuine dispute between the parties for a court order to be necessary">No genuine dispute between the parties for a court order to be necessary</option>
+                <option value="Too soon to make a decision because of ongoing negotiation">Too soon to make a decision because of ongoing negotiation</option>
+                <option value="No warning letter was sent to the opponent">No warning letter was sent to the opponent</option>
+                <option value="Granting or rejecting would be illegal, irrational or procedurally improper">Granting or rejecting would be illegal, irrational or procedurally improper</option>
+                <option value="Bail conditions in force or the opponent has been remanded in custody">Bail conditions in force or the opponent has been remanded in custody</option>
+                <option value="The police are involved">The police are involved</option>
+                <option value="The opponent should offer an undertaking">The opponent should offer an undertaking</option>
+                <option value="Pre-action correspondence was not sent">Pre-action correspondence was not sent</option>
+                <option value="Provider must show that orders obtained in England or Wales can be enforced abroad">Provider must show that orders obtained in England or Wales can be enforced abroad</option>
+                <option value="Investigative work must be carried out and result in reasonable indication that the case is arguable">Investigative work must be carried out and result in reasonable indication that the case is arguable</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
 
         <div class="govuk-button-group">
           <input type="submit" name="merits_continue_button" value="Save and continue" id="continue" class="govuk-button form-button" data-module="govuk-button" data-disable-with="Save and continue">
@@ -280,6 +206,8 @@ Merits assessment - emergency
         </div>
 
     </form>
+
   </div>
 </div>
+
 {% endblock %}
