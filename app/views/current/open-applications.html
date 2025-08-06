@@ -1,0 +1,184 @@
+{% extends "layouts/open.html" %}
+
+{% block pageTitle %}
+Open applications
+{% endblock %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-full">
+    <h1 class="govuk-heading-xl">Open applications</h1>
+    <table class="govuk-table" data-module="moj-sortable-table">
+      <thead class="govuk-table__head">
+        <tr class="govuk-table__row">
+          <th scope="col" class="govuk-table__header">Reference</th>
+          <th scope="col" class="govuk-table__header" aria-sort="ascending">Submitted</th>
+          <th scope="col" class="govuk-table__header" aria-sort="none">Updated</th>
+          <th scope="col" class="govuk-table__header" aria-sort="none">Type</th>
+          <th scope="col" class="govuk-table__header" aria-sort="none">DF</th>
+          <th scope="col" class="govuk-table__header" aria-sort="none">Matter type</th>
+          <th scope="col" class="govuk-table__header" aria-sort="none">Means</th>
+          <th scope="col" class="govuk-table__header"></th>
+        </tr>
+      </thead>
+      <tbody class="govuk-table__body">
+        <tr class="govuk-table__row">
+          <td class="govuk-table__cell">
+            <nobr><a class="govuk_link" href="application-details">L-B3H-J8L</a></nobr></td>
+          <td class="govuk-table__cell"><input type="hidden" name="date" value="2023-08-26T00:00:00.000Z">Sat 26 Aug</td>
+          <td class="govuk-table__cell"><input type="hidden" name="date" value="2023-08-30T00:00:00.000Z">Wed 30 Aug</td>
+          <td class="govuk-table__cell">Initial application</td>
+          <td class="govuk-table__cell">Used</td>
+          <td class="govuk-table__cell"><strong>Family</strong><br>Domestic Abuse, Section 8 orders</td>
+          <td data-sort-value="Non passported" class="govuk-table__cell">Non passported</td>
+          <td class="govuk-table__cell">
+              <button class="govuk-button govuk-button--secondary" data-module="govuk-button">Add <span class="govuk-visually-hidden">to your list</span></button>
+              <input type="hidden" name="refNo" value="L-B3H-J8L">
+          </td>
+        </tr><tr class="govuk-table__row">
+          <td class="govuk-table__cell">
+            <nobr><a class="govuk_link" href="application-details">L-E3S-D6N</a></nobr></td>
+          <td class="govuk-table__cell"><input type="hidden" name="date" value="2023-08-26T00:00:00.000Z">Sat 26 Aug</td>
+          <td class="govuk-table__cell"><input type="hidden" name="date" value="2023-09-11T00:00:00.000Z">Mon 11 Sep</td>
+          <td class="govuk-table__cell">Initial application</td>
+          <td class="govuk-table__cell">Not used</td>
+          <td class="govuk-table__cell"><strong>Family</strong><br>Domestic Abuse</td>
+          <td data-sort-value="Passported" class="govuk-table__cell">Passported</td>
+          <td class="govuk-table__cell">
+              <button class="govuk-button govuk-button--secondary" data-module="govuk-button">Add <span class="govuk-visually-hidden">to your list</span></button>
+              <input type="hidden" name="refNo" value="L-E3S-D6N">
+          </td>
+        </tr><tr class="govuk-table__row">
+          <td class="govuk-table__cell">
+            <nobr><a class="govuk_link" href="application-details">L-A2G-H4Q</a></nobr></td>
+          <td class="govuk-table__cell"><input type="hidden" name="date" value="2023-08-30T00:00:00.000Z">Wed 30 Aug</td>
+          <td class="govuk-table__cell"><input type="hidden" name="date" value="2023-09-01T00:00:00.000Z">Fri 01 Sep</td>
+          <td class="govuk-table__cell">Initial application</td>
+          <td class="govuk-table__cell">Used</td>
+          <td class="govuk-table__cell"><strong>Family</strong><br>Section 8 orders</td>
+          <td data-sort-value="Passported" class="govuk-table__cell">Passported</td>
+          <td class="govuk-table__cell">
+              <button class="govuk-button govuk-button--secondary" data-module="govuk-button">Add <span class="govuk-visually-hidden">to your list</span></button>
+              <input type="hidden" name="refNo" value="L-A2G-H4Q">
+          </td>
+        </tr><tr class="govuk-table__row">
+          <td class="govuk-table__cell">
+            <nobr><a class="govuk_link" href="application-details">L-F4R-E5M</a></nobr></td>
+          <td class="govuk-table__cell"><input type="hidden" name="date" value="2023-08-31T00:00:00.000Z">Thu 31 Aug</td>
+          <td class="govuk-table__cell"><input type="hidden" name="date" value="2023-08-31T00:00:00.000Z">Thu 31 Aug</td>
+          <td class="govuk-table__cell">Initial application</td>
+          <td class="govuk-table__cell">Not used</td>
+          <td class="govuk-table__cell"><strong>Family</strong><br>Financial &amp; Property - matrimonial</td>
+          <td data-sort-value="Passported" class="govuk-table__cell">Passported</td>
+          <td class="govuk-table__cell">
+              <button class="govuk-button govuk-button--secondary" data-module="govuk-button">Add <span class="govuk-visually-hidden">to your list</span></button>
+              <input type="hidden" name="refNo" value="L-F4R-E5M">
+          </td>
+        </tr><tr class="govuk-table__row">
+          <td class="govuk-table__cell">
+            <nobr><a class="govuk_link" href="application-details">L-C6Z-B7K</a></nobr></td>
+          <td class="govuk-table__cell"><input type="hidden" name="date" value="2023-08-31T00:00:00.000Z">Thu 31 Aug</td>
+          <td class="govuk-table__cell"><input type="hidden" name="date" value="2023-08-31T00:00:00.000Z">Thu 31 Aug</td>
+          <td class="govuk-table__cell">Initial application</td>
+          <td class="govuk-table__cell">Not used</td>
+          <td class="govuk-table__cell"><strong>Family</strong><br>Divorce, Nullity &amp; judicial separation</td>
+          <td data-sort-value="Non passported" class="govuk-table__cell">Non passported</td>
+          <td class="govuk-table__cell">
+              <button class="govuk-button govuk-button--secondary" data-module="govuk-button">Add <span class="govuk-visually-hidden">to your list</span></button>
+              <input type="hidden" name="refNo" value="L-C6Z-B7K">
+          </td>
+        </tr><tr class="govuk-table__row">
+          <td class="govuk-table__cell">
+            <nobr><a class="govuk_link" href="application-details">L-B3C-B8G</a></nobr></td>
+          <td class="govuk-table__cell"><input type="hidden" name="date" value="2023-08-31T00:00:00.000Z">Thu 31 Aug</td>
+          <td class="govuk-table__cell"><input type="hidden" name="date" value="2023-08-31T00:00:00.000Z">Thu 31 Aug</td>
+          <td class="govuk-table__cell">Initial application</td>
+          <td class="govuk-table__cell">Not used</td>
+          <td class="govuk-table__cell"><strong>Family</strong><br>Domestic Abuse</td>
+          <td data-sort-value="Non passported" class="govuk-table__cell">Non passported</td>
+          <td class="govuk-table__cell">
+              <button class="govuk-button govuk-button--secondary" data-module="govuk-button">Add <span class="govuk-visually-hidden">to your list</span></button>
+              <input type="hidden" name="refNo" value="L-B3C-B8G">
+          </td>
+        </tr><tr class="govuk-table__row">
+          <td class="govuk-table__cell">
+            <nobr><a class="govuk_link" href="application-details">L-D5A-A6L</a></nobr></td>
+          <td class="govuk-table__cell"><input type="hidden" name="date" value="2023-08-31T00:00:00.000Z">Thu 31 Aug</td>
+          <td class="govuk-table__cell"><input type="hidden" name="date" value="2023-09-01T00:00:00.000Z">Fri 01 Sep</td>
+          <td class="govuk-table__cell">Initial application</td>
+          <td class="govuk-table__cell">Not used</td>
+          <td class="govuk-table__cell"><strong>Family</strong><br>High Court Jurisdiction</td>
+          <td data-sort-value="Non passported" class="govuk-table__cell">Non passported</td>
+          <td class="govuk-table__cell">
+              <button class="govuk-button govuk-button--secondary" data-module="govuk-button">Add <span class="govuk-visually-hidden">to your list</span></button>
+              <input type="hidden" name="refNo" value="L-D5A-A6L">
+          </td>
+        </tr><tr class="govuk-table__row">
+          <td class="govuk-table__cell">
+            <nobr><a class="govuk_link" href="application-details">L-W1X-Y2Z</a></nobr></td>
+          <td class="govuk-table__cell"><input type="hidden" name="date" value="2023-09-10T00:00:00.000Z">Sun 10 Sep</td>
+          <td class="govuk-table__cell"><input type="hidden" name="date" value="2023-09-10T00:00:00.000Z">Sun 10 Sep</td>
+          <td class="govuk-table__cell">Initial application</td>
+          <td class="govuk-table__cell">Used</td>
+          <td class="govuk-table__cell"><strong>Family</strong><br>Public Law - Family</td>
+          <td data-sort-value="Passported" class="govuk-table__cell">Passported</td>
+          <td class="govuk-table__cell">
+              <button class="govuk-button govuk-button--secondary" data-module="govuk-button">Add <span class="govuk-visually-hidden">to your list</span></button>
+              <input type="hidden" name="refNo" value="L-W1X-Y2Z">
+          </td>
+        </tr><tr class="govuk-table__row">
+          <td class="govuk-table__cell">
+            <nobr><a class="govuk_link" href="application-details">L-A1B-C2D</a></nobr></td>
+          <td class="govuk-table__cell"><input type="hidden" name="date" value="2023-09-11T00:00:00.000Z">Mon 11 Sep</td>
+          <td class="govuk-table__cell"><input type="hidden" name="date" value="2023-09-11T00:00:00.000Z">Mon 11 Sep</td>
+          <td class="govuk-table__cell">Initial application</td>
+          <td class="govuk-table__cell">Used</td>
+          <td class="govuk-table__cell"><strong>Family</strong><br>Special Children Act</td>
+          <td data-sort-value="Passported" class="govuk-table__cell">Passported</td>
+          <td class="govuk-table__cell">
+              <button class="govuk-button govuk-button--secondary" data-module="govuk-button">Add <span class="govuk-visually-hidden">to your list</span></button>
+              <input type="hidden" name="refNo" value="L-A1B-C2D">
+          </td>
+        </tr><tr class="govuk-table__row">
+          <td class="govuk-table__cell">
+            <nobr><a class="govuk_link" href="application-details">L-I2Z-I3P</a></nobr></td>
+          <td class="govuk-table__cell"><input type="hidden" name="date" value="2023-10-30T00:00:00.000Z">Mon 30 Oct</td>
+          <td class="govuk-table__cell"><input type="hidden" name="date" value="2023-10-30T00:00:00.000Z">Mon 30 Oct</td>
+          <td class="govuk-table__cell">Initial application</td>
+          <td class="govuk-table__cell">Used</td>
+          <td class="govuk-table__cell"><strong>Family</strong><br>Domestic Abuse, Section 8 orders</td>
+          <td data-sort-value="Passported" class="govuk-table__cell">Passported</td>
+          <td class="govuk-table__cell">
+              <button class="govuk-button govuk-button--secondary" data-module="govuk-button">Add <span class="govuk-visually-hidden">to your list</span></button>
+              <input type="hidden" name="refNo" value="L-I2Z-I3P">
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <p class="moj-pagination__results" style="float:right" >Showing <b>1</b> to <b>10</b> of <b>137</b> applications</p>
+    {% from "govuk/components/pagination/macro.njk" import govukPagination %}
+
+    {{ govukPagination({
+      next: {
+        href: "#"
+      },
+      items: [
+        {
+          number: 1,
+          current: true,
+          href: "#"
+        },
+        {
+          number: 2,
+          href: "#"
+        },
+        {
+          number: 3,
+          href: "#"
+        }
+      ]
+    }) }}
+
+  </div>
+</div>
+{% endblock %}
