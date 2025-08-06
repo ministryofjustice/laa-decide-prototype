@@ -1,0 +1,245 @@
+{% extends "layouts/layout.html" %}
+
+{% block pageTitle %}
+Merits assessment - substantive
+{% endblock %}
+
+{% block beforeContent %}
+<a class="govuk-back-link" href="application-details">Back to application details</a>
+{% endblock %}
+
+{% set application = data['application']['applicationDetails'] %}
+{% set cert_id_to_change = data['cert_id_to_change'] %}
+
+{% if application['certificateType'] === 'Substantive' %}
+{% set part = '1' %}
+{% else %}
+{% set part = '2' %}
+{% endif %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    <h1 class="govuk-heading-xl govuk-!-margin-bottom-4">Make a merits assessment</h1>
+    <p class="govuk-!-font-size-36">{{ application['refNo'] }}</p>
+    <div class="govuk-!-padding-top-4"></div>
+  </div>
+</div>
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    <h2 class="govuk-heading-l">Substantive proceedings</h2>
+    <form action="application-details" method="POST">
+      <div class="govuk-form-group">
+        {% for proceeding in application['proceedings'] %}
+        {% for certificate in proceeding['certificates'] %}
+        {% if certificate['certificateType'] === 'Substantive certificate' %}
+
+         <h2 class="govuk-heading-m">{{ proceeding['proceedingType'] }}</h2>
+        {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+        {% from "govuk/components/date-input/macro.njk" import govukDateInput %}
+        {{ govukSummaryList({
+        classes: "govuk-!-margin-bottom-5",
+        rows: [
+          {
+            key: {
+              text: "Category"
+            },
+            value: {
+              text: application['categoryLaw'] + ' - ' + proceeding['matterType']
+            },
+            actions: {
+              
+            }
+          },
+          {
+            key: {
+              text: "Delegated functions"
+            },
+            value: {
+              text: "16 Oct 2023"
+            },
+            actions: {
+              
+            }
+          },
+          {
+            key: {
+              text: "Level of service"
+            },
+            value: {
+              text: certificate['formOfService']
+            },
+            actions: {
+              items: [
+                {
+                  href: "change-level-substantive?cert_id_to_change=" + certificate['id'] + "&proc_type=" + proceeding['proceedingType'],
+                  text: "Change",
+                  visuallyHiddenText: "Level of service"
+                }
+              ]
+            }
+          },
+          {
+            key: {
+              text: "Scope limitations"
+            },
+            value: {
+              text: certificate['scopeLimits']
+            },
+            actions: {
+              items: [
+                {
+                  href: "change-scope-substantive?cert_id_to_change=" + certificate['id'] + "&proc_type=" + proceeding['proceedingType'],
+                  text: "Change",
+                  visuallyHiddenText: "Scope limitations"
+                }
+              ]
+            }
+          }
+        ]
+      }) }}
+
+      {% set refuseHtml %}
+        {% include "./_refusal_reasons_dropdown.html" %}
+        {% endset -%}
+
+      {% set grantHtml %}
+        {% from "govuk/components/date-input/macro.njk" import govukDateInput %}
+
+        {{ govukDateInput({
+          id: "substantive-issued",
+          namePrefix: "substantive-issued",
+          fieldset: {
+            legend: {
+              text: "When should the substantive certificate be granted from?",
+              classes: "govuk-fieldset__legend--s"
+            }
+          }
+        }) }}
+        {% endset -%}
+
+        {{ govukRadios({
+          classes: "govuk-!-margin-bottom-9",
+          idPrefix: certificate['id']+"_decision",
+          name: certificate['id'],
+          items: [
+            {
+              value: "granted",
+              text: "Grant",
+              checked: checked(certificate['id'], "granted"),
+              conditional: {
+                html: grantHtml
+              }
+            },
+            {
+              value: "refused",
+              text: "Refuse",
+              checked: checked(certificate['id'], "refused"),
+              conditional: {
+                html: refuseHtml
+              }
+            }
+          ]
+        }) }}
+
+        {% endif %}
+        {% endfor %}
+        {% endfor %}
+      </div>
+
+      <table class="govuk-table govuk-!-margin-top-9">
+        <caption class="govuk-table__caption govuk-table__caption--l">Cost limits</caption>
+        <tbody class="govuk-table__body">
+          {% for limitation in application['costLimitations'] %}
+          {% if limitation['certificateType'] == 'Substantive certificate' %}
+          <tr class="govuk-table__row">
+            <td class="govuk-table__header">Certificate type</td>
+            <td class="govuk-table__cell">{{ limitation['certificateType'] }}</td>
+          </tr>
+          <tr class="govuk-table__row">
+            <td class="govuk-table__header">Default</td>
+            <td class="govuk-table__cell">{{ limitation['costLimit'] }}</td>
+          </tr>
+          <tr class="govuk-table__row">
+            <td class="govuk-table__header">Requested</td>
+            <td class="govuk-table__cell">{{ limitation['requestedCostLimit'] }}</td>
+          </tr>
+          {% if limitation['justification'] %}
+          <tr class="govuk-table__row">
+            <td class="govuk-table__header">Justification</td>
+            <td class="govuk-table__cell">{{ limitation['justification'] }}</td>
+          </tr>
+          {% endif %}
+          {% endif %}
+          {% endfor %}
+        </tbody>
+      </table>
+
+      {% from "govuk/components/radios/macro.njk" import govukRadios %}
+        {% from "govuk/components/input/macro.njk" import govukInput %}
+
+        {% set limitHtml %}
+        <div class="govuk-input__wrapper">
+                    <div class="govuk-input__prefix" aria-hidden="true">£</div>
+                    <input class="govuk-input govuk-input--width-5" id="substantiveCostAmount" name="substantiveCostAmount" value="{{ data['substantiveCostAmount'] }}" type="text" spellcheck="false">
+                  </div>
+        {% endset -%}
+
+        {{ govukRadios({
+          name: "substantiveCost",
+          fieldset: {
+            legend: {
+              text: "How much should be granted for the substantive certificate?",
+              isPageHeading: true,
+              classes: "govuk-fieldset__legend--s"
+            }
+          },
+          items: [
+            {
+              value: "Default limit (amount)",
+              text: "Default limit"
+            },
+            {
+              value: "Requested limit (amount)",
+              text: "Requested limit"
+            },
+            {
+              value: "New limit set by assessor (amount)",
+              text: "New limit",
+              conditional: {
+                html: limitHtml
+              }
+            }
+          ]
+        }) }}
+
+      <div class="govuk-!-padding-top-4"></div>
+
+      <div class="govuk-form-group">
+        <label class="govuk-label govuk-label--l" for="substantive-note">
+          Give further details
+        </label>
+        <div id="note-hint" class="govuk-hint">
+          This information is for internal use. It will not be shared with the provider.
+        </div>
+        <textarea class="govuk-textarea" name="substantive-note" id="substantive-note" rows="10">{{ data['substantive-note'] }}</textarea>
+        <div class="govuk-button-group">
+          <input type="submit" name="merits_continue_button" value="Save and continue" id="continue" class="govuk-button form-button" data-module="govuk-button" data-disable-with="Save and continue">
+          <input type="submit" name="merits_continue_button" value="Save and come back later" id="continue" class="govuk-button form-button govuk-button--secondary govuk-!-margin-left-3" data-module="govuk-button"
+            data-disable-with="Save and come back later">
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <!-- <div class="govuk-grid-column-one-third">
+    <form action="substantive-update-all">
+      <div class="govuk-button-group">
+        <input type="submit" name="update_all_substantive" value="Grant all" id="grant-all-substantive" class="govuk-button form-button govuk-button--secondary" data-module="govuk-button" data-disable-with="Grant all">
+        <input type="submit" name="update_all_substantive" value="Refuse all" id="refuse-all-substantive" class="govuk-button form-button govuk-button--warning govuk-!-margin-left-3" data-module="govuk-button" data-disable-with="Refuse all">
+      </div>
+    </form>
+  </div> -->
+</div>
+{% endblock %}

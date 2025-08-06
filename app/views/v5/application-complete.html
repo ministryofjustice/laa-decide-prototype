@@ -1,0 +1,142 @@
+{% if data['refNo'] in data['assignedApplications'] %}
+  {% extends "layouts/workload.html" %}
+{% else %}
+  {% extends "layouts/open.html" %}
+{% endif %}
+
+{% block pageTitle %}
+Application details
+{% endblock %}
+
+{% block beforeContent %}
+{% if data['refNo'] in data['assignedApplications'] %}
+<a class="govuk-back-link" href="my-applications">Back to my applications</a>
+{% else %}
+<a class="govuk-back-link" href="open-applications">Back to open applications</a>
+{% endif %}
+{% endblock %}
+
+{% set application = data['application']['applicationDetails'] %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    <h1 class="govuk-heading-xl govuk-!-margin-bottom-4">Submit overall decision</h1>
+    <p class="govuk-!-font-size-36">{{ application['refNo'] or 'L-I2Z-I3P'}}</p>
+    <p class="govuk-!-margin-bottom-8">Use this section to make the overall application decision. <br/>
+      This will be shared with the provider and recorded in the application history.</p>
+
+  </div>
+</div>
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    <table class="govuk-table">
+      <caption class="govuk-table__caption govuk-table__caption--l">Overview</caption>
+      <tbody class="govuk-table__body">
+        <tr class="govuk-table__row">
+          <td class="govuk-table__header govuk-!-width-one-half">CCMS reference number</td>
+          <td class="govuk-table__cell"><span id="reference-number">300000651984</span><button class="govuk-link--no-visited-state" style="background: none; border: none; color: #1d70b8; text-decoration: underline; cursor: copy;" onclick="copyContent()">Copy reference number</button>
+
+            <script>
+              let text = document.getElementById('reference-number').innerHTML;
+              const copyContent = async () => {
+                try {
+                  await navigator.clipboard.writeText(text);
+                  console.log('Content copied to clipboard');
+                } catch (err) {
+                  console.error('Failed to copy: ', err);
+                }
+              }
+            </script>
+
+          </td>
+        </tr>
+        <tr class="govuk-table__row">
+          <td class="govuk-table__header">Means assessment</td>
+          <td class="govuk-table__cell">
+            <span class="moj-badge moj-badge--green">Granted</span>
+<!--
+            {% if (application['meansAssessmentResult'] === 'Not started') %}
+            <span class="moj-badge moj-badge">{{ application['meansAssessmentResult'] }}</span>
+            {% endif %}
+            {% if (application['meansAssessmentResult'] === 'refused') or (application['meansAssessmentResult'] === 'rejected') %}
+            <span class="moj-badge moj-badge--red">{{ application['meansAssessmentResult'] }}</span>
+            {% endif %}
+            {% if application['meansAssessmentResult'] === 'Passported' %}
+            <span class="moj-badge moj-badge--green">Granted</span>
+            {% endif %}
+            {% if (application['meansAssessmentResult'] === 'granted') %}
+            <span class="moj-badge moj-badge--green">{{ application['meansAssessmentResult'] }}</span>
+            {% endif %}
+            {% if (application['meansAssessmentResult'] === 'partially granted') %}
+            <span class="moj-badge moj-badge--blue">{{ application['meansAssessmentResult'] }}</span>
+            {% endif %}
+-->
+          </td>
+        </tr>
+        <tr class="govuk-table__row">
+          <td class="govuk-table__header">Merits assessment</td>
+          <td class="govuk-table__cell">
+            <span class="moj-badge moj-badge--blue">Partially granted</span>
+<!--
+            {% if (application['meritsAssessmentResult'] === 'Not started') %}
+            <span class="moj-badge moj-badge--grey">{{ application['meritsAssessmentResult'] }}</span>
+            {% endif %}
+            {% if (application['meritsAssessmentResult'] === 'in progress') %}
+            <span class="moj-badge moj-badge--blue">{{ application['meritsAssessmentResult'] }}</span>
+            {% endif %}
+            {% if (application['meritsAssessmentResult'] === 'granted') %}
+            <span class="moj-badge moj-badge--green">{{ application['meritsAssessmentResult'] }}</span>
+            {% endif %}
+            {% if (application['meritsAssessmentResult'] === 'partially granted') %}
+            <span class="moj-badge moj-badge--blue">{{ application['meritsAssessmentResult'] }}</span>
+            {% endif %}
+            {% if (application['meritsAssessmentResult'] === 'refused') or (application['meritsAssessmentResult'] === 'rejected') %}
+            <span class="moj-badge moj-badge--red">{{ application['meritsAssessmentResult'] }}</span>
+            {% endif %}
+-->
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <form action="/decision-check" method="POST">
+      {% from "govuk/components/radios/macro.njk" import govukRadios %}
+
+      {{ govukRadios({
+        name: "overall-decision",
+        fieldset: {
+          legend: {
+            text: "What is your overall decision?",
+            isPageHeading: true,
+            classes: "govuk-fieldset__legend--l"
+          }
+        },
+        items: [
+          {
+            value: "grant",
+            text: "Grant"
+          },
+          {
+            value: "refuse",
+            text: "Refuse"
+          }
+        ]
+      }) }}
+
+      <div class="govuk-button-group">
+
+        {% from "govuk/components/button/macro.njk" import govukButton %}
+
+          {{ govukButton({
+            text: "Submit"
+          }) }}
+
+        <a class="govuk-link" href="application-details">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+
+{% endblock %}

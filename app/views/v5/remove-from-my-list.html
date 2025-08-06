@@ -1,0 +1,80 @@
+{% extends "layouts/layout.html" %}
+
+{% block pageTitle %}
+Remove from my list
+{% endblock %}
+
+{% block beforeContent %}
+<a class="govuk-back-link" href="application-details">Back to application details</a>
+{% endblock %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    <div class="govuk-form-group">
+      <form action="my-applications" novalidate data-validate='remove-from-list-validation'>
+        <fieldset class="govuk-fieldset">
+          <legend class="govuk-fieldset__legend govuk-fieldset__legend--xl">
+            <h1 class="govuk-fieldset__heading">Remove from my list</h1>
+          </legend>
+          <h2 class="govuk-body-l govuk-!-font-size-36">{{ data['refNoToRemove'] }}</h2>
+          <p class="govuk-body">Select the reason for removing the application from your list</p>
+          <div class="govuk-radios govuk-radios--conditional" data-module="govuk-radios">
+            <div class="govuk-radios__item">
+              <input class="govuk-radios__input" id="removal-reason" name="removal-reason" type="radio" value="I am not trained in this matter type">
+              <label class="govuk-label govuk-radios__label" for="removal-reason">
+                I am not trained in this matter type
+              </label>
+            </div>
+            <div class="govuk-radios__item">
+              <input class="govuk-radios__input" id="removal-reason-2" name="removal-reason" type="radio" value="Another caseworker should complete this">
+              <label class="govuk-label govuk-radios__label" for="removal-reason-2">
+                Another caseworker should complete this
+              </label>
+            </div>
+            <div class="govuk-radios__item">
+              <input class="govuk-radios__input" id="removal-reason-3" name="removal-reason" type="radio" value="Other" data-aria-controls="conditional-other">
+              <label class="govuk-label govuk-radios__label" for="removal-reason-3">
+                Other
+              </label>
+            </div>
+            <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-other">
+              <div class="govuk-form-group">
+                <label class="govuk-label" for="removal-reason-other">
+                  Give further details
+                </label>
+                <div id="other-hint" class="govuk-hint">
+                  This information is for internal use only
+                </div>
+                <textarea class="govuk-textarea govuk-!-width-two-thirds" name="removal-reason-other" id="removal-reason-other" rows="10"></textarea>
+              </div>
+            </div>
+        </fieldset>
+        
+        <div class="govuk-button-group govuk-!-margin-top-7">
+          <button class="govuk-button govuk-button" data-module="govuk-button">Save changes</button>
+          <a class="govuk-link" href="application-details">Cancel</a>
+        </div>
+
+      </form>
+    </div>
+  </div>
+</div>
+
+<script type="application/json" id="remove-from-list-validation">
+  {
+    "removal-reason": {
+      "presence": true
+    },
+    "removal-reason-other": {
+      "conditionallyRequired": {
+        "dependentOn": {
+          "name": "removal-reason",
+          "value": "Other"
+        },
+        "message": "^Please enter a reason for removing the application from your list"
+      }
+    }
+  }
+</script>
+{% endblock %}

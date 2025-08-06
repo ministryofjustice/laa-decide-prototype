@@ -1,0 +1,96 @@
+{% extends "layouts/search.html" %}
+
+{% block pageTitle %}
+Search results
+{% endblock %}
+
+{% if (data['advanced-search-day'].length == 1) %}
+{% set day = '0' + data['advanced-search-day'] %}
+{% else %}
+{% set day = data['advanced-search-day'] %}
+{% endif %}
+
+{% if data['advanced-search-month'].length == 1 %}
+{% set month = '0' + data['advanced-search-month'] %}
+{% else %}
+{% set month = data['advanced-search-month'] %}
+{% endif %}
+
+{% if data['advanced-search-year'].length == 2 %}
+{% set year = '20' + data['advanced-search-year'] %}
+{% else %}
+{% set year = data['advanced-search-year'] %}
+{% endif %}
+
+{% set dateOfBirth = day + '/' + month + '/' + year %}
+
+{% set count = 0 %}
+{% for application in data['applications'] %}
+{% if (application['applicationDetails']['refNo'] == data['name-or-reference']) or (application['applicationDetails']['applicant']['name'] == data['name-or-reference']) or (application['applicationDetails']['applicant']['dob'] == dateOfBirth) %}
+{% set count = count + 1 %}
+{% endif %}
+{% endfor %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-full">
+    <h1 class="govuk-heading-xl">Search results</h1>
+    {% include "./_search.html" %}
+
+    <div class="moj-filter-layout">
+      {% include "./_filter.html" %}
+
+      <div class="moj-filter-layout__content">
+        <div class="moj-action-bar">
+          <div class="moj-action-bar__filter"></div>
+        </div>
+
+        <div class="moj-scrollable-pane">
+          <div class="moj-scrollable-pane__wrapper">
+            <table class="govuk-table" data-module="moj-sortable-table">
+              <thead class="govuk-table__head">
+                <tr class="govuk-table__row">
+                  <th scope="col" class="govuk-table__header">Reference</th>
+                  <th scope="col" class="govuk-table__header" aria-sort="none">Submitted</th>
+                  <th scope="col" class="govuk-table__header" aria-sort="none">Updated</th>
+                  <th scope="col" class="govuk-table__header" aria-sort="none">Type</th>
+                  <th scope="col" class="govuk-table__header" aria-sort="none">DF</th>
+                  <th scope="col" class="govuk-table__header" aria-sort="none">Category</th>
+                  <th scope="col" class="govuk-table__header" aria-sort="none">Means</th>
+                  <th scope="col" class="govuk-table__header">Action</th>
+                </tr>
+              </thead>
+              <tbody class="govuk-table__body">
+                {% for application in data['applications'] %}
+                {% if (application['applicationDetails']['refNo'] == data['name-or-reference']) or (application['applicationDetails']['applicant']['name'] == data['name-or-reference']) or (application['applicationDetails']['applicant']['dob'] == dateOfBirth) %}
+                <tr class="govuk-table__row">
+                  <td class="govuk-table__cell"><a class="govuk_link" href="/v4/application-details?refNo={{ application['applicationDetails']['refNo'] }}">{{ application['applicationDetails']['refNo'] }}</a></td>
+                  <td class="govuk-table__cell"><input type="hidden" name="date" value="{{ application['applicationDetails']['dateSubmitted'] }}" />{{ application['applicationDetails']['dateSubmitted'] | date}}</td>
+                  <td class="govuk-table__cell"><input type="hidden" name="date" value="{{ application['applicationDetails']['dateLastUpdated'] }}" />{{ application['applicationDetails']['dateLastUpdated'] | date}}</td>
+                  <td class="govuk-table__cell">{{ application['applicationDetails']['applicationType'] }}</td>
+                  <td class="govuk-table__cell">{{ application['applicationDetails']['delegatedFunctions'] }}</td>
+                  <td class="govuk-table__cell">{{ application['applicationDetails']['categoryLaw'] }}</td>
+                  <td class="govuk-table__cell">{{ application['applicationDetails']['meansType'] }}</td>
+                  <td class="govuk-table__cell">
+                    {% if application['applicationDetails']['refNo'] not in data['assignedApplications'] %}
+                    <form action="my-applications">
+                      <button class="govuk-button govuk-button--secondary" data-module="govuk-button">Add <span class="govuk-visually-hidden">to my list</span></button>
+                      <input type="hidden" name="refNo" value="{{ application['applicationDetails']['refNo'] }}">
+                    </form>
+                    {% else %}
+                    <p>Assigned to: You</p>
+                    {% endif %}
+                  </td>
+                </tr>
+                {% endif %}
+                {% endfor %}
+              </tbody>
+            </table>
+            <p>Showing <b>1</b> to <b>{{ count }}</b> of <b>{{ count }}</b> results</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

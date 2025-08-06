@@ -1,0 +1,41 @@
+{% if data['refNo'] in data['assignedApplications'] %}
+  {% extends "layouts/workload.html" %}
+{% else %}
+  {% extends "layouts/open.html" %}
+{% endif %}
+
+{% block pageTitle %}
+Application history
+{% endblock %}
+
+{% block beforeContent %}
+{% if data['refNo'] in data['assignedApplications'] %}
+<a class="govuk-back-link" href="my-applications">Back to my applications</a>
+{% else %}
+<a class="govuk-back-link" href="open-applications">Back to open applications</a>
+{% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    <div class="govuk-panel govuk-panel--confirmation">
+      <h1 class="govuk-panel__title">
+        Application for civil legal aid assessed completely
+      </h1>
+      <div class="govuk-panel__body">
+        Reference number<br><strong>{{ application['refNo'] or 'E-X4M-P7E'}}</strong>
+      </div>
+    </div>
+    <h2 class="govuk-heading-m">What happens next</h2>
+    <p class="govuk-body">
+      We’ve saved your decision, and the provider will be informed.
+    </p>
+        {% from "govuk/components/button/macro.njk" import govukButton %}
+    {{ govukButton({
+      text: "View my applications",
+      href: "my-applications"
+    }) }}
+  </div>
+</div>
+{% endblock %}

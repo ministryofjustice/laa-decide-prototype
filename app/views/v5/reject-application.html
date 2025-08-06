@@ -1,0 +1,71 @@
+{% extends "layouts/layout.html" %}
+
+{% block pageTitle %}
+Reject application
+{% endblock %}
+
+{% block beforeContent %}
+<a class="govuk-back-link" href="application-details">Back to application details</a>
+{% endblock %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    <form action="reject-application" method="POST" novalidate data-validate='reject-validation'>
+        <fieldset class="govuk-fieldset">
+          <legend class="govuk-fieldset__legend govuk-fieldset__legend--xl">
+            <h1 class="govuk-fieldset__heading">Send back to provider</h1>
+          </legend>
+          <h2 class="govuk-body-l govuk-!-font-size-36">{{ data['refNo'] }}</h2>
+          <div class="govuk-form-group">
+            <div class="govuk-radios">
+              <div class="govuk-radios__item">
+                <input class="govuk-radios__input" id="rejection-reason" name="rejection-reason" type="radio" value="RFI">
+                <label class="govuk-label govuk-radios__label" for="rejection-reason">
+                  Request further information
+                </label>
+              </div>
+              <div class="govuk-radios__item">
+                <input class="govuk-radios__input" id="rejection-reason-1" name="rejection-reason" type="radio" value="Incorrect matter type" data-aria-controls="conditional-incorrect-means">
+                <label class="govuk-label govuk-radios__label" for="rejection-reason-1">
+                  Reject for incorrect matter type
+                </label>
+              </div>
+              <div class="govuk-radios__item">
+                <input class="govuk-radios__input" id="rejection-reason-2" name="rejection-reason" type="radio" value="Incorrect proceeding" data-aria-controls="conditional-incorrect-means">
+                <label class="govuk-label govuk-radios__label" for="rejection-reason-2">
+                  Reject for incorrect proceeding
+                </label>
+              </div>
+              <div class="govuk-radios__item">
+                <input class="govuk-radios__input" id="rejection-reason-4" name="rejection-reason" type="radio" value="Other" >
+                <label class="govuk-label govuk-radios__label" for="rejection-reason-4">
+                  Reject for other reason
+                </label>
+              </div>
+               <div class="govuk-radios__item">
+                <input class="govuk-radios__input" id="rejection-reason-3" name="rejection-reason" type="radio" value="Withdraw">
+                <label class="govuk-label govuk-radios__label" for="rejection-reason-3">
+                  Withdraw
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <div class="govuk-form-group">
+            <label class="govuk-label" for="request-more-information">
+             Write a note for the provider
+            </label>
+            <textarea class="govuk-textarea govuk-!-width-full" name="request-more-information" id="request-more-information" rows="10"></textarea>
+          </div>
+        </fieldset>
+
+        <div class="govuk-button-group">
+          <button class="govuk-button govuk-button" data-module="govuk-button">Send</button>
+          <a class="govuk-link" href="application-details">Cancel</a>
+        </div>
+
+    </form>
+  </div>
+</div>
+{% endblock %}
