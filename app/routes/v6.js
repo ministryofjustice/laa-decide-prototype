@@ -378,6 +378,95 @@ const caseworkers = [
   'David Brown'
 ];
 
+// Pre-seeded scenario applications (always available via search)
+const SEEDED_APPLICATIONS = [
+  {
+    ref: 'L-FHGR-MNT7',
+    firstName: 'Thomas',
+    lastName: 'Hartley',
+    dob: '12 Mar 1985',
+    submitted: '03 Jan 2026',
+    firm: 'Pemberton & Co Solicitors<br>OK514R',
+    status: 'Granted',
+    decisionType: 'Grant',
+    type: 'Initial application',
+    delegatedFunctions: 'Used',
+    matterType: { title: 'Family', subtext: "Special Children's Act" },
+    isPriorAuthority: false
+  },
+  {
+    ref: 'L-FHGR-MNT7',
+    firstName: 'Thomas',
+    lastName: 'Hartley',
+    dob: '12 Mar 1985',
+    submitted: '18 Jan 2026',
+    firm: 'Pemberton & Co Solicitors<br>OK514R',
+    status: 'Granted',
+    decisionType: 'Grant',
+    type: 'Prior authority',
+    delegatedFunctions: 'N/A',
+    matterType: { title: 'Family', subtext: "Special Children's Act" },
+    isPriorAuthority: true,
+    priorAuthorityType: 'Expert - Psychiatrist'
+  },
+  {
+    ref: 'L-AUTO-GR4N',
+    firstName: 'Rebecca',
+    lastName: 'Okafor',
+    dob: '27 Sep 1990',
+    submitted: '10 Feb 2026',
+    firm: 'Whitfield Legal Services<br>OK782T',
+    status: 'Granted',
+    decisionType: 'Grant',
+    type: 'Initial application',
+    delegatedFunctions: 'Used',
+    matterType: { title: 'Family', subtext: "Special Children's Act" },
+    isPriorAuthority: false
+  },
+  {
+    ref: 'L-AUTO-GR4N',
+    firstName: 'Rebecca',
+    lastName: 'Okafor',
+    dob: '27 Sep 1990',
+    submitted: '21 Feb 2026',
+    firm: 'Whitfield Legal Services<br>OK782T',
+    status: 'Granted',
+    decisionType: 'Grant',
+    type: 'Prior authority',
+    delegatedFunctions: 'N/A',
+    matterType: { title: 'Family', subtext: "Special Children's Act" },
+    isPriorAuthority: true,
+    priorAuthorityType: 'Expert - Psychiatrist'
+  }
+];
+
+const SEEDED_HISTORY = {
+  'L-FHGR-MNT7': [
+    { timestamp: '03 Jan 2026 09:14', action: 'Initial application received', caseworker: 'N/A', details: null },
+    { timestamp: '05 Jan 2026 10:32', action: 'Caseworker note added', caseworker: 'Sarah Johnson', details: 'Client called to ask what would happen next. Advised on the process and expected timescales.' },
+    { timestamp: '06 Jan 2026 11:05', action: 'Application assigned to Sarah Johnson', caseworker: 'Sarah Johnson', details: null },
+    { timestamp: '14 Jan 2026 14:22', action: 'Initial application granted', caseworker: 'Sarah Johnson', details: null, justification: 'The application meets the merits and means criteria for civil legal aid. The client has a strong arguable case with prospects of success above 50%. Delegated functions were used appropriately given the urgency of the proceedings involving the welfare of children. All supporting evidence has been reviewed and found sufficient.' },
+    { timestamp: '18 Jan 2026 09:47', action: 'Prior authority request received', caseworker: 'N/A', details: null, justification: 'Prior authority requested for a psychiatric expert (Dr Morley Calzoni) to prepare a report for use in proceedings. The expert is required to assess the mental health of the client and provide an opinion on parenting capacity. The requested rate of £100.80 per hour for 60 hours exceeds the standard prescribed rate, hence prior authority is required.' },
+    { timestamp: '20 Jan 2026 10:15', action: 'Prior authority assigned to Mike Chen', caseworker: 'Mike Chen', details: null },
+    { timestamp: '27 Jan 2026 15:33', action: 'Prior authority granted', caseworker: 'Mike Chen', details: null, justification: 'The prior authority request has been approved. The use of a psychiatric expert is justified given the complexity of the parenting capacity issues raised in these proceedings. The hourly rate of £100.80 is considered reasonable given the expert\'s specialism and location. Authority granted for up to 60 hours.' },
+    { timestamp: '02 Feb 2026 08:55', action: 'Amendment (Redetermination) received', caseworker: 'N/A', details: null, justification: 'The provider has submitted a redetermination request following the original grant decision. The provider contends that the scope of the certificate should be extended to cover additional proceedings relating to contact arrangements. New evidence has been submitted in support of the amendment request.' },
+    { timestamp: '04 Feb 2026 09:20', action: 'Amendment assigned to Emma Wilson', caseworker: 'Emma Wilson', details: null },
+    { timestamp: '12 Feb 2026 16:44', action: 'Amendment refused', caseworker: 'Emma Wilson', details: null, justification: 'The amendment request has been refused. The additional proceedings relating to contact arrangements do not meet the merits criteria required for an extension of scope. The existing certificate adequately covers the current proceedings and there is insufficient evidence to justify the requested extension at this stage.' },
+    { timestamp: '19 Feb 2026 11:10', action: 'Appeal received', caseworker: 'N/A', details: null }
+  ],
+  'L-AUTO-GR4N': [
+    { timestamp: '10 Feb 2026 08:30', action: 'Initial application received', caseworker: 'N/A', details: null },
+    { timestamp: '10 Feb 2026 08:31', action: 'Initial application granted', caseworker: 'System', details: null, justification: 'Application automatically granted by the system. The application met all required merits and means criteria and was eligible for automated processing under delegated functions. No manual caseworker review was required at this stage.' },
+    { timestamp: '21 Feb 2026 11:22', action: 'Prior authority request received', caseworker: 'N/A', details: null, justification: 'Prior authority requested for a psychiatric expert (Dr Morley Calzoni) to prepare a report for use in proceedings. The expert is required to assess the mental health of the client and provide an opinion on parenting capacity. The requested rate of £100.80 per hour for 60 hours exceeds the standard prescribed rate, hence prior authority is required.' },
+    { timestamp: '24 Feb 2026 09:40', action: 'Prior authority assigned to David Brown', caseworker: 'David Brown', details: null },
+    { timestamp: '03 Mar 2026 14:55', action: 'Prior authority granted', caseworker: 'David Brown', details: null, justification: 'The prior authority request has been approved. The use of a psychiatric expert is justified given the complexity of the parenting capacity issues raised in these proceedings. The hourly rate of £100.80 is considered reasonable given the expert\'s specialism and location. Authority granted for up to 60 hours.' },
+    { timestamp: '12 Mar 2026 10:05', action: 'Amendment (Redetermination) received', caseworker: 'N/A', details: null, justification: 'The provider has submitted a redetermination request following the original grant decision. The provider contends that the scope of the certificate should be extended to cover additional proceedings relating to contact arrangements. New evidence has been submitted in support of the amendment request.' },
+    { timestamp: '14 Mar 2026 09:15', action: 'Amendment assigned to Emma Wilson', caseworker: 'Emma Wilson', details: null },
+    { timestamp: '22 Mar 2026 16:30', action: 'Amendment refused', caseworker: 'Emma Wilson', details: null, justification: 'The amendment request has been refused. The additional proceedings relating to contact arrangements do not meet the merits criteria required for an extension of scope. The existing certificate adequately covers the current proceedings and there is insufficient evidence to justify the requested extension at this stage.' },
+    { timestamp: '01 Apr 2026 11:45', action: 'Appeal received', caseworker: 'N/A', details: null }
+  ]
+};
+
 const firstNames = ['John', 'Jane', 'Michael', 'Emma', 'David', 'Sarah', 'James', 'Mary', 'Robert', 'Patricia', 'Samuel', 'Jennifer', 'William', 'Linda', 'Christopher'];
 const lastNames = ['Smith', 'Johnson', 'Williams', 'Brown', 'Jones', 'Garcia', 'Miller', 'Davis', 'Rodriguez', 'Martinez', 'Hernandez', 'Lopez', 'Gonzalez', 'Wilson', 'Anderson'];
 
@@ -702,12 +791,25 @@ router.get('/remove-application/:reference', function(req, res) {
 router.get('/application/:reference/history', function(req, res) {
   const ref = req.params.reference;
   
-  // Initialize history if it doesn't exist
+  // Ensure seeded applications and history are always available
+  if (!req.session.data['completed-applications']) {
+    req.session.data['completed-applications'] = [];
+  }
+  const seededRefsHistory = [...new Set(SEEDED_APPLICATIONS.map(a => a.ref))];
+  req.session.data['completed-applications'] = req.session.data['completed-applications'].filter(a => !seededRefsHistory.includes(a.ref));
+  SEEDED_APPLICATIONS.forEach(seeded => {
+    req.session.data['completed-applications'].push(seeded);
+  });
+
+  // Always ensure seeded history is available
   if (!req.session.data['app-history']) {
     req.session.data['app-history'] = {};
   }
-  
-  if (!req.session.data['app-history'][ref] || req.session.data['app-history'][ref].length === 0 || 
+  Object.keys(SEEDED_HISTORY).forEach(r => {
+    req.session.data['app-history'][r] = SEEDED_HISTORY[r];
+  });
+
+  if (!req.session.data['app-history'][ref] || req.session.data['app-history'][ref].length === 0 ||
       (req.session.data['app-history'][ref].length > 0 && !req.session.data['app-history'][ref][0].action)) {
     
     req.session.data['app-history'][ref] = [];
@@ -785,6 +887,25 @@ router.post('/application/:reference/add-note', function(req, res) {
 router.get('/search', function(req, res) {
   const showResults = Object.keys(req.query).length > 0;
   let results = [];
+
+  // Always ensure seeded applications are in completed-applications
+  if (!req.session.data['completed-applications']) {
+    req.session.data['completed-applications'] = [];
+  }
+  // Remove stale seeded entries and re-inject fresh ones
+  const seededRefs = [...new Set(SEEDED_APPLICATIONS.map(a => a.ref))];
+  req.session.data['completed-applications'] = req.session.data['completed-applications'].filter(a => !seededRefs.includes(a.ref));
+  SEEDED_APPLICATIONS.forEach(seeded => {
+    req.session.data['completed-applications'].push(seeded);
+  });
+
+  // Always ensure seeded history is available
+  if (!req.session.data['app-history']) {
+    req.session.data['app-history'] = {};
+  }
+  Object.keys(SEEDED_HISTORY).forEach(ref => {
+    req.session.data['app-history'][ref] = SEEDED_HISTORY[ref];
+  });
   
   if (showResults) {
     // Create a map to track unique references (prefer assigned-applications, then completed, then open)
@@ -861,6 +982,22 @@ router.get('/search', function(req, res) {
 router.get('/application/:reference', function(req, res) {
   const reference = req.params.reference;
   const hasLinkedCases = reference === 'L-12Z-13P';
+
+  // Ensure seeded applications are always available
+  if (!req.session.data['completed-applications']) {
+    req.session.data['completed-applications'] = [];
+  }
+  const seededRefsApp = [...new Set(SEEDED_APPLICATIONS.map(a => a.ref))];
+  req.session.data['completed-applications'] = req.session.data['completed-applications'].filter(a => !seededRefsApp.includes(a.ref));
+  SEEDED_APPLICATIONS.forEach(seeded => {
+    req.session.data['completed-applications'].push(seeded);
+  });
+  if (!req.session.data['app-history']) {
+    req.session.data['app-history'] = {};
+  }
+  Object.keys(SEEDED_HISTORY).forEach(ref => {
+    req.session.data['app-history'][ref] = SEEDED_HISTORY[ref];
+  });
   
   // Get application data from assigned, completed, or open applications
   let applicationData = {};
@@ -888,27 +1025,29 @@ router.get('/application/:reference', function(req, res) {
   }
   
   // Get prior authority type from the actual data
-  let priorAuthorityType = 'expert';
+  let priorAuthorityType = null;
   if (applicationData.isPriorAuthority) {
-    priorAuthorityType = applicationData.priorAuthorityType || 'expert';
-  } else if (req.session.data['open-applications']) {
+    priorAuthorityType = applicationData.priorAuthorityType || 'Expert';
+  }
+  if (!priorAuthorityType && req.session.data['open-applications']) {
     const priorAuthApp = req.session.data['open-applications'].find(app => app.ref === reference && app.isPriorAuthority);
     if (priorAuthApp) {
-      priorAuthorityType = priorAuthApp.priorAuthorityType || 'expert';
+      priorAuthorityType = priorAuthApp.priorAuthorityType || 'Expert';
     }
   }
   if (!priorAuthorityType && req.session.data['completed-applications']) {
     const priorAuthApp = req.session.data['completed-applications'].find(app => app.ref === reference && app.isPriorAuthority);
     if (priorAuthApp) {
-      priorAuthorityType = priorAuthApp.priorAuthorityType || 'expert';
+      priorAuthorityType = priorAuthApp.priorAuthorityType || 'Expert';
     }
   }
   if (!priorAuthorityType && req.session.data['assigned-applications']) {
     const priorAuthApp = req.session.data['assigned-applications'].find(app => app.ref === reference && app.isPriorAuthority);
     if (priorAuthApp) {
-      priorAuthorityType = priorAuthApp.priorAuthorityType || 'expert';
+      priorAuthorityType = priorAuthApp.priorAuthorityType || 'Expert';
     }
   }
+  if (!priorAuthorityType) priorAuthorityType = 'Expert';
   
   // Generate fallback/derived data for the People tab
   const found = (applicationData && applicationData.ref) ? applicationData : {
@@ -1003,13 +1142,17 @@ router.get('/application/:reference', function(req, res) {
   // Convert app-history to historyEvents format for template
   let historyEvents = [];
   if (req.session.data['app-history'] && req.session.data['app-history'][reference]) {
+    const totalEvents = req.session.data['app-history'][reference].length;
     historyEvents = req.session.data['app-history'][reference].map((event, index) => {
       const action = event.action || event.title;
+      const isPAEvent = action && (action.toLowerCase().includes('prior authority') || action.toLowerCase().includes('amendment') || action.toLowerCase().includes('appeal'));
+      const tabAnchor = isPAEvent ? '#prior-authority' : '';
+      const isLastEvent = index === totalEvents - 1;
       return {
         datetime: event.timestamp || event.datetime,
         caseworker: event.caseworker,
         title: action,
-        versionLink: `/v6/application/${reference}?viewVersion=${index}`,
+        versionLink: !isLastEvent ? `/v6/application/${reference}?viewVersion=${index}${tabAnchor}` : null,
         changes: event.changes || null,
         notes: event.notes || null,
         justification: event.expandedText || event.justification || event.details || null,
