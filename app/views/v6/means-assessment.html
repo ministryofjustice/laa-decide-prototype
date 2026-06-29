@@ -1,0 +1,175 @@
+{% extends "legacy_layout.html" %}
+
+{% block pageTitle %}
+Means assessment
+{% endblock %}
+
+{% block beforeContent %}
+<a class="govuk-back-link" href="application-details">Back to application details</a>
+{% endblock %}
+
+{% set application = data['application']['applicationDetails'] %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    <h1 class="govuk-heading-xl govuk-!-margin-bottom-4">Make a decision on means</h1>
+    <p class="govuk-!-font-size-36">{{ application['refNo'] }}</p>
+    <div class="govuk-!-padding-top-4"></div>
+  </div>
+</div>
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    <h2 class="govuk-heading-l">Proceedings</h2>
+    <form action="application-details" method="POST">
+      <div class="govuk-form-group">
+        {% for proceeding in application['proceedings'] %}
+        {% set hint=application['categoryLaw'] + ' - ' + proceeding['matterType'] %}
+
+        {% set refuseHtml %}
+        {{ govukRadios({
+          idPrefix: proceeding['id']+"_means_refusal_reason",
+          name: proceeding['id']+"_means_refusal_reason",
+          fieldset: {},
+          items: [
+            {
+              value: "Insufficient information has been provided",
+              text: "Insufficient information has been provided",
+              id: "refused_1",
+              selected: checked(proceeding['id']+"_means_refusal_reason", "Insufficient information has been provided")
+            },
+            {
+              value: "Other",
+              text: "Other",
+              id: "refused_2",
+              selected: checked(proceeding['id']+"_means_refusal_reason", "Other")
+            }
+          ]
+        })}}
+        {% endset -%}
+
+        {{ govukRadios({
+          idPrefix: proceeding['id']+"_means_decision",
+          name: proceeding['id'],
+          fieldset: {
+            legend: {
+              text: proceeding['proceedingType'],
+              classes: "govuk-fieldset__legend--m"
+            }
+          },
+          hint: {
+            text: hint | safe
+          },
+          items: [
+            {
+              value: "granted",
+              text: "Grant",
+              checked: checked(proceeding['id'], "granted")
+            },
+            {
+              value: "refused",
+              text: "Refuse",
+              checked: checked(proceeding['id'], "refused"),
+              conditional: {
+                html: refuseHtml
+              }
+            }
+          ]
+        })}}
+
+        <div class="govuk-!-padding-top-4"></div>
+        {% endfor %}
+
+        <div>
+          <h2 class="govuk-heading-l">Contribution</h2>
+          {% if application['contributions'].length > 0 %}
+          <p class="govuk-body">This applicant needs to pay towards legal aid.</p>
+          {% else %}
+          <p class="govuk-body">This applicant does not need to pay towards legal aid.</p>
+          {% endif %}
+          <ul class="govuk-list govuk-list--bullet">
+            {% for contribution in application['contributions'] %}
+            <li>
+              <p class="govuk-body">£{{ contribution['amount'] }} {{ contribution['description'] }}</p>
+            </li>
+            {% endfor %}
+          </ul>
+          <div class="govuk-!-padding-top-4"></div>
+        </div>
+
+        <h2 class="govuk-heading-m">How much should the applicant pay towards legal aid?</h2>
+        
+        <dl class="govuk-summary-list govuk-!-margin-bottom-9">
+          <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">
+              Monthly from disposable income
+            </dt>
+            <dd class="govuk-summary-list__value">
+              £25.68
+            </dd>
+            <dd class="govuk-summary-list__actions">
+              <a class="govuk-link" href="#">
+                Change<span class="govuk-visually-hidden">monthly</span>
+              </a>
+            </dd>
+          </div>
+          <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">
+              One off from disposable capital
+            </dt>
+            <dd class="govuk-summary-list__value">
+              £4500
+            </dd>
+            <dd class="govuk-summary-list__actions">
+              <a class="govuk-link" href="#">
+                Change<span class="govuk-visually-hidden">one off</span>
+              </a>
+            </dd>
+          </div>
+     
+        
+         
+        </dl>
+
+
+
+        <div class="govuk-!-padding-top-4"></div>
+
+        <div class="govuk-form-group">
+          <label class="govuk-label govuk-label--m" for="means-note">
+            Explain to the provider why you have refused the means
+          </label>
+          <div id="note-hint" class="govuk-hint">
+           This will be shared with the provider and saved in the application history
+          </div>
+          <textarea class="govuk-textarea" name="means-note" id="means-note" rows="10">{{ data['means-note'] }}</textarea>
+         
+        </div>
+
+        <div class="govuk-form-group">
+          <label class="govuk-label govuk-label--m" for="means-note">
+            Add a note to the application history
+          </label>
+          <div id="note-hint" class="govuk-hint">
+            This is for internal use. It will not be shared with the provider
+          </div>
+          <textarea class="govuk-textarea" name="means-note" id="means-note" rows="10">{{ data['means-note'] }}</textarea>
+          <div class="govuk-button-group">
+            <input type="submit" name="means_continue_button" value="Save decision" id="continue" class="govuk-button form-button" data-module="govuk-button" data-disable-with="Save decision">
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <!-- <div class="govuk-grid-column-one-third">
+    <form action="means-update-all">
+      <div class="govuk-button-group">
+        <input type="submit" name="update_all_means" value="Grant all" id="grant-all-means" class="govuk-button form-button govuk-button--secondary" data-module="govuk-button" data-disable-with="Grant all">
+        <input type="submit" name="update_all_means" value="Refuse all" id="refuse-all-means" class="govuk-button form-button govuk-button--warning govuk-!-margin-left-3" data-module="govuk-button" data-disable-with="Refuse all">
+      </div>
+    </form>
+  </div> -->
+</div>
+{% endblock %}

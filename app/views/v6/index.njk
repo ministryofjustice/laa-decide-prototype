@@ -1,0 +1,65 @@
+{% extends "govuk/template.njk" %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "moj/components/header/macro.njk" import mojHeader %}
+
+{% block head %}
+  <!-- Include our compiled CSS which imports both GOV.UK and MOJ styles -->
+  <link href="/public/stylesheets/application.css" rel="stylesheet">
+{% endblock %}
+
+{% block header %}
+  {{ mojHeader({
+    organisationLabel: {
+      text: 'Ministry of Justice',
+      href: '#'
+    },
+    serviceLabel: {
+      text: 'Prototype Service',
+      href: '#'
+    },
+    navigation: {
+      label: 'Account navigation',
+      items: [{
+        text: 'My account',
+        href: '#',
+        active: true
+      }, {
+        text: 'Sign out',
+        href: '#'
+      }]
+    }
+  }) }}
+{% endblock %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      <h1 class="govuk-heading-xl">Welcome to the Civil Decide prototype</h1>
+      
+      <p class="govuk-body">
+        Thank you for taking part in our testing. We will be using this prototype as part of todays research session. You will be asked to use the prototype to complete some tasks related to your role.
+      </p>
+
+      <p class="govuk-body">
+        Please note, as this is a prototype, it uses dummy data, and some of the links may not work as expected. If you have any queries during the testing please ask the user researcher for support.
+      </p>
+
+      {{ govukButton({
+        text: "Start now",
+        href: "/open-applications",
+        isStartButton: true
+      }) }}
+    </div>
+  </div>
+{% endblock %}
+
+{% block bodyEnd %}
+  <script src="/plugin-assets/govuk-prototype-kit/lib/assets/javascripts/kit.js"></script>
+  <script src="/plugin-assets/govuk-prototype-kit/lib/assets/javascripts/auto-store-data.js"></script>
+  <script type="module" src="/plugin-assets/govuk-frontend/dist/govuk/govuk-frontend.min.js"></script>
+  <script type="module" src="/plugin-assets/govuk-frontend/dist/govuk-prototype-kit/init.js"></script>
+  <script type="module" src="/plugin-assets/%40ministryofjustice%2Ffrontend/moj/moj-frontend.min.js"></script>
+  <script type="module" src="/plugin-assets/%40ministryofjustice%2Ffrontend/moj/init.js"></script>
+  <script src="/plugin-assets/jquery/dist/jquery.js"></script>
+  <script type="module" src="/public/javascripts/application.js"></script>
+{% endblock %}

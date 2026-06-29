@@ -1,0 +1,176 @@
+{% extends "govuk/template.njk" %}
+
+{% from "govuk/components/header/macro.njk" import govukHeader %}
+{% from "govuk/components/phase-banner/macro.njk" import govukPhaseBanner %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+{% from "govuk/components/table/macro.njk" import govukTable %}
+{% from "moj/components/primary-navigation/macro.njk" import mojPrimaryNavigation %}
+
+{% block head %}
+  <link href="/public/stylesheets/application.css" rel="stylesheet">
+  <style>
+    .moj-primary-navigation__item:first-child .moj-primary-navigation__link { color: #0b0c0c; }
+    .moj-primary-navigation__item:first-child .moj-primary-navigation__link:hover { color: #0b0c0c; }
+  </style>
+{% endblock %}
+
+{% block header %}
+  {{ govukHeader({
+    homepageUrl: "#",
+    productName: "Legal Aid Agency",
+    navigationClasses: "govuk-header__navigation--end",
+    navigation: [
+      {
+        href: "#",
+        text: "joann.barton@law.com"
+      },
+      {
+        href: "#",
+        text: "Sign out"
+      }
+    ]
+  }) }}
+
+  {{ mojPrimaryNavigation({
+    label: 'Primary navigation',
+    items: [
+      {
+        text: 'Decide if an applicant can get legal aid',
+        href: '#'
+      },
+      {
+        text: 'Open applications',
+        href: '/v6/open-applications'
+      },
+      {
+        text: 'Your list',
+        href: '/v6/yourlist'
+      },
+      {
+        text: 'Search',
+        href: '/v6/search'
+      }
+    ]
+  }) }}
+{% endblock %}
+
+{% block beforeContent %}
+  {{ govukPhaseBanner({
+    tag: { text: "Beta" },
+    html: 'This is a new service – your <a class="govuk-link" href="#">feedback</a> will help us to improve it.'
+  }) }}
+  {{ govukBackLink({
+    text: "Back",
+    href: "javascript:history.back()"
+  }) }}
+{% endblock %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full" style="width: 70%;">
+      
+      <div id="toast-notification"></div>
+      
+      <h1 class="govuk-heading-xl govuk-!-margin-bottom-6">Open applications</h1>
+
+      {% if applications and applications.length > 0 %}
+        <table class="govuk-table moj-sortable-table" data-module="moj-sortable-table">
+          <thead class="govuk-table__head">
+            <tr class="govuk-table__row">
+              <th scope="col" class="govuk-table__header">Reference</th>
+              <th scope="col" class="govuk-table__header" aria-sort="none" data-sort-type="date">Submitted</th>
+              <th scope="col" class="govuk-table__header" aria-sort="none" data-sort-type="date">Last updated</th>
+              <th scope="col" class="govuk-table__header">Type</th>
+              <th scope="col" class="govuk-table__header" aria-sort="none">Delegated Functions</th>
+              <th scope="col" class="govuk-table__header" aria-sort="none">Matter type</th>
+              <th scope="col" class="govuk-table__header">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="govuk-table__body">
+            {% for application in applications %}
+              <tr class="govuk-table__row">
+                <td class="govuk-table__cell">
+                  <a href="/v6/application/{{ application.ref }}{% if application.isPriorAuthority %}#prior-authority{% endif %}" class="govuk-link">
+                    {{ application.ref }}
+                  </a>
+                </td>
+                <td class="govuk-table__cell" data-sort-value="{{ application.submitted | replace(' ', '') }}">
+                  {{ application.submitted }}
+                </td>
+                <td class="govuk-table__cell" data-sort-value="{{ application.submitted | replace(' ', '') }}">
+                  {{ application.submitted }}
+                </td>
+                <td class="govuk-table__cell">
+                  {% if application.isPriorAuthority %}
+                    Prior authority<br><strong>{{ application.priorAuthorityType }}</strong>
+                  {% else %}
+                    Initial application
+                  {% endif %}
+                </td>
+                <td class="govuk-table__cell">
+                  {{ application.delegatedFunctions }}
+                </td>
+                <td class="govuk-table__cell">
+                  <strong>{{ application.matterType.title }}</strong><br>{{ application.matterType.subtext }}
+                </td>
+                <td class="govuk-table__cell">
+                  <a href="#" class="govuk-link add-to-list" data-ref="{{ application.ref }}">Add</a>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      {% else %}
+        <p class="govuk-body">You have no applications in your list.</p>
+      {% endif %}
+
+    </div>
+  </div>
+
+  <script>
+    // Handle "Add" link clicks for adding applications to list
+    document.querySelectorAll('.add-to-list').forEach(link => {
+      link.addEventListener('click', function(e) {
+        e.preventDefault();
+        const reference = this.getAttribute('data-ref');
+        
+        // Add application to list via fetch
+        fetch('/v6/add-application/' + reference, { 
+          method: 'GET',
+          headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+          }
+        })
+          .then(response => {
+            // Show toast notification using GOV.UK toast component
+            const toastContainer = document.getElementById('toast-notification');
+            const toast = document.createElement('div');
+            toast.setAttribute('data-module', 'govuk-notification-banner');
+            toast.setAttribute('role', 'region');
+            toast.setAttribute('aria-labelledby', 'govuk-notification-banner-title');
+            toast.className = 'govuk-notification-banner govuk-notification-banner--success';
+            toast.style.cssText = 'margin-bottom: 20px;';
+            toast.innerHTML = '<div class="govuk-notification-banner__header"><h2 id="govuk-notification-banner-title" class="govuk-notification-banner__title">Success</h2></div><div class="govuk-notification-banner__content"><p class="govuk-notification-banner__heading">You added this application to your list</p></div>';
+            
+            toastContainer.appendChild(toast);
+            
+            // Hide toast after 3 seconds
+            setTimeout(() => {
+              toast.remove();
+            }, 3000);
+          })
+          .catch(error => console.error('Error:', error));
+      });
+    });
+  </script>
+{% endblock %}
+
+{% block bodyEnd %}
+  <script src="/plugin-assets/govuk-prototype-kit/lib/assets/javascripts/kit.js"></script>
+  <script src="/plugin-assets/govuk-prototype-kit/lib/assets/javascripts/auto-store-data.js"></script>
+  <script type="module" src="/plugin-assets/govuk-frontend/dist/govuk/govuk-frontend.min.js"></script>
+  <script type="module" src="/plugin-assets/govuk-frontend/dist/govuk-prototype-kit/init.js"></script>
+  <script type="module" src="/plugin-assets/%40ministryofjustice%2Ffrontend/moj/moj-frontend.min.js"></script>
+  <script type="module" src="/plugin-assets/%40ministryofjustice%2Ffrontend/moj/init.js"></script>
+  <script src="/plugin-assets/jquery/dist/jquery.js"></script>
+{% endblock %}

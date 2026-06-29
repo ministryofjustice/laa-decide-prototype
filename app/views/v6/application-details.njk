@@ -1,0 +1,973 @@
+{% extends "govuk/template.njk" %}
+
+{% from "govuk/components/header/macro.njk" import govukHeader %}
+{% from "govuk/components/phase-banner/macro.njk" import govukPhaseBanner %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/tag/macro.njk" import govukTag %}
+{% from "govuk/components/tabs/macro.njk" import govukTabs %}
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+{% from "govuk/components/table/macro.njk" import govukTable %}
+{% from "govuk/components/pagination/macro.njk" import govukPagination %}
+{% from "govuk/components/details/macro.njk" import govukDetails %}
+{% from "govuk/components/textarea/macro.njk" import govukTextarea %}
+
+{% block head %}
+  <link href="/public/stylesheets/application.css" rel="stylesheet">
+  <style>
+    .moj-primary-navigation__item:first-child .moj-primary-navigation__link { color: #0b0c0c; }
+    .moj-primary-navigation__item:first-child .moj-primary-navigation__link:hover { color: #0b0c0c; }
+  </style>
+{% endblock %}
+
+{% from "moj/components/primary-navigation/macro.njk" import mojPrimaryNavigation %}
+
+{% block header %}
+  {{ govukHeader({
+    homepageUrl: "#",
+    productName: "Legal Aid Agency",
+    navigationClasses: "govuk-header__navigation--end",
+    navigation: [
+      {
+        href: "#",
+        text: "joann.barton@law.com"
+      },
+      {
+        href: "#",
+        text: "Sign out"
+      }
+    ]
+  }) }}
+
+  {{ mojPrimaryNavigation({
+    label: 'Primary navigation',
+    items: [
+      {
+        text: 'Decide if an applicant can get legal aid',
+        href: '#'
+      },
+      {
+        text: 'Open applications',
+        href: '/open-applications'
+      },
+      {
+        text: 'Your list',
+        href: '#'
+      },
+      {
+        text: 'Search',
+        href: '/search'
+      }
+    ]
+  }) }}
+{% endblock %}
+
+{% block beforeContent %}
+  {{ govukPhaseBanner({
+    tag: { text: "Beta" },
+    html: 'This is a new service – your <a class="govuk-link" href="#">feedback</a> will help us to improve it.'
+  }) }}
+  {{ govukBackLink({
+    text: "Back",
+    href: "javascript:history.back()"
+  }) }}
+{% endblock %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full" style="width: 70%;">
+      
+      <div id="toast-notification"></div>
+
+      {% if isViewingPreviousVersion %}
+        <div class="govuk-notification-banner" role="region" aria-labelledby="govuk-notification-banner-title">
+          <div class="govuk-notification-banner__header">
+            <h2 class="govuk-notification-banner__title" id="govuk-notification-banner-title">
+              Important
+            </h2>
+          </div>
+          <div class="govuk-notification-banner__content">
+            <p class="govuk-body">You are viewing a previous version before an update was made. <a href="/v6/application/{{ reference }}" class="govuk-link">Go to current version</a></p>
+          </div>
+        </div>
+      {% endif %}
+
+      <div class="govuk-!-margin-bottom-4">
+        {{ govukTag({
+          text: "In progress",
+          classes: "govuk-tag--light-blue"
+        }) }}
+      </div>
+
+      <h1 class="govuk-heading-xl govuk-!-margin-bottom-4">{{ application.ref or application.reference }}</h1>
+
+      {% if application.status %}
+        <p class="govuk-!-margin-bottom-4">
+          {% if application.status === "Granted" %}
+            <strong class="govuk-tag govuk-tag--green">{{ application.status }}</strong>
+          {% elif application.status === "Refused" %}
+            <strong class="govuk-tag govuk-tag--red">{{ application.status }}</strong>
+          {% else %}
+            <strong class="govuk-tag govuk-tag--light-blue">{{ application.status }}</strong>
+          {% endif %}
+        </p>
+      {% endif %}
+
+      <p class="govuk-body govuk-!-margin-bottom-1">
+        <strong>Assigned to:</strong> Caseworker name
+      </p>
+      <p class="govuk-body govuk-!-margin-bottom-6">
+        <strong>Date received:</strong> 19 May 2023
+      </p>
+
+      {% if sessionData['decision-reference'] !== reference %}
+        {% if isAssigned %}
+          {{ govukButton({
+            text: "Reassign",
+            classes: "govuk-button--secondary govuk-!-margin-bottom-8",
+            style: "background-color: #00703c; color: white;"
+          }) }}
+        {% else %}
+          <form id="addToListForm" style="display: inline;">
+            <input type="hidden" name="reference" value="{{ reference }}">
+            {{ govukButton({
+              text: "Add to your list",
+              classes: "govuk-button--secondary govuk-!-margin-bottom-8",
+              style: "background-color: #00703c; color: white;"
+            }) }}
+          </form>
+
+          <script>
+            document.getElementById('addToListForm').addEventListener('submit', function(e) {
+              e.preventDefault();
+              const reference = this.querySelector('input[name="reference"]').value;
+              
+              // Add application to list via fetch
+              fetch('/v6/add-application/' + reference, { 
+                method: 'GET',
+                headers: {
+                  'X-Requested-With': 'XMLHttpRequest'
+                }
+              })
+                .then(response => {
+                  // Show toast notification using GOV.UK toast component
+                  const toastContainer = document.getElementById('toast-notification');
+                  const toast = document.createElement('div');
+                  toast.setAttribute('data-module', 'govuk-notification-banner');
+                  toast.setAttribute('role', 'region');
+                  toast.setAttribute('aria-labelledby', 'govuk-notification-banner-title');
+                  toast.className = 'govuk-notification-banner govuk-notification-banner--success';
+                  toast.style.cssText = 'margin-bottom: 20px;';
+                  toast.innerHTML = '<div class="govuk-notification-banner__header"><h2 id="govuk-notification-banner-title" class="govuk-notification-banner__title">Success</h2></div><div class="govuk-notification-banner__content"><p class="govuk-notification-banner__heading">You added this application to your list</p></div>';
+                  
+                  toastContainer.appendChild(toast);
+                  
+                  // Hide toast after 3 seconds
+                  setTimeout(() => {
+                    toast.remove();
+                  }, 3000);
+                })
+              .catch(error => console.error('Error:', error));
+          });
+        </script>
+        {% endif %}
+      {% endif %}
+
+      {% set appDetailsHtml %}
+        <h2 class="govuk-heading-m">Overview</h2>
+
+        <div class="govuk-summary-card govuk-!-margin-bottom-6">
+          <div class="govuk-summary-card__title-wrapper" style="background-color: #f3f2f1; padding: 15px;">
+            <h2 class="govuk-summary-card__title govuk-heading-s govuk-!-margin-bottom-0">Client details</h2>
+          </div>
+          <div class="govuk-summary-card__content">
+            <dl class="govuk-summary-list">
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Application type</dt>
+                <dd class="govuk-summary-list__value">Initial application</dd>
+              </div>
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Matter type</dt>
+                <dd class="govuk-summary-list__value"><strong>Family:</strong> Special Children's Act</dd>
+              </div>
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Delegated functions</dt>
+                <dd class="govuk-summary-list__value">
+                  {% if reference and 'L-12Z' in reference %}
+                    Used
+                  {% elif reference and 'L-W1X' in reference %}
+                    Not used
+                  {% elif reference and 'N-J5S' in reference %}
+                    Used
+                  {% else %}
+                    {{ application.delegatedFunctions or 'Used' }}
+                  {% endif %}
+                </dd>
+              </div>
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Certificate type</dt>
+                <dd class="govuk-summary-list__value">Substantive</dd>
+              </div>
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Merits decision</dt>
+                <dd class="govuk-summary-list__value">
+                  {{ govukTag({ text: "In progress", classes: "govuk-tag--light-blue" }) }}
+                </dd>
+              </div>
+            </dl>
+          </div>
+        </div>
+
+        <h2 class="govuk-heading-m govuk-!-margin-top-8">Proceedings</h2>
+
+        <div class="govuk-summary-card govuk-!-margin-bottom-6">
+          <div class="govuk-summary-card__title-wrapper" style="background-color: #f3f2f1; padding: 15px;">
+            <h2 class="govuk-summary-card__title govuk-heading-s govuk-!-margin-bottom-0">1. Care order</h2>
+          </div>
+          <div class="govuk-summary-card__content">
+            <dl class="govuk-summary-list">
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Client role</dt>
+                <dd class="govuk-summary-list__value">Respondent</dd>
+              </div>
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Delegated functions</dt>
+                <dd class="govuk-summary-list__value">
+                  {% if reference and 'L-12Z' in reference %}
+                    Not used
+                  {% elif reference and 'L-W1X' in reference %}
+                    02 Oct 2025
+                  {% elif reference and 'N-J5S' in reference %}
+                    15 Nov 2025
+                  {% else %}
+                    05 Sept 2025
+                  {% endif %}
+                </dd>
+              </div>
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Substantive level of service</dt>
+                <dd class="govuk-summary-list__value">
+                  {% if reference and 'L-12Z' in reference %}
+                    Limited representation
+                  {% elif reference and 'L-W1X' in reference %}
+                    Full representation
+                  {% elif reference and 'N-J5S' in reference %}
+                    Full representation
+                  {% else %}
+                    Full representation
+                  {% endif %}
+                </dd>
+              </div>
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Substantive scope limitations</dt>
+                <dd class="govuk-summary-list__value">
+                  {% if reference and 'L-12Z' in reference %}
+                    Mediation<br><br>
+                    Limited to mediation and any action necessary to settle the dispute.
+                  {% elif reference and 'L-W1X' in reference %}
+                    Initial steps<br><br>
+                    Limited to steps up to and including first substantive hearing.
+                  {% elif reference and 'N-J5S' in reference %}
+                    All steps<br><br>
+                    Full scope of representation in all steps of the proceedings.
+                  {% else %}
+                    Final hearing<br><br>
+                    Limited to all steps up to and including final hearing and any action necessary to implement (but not enforce) the order.
+                  {% endif %}
+                </dd>
+              </div>
+            </dl>
+          </div>
+        </div>
+
+        <div class="govuk-summary-card govuk-!-margin-bottom-6">
+          <div class="govuk-summary-card__title-wrapper" style="background-color: #f3f2f1; padding: 15px;">
+            <h2 class="govuk-summary-card__title govuk-heading-s govuk-!-margin-bottom-0">2. Supervision order</h2>
+          </div>
+          <div class="govuk-summary-card__content">
+            <dl class="govuk-summary-list">
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Client role</dt>
+                <dd class="govuk-summary-list__value">
+                  {% if reference and 'L-12Z' in reference %}
+                    Applicant
+                  {% elif reference and 'L-W1X' in reference %}
+                    Respondent
+                  {% elif reference and 'N-J5S' in reference %}
+                    Respondent
+                  {% else %}
+                    Respondent
+                  {% endif %}
+                </dd>
+              </div>
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Delegated functions</dt>
+                <dd class="govuk-summary-list__value">
+                  {% if reference and 'L-12Z' in reference %}
+                    Used
+                  {% elif reference and 'L-W1X' in reference %}
+                    09 Oct 2025
+                  {% elif reference and 'N-J5S' in reference %}
+                    22 Nov 2025
+                  {% else %}
+                    05 Sept 2025
+                  {% endif %}
+                </dd>
+              </div>
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Substantive level of service</dt>
+                <dd class="govuk-summary-list__value">
+                  {% if reference and 'L-12Z' in reference %}
+                    Limited representation
+                  {% elif reference and 'L-W1X' in reference %}
+                    Full representation
+                  {% elif reference and 'N-J5S' in reference %}
+                    Full representation
+                  {% else %}
+                    Full representation
+                  {% endif %}
+                </dd>
+              </div>
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Substantive scope limitations</dt>
+                <dd class="govuk-summary-list__value">
+                  {% if reference and 'L-12Z' in reference %}
+                    Advice only<br><br>
+                    Limited to providing advice on the matter.
+                  {% elif reference and 'L-W1X' in reference %}
+                    Interim hearing<br><br>
+                    Limited to steps up to and including any interim hearings.
+                  {% elif reference and 'N-J5S' in reference %}
+                    All steps<br><br>
+                    Full scope of representation in all steps of the proceedings.
+                  {% else %}
+                    Final hearing<br><br>
+                    Limited to all steps up to and including final hearing and any action necessary to implement (but not enforce) the order.
+                  {% endif %}
+                </dd>
+              </div>
+            </dl>
+          </div>
+        </div>
+
+        <h2 class="govuk-heading-m govuk-!-margin-top-8">Linked cases</h2>
+
+        <div class="govuk-!-margin-bottom-6" style="border: 1px solid #b1b4b6;">
+          <div style="background-color: #f3f2f1; padding: 15px; border-bottom: 1px solid #b1b4b6; display: flex; justify-content: space-between; align-items: center;">
+            <h2 class="govuk-heading-s govuk-!-margin-bottom-0">Cases linked to this application</h2>
+            <a href="#" class="govuk-link govuk-heading-s govuk-!-margin-bottom-0">Manage cases</a>
+          </div>
+          <div style="padding: 15px;">
+            {% if hasLinkedCases %}
+              <table class="govuk-table govuk-!-margin-bottom-0">
+                <tbody class="govuk-table__body">
+                  <tr class="govuk-table__row">
+                    <td class="govuk-table__cell"><strong>Lead</strong></td>
+                    <td class="govuk-table__cell">Haylie</td>
+                    <td class="govuk-table__cell">Septimus</td>
+                    <td class="govuk-table__cell"><a href="#" class="govuk-link">L-12Z-13P</a></td>
+                    <td class="govuk-table__cell">{{ govukTag({ text: "In progress", classes: "govuk-tag--light-blue" }) }}</td>
+                  </tr>
+                  <tr class="govuk-table__row">
+                    <td class="govuk-table__cell"><strong>Associated</strong></td>
+                    <td class="govuk-table__cell">Jocelyn<br>Bergson</td>
+                    <td class="govuk-table__cell">Puran</td>
+                    <td class="govuk-table__cell"><a href="#" class="govuk-link">L-12Z-14X</a></td>
+                    <td class="govuk-table__cell">{{ govukTag({ text: "In progress", classes: "govuk-tag--light-blue" }) }}</td>
+                  </tr>
+                  <tr class="govuk-table__row">
+                    <td class="govuk-table__cell"><strong>Associated</strong></td>
+                    <td class="govuk-table__cell">Davis David<br>Allen George</td>
+                    <td class="govuk-table__cell">Devine<br>Schleifer</td>
+                    <td class="govuk-table__cell"><a href="#" class="govuk-link">L-12Z-15Y</a></td>
+                    <td class="govuk-table__cell">{{ govukTag({ text: "In progress", classes: "govuk-tag--light-blue" }) }}</td>
+                  </tr>
+                  <tr class="govuk-table__row">
+                    <td class="govuk-table__cell"><strong>Associated</strong></td>
+                    <td class="govuk-table__cell">Mira Saris</td>
+                    <td class="govuk-table__cell">Howell</td>
+                    <td class="govuk-table__cell"><a href="#" class="govuk-link">L-12Z-16Z</a></td>
+                    <td class="govuk-table__cell">{{ govukTag({ text: "In progress", classes: "govuk-tag--light-blue" }) }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            {% else %}
+              <h2 class="govuk-heading-m govuk-!-margin-bottom-4">There are currently no cases linked to this application</h2>
+              <ul class="govuk-list govuk-list--bullet govuk-!-margin-bottom-0">
+                <li>To link a case please use managed cases and add a new case to be linked to the application</li>
+              </ul>
+            {% endif %}
+          </div>
+        </div>
+
+        <h2 class="govuk-heading-m govuk-!-margin-top-8">Request cost limits</h2>
+
+        <div class="govuk-summary-card govuk-!-margin-bottom-6">
+          <div class="govuk-summary-card__title-wrapper" style="background-color: #f3f2f1; padding: 15px;">
+            <h2 class="govuk-summary-card__title govuk-heading-s govuk-!-margin-bottom-0">Request cost limits</h2>
+          </div>
+          <div class="govuk-summary-card__content">
+            <dl class="govuk-summary-list">
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Substantive certificate</dt>
+                <dd class="govuk-summary-list__value">£25,000</dd>
+              </div>
+            </dl>
+          </div>
+        </div>
+
+        <h2 class="govuk-heading-m govuk-!-margin-top-8">Uploaded evidence</h2>
+
+        <div class="govuk-!-margin-bottom-6" style="border: 1px solid #b1b4b6;">
+          <div style="background-color: #f3f2f1; padding: 15px; border-bottom: 1px solid #b1b4b6;">
+            <h2 class="govuk-heading-s govuk-!-margin-bottom-0">Supporting evidence</h2>
+          </div>
+          <div style="padding: 15px;">
+            <table class="govuk-table govuk-!-margin-bottom-0">
+              <thead class="govuk-table__head">
+                <tr class="govuk-table__row">
+                  <th scope="col" class="govuk-table__header" style="width: 50%;">Type of evidence</th>
+                  <th scope="col" class="govuk-table__header" style="width: 50%;">File name & Date received</th>
+                </tr>
+              </thead>
+              <tbody class="govuk-table__body">
+                <tr class="govuk-table__row">
+                  <td class="govuk-table__cell">Merits report</td>
+                  <td class="govuk-table__cell">
+                    <a href="#" class="govuk-link">merits_report.pdf</a><br>
+                    14 July 2024
+                  </td>
+                </tr>
+                <tr class="govuk-table__row">
+                  <td class="govuk-table__cell">PR Evidence</td>
+                  <td class="govuk-table__cell">
+                    <a href="#" class="govuk-link">parental_responsibility.pdf</a><br>
+                    14 July 2024
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="govuk-!-margin-top-8">
+          {{ govukButton({
+            text: "Make assessment",
+            href: "/v6/decision-start?ref=" ~ reference,
+            style: "background-color: #00703c; color: white;"
+          }) }}
+        </div>
+      {% endset -%}
+
+      {% set peopleHtml %}
+        {{ govukSummaryList({
+          card: { title: { text: "Client" } },
+          rows: [
+            { key: { text: "First name" }, value: { text: application.firstName }, actions: { items: [{ href: "/v6/change/" ~ reference ~ "/first-name", text: "Change" }] } },
+            { key: { text: "Last name" }, value: { text: application.lastName }, actions: { items: [{ href: "/v6/change/" ~ reference ~ "/last-name", text: "Change" }] } },
+            { key: { text: "Last name at birth" }, value: { text: application.lastName }, actions: { items: [{ href: "/v6/change/" ~ reference ~ "/last-name-birth", text: "Change" }] } },
+            { key: { text: "Date of birth" }, value: { text: application.dob }, actions: { items: [{ href: "/v6/change/" ~ reference ~ "/date-of-birth", text: "Change" }] } },
+            { key: { text: "National Insurance number" }, value: { text: application.niNumber }, actions: { items: [{ href: "/v6/change/" ~ reference ~ "/ni-number", text: "Change" }] } },
+            { key: { text: "Applied for legal aid before" }, value: { text: "Yes" } },
+            { key: { text: "Previous reference number" }, value: { text: application.prevReference } },
+            { key: { text: "Correspondence address" }, value: { html: application.correspondenceAddress }, actions: { items: [{ href: "/v6/change/" ~ reference ~ "/correspondence-address", text: "Change" }] } },
+            { key: { text: "Home address" }, value: { html: application.homeAddress }, actions: { items: [{ href: "/v6/change/" ~ reference ~ "/home-address", text: "Change" }] } }
+          ]
+        }) }}
+
+        {{ govukSummaryList({
+          card: { title: { text: "Provider" } },
+          rows: [
+            { key: { text: "Firm" }, value: { text: application.providerFirm } },
+            { key: { text: "Account number" }, value: { text: application.providerAccount } },
+            { key: { text: "Address" }, value: { html: application.providerAddress } },
+            { key: { text: "Phone" }, value: { text: application.providerPhone } }
+          ]
+        }) }}
+
+        {{ govukSummaryList({
+          card: { title: { text: "Opponents" } },
+          rows: [
+            { key: { text: "Opponent 1 name" }, value: { text: application.opponentName }, actions: { items: [{ href: "/v6/change/" ~ reference ~ "/opponent-name", text: "Change" }] } }
+          ]
+        }) }}
+
+        {% set childrenRows = [] %}
+        {% if application.children and application.children.length > 0 %}
+          {% set childrenRows = [
+            { key: { text: "Child 1 name" }, value: { text: application.children[0].name }, actions: { items: [{ href: "/v6/change/" ~ reference ~ "/child-name", text: "Change" }] } },
+            { key: { text: "Child 1 date of birth" }, value: { text: application.children[0].dob }, actions: { items: [{ href: "/v6/change/" ~ reference ~ "/child-1-dob", text: "Change" }] } },
+            { key: { text: "Child 2 name" }, value: { text: application.children[1].name }, actions: { items: [{ href: "/v6/change/" ~ reference ~ "/child-2-name", text: "Change" }] } },
+            { key: { text: "Child 2 date of birth" }, value: { text: application.children[1].dob }, actions: { items: [{ href: "/v6/change/" ~ reference ~ "/child-2-dob", text: "Change" }] } }
+          ] %}
+        {% endif %}
+
+        {{ govukSummaryList({
+          card: { title: { text: "Children involved in this application" } },
+          rows: childrenRows
+        }) }}
+
+        {{ govukSummaryList({
+          card: { title: { text: "Who your client is in this proceeding" } },
+          rows: [
+            { key: { text: "Client is the biological parent of any child involved" }, value: { text: application.isBioParent } }
+          ]
+        }) }}
+
+        <div class="govuk-!-margin-top-6">
+          {{ govukButton({
+            text: "Make assessment",
+            style: "background-color: #00703c; color: white;"
+          }) }}
+        </div>
+      {% endset -%}
+
+      {% set applicationHistoryHtml %}
+        <table class="govuk-table">
+          <thead class="govuk-table__head">
+            <tr class="govuk-table__row">
+              <th scope="col" class="govuk-table__header">Date and time</th>
+              <th scope="col" class="govuk-table__header">Caseworker</th>
+              <th scope="col" class="govuk-table__header">Update</th>
+            </tr>
+          </thead>
+          <tbody class="govuk-table__body">
+            {% if historyEvents and historyEvents.length > 0 %}
+              {% for event in historyEvents %}
+              <tr class="govuk-table__row">
+                <td class="govuk-table__cell govuk-!-padding-3" style="white-space: nowrap;">{{ event.datetime }}</td>
+                <td class="govuk-table__cell govuk-!-padding-3">{{ event.caseworker }}</td>
+                <td class="govuk-table__cell govuk-!-padding-3">
+                  <strong>{{ event.title }}</strong><br>
+
+                  {% if event.versionLink %}
+                    <a href="{{ event.versionLink }}" class="govuk-link govuk-!-font-size-16 govuk-!-display-inline-block govuk-!-margin-bottom-2">Go to this version</a><br>
+                  {% endif %}
+
+                  {% if event.oldValue and event.newValue %}
+                    From: <strong>{{ event.oldValue | safe }}</strong><br>
+                    To: <strong>{{ event.newValue | safe }}</strong><br><br>
+                  {% elif event.changes %}
+                    From: <strong>{{ event.changes.From }}</strong><br>
+                    To: <strong>{{ event.changes.To }}</strong><br><br>
+                  {% endif %}
+
+                  {% if event.justification %}
+                    <details class="govuk-details govuk-!-margin-bottom-0 govuk-!-margin-top-2">
+                      <summary class="govuk-details__summary">
+                        <span class="govuk-details__summary-text">Expand</span>
+                      </summary>
+                      <div class="govuk-details__text">
+                        {{ event.justification }}
+                      </div>
+                    </details>
+                  {% elif event.notes %}
+                    <p class="govuk-body govuk-!-margin-bottom-0 govuk-!-margin-top-2">{{ event.notes }}</p>
+                  {% endif %}
+                </td>
+              </tr>
+              {% endfor %}
+            {% else %}
+              <tr class="govuk-table__row">
+                <td colspan="3" class="govuk-table__cell govuk-!-padding-3" style="text-align: center; color: #505a5f;">No history events yet</td>
+              </tr>
+            {% endif %}
+          </tbody>
+        </table>
+
+        <!-- Pagination -->
+        {{ govukPagination({
+          previous: { href: "#" },
+          next: { href: "#" },
+          items: [
+            { number: 1, href: "#" },
+            { ellipsis: true },
+            { number: 6, href: "#", current: true },
+            { number: 7, href: "#" },
+            { number: 8, href: "#" },
+            { ellipsis: true },
+            { number: 42, href: "#" }
+          ]
+        }) }}
+
+        <!-- Add note form -->
+        <h2 class="govuk-heading-s govuk-!-margin-top-6">Add a note to the application history</h2>
+        <form action="/v6/application/{{ reference }}/add-note" method="post">
+          {{ govukTextarea({
+            name: "historyNote",
+            id: "historyNote",
+            hint: { text: "This information is for internal use only" }
+          }) }}
+
+          {{ govukButton({
+            text: "Add to application history",
+            classes: "govuk-button--secondary",
+            style: "background-color: #00703c; color: white;"
+          }) }}
+        </form>
+      {% endset -%}
+
+      {% set priorAuthorityHtml %}
+        {% if hasPriorAuthority %}
+          <h2 class="govuk-heading-l">Overview</h2>
+          
+          <div class="govuk-summary-card">
+            <div class="govuk-summary-card__title-wrapper">
+              <h3 class="govuk-summary-card__title">Request details</h3>
+            </div>
+            <div class="govuk-summary-card__content">
+              <dl class="govuk-summary-list">
+                <div class="govuk-summary-list__row">
+                  <dt class="govuk-summary-list__key">Application type</dt>
+                  <dd class="govuk-summary-list__value">Prior authority</dd>
+                </div>
+                <div class="govuk-summary-list__row">
+                  <dt class="govuk-summary-list__key">Matter type</dt>
+                  <dd class="govuk-summary-list__value"><strong>Family:</strong> Special Children's Act</dd>
+                </div>
+                <div class="govuk-summary-list__row">
+                  <dt class="govuk-summary-list__key">Submitted by</dt>
+                  <dd class="govuk-summary-list__value">Angel Philips</dd>
+                </div>
+                <div class="govuk-summary-list__row">
+                  <dt class="govuk-summary-list__key">Date submitted</dt>
+                  <dd class="govuk-summary-list__value">14 May 2026</dd>
+                </div>
+                <div class="govuk-summary-list__row">
+                  <dt class="govuk-summary-list__key">Status</dt>
+                  <dd class="govuk-summary-list__value"><strong class="govuk-tag govuk-tag--pink">Submitted</strong></dd>
+                </div>
+              </dl>
+            </div>
+          </div>
+
+          <h2 class="govuk-heading-m govuk-!-margin-top-8">Request type</h2>
+          
+          {% if priorAuthorityType and 'Expert' in priorAuthorityType %}
+            <div class="govuk-summary-card">
+              <div class="govuk-summary-card__title-wrapper">
+                <h3 class="govuk-summary-card__title">Expert</h3>
+              </div>
+              <div class="govuk-summary-card__content">
+                <dl class="govuk-summary-list">
+                  <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">Expert name</dt>
+                    <dd class="govuk-summary-list__value">
+                      {% if 'Psychiatrist' in priorAuthorityType %}
+                        Dr Morley Calzoni
+                      {% elif 'Physiotherapist' in priorAuthorityType %}
+                        Dr Rachel Thompson
+                      {% else %}
+                        Dr Andrew Wilson
+                      {% endif %}
+                    </dd>
+                  </div>
+                  <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">Expert type</dt>
+                    <dd class="govuk-summary-list__value">
+                      {% if 'Psychiatrist' in priorAuthorityType %}
+                        Psychiatrist
+                      {% elif 'Physiotherapist' in priorAuthorityType %}
+                        Physiotherapist
+                      {% else %}
+                        Medical examiner
+                      {% endif %}
+                    </dd>
+                  </div>
+                  <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">Location</dt>
+                    <dd class="govuk-summary-list__value">
+                      {% if 'Psychiatrist' in priorAuthorityType %}
+                        London
+                      {% elif 'Physiotherapist' in priorAuthorityType %}
+                        Manchester
+                      {% else %}
+                        Birmingham
+                      {% endif %}
+                    </dd>
+                  </div>
+                </dl>
+              </div>
+            </div>
+
+            <div class="govuk-summary-card">
+              <div class="govuk-summary-card__title-wrapper">
+                <h3 class="govuk-summary-card__title">Expert cost</h3>
+              </div>
+              <div class="govuk-summary-card__content">
+                <dl class="govuk-summary-list">
+                  <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">Apportioned</dt>
+                    <dd class="govuk-summary-list__value">No</dd>
+                  </div>
+                  <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">Hours requested</dt>
+                    <dd class="govuk-summary-list__value">
+                      {% if 'Psychiatrist' in priorAuthorityType %}
+                        60
+                      {% elif 'Physiotherapist' in priorAuthorityType %}
+                        40
+                      {% else %}
+                        50
+                      {% endif %}
+                    </dd>
+                  </div>
+                  <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">Expert fee hourly rate</dt>
+                    <dd class="govuk-summary-list__value">
+                      {% if 'Psychiatrist' in priorAuthorityType %}
+                        £100.80
+                      {% elif 'Physiotherapist' in priorAuthorityType %}
+                        £85.50
+                      {% else %}
+                        £95.00
+                      {% endif %}
+                    </dd>
+                  </div>
+                  <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">Total amount requested</dt>
+                    <dd class="govuk-summary-list__value">
+                      {% if 'Psychiatrist' in priorAuthorityType %}
+                        £6,048.00
+                      {% elif 'Physiotherapist' in priorAuthorityType %}
+                        £3,420.00
+                      {% else %}
+                        £4,750.00
+                      {% endif %}
+                    </dd>
+                  </div>
+                  <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">Justification of request</dt>
+                    <dd class="govuk-summary-list__value">
+                      {% if 'Psychiatrist' in priorAuthorityType %}
+                        Expert required to undertake psychiatric assessment on client, ordered by the court
+                      {% elif 'Physiotherapist' in priorAuthorityType %}
+                        Expert physiotherapy assessment needed to establish client's functional capacity
+                      {% else %}
+                        Expert medical assessment required for case preparation
+                      {% endif %}
+                    </dd>
+                  </div>
+                </dl>
+              </div>
+            </div>
+          {% else %}
+            <div class="govuk-summary-card">
+              <div class="govuk-summary-card__title-wrapper">
+                <h3 class="govuk-summary-card__title">Counsel</h3>
+              </div>
+              <div class="govuk-summary-card__content">
+                <dl class="govuk-summary-list">
+                  <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">Counsel type</dt>
+                    <dd class="govuk-summary-list__value">
+                      {% if 'King' in priorAuthorityType %}
+                        King's Counsel alone
+                      {% else %}
+                        Junior Counsel
+                      {% endif %}
+                    </dd>
+                  </div>
+                  <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">Justification of request</dt>
+                    <dd class="govuk-summary-list__value">The Prosecution/Opposing party has instructed King's Counsel (KC) or multiple counsel, creating an unfair disparity in representation if the defense is limited to a single junior.</dd>
+                  </div>
+                </dl>
+              </div>
+            </div>
+          {% endif %}
+
+          <h2 class="govuk-heading-m govuk-!-margin-top-8">Uploaded evidence</h2>
+          
+          <div class="govuk-summary-card">
+            <div class="govuk-summary-card__title-wrapper">
+              <h3 class="govuk-summary-card__title">Supporting evidence</h3>
+            </div>
+            <div class="govuk-summary-card__content">
+              <table class="govuk-table govuk-!-margin-bottom-0">
+                <thead class="govuk-table__head">
+                  <tr class="govuk-table__row">
+                    <th scope="col" class="govuk-table__header">File name</th>
+                    <th scope="col" class="govuk-table__header">Category</th>
+                    <th scope="col" class="govuk-table__header">Date added</th>
+                    <th scope="col" class="govuk-table__header">Actions</th>
+                  </tr>
+                </thead>
+                <tbody class="govuk-table__body">
+                  <tr class="govuk-table__row">
+                    <td class="govuk-table__cell"><strong>Instruction_letter.pdf</strong></td>
+                    <td class="govuk-table__cell">Letter of instruction</td>
+                    <td class="govuk-table__cell">15 Feb 2026</td>
+                    <td class="govuk-table__cell"><a href="#" class="govuk-link">View</a></td>
+                  </tr>
+                  <tr class="govuk-table__row">
+                    <td class="govuk-table__cell"><strong>Court_order_signed.png</strong></td>
+                    <td class="govuk-table__cell">Court order</td>
+                    <td class="govuk-table__cell">15 Feb 2026</td>
+                    <td class="govuk-table__cell"><a href="#" class="govuk-link">View</a></td>
+                  </tr>
+                  {% if priorAuthorityType and 'Expert' in priorAuthorityType %}
+                  <tr class="govuk-table__row">
+                    <td class="govuk-table__cell"><strong>Dr_Smith_estimate.doc</strong></td>
+                    <td class="govuk-table__cell">Estimate of cost</td>
+                    <td class="govuk-table__cell">15 Feb 2026</td>
+                    <td class="govuk-table__cell"><a href="#" class="govuk-link">View</a></td>
+                  </tr>
+                  <tr class="govuk-table__row">
+                    <td class="govuk-table__cell"><strong>Alternative_quotes</strong></td>
+                    <td class="govuk-table__cell">Alternative quotes</td>
+                    <td class="govuk-table__cell">15 Feb 2026</td>
+                    <td class="govuk-table__cell"><a href="#" class="govuk-link">View</a></td>
+                  </tr>
+                  {% endif %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <h2 class="govuk-heading-m govuk-!-margin-top-8">Previous applications</h2>
+          
+          <div class="govuk-summary-card">
+            <div class="govuk-summary-card__title-wrapper">
+              <h3 class="govuk-summary-card__title">Previous applications</h3>
+            </div>
+            <div class="govuk-summary-card__content">
+              <table class="govuk-table govuk-!-margin-bottom-0">
+                <thead class="govuk-table__head">
+                  <tr class="govuk-table__row">
+                    <th scope="col" class="govuk-table__header">Application type</th>
+                    <th scope="col" class="govuk-table__header">Caseworker</th>
+                    <th scope="col" class="govuk-table__header">Date submitted</th>
+                    <th scope="col" class="govuk-table__header">Status</th>
+                    <th scope="col" class="govuk-table__header">Actions</th>
+                  </tr>
+                </thead>
+                <tbody class="govuk-table__body">
+                  {% if priorAuthorityType and 'Expert' in priorAuthorityType %}
+                    <tr class="govuk-table__row">
+                      <td class="govuk-table__cell">Prior authority<br><span class="govuk-body-s">Expert (Psychiatrist)</span></td>
+                      <td class="govuk-table__cell">Aspen Dorwart</td>
+                      <td class="govuk-table__cell">10 Sep 2024</td>
+                      <td class="govuk-table__cell"><strong class="govuk-tag govuk-tag--red">Refused</strong></td>
+                      <td class="govuk-table__cell"><a href="#" class="govuk-link">View</a></td>
+                    </tr>
+                    <tr class="govuk-table__row">
+                      <td class="govuk-table__cell">Prior authority<br><span class="govuk-body-s">Expert (Physiotherapist)</span></td>
+                      <td class="govuk-table__cell">Angel Herwitz</td>
+                      <td class="govuk-table__cell">10 Sep 2024</td>
+                      <td class="govuk-table__cell"><strong class="govuk-tag govuk-tag--green">Granted</strong></td>
+                      <td class="govuk-table__cell"><a href="#" class="govuk-link">View</a></td>
+                    </tr>
+                    <tr class="govuk-table__row">
+                      <td class="govuk-table__cell">Prior authority<br><span class="govuk-body-s">Other expenses</span></td>
+                      <td class="govuk-table__cell">Tatjana Dolidis</td>
+                      <td class="govuk-table__cell">10 Sep 2024</td>
+                      <td class="govuk-table__cell"><strong class="govuk-tag govuk-tag--green">Granted</strong></td>
+                      <td class="govuk-table__cell"><a href="#" class="govuk-link">View</a></td>
+                    </tr>
+                    <tr class="govuk-table__row">
+                      <td class="govuk-table__cell">Prior authority<br><span class="govuk-body-s">Expert (Blood test)</span></td>
+                      <td class="govuk-table__cell">Anika Vabrous</td>
+                      <td class="govuk-table__cell">10 Sep 2024</td>
+                      <td class="govuk-table__cell"><strong class="govuk-tag govuk-tag--green">Granted</strong></td>
+                      <td class="govuk-table__cell"><a href="#" class="govuk-link">View</a></td>
+                    </tr>
+                  {% else %}
+                    <tr class="govuk-table__row">
+                      <td class="govuk-table__cell">Prior authority<br><span class="govuk-body-s">Junior counsel</span></td>
+                      <td class="govuk-table__cell">Aspen Dorwart</td>
+                      <td class="govuk-table__cell">10 Sep 2024</td>
+                      <td class="govuk-table__cell"><strong class="govuk-tag govuk-tag--red">Refused</strong></td>
+                      <td class="govuk-table__cell"><a href="#" class="govuk-link">View</a></td>
+                    </tr>
+                    <tr class="govuk-table__row">
+                      <td class="govuk-table__cell">Prior authority<br><span class="govuk-body-s">King's Counsel</span></td>
+                      <td class="govuk-table__cell">Angel Herwitz</td>
+                      <td class="govuk-table__cell">10 Sep 2024</td>
+                      <td class="govuk-table__cell"><strong class="govuk-tag govuk-tag--green">Granted</strong></td>
+                      <td class="govuk-table__cell"><a href="#" class="govuk-link">View</a></td>
+                    </tr>
+                    <tr class="govuk-table__row">
+                      <td class="govuk-table__cell">Prior authority<br><span class="govuk-body-s">King's Counsel</span></td>
+                      <td class="govuk-table__cell">Tatjana Dolidis</td>
+                      <td class="govuk-table__cell">10 Sep 2024</td>
+                      <td class="govuk-table__cell"><strong class="govuk-tag govuk-tag--green">Granted</strong></td>
+                      <td class="govuk-table__cell"><a href="#" class="govuk-link">View</a></td>
+                    </tr>
+                    <tr class="govuk-table__row">
+                      <td class="govuk-table__cell">Prior authority<br><span class="govuk-body-s">King's Counsel and Junior Counsel</span></td>
+                      <td class="govuk-table__cell">Anika Vabrous</td>
+                      <td class="govuk-table__cell">10 Sep 2024</td>
+                      <td class="govuk-table__cell"><strong class="govuk-tag govuk-tag--green">Granted</strong></td>
+                      <td class="govuk-table__cell"><a href="#" class="govuk-link">View</a></td>
+                    </tr>
+                  {% endif %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="govuk-!-margin-top-8">
+            {{ govukButton({
+              text: "Make assessment",
+              style: "background-color: #00703c; color: white;"
+            }) }}
+          </div>
+        {% else %}
+          <h2 class="govuk-heading-m govuk-!-margin-bottom-4">There are currently no prior authority requests linked to this application</h2>
+        {% endif %}
+      {% endset -%}
+
+    </div>
+  </div>
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full" style="width: 70%;">
+
+      {{ govukTabs({
+        items: [
+          {
+            label: "Application details",
+            id: "application-details",
+            panel: {
+              html: appDetailsHtml
+            }
+          },
+          {
+            label: "People",
+            id: "people",
+            panel: {
+              html: peopleHtml
+            }
+          },
+          {
+            label: "Prior authority",
+            id: "prior-authority",
+            panel: {
+              html: priorAuthorityHtml
+            }
+          },
+          {
+            label: "Application history",
+            id: "application-history",
+            panel: {
+              html: applicationHistoryHtml
+            }
+          }
+        ]
+      }) }}
+
+    </div>
+  </div>
+{% endblock %}
+
+{% block bodyEnd %}
+  <script src="/plugin-assets/govuk-prototype-kit/lib/assets/javascripts/kit.js"></script>
+  <script src="/plugin-assets/govuk-prototype-kit/lib/assets/javascripts/auto-store-data.js"></script>
+  <script type="module" src="/plugin-assets/govuk-frontend/dist/govuk/govuk-frontend.min.js"></script>
+  <script type="module" src="/plugin-assets/govuk-frontend/dist/govuk-prototype-kit/init.js"></script>
+  <script type="module" src="/plugin-assets/%40ministryofjustice%2Ffrontend/moj/moj-frontend.min.js"></script>
+  <script type="module" src="/plugin-assets/%40ministryofjustice%2Ffrontend/moj/init.js"></script>
+  <script src="/plugin-assets/jquery/dist/jquery.js"></script>
+  <script type="module" src="/public/javascripts/application.js"></script>
+{% endblock %}

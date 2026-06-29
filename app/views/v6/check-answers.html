@@ -1,0 +1,178 @@
+{% extends "govuk/template.njk" %}
+
+{% from "govuk/components/header/macro.njk" import govukHeader %}
+{% from "govuk/components/phase-banner/macro.njk" import govukPhaseBanner %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+{% from "moj/components/primary-navigation/macro.njk" import mojPrimaryNavigation %}
+
+{% block head %}
+  <link href="/public/stylesheets/application.css" rel="stylesheet">
+  <style>
+    .moj-primary-navigation__item:first-child .moj-primary-navigation__link { color: #0b0c0c; }
+    .moj-primary-navigation__item:first-child .moj-primary-navigation__link:hover { color: #0b0c0c; }
+  </style>
+{% endblock %}
+
+{% block pageTitle %}
+Check your answers
+{% endblock %}
+
+{% block header %}
+  {{ govukHeader({
+    homepageUrl: "#",
+    productName: "Legal Aid Agency",
+    navigationClasses: "govuk-header__navigation--end",
+    navigation: [
+      {
+        href: "#",
+        text: "joann.barton@law.com"
+      },
+      {
+        href: "#",
+        text: "Sign out"
+      }
+    ]
+  }) }}
+
+  {{ mojPrimaryNavigation({
+    label: 'Primary navigation',
+    items: [
+      {
+        text: 'Decide if an applicant can get legal aid',
+        href: '#'
+      },
+      {
+        text: 'Open applications',
+        href: '/open-applications'
+      },
+      {
+        text: 'Your list',
+        href: '#'
+      },
+      {
+        text: 'Search',
+        href: '/search'
+      }
+    ]
+  }) }}
+{% endblock %}
+
+{% block beforeContent %}
+  {{ govukPhaseBanner({
+    tag: { text: "Beta" },
+    html: 'This is a new service – your <a class="govuk-link" href="#">feedback</a> will help us to improve it.'
+  }) }}
+  {{ govukBackLink({
+    text: "Back",
+    href: "javascript:history.back()"
+  }) }}
+{% endblock %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-full" style="width: 85%;">
+    <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+    
+    <h1 class="govuk-heading-xl govuk-!-margin-bottom-2">Check your answers</h1>
+    <p class="govuk-heading-l govuk-!-margin-bottom-4" style="font-weight: normal;">{{ decisionReference or 'L-12Z-13P' }}</p>
+
+    {% if data['overall-decision'] === 'refuse' %}
+      {# REFUSE DECISION SUMMARY #}
+      {% set summaryRows = [
+        {
+          key: { text: "Certificate type" },
+          value: { text: "Substantive certificate" },
+          actions: {
+            items: [{ href: "/v6/overall-decision", text: "Change", visuallyHiddenText: "certificate type" }]
+          }
+        },
+        {
+          key: { text: "Merits assessment" },
+          value: { text: "Refuse" },
+          actions: {
+            items: [{ href: "/v6/overall-decision", text: "Change", visuallyHiddenText: "merit assessment" }]
+          }
+        },
+        {
+          key: { text: "Refusal reason" },
+          value: { text: data['refusal-reason'] or "Not specified" },
+          actions: {
+            items: [{ href: "/v6/refuse-reason", text: "Change", visuallyHiddenText: "refusal reason" }]
+          }
+        },
+        {
+          key: { text: "Justification" },
+          value: { text: data['refuse-justification'] or "" },
+          actions: {
+            items: [{ href: "/v6/refuse-reason", text: "Change", visuallyHiddenText: "justification" }]
+          }
+        }
+      ] %}
+
+    {% else %}
+      {# GRANT DECISION SUMMARY #}
+      {% set summaryRows = [
+        {
+          key: { text: "Certificate type" },
+          value: { text: "Substantive certificate" },
+          actions: {
+            items: [{ href: "/v6/overall-decision", text: "Change", visuallyHiddenText: "certificate type" }]
+          }
+        },
+        {
+          key: { text: "Date granted" },
+          value: { text: data['cert-date-display'] or "12 June 2026" },
+          actions: {
+            items: [{ href: "/v6/grant-certificate-date", text: "Change", visuallyHiddenText: "date granted" }]
+          }
+        },
+        {
+          key: { text: "Merit assessment" },
+          value: { text: "Grant" },
+          actions: {
+            items: [{ href: "/v6/overall-decision", text: "Change", visuallyHiddenText: "merit assessment" }]
+          }
+        }
+      ] %}
+    {% endif %}
+
+    <div class="govuk-summary-card govuk-!-margin-bottom-8">
+      <div class="govuk-summary-card__title-wrapper">
+        <h2 class="govuk-summary-card__title">Overall decision</h2>
+      </div>
+      <div class="govuk-summary-card__content">
+        {{ govukSummaryList({
+          rows: summaryRows
+        }) }}
+      </div>
+    </div>
+
+    {% if data['overall-decision'] === 'refuse' %}
+      <form action="/v6/refuse-decision-submit" method="POST">
+        {% from "govuk/components/button/macro.njk" import govukButton %}
+        <div class="govuk-button-group">
+          {{ govukButton({
+            text: "Submit decision"
+          }) }}
+          <a href="/v6/refuse-reason" class="govuk-link">Cancel</a>
+        </div>
+      </form>
+    {% else %}
+      <form action="/v6/check-answers-submit" method="POST">
+        {% from "govuk/components/button/macro.njk" import govukButton %}
+        <div class="govuk-button-group">
+          {{ govukButton({
+            text: "Submit decision"
+          }) }}
+          <a href="/v6/overall-decision" class="govuk-link">Cancel</a>
+        </div>
+      </form>
+    {% endif %}
+    </div>
+  </div>
+</div>
+</div>
+{% endblock %}

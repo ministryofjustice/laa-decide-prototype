@@ -1,0 +1,97 @@
+
+{% extends "govuk/template.njk" %}
+
+{% from "govuk/components/header/macro.njk" import govukHeader %}
+{% from "govuk/components/phase-banner/macro.njk" import govukPhaseBanner %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "moj/components/primary-navigation/macro.njk" import mojPrimaryNavigation %}
+
+{% block head %}
+  <link href="/public/stylesheets/application.css" rel="stylesheet">
+  <style>
+    .moj-primary-navigation__item:first-child .moj-primary-navigation__link { color: #0b0c0c; }
+    .moj-primary-navigation__item:first-child .moj-primary-navigation__link:hover { color: #0b0c0c; }
+  </style>
+{% endblock %}
+
+{% block pageTitle %}
+Confirmation screen
+{% endblock %}
+
+{% block header %}
+  {{ govukHeader({
+    homepageUrl: "#",
+    productName: "Legal Aid Agency",
+    navigationClasses: "govuk-header__navigation--end",
+    navigation: [
+      {
+        href: "#",
+        text: "joann.barton@law.com"
+      },
+      {
+        href: "#",
+        text: "Sign out"
+      }
+    ]
+  }) }}
+
+  {{ mojPrimaryNavigation({
+    label: 'Primary navigation',
+    items: [
+      {
+        text: 'Decide if an applicant can get legal aid',
+        href: '#'
+      },
+      {
+        text: 'Open applications',
+        href: '/v6/open-applications'
+      },
+      {
+        text: 'Your list',
+        href: '/v6/yourlist'
+      },
+      {
+        text: 'Search',
+        href: '/v6/search'
+      }
+    ]
+  }) }}
+{% endblock %}
+
+{% block beforeContent %}
+  {{ govukPhaseBanner({
+    tag: { text: "Beta" },
+    html: 'This is a new service – your <a class="govuk-link" href="#">feedback</a> will help us to improve it.'
+  }) }}
+{% endblock %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-full" style="width: 85%;">
+    <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+    <div class="govuk-panel govuk-panel--confirmation">
+      <h1 class="govuk-panel__title">
+        Application for civil legal aid assessed completely
+      </h1>
+      <div class="govuk-panel__body">
+        Apply reference number: <strong>{{ decisionReference or 'L-12Z-13P' }}</strong>
+      </div>
+    </div>
+    
+    <h2 class="govuk-heading-m">What happens next</h2>
+    <p class="govuk-body">
+      We've saved your decision and the provider will be informed.
+    </p>
+    
+    {% from "govuk/components/button/macro.njk" import govukButton %}
+    {{ govukButton({
+      text: "View your list",
+      href: "/v6/yourlist"
+    }) }}
+    </div>
+  </div>
+</div>
+</div>
+{% endblock %}

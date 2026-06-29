@@ -1,0 +1,138 @@
+{% extends "govuk/template.njk" %}
+
+{% from "govuk/components/header/macro.njk" import govukHeader %}
+{% from "govuk/components/phase-banner/macro.njk" import govukPhaseBanner %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+{% from "govuk/components/table/macro.njk" import govukTable %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "moj/components/primary-navigation/macro.njk" import mojPrimaryNavigation %}
+
+{% block head %}
+  <link href="/public/stylesheets/application.css" rel="stylesheet">
+  <style>
+    .moj-primary-navigation__item:first-child .moj-primary-navigation__link { color: #0b0c0c; }
+    .moj-primary-navigation__item:first-child .moj-primary-navigation__link:hover { color: #0b0c0c; }
+  </style>
+{% endblock %}
+
+{% block header %}
+  {{ govukHeader({
+    homepageUrl: "#",
+    productName: "Legal Aid Agency",
+    navigationClasses: "govuk-header__navigation--end",
+    navigation: [
+      {
+        href: "#",
+        text: "joann.barton@law.com"
+      },
+      {
+        href: "#",
+        text: "Sign out"
+      }
+    ]
+  }) }}
+
+  {{ mojPrimaryNavigation({
+    label: 'Primary navigation',
+    items: [
+      {
+        text: 'Decide if an applicant can get legal aid',
+        href: '#'
+      },
+      {
+        text: 'Open applications',
+        href: '/v6/open-applications'
+      },
+      {
+        text: 'Your list',
+        href: '/v6/yourlist'
+      },
+      {
+        text: 'Search',
+        href: '/v6/search'
+      }
+    ]
+  }) }}
+{% endblock %}
+
+{% block beforeContent %}
+  {{ govukPhaseBanner({
+    tag: { text: "Beta" },
+    html: 'This is a new service – your <a class="govuk-link" href="#">feedback</a> will help us to improve it.'
+  }) }}
+  {{ govukBackLink({
+    text: "Back",
+    href: "javascript:history.back()"
+  }) }}
+{% endblock %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full" style="width: 70%;">
+      
+      <h1 class="govuk-heading-xl govuk-!-margin-bottom-6">Your list</h1>
+
+      {% if applications and applications.length > 0 %}
+        <table class="govuk-table" data-module="govuk-table">
+          <thead class="govuk-table__head">
+            <tr class="govuk-table__row">
+              <th scope="col" class="govuk-table__header">Reference</th>
+              <th scope="col" class="govuk-table__header">Submitted</th>
+              <th scope="col" class="govuk-table__header">Last updated</th>
+              <th scope="col" class="govuk-table__header">Type</th>
+              <th scope="col" class="govuk-table__header">Delegated Functions</th>
+              <th scope="col" class="govuk-table__header">Matter type</th>
+              <th scope="col" class="govuk-table__header">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="govuk-table__body">
+            {% for app in applications %}
+              <tr class="govuk-table__row">
+                <td class="govuk-table__cell">
+                  <a href="/v6/application/{{ app.ref }}{% if app.isPriorAuthority %}#prior-authority{% endif %}" class="govuk-link">
+                    {{ app.ref }}
+                  </a>
+                </td>
+                <td class="govuk-table__cell">
+                  {{ app.submitted }}
+                </td>
+                <td class="govuk-table__cell">
+                  {{ app.lastUpdated }}
+                </td>
+                <td class="govuk-table__cell">
+                  {% if app.isPriorAuthority %}
+                    Prior authority<br><strong>{{ app.priorAuthorityType }}</strong>
+                  {% else %}
+                    {{ app.type }}
+                  {% endif %}
+                </td>
+                <td class="govuk-table__cell">
+                  {{ app.delegatedFunctions }}
+                </td>
+                <td class="govuk-table__cell">
+                  <strong>{{ app.matterType.title }}</strong><br>{{ app.matterType.subtext }}
+                </td>
+                <td class="govuk-table__cell">
+                  <a href="/v6/remove-application/{{ app.ref }}" class="govuk-link">Reassign</a>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      {% else %}
+        <p class="govuk-body">You have no applications in your list.</p>
+      {% endif %}
+
+    </div>
+  </div>
+{% endblock %}
+
+{% block bodyEnd %}
+  <script src="/plugin-assets/govuk-prototype-kit/lib/assets/javascripts/kit.js"></script>
+  <script src="/plugin-assets/govuk-prototype-kit/lib/assets/javascripts/auto-store-data.js"></script>
+  <script type="module" src="/plugin-assets/govuk-frontend/dist/govuk/govuk-frontend.min.js"></script>
+  <script type="module" src="/plugin-assets/govuk-frontend/dist/govuk-prototype-kit/init.js"></script>
+  <script type="module" src="/plugin-assets/%40ministryofjustice%2Ffrontend/moj/moj-frontend.min.js"></script>
+  <script type="module" src="/plugin-assets/%40ministryofjustice%2Ffrontend/moj/init.js"></script>
+  <script src="/plugin-assets/jquery/dist/jquery.js"></script>
+{% endblock %}

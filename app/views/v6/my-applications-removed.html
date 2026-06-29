@@ -1,0 +1,98 @@
+{% extends "layouts/workload.html" %}
+
+{% block pageTitle %}
+My applications
+{% endblock %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-full">
+    <div class="govuk-notification-banner govuk-notification-banner--success" role="alert" aria-labelledby="govuk-notification-banner-title" data-module="govuk-notification-banner">
+      <div class="govuk-notification-banner__header">
+        <h2 class="govuk-notification-banner__title" id="govuk-notification-banner-title">
+          Success
+        </h2>
+      </div>
+      <div class="govuk-notification-banner__content">
+        <p class="govuk-notification-banner__heading">Application L-C7T-G2B has been removed from your list</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-full">
+    <h1 class="govuk-heading-xl">Your list</h1>
+    
+    <table class="govuk-table" data-module="moj-sortable-table">
+      <thead class="govuk-table__head">
+        <tr class="govuk-table__row">
+          <th scope="col" class="govuk-table__header">Reference</th>
+          <th scope="col" class="govuk-table__header" aria-sort="ascending"><button type="button" data-index="1">Submitted</button></th>
+          <th scope="col" class="govuk-table__header" aria-sort="none"><button type="button" data-index="2">Updated</button></th>
+          <th scope="col" class="govuk-table__header" aria-sort="none"><button type="button" data-index="3">Type</button></th>
+          <th scope="col" class="govuk-table__header" aria-sort="none"><button type="button" data-index="4">DF</button></th>
+          <th scope="col" class="govuk-table__header" aria-sort="none"><button type="button" data-index="5">Matter type</button></th>
+          <th scope="col" class="govuk-table__header" aria-sort="none"><button type="button" data-index="6">Means</button></th>
+          <th scope="col" class="govuk-table__header"></th>
+        </tr>
+      </thead>
+      <tbody class="govuk-table__body">
+        
+      <tr class="govuk-table__row">
+          <td class="govuk-table__cell">
+            <nobr><a class="govuk_link" href="#">L-W1X-Y2Z</a></nobr></td>
+          <td class="govuk-table__cell"><input type="hidden" name="date" value="2023-09-10T00:00:00.000Z">Sun 10 Sep</td>
+          <td class="govuk-table__cell"><input type="hidden" name="date" value="2023-09-10T00:00:00.000Z">Sun 10 Sep</td>
+          <td class="govuk-table__cell">Initial application</td>
+          <td class="govuk-table__cell">Used</td>
+          <td class="govuk-table__cell"><strong>Family</strong><br>Public Law - Family</td>
+          <td class="govuk-table__cell">Passported</td>
+          <td class="govuk-table__cell">
+          <form action="remove-from-my-list">
+            <button class="govuk-button govuk-button--secondary" data-module="govuk-button">Remove <span class="govuk-visually-hidden">from my list</span></button>
+            <input type="hidden" name="refNoToRemove" value="">
+          </form>
+          </td>
+        </tr><tr class="govuk-table__row">
+          <td class="govuk-table__cell">
+            <nobr><a class="govuk_link" href="#">L-A1B-C2D</a></nobr></td>
+          <td class="govuk-table__cell"><input type="hidden" name="date" value="2023-09-11T00:00:00.000Z">Mon 11 Sep</td>
+          <td class="govuk-table__cell"><input type="hidden" name="date" value="2023-09-11T00:00:00.000Z">Mon 11 Sep</td>
+          <td class="govuk-table__cell">Initial application</td>
+          <td class="govuk-table__cell">Used</td>
+          <td class="govuk-table__cell"><strong>Family</strong><br>Special Children Act</td>
+          <td class="govuk-table__cell">Passported</td>
+          <td class="govuk-table__cell">
+          <form action="remove-from-my-list">
+            <button class="govuk-button govuk-button--secondary" data-module="govuk-button">Remove <span class="govuk-visually-hidden">from my list</span></button>
+            <input type="hidden" name="refNoToRemove" value="">
+          </form>
+          </td>
+        </tr><tr class="govuk-table__row">
+          <td class="govuk-table__cell">
+            <nobr><a class="govuk_link" href="application-details-added">L-I2Z-I3P</a></nobr></td>
+          <td class="govuk-table__cell"><input type="hidden" name="date" value="2023-10-30T00:00:00.000Z">Mon 30 Oct</td>
+          <td class="govuk-table__cell"><input type="hidden" name="date" value="2023-10-30T00:00:00.000Z">Mon 30 Oct</td>
+          <td class="govuk-table__cell">Initial application</td>
+          <td class="govuk-table__cell">Used</td>
+          <td class="govuk-table__cell"><strong>Family</strong><br>Domestic Abuse, Section 8 orders</td>
+          <td class="govuk-table__cell">Passported</td>
+          <td class="govuk-table__cell">
+          <form action="remove-from-my-list">
+            <button class="govuk-button govuk-button--secondary" data-module="govuk-button">Remove <span class="govuk-visually-hidden">from my list</span></button>
+            <input type="hidden" name="refNoToRemove" value="">
+          </form>
+          </td>
+        </tr></tbody>
+    </table>
+
+      {% from "govuk/components/button/macro.njk" import govukButton %}
+      {{ govukButton({
+        text: "View open applications",
+        href: "open-applications"
+      }) }}
+
+  </div>
+</div>
+{% endblock %}

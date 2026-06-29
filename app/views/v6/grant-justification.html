@@ -1,0 +1,46 @@
+{% extends "layouts/workload.html" %}
+
+{% block pageTitle %}
+Why are you granting this application?
+{% endblock %}
+
+{% set application = data['application']['applicationDetails'] %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    <a href="javascript:history.back()" class="govuk-back-link">Back</a>
+    
+    <h1 class="govuk-heading-xl govuk-!-margin-bottom-2">Why are you granting this application?</h1>
+    <p class="govuk-heading-l govuk-!-margin-bottom-4" style="font-weight: normal;">{{ application['refNo'] or 'L-I2Z-I3P'}}</p>
+    
+    <p class="govuk-body govuk-!-margin-bottom-8">
+      Provide clear reasons and scope context for the provider. This text will appear on the final notification documentation.
+    </p>
+
+    <form action="/v6/grant-submit" method="POST">
+      {% from "govuk/components/textarea/macro.njk" import govukTextarea %}
+
+      {{ govukTextarea({
+        name: "grant-reasons",
+        id: "grant-reasons",
+        label: {
+          text: "Decision justification details",
+          classes: "govuk-label--m"
+        },
+        hint: {
+          text: "Enter merits assessment approval context text here..."
+        }
+      }) }}
+
+      <div class="govuk-button-group">
+        {% from "govuk/components/button/macro.njk" import govukButton %}
+        {{ govukButton({
+          text: "Continue"
+        }) }}
+        <a href="/v6/overall-decision" class="govuk-link">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

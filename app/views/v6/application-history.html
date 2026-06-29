@@ -1,0 +1,90 @@
+
+{% extends "layouts/layout.html" %}
+
+{% block pageTitle %}
+Application history - {{ reference }}
+{% endblock %}
+
+{% block content %}
+<div style="padding: 30px 0;">
+  <div style="max-width: 66.66%; margin: 0 auto; padding: 0 30px;">
+    <a href="/v6/application/{{ reference }}" style="font-size: 14px; display: inline-block; margin-bottom: 20px; text-decoration: none; color: #0b0c0c;">‹ Back to application</a>
+    <br>
+    <span style="background-color: #dfebf4; color: #1d70b8; padding: 4px 8px; font-size: 14px; font-weight: bold;">In progress</span>
+    <h1 style="font-size: 36px; margin: 15px 0;">{{ reference }}</h1>
+    
+    <div style="font-size: 16px; margin-bottom: 20px; line-height: 1.5;">
+      <strong>Assigned to:</strong> {{ assignedCaseworker or 'Unassigned' }}<br>
+      <strong>Date received:</strong> 19 May 2023
+    </div>
+    <button style="background-color: #f3f2f1; border: 1px solid #b1b4b6; padding: 8px 12px; font-size: 14px; cursor: pointer; box-shadow: 0 2px 0 #0b0c0c;">Reassign</button>
+
+    <div style="margin-top: 30px;">
+      <div style="border-bottom: 1px solid #b1b4b6; display: flex; margin-bottom: 20px;">
+        <a href="/v6/application/{{ reference }}" style="padding: 10px 20px; background: #f3f2f1; border: 1px solid #b1b4b6; border-bottom: none; margin-right: 5px; text-decoration: none; color: #0b0c0c; font-size: 14px;">Application details</a>
+        <a href="/v6/application/{{ reference }}#people" style="padding: 10px 20px; background: #f3f2f1; border: 1px solid #b1b4b6; border-bottom: none; margin-right: 5px; text-decoration: none; color: #0b0c0c; font-size: 14px;">People</a>
+        <a href="/v6/application/{{ reference }}#prior-authority" style="padding: 10px 20px; background: #f3f2f1; border: 1px solid #b1b4b6; border-bottom: none; margin-right: 5px; text-decoration: none; color: #0b0c0c; font-size: 14px;">Prior authority</a>
+        <a href="/v6/application/{{ reference }}/history" style="padding: 10px 20px; background: #ffffff; border: 1px solid #b1b4b6; border-bottom: 1px solid #ffffff; margin-right: 5px; text-decoration: none; color: #0b0c0c; font-size: 14px; font-weight: bold; position: relative; top: 1px;">Application history</a>
+      </div>
+    </div>
+
+    <section style="width: 100%;">
+        <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
+          <thead>
+            <tr>
+              <th style="width: 20%; background: #f3f2f1; text-align: left; padding: 12px; border: 1px solid #b1b4b6;">Date and time</th>
+              <th style="width: 20%; background: #f3f2f1; text-align: left; padding: 12px; border: 1px solid #b1b4b6;">Caseworker</th>
+              <th style="width: 60%; background: #f3f2f1; text-align: left; padding: 12px; border: 1px solid #b1b4b6;">Update</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% if history and history.length > 0 %}
+              {% for event in history %}
+              <tr>
+                <td style="padding: 15px 12px; border: 1px solid #b1b4b6; vertical-align: top;">{{ event.timestamp }}</td>
+                <td style="padding: 15px 12px; border: 1px solid #b1b4b6; vertical-align: top;">{{ event.caseworker or 'System' }}</td>
+                <td style="padding: 15px 12px; border: 1px solid #b1b4b6; vertical-align: top;">
+                  <strong>{{ event.action }}</strong>
+                  {% if event.details %}
+                    <details style="margin-top: 8px;">
+                      <summary style="color: #1d70b8; cursor: pointer; font-weight: normal; outline: none;">
+                        Expand
+                      </summary>
+                      <div style="margin-top: 8px; padding: 10px; background-color: #ffffff; border: 1px solid #b1b4b6; color: #505a5f; line-height: 1.5;">
+                        {{ event.details }}
+                      </div>
+                    </details>
+                  {% endif %}
+                </td>
+              </tr>
+              {% endfor %}
+            {% else %}
+              <tr>
+                <td colspan="3" style="padding: 20px; text-align: center; border: 1px solid #b1b4b6; color: #505a5f;">No history events yet</td>
+              </tr>
+            {% endif %}
+          </tbody>
+        </table>
+
+        <div style="display: flex; justify-content: center; align-items: center; gap: 10px; margin: 30px 0; font-size: 14px;">
+          <a href="#" style="padding: 5px 10px; text-decoration: none; color: #1d70b8;">← Previous</a>
+          <a href="#" style="padding: 5px 10px; text-decoration: none; color: #1d70b8;">1</a>
+          <span>...</span>
+          <a href="#" style="background: #1d70b8; color: white; font-weight: bold; padding: 5px 10px;">1</a>
+          <a href="#" style="padding: 5px 10px; text-decoration: none; color: #1d70b8;">Next →</a>
+        </div>
+
+        <div style="margin-top: 40px; border-top: 2px solid #b1b4b6; padding-top: 20px;">
+          <h3 style="font-size: 19px; margin-bottom: 5px;">Add a note to the application history</h3>
+          <div style="font-size: 14px; color: #505a5f; margin-bottom: 10px;">This information is for internal use only</div>
+          <form action="/v6/application/{{ reference }}/add-note" method="POST">
+            <textarea name="note" style="width: 100%; height: 120px; border: 1px solid #0b0c0c; padding: 10px; font-family: inherit; box-sizing: border-box;"></textarea>
+            <button type="submit" style="background: #00703c; color: white; border: none; padding: 10px 20px; font-weight: bold; margin-top: 10px; cursor: pointer;">Add to application history</button>
+          </form>
+        </div>
+      </section>
+
+    </div>
+  </div>
+</div>
+{% endblock %}

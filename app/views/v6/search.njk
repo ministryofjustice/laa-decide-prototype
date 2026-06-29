@@ -1,0 +1,208 @@
+{% extends "govuk/template.njk" %}
+
+{% from "govuk/components/header/macro.njk" import govukHeader %}
+{% from "moj/components/primary-navigation/macro.njk" import mojPrimaryNavigation %}
+{% from "govuk/components/phase-banner/macro.njk" import govukPhaseBanner %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/date-input/macro.njk" import govukDateInput %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+{% block head %}
+  <link href="/public/stylesheets/application.css" rel="stylesheet">
+  <style>
+    .moj-primary-navigation__item:first-child .moj-primary-navigation__link { color: #0b0c0c; }
+    .moj-primary-navigation__item:first-child .moj-primary-navigation__link:hover { color: #0b0c0c; }
+  </style>
+{% endblock %}
+
+{% block header %}
+  {{ govukHeader({
+    homepageUrl: "#",
+    productName: "Legal Aid Agency",
+    navigationClasses: "govuk-header__navigation--end",
+    navigation: [
+      {
+        href: "#",
+        text: "jonaan.barton@law.com"
+      },
+      {
+        href: "#",
+        text: "Sign out"
+      }
+    ]
+  }) }}
+
+  {{ mojPrimaryNavigation({
+    label: 'Primary navigation',
+    items: [
+      {
+        text: 'Decide if an applicant can get legal aid',
+        href: '#'
+      },
+      {
+        text: 'Open applications',
+        href: '/open-applications'
+      },
+      {
+        text: 'Your list',
+        href: '#'
+      },
+      {
+        text: 'Search',
+        href: '/search',
+        active: true
+      }
+    ]
+  }) }}
+{% endblock %}
+
+{% block beforeContent %}
+  {{ govukPhaseBanner({
+    tag: {
+      text: "Beta"
+    },
+    html: 'This is a new service – your <a class="govuk-link" href="#">feedback</a> will help us to improve it.'
+  }) }}
+  {{ govukBackLink({
+    text: "Back",
+    href: "#"
+  }) }}
+{% endblock %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      
+      <h1 class="govuk-heading-xl govuk-!-margin-bottom-4">Search for a case</h1>
+      <p class="govuk-body govuk-!-margin-bottom-6" style="color: #505a5f;">You must complete at least one field to search.</p>
+
+      <form action="/v6/search" method="GET">
+        <div class="govuk-!-padding-6" style="background-color: #f3f2f1;">
+          
+          {{ govukInput({
+            label: {
+              text: "Reference number",
+              classes: "govuk-label--s"
+            },
+            hint: {
+              text: "Reference number for example L-W1X-Y2Z"
+            },
+            id: "reference-number",
+            name: "reference",
+            value: query.reference,
+            classes: "govuk-!-width-two-thirds"
+          }) }}
+
+          {{ govukInput({
+            label: {
+              text: "Applicant’s first name",
+              classes: "govuk-label--s"
+            },
+            id: "first-name",
+            name: "firstName",
+            value: query.firstName,
+            classes: "govuk-!-width-two-thirds"
+          }) }}
+
+          {{ govukInput({
+            label: {
+              text: "Applicant’s last name",
+              classes: "govuk-label--s"
+            },
+            id: "last-name",
+            name: "lastName",
+            value: query.lastName,
+            classes: "govuk-!-width-two-thirds"
+          }) }}
+
+          {{ govukDateInput({
+            id: "dob",
+            namePrefix: "dob",
+            fieldset: {
+              legend: {
+                text: "Applicant’s date of birth",
+                classes: "govuk-fieldset__legend--s"
+              }
+            },
+            hint: {
+              text: "For example, 17/5/2024."
+            },
+            items: [
+              {
+                name: "day",
+                value: query['dob-day'],
+                classes: "govuk-input--width-2"
+              },
+              {
+                name: "month",
+                value: query['dob-month'],
+                classes: "govuk-input--width-2"
+              },
+              {
+                name: "year",
+                value: query['dob-year'],
+                classes: "govuk-input--width-4"
+              }
+            ]
+          }) }}
+
+          <div class="govuk-button-group govuk-!-margin-top-6">
+            {{ govukButton({
+              text: "Search"
+            }) }}
+            <a class="govuk-link" href="/v6/search">Clear</a>
+          </div>
+
+        </div>
+      </form>
+
+      {% if showResults %}
+        <h2 class="govuk-heading-m govuk-!-margin-top-8">{{ resultCount }} search result{{ "s" if resultCount != 1 else "" }}</h2>
+
+        {% if resultCount > 0 %}
+          <table class="govuk-table govuk-!-font-size-16">
+            <thead class="govuk-table__head">
+              <tr class="govuk-table__row">
+                <th scope="col" class="govuk-table__header">Reference</th>
+                <th scope="col" class="govuk-table__header">First name's</th>
+                <th scope="col" class="govuk-table__header">Last name</th>
+                <th scope="col" class="govuk-table__header">Date of birth</th>
+                <th scope="col" class="govuk-table__header">Submitted</th>
+                <th scope="col" class="govuk-table__header">Firm name & number</th>
+                <th scope="col" class="govuk-table__header">Outcome</th>
+              </tr>
+            </thead>
+            <tbody class="govuk-table__body">
+              {% for row in results %}
+                <tr class="govuk-table__row">
+                  <td class="govuk-table__cell"><a href="/v6/application/{{ row.ref }}" class="govuk-link">{{ row.ref }}</a></td>
+                  <td class="govuk-table__cell">{{ row.firstName }}</td>
+                  <td class="govuk-table__cell">{{ row.lastName }}</td>
+                  <td class="govuk-table__cell">{{ row.dob }}</td>
+                  <td class="govuk-table__cell">{{ row.submitted }}</td>
+                  <td class="govuk-table__cell">{{ row.firm | safe }}</td>
+                  <td class="govuk-table__cell"><strong class="govuk-tag govuk-tag--{{ row.outcomeClass }}">{{ row.outcome }}</strong></td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        {% else %}
+          <p class="govuk-body">No results found for your search.</p>
+        {% endif %}
+      {% endif %}
+
+    </div>
+  </div>
+{% endblock %}
+
+{% block bodyEnd %}
+  <script src="/plugin-assets/govuk-prototype-kit/lib/assets/javascripts/kit.js"></script>
+  <script src="/plugin-assets/govuk-prototype-kit/lib/assets/javascripts/auto-store-data.js"></script>
+  <script type="module" src="/plugin-assets/govuk-frontend/dist/govuk/govuk-frontend.min.js"></script>
+  <script type="module" src="/plugin-assets/govuk-frontend/dist/govuk-prototype-kit/init.js"></script>
+  <script type="module" src="/plugin-assets/%40ministryofjustice%2Ffrontend/moj/moj-frontend.min.js"></script>
+  <script type="module" src="/plugin-assets/%40ministryofjustice%2Ffrontend/moj/init.js"></script>
+  <script src="/plugin-assets/jquery/dist/jquery.js"></script>
+  <script type="module" src="/public/javascripts/application.js"></script>
+{% endblock %}
