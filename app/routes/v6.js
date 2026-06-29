@@ -416,7 +416,6 @@ function generateRandomDate() {
 function generateMockApplications(count = 8) {
   const applications = [];
   const generatedRefs = new Set();
-  const delegatedOptions = ['Used', 'Not used'];
   const priorAuthorityTypes = ['Expert (Psychiatrist)', 'Expert (Physiotherapist)', 'Counsel', 'King\'s Counsel'];
   
   for (let i = 0; i < count; i++) {
@@ -433,7 +432,7 @@ function generateMockApplications(count = 8) {
     const outcomeClasses = { 'In progress': 'light-blue', 'Submitted': 'purple', 'Returned': 'turquoise' };
     const submittedDate = generateRandomDate();
     
-    // Create the initial application
+    // Create the initial application - delegated functions are always "Used"
     applications.push({
       ref: ref,
       reference: ref,
@@ -445,12 +444,12 @@ function generateMockApplications(count = 8) {
       outcome: outcome,
       outcomeClass: outcomeClasses[outcome],
       type: 'Initial application',
-      delegatedFunctions: delegatedOptions[Math.floor(Math.random() * delegatedOptions.length)],
+      delegatedFunctions: 'Used',
       matterType: { title: 'Family', subtext: 'Special Children\'s Act' },
       isPriorAuthority: false
     });
     
-    // Randomly add 1-2 prior authority sub-applications for the same reference
+    // Randomly add 1-2 prior authority sub-applications for the same reference - delegated functions are N/A
     if (Math.random() > 0.5) {
       const numPriorAuth = Math.random() > 0.6 ? 2 : 1;
       for (let j = 0; j < numPriorAuth; j++) {
@@ -466,7 +465,7 @@ function generateMockApplications(count = 8) {
           outcomeClass: outcomeClasses[outcome],
           type: 'Prior authority',
           priorAuthorityType: priorAuthorityTypes[Math.floor(Math.random() * priorAuthorityTypes.length)],
-          delegatedFunctions: delegatedOptions[Math.floor(Math.random() * delegatedOptions.length)],
+          delegatedFunctions: 'N/A',
           matterType: { title: 'Family', subtext: 'Special Children\'s Act' },
           isPriorAuthority: true
         });
@@ -483,18 +482,92 @@ router.get('/open-applications', function(req, res) {
   }
   
   // Always regenerate open applications on each request to ensure prior authority apps appear
-  req.session.data['open-applications'] = generateMockApplications(8);
+  let applications = generateMockApplications(8);
   
   // Restore any stored decisions from decision-store
   if (req.session.data['decision-store']) {
-    req.session.data['open-applications'].forEach(app => {
+    applications.forEach(app => {
       restoreDecisionData(app, req.session.data['decision-store']);
     });
   }
   
+  // Apply filters based on query parameters
+  const { applicationType, matterType, categories } = req.query;
+  
+  let filteredApps = applications;
+  
+  console.log('Query params:', req.query);
+  
+  // Filter by application type
+  if (applicationType) {
+    console.log('Filtering by applicationType');
+    let selectedTypes = Array.isArray(applicationType) ? applicationType : [applicationType];
+    // Remove _unchecked values
+    selectedTypes = selectedTypes.filter(t => t !== '_unchecked');
+    console.log('selectedTypes after filter:', selectedTypes);
+    
+    if (selectedTypes.length > 0) {
+      filteredApps = filteredApps.filter(app => {
+        for (let type of selectedTypes) {
+          if (type === 'initial' && !app.isPriorAuthority) return true;
+          if (type === 'prior' && app.isPriorAuthority) return true;
+        }
+        return false;
+      });
+      console.log('After applicationType filter:', filteredApps.length);
+    }
+  }
+  
+  // Filter by matter type
+  if (matterType) {
+    console.log('Filtering by matterType');
+    let selectedMatters = Array.isArray(matterType) ? matterType : [matterType];
+    // Remove _unchecked values
+    selectedMatters = selectedMatters.filter(m => m !== '_unchecked');
+    console.log('selectedMatters after filter:', selectedMatters);
+    
+    if (selectedMatters.length > 0) {
+      filteredApps = filteredApps.filter(app => {
+        for (let matter of selectedMatters) {
+          if (matter === 'sca' && app.matterType.title === 'Family') return true;
+        }
+        return false;
+      });
+      console.log('After matterType filter:', filteredApps.length);
+    }
+  }
+  
+  // Filter by categories (for prior authority applications only)
+  if (categories) {
+    console.log('Filtering by categories');
+    let selectedCategories = Array.isArray(categories) ? categories : [categories];
+    // Remove _unchecked values
+    selectedCategories = selectedCategories.filter(c => c !== '_unchecked');
+    console.log('selectedCategories after filter:', selectedCategories);
+    
+    if (selectedCategories.length > 0) {
+      filteredApps = filteredApps.filter(app => {
+        if (!app.isPriorAuthority) return true; // Pass through non-prior-authority apps
+        
+        for (let cat of selectedCategories) {
+          if (cat === 'expert' && app.priorAuthorityType && app.priorAuthorityType.includes('Expert')) return true;
+          if (cat === 'junior-counsel' && app.priorAuthorityType && app.priorAuthorityType.includes('Counsel')) return true;
+          if (cat === 'expenses' && app.priorAuthorityType && app.priorAuthorityType.includes('expenses')) return true;
+        }
+        return false;
+      });
+      console.log('After categories filter:', filteredApps.length);
+    }
+  }
+  
+  console.log('Final filtered apps:', filteredApps.length);
+  
+  req.session.data['open-applications'] = filteredApps;
+  
   res.render('v6/open-applications.njk', { 
     pageTitle: 'Open applications',
-    applications: req.session.data['open-applications']
+    applications: filteredApps,
+    query: req.query
   });
 });
 

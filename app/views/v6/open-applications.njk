@@ -4,13 +4,42 @@
 {% from "govuk/components/phase-banner/macro.njk" import govukPhaseBanner %}
 {% from "govuk/components/back-link/macro.njk" import govukBackLink %}
 {% from "govuk/components/table/macro.njk" import govukTable %}
+{% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
 {% from "moj/components/primary-navigation/macro.njk" import mojPrimaryNavigation %}
+{% from "moj/components/filter/macro.njk" import mojFilter %}
 
 {% block head %}
   <link href="/public/stylesheets/application.css" rel="stylesheet">
   <style>
     .moj-primary-navigation__item:first-child .moj-primary-navigation__link { color: #0b0c0c; }
     .moj-primary-navigation__item:first-child .moj-primary-navigation__link:hover { color: #0b0c0c; }
+    .moj-filter-layout {
+      display: flex;
+      gap: 0px;
+    }
+    .moj-filter-layout__filter {
+      width: 130px;
+      flex-shrink: 0;
+      overflow-y: scroll;
+      max-height: none;
+      scrollbar-width: none;
+      margin-right: 20px;
+    }
+    .moj-filter-layout__filter::-webkit-scrollbar {
+      display: none;
+    }
+    .moj-filter-layout__content {
+      flex: 1;
+      min-width: 0;
+      overflow-x: auto;
+    }
+    .moj-filter__selected:not(:has(.moj-filter-tags))::after {
+      content: "No filters selected";
+      display: block;
+      font-family: "GDS Transport", arial, sans-serif;
+      font-size: 19px;
+      margin-top: 15px;
+    }
   </style>
 {% endblock %}
 
@@ -67,67 +96,235 @@
 
 {% block content %}
   <div class="govuk-grid-row">
-    <div class="govuk-grid-column-full" style="width: 70%;">
+    <div class="govuk-grid-column-full">
       
       <div id="toast-notification"></div>
       
       <h1 class="govuk-heading-xl govuk-!-margin-bottom-6">Open applications</h1>
 
-      {% if applications and applications.length > 0 %}
-        <table class="govuk-table moj-sortable-table" data-module="moj-sortable-table">
-          <thead class="govuk-table__head">
-            <tr class="govuk-table__row">
-              <th scope="col" class="govuk-table__header">Reference</th>
-              <th scope="col" class="govuk-table__header" aria-sort="none" data-sort-type="date">Submitted</th>
-              <th scope="col" class="govuk-table__header" aria-sort="none" data-sort-type="date">Last updated</th>
-              <th scope="col" class="govuk-table__header">Type</th>
-              <th scope="col" class="govuk-table__header" aria-sort="none">Delegated Functions</th>
-              <th scope="col" class="govuk-table__header" aria-sort="none">Matter type</th>
-              <th scope="col" class="govuk-table__header">Actions</th>
-            </tr>
-          </thead>
-          <tbody class="govuk-table__body">
-            {% for application in applications %}
-              <tr class="govuk-table__row">
-                <td class="govuk-table__cell">
-                  <a href="/v6/application/{{ application.ref }}{% if application.isPriorAuthority %}#prior-authority{% endif %}" class="govuk-link">
-                    {{ application.ref }}
-                  </a>
-                </td>
-                <td class="govuk-table__cell" data-sort-value="{{ application.submitted | replace(' ', '') }}">
-                  {{ application.submitted }}
-                </td>
-                <td class="govuk-table__cell" data-sort-value="{{ application.submitted | replace(' ', '') }}">
-                  {{ application.submitted }}
-                </td>
-                <td class="govuk-table__cell">
-                  {% if application.isPriorAuthority %}
-                    Prior authority<br><strong>{{ application.priorAuthorityType }}</strong>
-                  {% else %}
-                    Initial application
-                  {% endif %}
-                </td>
-                <td class="govuk-table__cell">
-                  {{ application.delegatedFunctions }}
-                </td>
-                <td class="govuk-table__cell">
-                  <strong>{{ application.matterType.title }}</strong><br>{{ application.matterType.subtext }}
-                </td>
-                <td class="govuk-table__cell">
-                  <a href="#" class="govuk-link add-to-list" data-ref="{{ application.ref }}">Add</a>
-                </td>
-              </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-      {% else %}
-        <p class="govuk-body">You have no applications in your list.</p>
-      {% endif %}
+      {% set filterOptionsHtml %}
+        <div class="govuk-form-group">
+          <label class="govuk-label govuk-!-font-weight-bold" for="date-submitted">Date submitted</label>
+          <input class="govuk-input" id="date-submitted" name="date-submitted" type="date">
+        </div>
 
+        <div class="govuk-form-group">
+          <label class="govuk-label govuk-!-font-weight-bold" for="date-last-updated">Date last updated</label>
+          <input class="govuk-input" id="date-last-updated" name="date-last-updated" type="date">
+        </div>
+
+        {{ govukCheckboxes({
+          idPrefix: "application-type",
+          name: "applicationType",
+          classes: "govuk-checkboxes--small",
+          fieldset: {
+            legend: { text: "Application type", classes: "govuk-fieldset__legend--s govuk-!-font-weight-bold" }
+          },
+          items: [
+            { value: "initial", text: "Initial application", checked: query.applicationType and ("initial" in query.applicationType) },
+            { value: "prior", text: "Prior authority", checked: query.applicationType and ("prior" in query.applicationType) }
+          ]
+        }) }}
+
+        {{ govukCheckboxes({
+          idPrefix: "matter-type",
+          name: "matterType",
+          classes: "govuk-checkboxes--small",
+          fieldset: {
+            legend: { text: "Matter type", classes: "govuk-fieldset__legend--s govuk-!-font-weight-bold" }
+          },
+          items: [
+            { value: "sca", text: "Special Children's Act", checked: query.matterType and ("sca" in query.matterType) }
+          ]
+        }) }}
+
+        {{ govukCheckboxes({
+          idPrefix: "categories",
+          name: "categories",
+          classes: "govuk-checkboxes--small",
+          fieldset: {
+            legend: { text: "Categories", classes: "govuk-fieldset__legend--s govuk-!-font-weight-bold" }
+          },
+          items: [
+            { value: "expert", text: "Expert", checked: query.categories and ("expert" in query.categories) },
+            { value: "junior-counsel", text: "Junior counsel", checked: query.categories and ("junior-counsel" in query.categories) },
+            { value: "expenses", text: "Expenses", checked: query.categories and ("expenses" in query.categories) }
+          ]
+        }) }}
+      {% endset %}
+
+      <div class="moj-filter-layout">
+        <div class="moj-filter-layout__filter" id="filter-panel">
+          <form method="GET" action="/v6/open-applications">
+            {{ mojFilter({
+              heading: { text: 'Filter' },
+              selectedFilters: {
+                heading: { text: 'Selected filters' },
+                clearLink: { text: 'Clear filters', href: '/v6/open-applications' },
+                categories: []
+              },
+              optionsHtml: filterOptionsHtml
+            }) }}
+          </form>
+        </div>
+
+        <div class="moj-filter-layout__content">
+          <div class="moj-action-bar">
+            <div class="moj-action-bar__filter">
+              <button class="govuk-button govuk-button--secondary" id="custom-filter-toggle">Show filter</button>
+            </div>
+          </div>
+
+          {% if applications and applications.length > 0 %}
+            <table class="govuk-table moj-sortable-table" data-module="moj-sortable-table">
+              <thead class="govuk-table__head">
+                <tr class="govuk-table__row">
+                  <th scope="col" class="govuk-table__header">Reference</th>
+                  <th scope="col" class="govuk-table__header" aria-sort="none" data-sort-type="date">Submitted</th>
+                  <th scope="col" class="govuk-table__header" aria-sort="none" data-sort-type="date">Last updated</th>
+                  <th scope="col" class="govuk-table__header">Type</th>
+                  <th scope="col" class="govuk-table__header" aria-sort="none">Delegated Functions</th>
+                  <th scope="col" class="govuk-table__header" aria-sort="none">Matter type</th>
+                  <th scope="col" class="govuk-table__header">Actions</th>
+                </tr>
+              </thead>
+              <tbody class="govuk-table__body">
+                {% for app in applications %}
+                  <tr class="govuk-table__row">
+                    <td class="govuk-table__cell">
+                      <a href="/v6/application/{{ app.ref }}{% if app.isPriorAuthority %}#prior-authority{% endif %}" class="govuk-link">
+                        {{ app.ref }}
+                      </a>
+                    </td>
+                    <td class="govuk-table__cell" data-sort-value="{{ app.submitted | replace(' ', '') }}">
+                      {{ app.submitted }}
+                    </td>
+                    <td class="govuk-table__cell" data-sort-value="{{ app.submitted | replace(' ', '') }}">
+                      {{ app.submitted }}
+                    </td>
+                    <td class="govuk-table__cell">
+                      {% if app.isPriorAuthority %}
+                        Prior authority<br><strong>{{ app.priorAuthorityType }}</strong>
+                      {% else %}
+                        Initial application
+                      {% endif %}
+                    </td>
+                    <td class="govuk-table__cell">
+                      {{ app.delegatedFunctions }}
+                    </td>
+                    <td class="govuk-table__cell">
+                      <strong>{{ app.matterType.title }}</strong><br>{{ app.matterType.subtext }}
+                    </td>
+                    <td class="govuk-table__cell">
+                      <a href="#" class="govuk-link add-to-list" data-ref="{{ app.ref }}">Add</a>
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          {% else %}
+            <p class="govuk-body">No open applications found.</p>
+          {% endif %}
+        </div>
+      </div>
     </div>
   </div>
 
   <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const toggleBtn = document.getElementById('custom-filter-toggle');
+      const filterPanel = document.getElementById('filter-panel');
+      const hasFilters = window.location.search.length > 0;
+
+      // Default state: Keep open if filters were just applied
+      if (hasFilters) {
+        filterPanel.style.display = 'block';
+        toggleBtn.textContent = 'Hide filter';
+      } else {
+        filterPanel.style.display = 'none';
+        toggleBtn.textContent = 'Show filter';
+      }
+
+      toggleBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        if (filterPanel.style.display === 'none') {
+          filterPanel.style.display = 'block';
+          toggleBtn.textContent = 'Hide filter';
+        } else {
+          filterPanel.style.display = 'none';
+          toggleBtn.textContent = 'Show filter';
+        }
+      });
+
+      // Display filter chips in the filter panel
+      const filterLabels = {
+        'initial': 'Initial application',
+        'prior': 'Prior authority',
+        'sca': "Special Children's Act",
+        'expert': 'Expert',
+        'junior-counsel': 'Junior counsel',
+        'expenses': 'Expenses'
+      };
+
+      // Populate chips from query parameters in the moj-filter__selected section
+      const queryParams = new URLSearchParams(window.location.search);
+      const selectedFiltersSection = filterPanel.querySelector('.moj-filter__selected');
+      
+      if (selectedFiltersSection) {
+        const chipsContainer = selectedFiltersSection.querySelector('.moj-filter-tags');
+        if (chipsContainer) {
+          // Clear existing chips
+          chipsContainer.innerHTML = '';
+          
+          queryParams.forEach((value, key) => {
+            if (key === 'applicationType' || key === 'matterType' || key === 'categories') {
+              const values = value.split(',').filter(v => v);
+              values.forEach(val => {
+                const label = filterLabels[val] || val;
+                const chip = document.createElement('span');
+                chip.className = 'moj-filter-tags__item';
+                chip.innerHTML = `
+                  <strong class="moj-filter-tags__label">${label}</strong>
+                  <a href="#" class="moj-filter-tags__remove" data-filter="${key}" data-value="${val}" aria-label="Remove ${label}">✕</a>
+                `;
+                chipsContainer.appendChild(chip);
+              });
+            }
+          });
+
+          // Handle removing individual chips
+          chipsContainer.querySelectorAll('.moj-filter-tags__remove').forEach(removeBtn => {
+            removeBtn.addEventListener('click', function(e) {
+              e.preventDefault();
+              const filterKey = this.getAttribute('data-filter');
+              const filterValue = this.getAttribute('data-value');
+              
+              // Uncheck the corresponding checkbox
+              const checkbox = filterPanel.querySelector(`input[name="${filterKey}"][value="${filterValue}"]`);
+              if (checkbox) {
+                checkbox.checked = false;
+              }
+            });
+          });
+        }
+      }
+
+      // Handle "Clear filters" - keep panel open but clear selections
+      const clearLinks = filterPanel.querySelectorAll('a[href*="/v6/open-applications"]');
+      clearLinks.forEach(link => {
+        if (link.textContent.includes('Clear')) {
+          link.addEventListener('click', function(e) {
+            e.preventDefault();
+            // Uncheck all checkboxes
+            const checkboxes = filterPanel.querySelectorAll('input[type="checkbox"]');
+            checkboxes.forEach(cb => cb.checked = false);
+            // Navigate to clean URL
+            window.location.href = '/v6/open-applications';
+          });
+        }
+      });
+    });
+
     // Handle "Add" link clicks for adding applications to list
     document.querySelectorAll('.add-to-list').forEach(link => {
       link.addEventListener('click', function(e) {
