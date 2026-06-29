@@ -169,15 +169,14 @@ router.post('/refuse-decision-submit', function(request, response) {
         const justification = request.session.data['refuse-justification'] || '';
         
         request.session.data['app-history'][decisionReference].push({
-            datetime: datetime,
-            title: 'Initial application refused',
+            timestamp: datetime,
+            action: 'Initial application refused',
             caseworker: caseworker,
             changes: {
               From: 'Submitted',
               To: 'Refused'
             },
-            expandedText: justification || null,
-            notes: justification || null,
+            details: justification || null,
             versionLink: '/v6/application/' + decisionReference
         })
         
@@ -252,8 +251,8 @@ router.post('/check-answers-submit', function(request, response) {
           const certDate = request.session.data['cert-date-display'] || '';
           
           request.session.data['app-history'][decisionReference].push({
-              datetime: datetime,
-              title: 'Initial application granted',
+              timestamp: datetime,
+              action: 'Initial application granted',
               caseworker: caseworker,
               changes: {
                 From: 'Submitted',
@@ -676,9 +675,10 @@ router.get('/add-application/:reference', function(req, res) {
     
     // Log: Application assigned to caseworker (when they add it)
     req.session.data['app-history'][ref].push({
-      datetime: datetime,
-      title: 'Application assigned to ' + assignedCaseworker,
-      caseworker: assignedCaseworker
+      timestamp: datetime,
+      action: 'Application assigned to ' + assignedCaseworker,
+      caseworker: assignedCaseworker,
+      details: null
     });
   }
   
@@ -701,8 +701,47 @@ router.get('/remove-application/:reference', function(req, res) {
 
 router.get('/application/:reference/history', function(req, res) {
   const ref = req.params.reference;
+  
+  // Initialize history if it doesn't exist
+  if (!req.session.data['app-history']) {
+    req.session.data['app-history'] = {};
+  }
+  
+  if (!req.session.data['app-history'][ref] || req.session.data['app-history'][ref].length === 0 || 
+      (req.session.data['app-history'][ref].length > 0 && !req.session.data['app-history'][ref][0].action)) {
+    
+    req.session.data['app-history'][ref] = [];
+    
+    // Add initial application received entry
+    let submittedDate = 'N/A';
+    
+    if (req.session.data['open-applications']) {
+      const openApp = req.session.data['open-applications'].find(app => app.ref === ref);
+      if (openApp && openApp.submitted) {
+        submittedDate = openApp.submitted;
+      }
+    }
+    
+    if (submittedDate === 'N/A') {
+      const now = new Date();
+      submittedDate = now.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+    }
+    
+    const randomHour = Math.floor(Math.random() * 24);
+    const randomMin = Math.floor(Math.random() * 60);
+    const timeStr = String(randomHour).padStart(2, '0') + ':' + String(randomMin).padStart(2, '0');
+    const datetime = submittedDate + ' ' + timeStr;
+    
+    req.session.data['app-history'][ref].push({
+      timestamp: datetime,
+      action: 'Initial application received',
+      caseworker: 'N/A',
+      details: null
+    });
+  }
+  
   const assignedApp = req.session.data['assigned-applications'] ? req.session.data['assigned-applications'].find(app => app.ref === ref) : null;
-  const history = req.session.data['app-history'] && req.session.data['app-history'][ref] ? req.session.data['app-history'][ref] : [];
+  const history = req.session.data['app-history'][ref] || [];
   
   res.render('v6/application-history.html', {
     reference: ref,
@@ -919,7 +958,7 @@ router.get('/application/:reference', function(req, res) {
   
   // Ensure the history entry exists and has the correct format
   if (!req.session.data['app-history'][reference] || req.session.data['app-history'][reference].length === 0 || 
-      (req.session.data['app-history'][reference].length > 0 && !req.session.data['app-history'][reference][0].title)) {
+      (req.session.data['app-history'][reference].length > 0 && !req.session.data['app-history'][reference][0].action)) {
     
     // Clear and initialize
     req.session.data['app-history'][reference] = [];
@@ -950,10 +989,10 @@ router.get('/application/:reference', function(req, res) {
     const datetime = submittedDate + ' ' + timeStr;
     
     req.session.data['app-history'][reference].push({
-      datetime: datetime,
-      title: 'Initial application received',
+      timestamp: datetime,
+      action: 'Initial application received',
       caseworker: 'N/A',
-      versionLink: '/v6/application/' + reference
+      details: null
     });
   }
   
@@ -965,14 +1004,15 @@ router.get('/application/:reference', function(req, res) {
   let historyEvents = [];
   if (req.session.data['app-history'] && req.session.data['app-history'][reference]) {
     historyEvents = req.session.data['app-history'][reference].map((event, index) => {
+      const action = event.action || event.title;
       return {
-        datetime: event.datetime,
+        datetime: event.timestamp || event.datetime,
         caseworker: event.caseworker,
-        title: event.title,
-        versionLink: event.versionLink ? event.versionLink + '?viewVersion=' + index : null,
+        title: action,
+        versionLink: `/v6/application/${reference}?viewVersion=${index}`,
         changes: event.changes || null,
         notes: event.notes || null,
-        justification: event.expandedText || event.justification || null,
+        justification: event.expandedText || event.justification || event.details || null,
         oldValue: event.oldValue || null,
         newValue: event.newValue || null
       };
@@ -1136,13 +1176,10 @@ router.post('/change/:reference/:field/confirm', function(req, res) {
   const caseworker = application?.caseworker || 'Mo Bradshaw';
   
   req.session.data['app-history'][reference].push({
-    datetime: datetime,
-    title: `${displayField} updated`,
+    timestamp: datetime,
+    action: `${displayField} updated`,
     caseworker: caseworker,
-    oldValue: oldValue,
-    newValue: newValue,
-    justification: justification || null,
-    versionLink: `/v6/application/${reference}`
+    details: justification || null
   });
   
   // Clear change session data
