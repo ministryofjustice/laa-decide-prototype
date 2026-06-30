@@ -46,12 +46,17 @@ Application history - {{ reference }}
                 <td style="padding: 15px 12px; border: 1px solid #b1b4b6; vertical-align: top;">
                   <strong>{{ event.action }}</strong>
                   {% if event.details %}
+                    <div style="margin-top: 8px; color: #505a5f; line-height: 1.5; white-space: pre-wrap;">
+                      {{ event.details }}
+                    </div>
+                  {% endif %}
+                  {% if event.justification %}
                     <details style="margin-top: 8px;">
                       <summary style="color: #1d70b8; cursor: pointer; font-weight: normal; outline: none;">
                         Expand
                       </summary>
                       <div style="margin-top: 8px; padding: 10px; background-color: #ffffff; border: 1px solid #b1b4b6; color: #505a5f; line-height: 1.5;">
-                        {{ event.details }}
+                        {{ event.justification }}
                       </div>
                     </details>
                   {% endif %}
