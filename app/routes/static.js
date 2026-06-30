@@ -28,12 +28,12 @@ function requireAuth(req, res, next) {
   if (req.session.data && req.session.data['static-authenticated']) {
     next();
   } else {
-    res.redirect('/static/password');
+    res.redirect('/static/');
   }
 }
 
-// Password page
-router.get('/password', function(req, res) {
+// Default root route - shows password form
+router.get('/', function(req, res) {
   res.render('static/password.njk', { 
     pageTitle: 'Enter password',
     errorMessage: req.session.data && req.session.data['static-password-error'] ? req.session.data['static-password-error'] : null
@@ -61,7 +61,7 @@ router.post('/password-submit', function(req, res) {
       req.session.data = {};
     }
     req.session.data['static-password-error'] = 'Incorrect password';
-    res.redirect('/static/password');
+    res.redirect('/static/');
   }
 });
 
@@ -69,15 +69,10 @@ router.post('/password-submit', function(req, res) {
 router.get('/index', function(req, res) {
   // Check authentication
   if (!req.session.data || !req.session.data['static-authenticated']) {
-    res.redirect('/static/password');
+    res.redirect('/static/');
     return;
   }
   res.render('static/index.njk', { pageTitle: 'Civil Decide prototype' });
-});
-
-// Default root route - redirect to password
-router.get('/', function(req, res) {
-  res.redirect('/static/password');
 });
 
 // add an item to the application history
