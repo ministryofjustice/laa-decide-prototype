@@ -492,6 +492,20 @@ const SEEDED_APPLICATIONS = [
     matterType: { title: 'Family', subtext: "Special Children's Act" },
     isPriorAuthority: true,
     priorAuthorityType: 'Expert - Psychiatrist'
+  },
+  {
+    ref: 'L-REFUS-ED1A',
+    firstName: 'Patricia',
+    lastName: 'Lynch',
+    dob: '15 May 1987',
+    submitted: '15 Feb 2026',
+    firm: 'Morrison & Associates<br>OK234T',
+    status: 'Refused',
+    decisionType: 'Refuse',
+    type: 'Initial application',
+    delegatedFunctions: 'N/A',
+    matterType: { title: 'Family', subtext: 'Divorce' },
+    isPriorAuthority: false
   }
 ];
 
@@ -519,6 +533,18 @@ const SEEDED_HISTORY = {
     { timestamp: '14 Mar 2026 09:15', action: 'Amendment assigned to Emma Wilson', caseworker: 'Emma Wilson', details: null },
     { timestamp: '22 Mar 2026 16:30', action: 'Amendment refused', caseworker: 'Emma Wilson', details: null, justification: 'The amendment request has been refused. The additional proceedings relating to contact arrangements do not meet the merits criteria required for an extension of scope. The existing certificate adequately covers the current proceedings and there is insufficient evidence to justify the requested extension at this stage.' },
     { timestamp: '01 Apr 2026 11:45', action: 'Appeal received', caseworker: 'N/A', details: null }
+  ],
+  'L-REFUS-ED1A': [
+    { timestamp: '15 Feb 2026 10:05', action: 'Initial application received', caseworker: 'N/A', details: null },
+    { timestamp: '15 Feb 2026 10:06', action: 'Caseworker note added', caseworker: 'Client Services', details: 'Client called to ask what would happen next. Advised on the process and expected timescales.' },
+    { timestamp: '16 Feb 2026 11:30', action: 'Application assigned to Jonathan Lee', caseworker: 'Jonathan Lee', details: null },
+    { timestamp: '24 Feb 2026 14:15', action: 'Initial application refused', caseworker: 'Jonathan Lee', details: null, justification: 'The application does not meet the merits criteria required for civil legal aid. The client\'s prospects of success have been assessed as below 50%. While the client\'s financial circumstances fall within the means assessment criteria, the weakness of the legal case prevents grant at this stage.' },
+    { timestamp: '28 Feb 2026 09:20', action: 'Appeal received', caseworker: 'N/A', details: null },
+    { timestamp: '01 Mar 2026 10:00', action: 'Appeal assigned to Michelle Foster', caseworker: 'Michelle Foster', details: null },
+    { timestamp: '12 Mar 2026 16:45', action: 'Appeal granted', caseworker: 'Michelle Foster', details: null, justification: 'The appeal has been allowed. Upon reconsideration of the evidence provided, the prospects of success have been reassessed as exceeding 50%. The client\'s legal position is stronger than initially assessed. Certificate issued for the scope of proceedings relating to the divorce and ancillary relief.' },
+    { timestamp: '18 Mar 2026 11:10', action: 'Amendment received', caseworker: 'N/A', details: null, justification: 'The provider has submitted an amendment request to extend the scope to include proceedings relating to child arrangements. Additional evidence supporting the urgency and necessity of the extension has been provided.' },
+    { timestamp: '20 Mar 2026 09:30', action: 'Amendment assigned to Sophie Harris', caseworker: 'Sophie Harris', details: null },
+    { timestamp: '28 Mar 2026 15:20', action: 'Amendment granted', caseworker: 'Sophie Harris', details: null, justification: 'The amendment request has been approved. The extension to cover child arrangements proceedings is justified given the interrelationship with the divorce proceedings and the welfare considerations involved. Certificate extended to cover the additional proceedings.' }
   ]
 };
 
