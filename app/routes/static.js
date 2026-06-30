@@ -20,6 +20,66 @@ function restoreDecisionData(application, decisionStore) {
   }
 }
 
+// Password for accessing the prototype
+const PROTOTYPE_PASSWORD = 'prototype';
+
+// Authentication middleware
+function requireAuth(req, res, next) {
+  if (req.session.data && req.session.data['static-authenticated']) {
+    next();
+  } else {
+    res.redirect('/static/password');
+  }
+}
+
+// Password page
+router.get('/password', function(req, res) {
+  res.render('static/password.njk', { 
+    pageTitle: 'Enter password',
+    errorMessage: req.session.data && req.session.data['static-password-error'] ? req.session.data['static-password-error'] : null
+  });
+  // Clear error after displaying
+  if (req.session.data) {
+    delete req.session.data['static-password-error'];
+  }
+});
+
+// Password submission
+router.post('/password-submit', function(req, res) {
+  const enteredPassword = req.body.password;
+  
+  if (enteredPassword === PROTOTYPE_PASSWORD) {
+    // Store auth in session
+    if (!req.session.data) {
+      req.session.data = {};
+    }
+    req.session.data['static-authenticated'] = true;
+    res.redirect('/static/index');
+  } else {
+    // Store error and redirect back
+    if (!req.session.data) {
+      req.session.data = {};
+    }
+    req.session.data['static-password-error'] = 'Incorrect password';
+    res.redirect('/static/password');
+  }
+});
+
+// Welcome/index page - requires auth
+router.get('/index', function(req, res) {
+  // Check authentication
+  if (!req.session.data || !req.session.data['static-authenticated']) {
+    res.redirect('/static/password');
+    return;
+  }
+  res.render('static/index.njk', { pageTitle: 'Civil Decide prototype' });
+});
+
+// Default root route - redirect to password
+router.get('/', function(req, res) {
+  res.redirect('/static/password');
+});
+
 // add an item to the application history
 
 router.post('/send-back-check', function(request, response) {
