@@ -1334,15 +1334,11 @@ router.get('/application/:reference', function(req, res) {
   
   // If viewing a specific version, reconstruct the application state at that point
   let versionedApplication = application;
-  let displayedHistoryEvents = historyEvents;
   let versionedTitle = null;
   
   if (isViewingPreviousVersion && viewVersion !== null) {
     // Reconstruct application state at this version
     versionedApplication = reconstructApplicationAtVersion(application, historyArray, viewVersion);
-    
-    // Trim history events to only show up to this version
-    displayedHistoryEvents = historyEvents.slice(0, viewVersion + 1);
     
     // Get the event title for display
     if (historyArray[viewVersion]) {
@@ -1359,7 +1355,7 @@ router.get('/application/:reference', function(req, res) {
     priorAuthorityType: priorAuthorityType,
     sessionData: req.session.data,
     isAssigned: isAssigned,
-    historyEvents: displayedHistoryEvents,
+    historyEvents: historyEvents,
     isViewingPreviousVersion: isViewingPreviousVersion,
     viewVersion: viewVersion,
     versionedTitle: versionedTitle
