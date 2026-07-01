@@ -1229,8 +1229,8 @@ router.get('/application/:reference', function(req, res) {
     reference: reference,
     niNumber: `JT${nameLen}15${nameLen}B`,
     prevReference: `30000123${nameLen}`,
-    correspondenceAddress: `${nameLen} Armitage house<br>108 petty France<br>London<br>SW2 8QT`,
-    homeAddress: `${nameLen * 2} Knightsbridge place<br>117A Russell Square<br>London<br>NW3 6BD`,
+    correspondenceAddress: found.correspondenceAddress || `${nameLen} Armitage house<br>108 petty France<br>London<br>SW2 8QT`,
+    homeAddress: found.homeAddress || `${nameLen * 2} Knightsbridge place<br>117A Russell Square<br>London<br>NW3 6BD`,
     opponentName: `${found.lastName} city council`,
     children: [
       { name: `Kaylynn ${found.lastName}`, dob: `20 Dec 202${nameLen % 9}` },
