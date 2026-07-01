@@ -1382,6 +1382,7 @@ router.get('/application/:reference', function(req, res) {
   });
   
   console.log('APPLICATION REF:', application.ref, 'REFERENCE:', reference);
+});
 
 // GET /change/:reference/:field - Display change input form
 router.get('/change/:reference/:field', function(req, res) {
