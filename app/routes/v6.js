@@ -1067,12 +1067,15 @@ router.get('/search', function(req, res) {
     req.session.data['completed-applications'].push(seeded);
   });
 
-  // Always ensure seeded history is available
+  // Always ensure seeded history is available (but don't overwrite existing)
   if (!req.session.data['app-history']) {
     req.session.data['app-history'] = {};
   }
   Object.keys(SEEDED_HISTORY).forEach(ref => {
-    req.session.data['app-history'][ref] = SEEDED_HISTORY[ref];
+    // Only initialize if not already set (preserves added notes)
+    if (!req.session.data['app-history'][ref]) {
+      req.session.data['app-history'][ref] = SEEDED_HISTORY[ref];
+    }
   });
   
   if (showResults) {
@@ -1164,7 +1167,10 @@ router.get('/application/:reference', function(req, res) {
     req.session.data['app-history'] = {};
   }
   Object.keys(SEEDED_HISTORY).forEach(ref => {
-    req.session.data['app-history'][ref] = SEEDED_HISTORY[ref];
+    // Only initialize if not already set (preserves added notes)
+    if (!req.session.data['app-history'][ref]) {
+      req.session.data['app-history'][ref] = SEEDED_HISTORY[ref];
+    }
   });
   
   // Get application data from assigned, completed, or open applications
