@@ -1329,7 +1329,8 @@ router.get('/application/:reference', function(req, res) {
         versionLink: !isLastEvent ? `/v6/application/${reference}?viewVersion=${index}${tabAnchor}` : null,
         changes: event.changes || null,
         notes: event.notes || null,
-        justification: event.expandedText || event.justification || event.details || null,
+        details: event.details || null,  // Pass details separately for notes
+        justification: event.expandedText || event.justification || (event.type !== 'note' ? event.details : null) || null,
         oldValue: event.oldValue || null,
         newValue: event.newValue || null
       };
