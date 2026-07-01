@@ -558,7 +558,7 @@ const SEEDED_HISTORY = {
     // Version 0: Application received
     { timestamp: '03 Jan 2026 09:14', action: 'Application received', caseworker: 'N/A', type: 'status_change', statusAfter: 'Submitted', justification: 'Initial application submitted by provider.' },
     // Version 1: Note added
-    { timestamp: '05 Jan 2026 10:32', action: 'Caseworker note added', caseworker: 'Sarah Johnson', type: 'note', details: 'Client called to ask what would happen next. Advised on the process and expected timescales.' },
+    { timestamp: '05 Jan 2026 10:32', action: 'Note Added', caseworker: 'Sarah Johnson', type: 'note', details: 'Client called to ask what would happen next. Advised on the process and expected timescales.' },
     // Version 2: Assigned
     { timestamp: '06 Jan 2026 11:05', action: 'Application assigned to Sarah Johnson', caseworker: 'Sarah Johnson', type: 'assignment', details: null },
     // Version 3: Decision to Grant
@@ -602,7 +602,7 @@ const SEEDED_HISTORY = {
     // Version 0: Application received
     { timestamp: '15 Feb 2026 10:05', action: 'Application received', caseworker: 'N/A', type: 'status_change', statusAfter: 'Submitted', justification: 'Initial application submitted by provider.' },
     // Version 1: Note added
-    { timestamp: '15 Feb 2026 10:06', action: 'Caseworker note added', caseworker: 'Client Services', type: 'note', details: 'Client called to ask what would happen next. Advised on the process and expected timescales.' },
+    { timestamp: '15 Feb 2026 10:06', action: 'Note Added', caseworker: 'Client Services', type: 'note', details: 'Client called to ask what would happen next. Advised on the process and expected timescales.' },
     // Version 2: Assigned
     { timestamp: '16 Feb 2026 11:30', action: 'Application assigned to Jonathan Lee', caseworker: 'Jonathan Lee', type: 'assignment', details: null },
     // Version 3: Name change
@@ -1036,7 +1036,7 @@ router.post('/application/:reference/add-note', function(req, res) {
   // Add note using new versioned event structure (append to end maintains version indices)
   req.session.data['app-history'][ref].push({
     timestamp: timestamp,
-    action: 'Caseworker note added',
+    action: 'Note Added',
     caseworker: caseworkerName,
     type: 'note',
     details: note
