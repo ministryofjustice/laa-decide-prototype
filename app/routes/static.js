@@ -551,7 +551,9 @@ const SEEDED_APPLICATIONS = [
     type: 'Initial application',
     delegatedFunctions: 'N/A',
     matterType: { title: 'Family', subtext: 'Divorce' },
-    isPriorAuthority: false
+    isPriorAuthority: false,
+    homeAddress: '16 Knightsbridge place<br>117A Russell Square<br>London<br>NW3 6BD',
+    correspondenceAddress: '6 Armitage house<br>108 petty France<br>London<br>SW2 8QT'
   }
 ];
 
