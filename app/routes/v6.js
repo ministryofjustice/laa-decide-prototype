@@ -603,22 +603,24 @@ const SEEDED_HISTORY = {
     { timestamp: '15 Feb 2026 10:06', action: 'Caseworker note added', caseworker: 'Client Services', type: 'note', details: 'Client called to ask what would happen next. Advised on the process and expected timescales.' },
     // Version 2: Assigned
     { timestamp: '16 Feb 2026 11:30', action: 'Application assigned to Jonathan Lee', caseworker: 'Jonathan Lee', type: 'assignment', details: null },
-    // Version 3: Decision to Refuse
+    // Version 3: Name change
+    { timestamp: '20 Feb 2026 09:15', action: 'Client name updated', caseworker: 'Jonathan Lee', type: 'data_change', fieldChanged: 'firstName', oldValue: 'Patriciase', newValue: 'Patricia', justification: 'Name updated following request to correct spelling mistake. Verification of legal documentation completed.' },
+    // Version 4: Address change
+    { timestamp: '20 Feb 2026 14:30', action: 'Client correspondence address updated', caseworker: 'Jonathan Lee', type: 'data_change', fieldChanged: 'address', oldValue: '6 Armitage house, 108 petty France, London, SW2 8QT', newValue: '2 Highfield Lane, Sheffield, South Yorkshire, S10 2AB, United Kingdom', justification: 'Correspondence address updated as per client request.' },
+    // Version 5: Decision to Refuse
     { timestamp: '24 Feb 2026 14:15', action: 'Decision to Refuse application', caseworker: 'Jonathan Lee', type: 'decision', statusAfter: 'Refused', justification: 'The application does not meet the merits criteria required for civil legal aid. The client\'s prospects of success have been assessed as below 50%. While the client\'s financial circumstances fall within the means assessment criteria, the weakness of the legal case prevents grant at this stage.' },
-    // Version 4: Appeal received
+    // Version 6: Appeal received
     { timestamp: '28 Feb 2026 09:20', action: 'Appeal received', caseworker: 'N/A', type: 'status_change', statusAfter: 'Under Appeal', justification: 'Client has submitted an appeal against the refusal decision.' },
-    // Version 5: Appeal assigned
+    // Version 7: Appeal assigned
     { timestamp: '01 Mar 2026 10:00', action: 'Appeal assigned to Michelle Foster', caseworker: 'Michelle Foster', type: 'assignment', details: null },
-    // Version 6: Name change
-    { timestamp: '01 Mar 2026 10:30', action: 'Client name updated', caseworker: 'Michelle Foster', type: 'data_change', fieldChanged: 'firstName', oldValue: 'Patriciase', newValue: 'Patricia', justification: 'Name updated following request to correct spelling mistake. Verification of legal documentation completed.' },
-    // Version 7: Appeal granted
+    // Version 8: Appeal granted
     { timestamp: '12 Mar 2026 16:45', action: 'Appeal granted', caseworker: 'Michelle Foster', type: 'decision', statusAfter: 'Granted', justification: 'The appeal has been allowed. Upon reconsideration of the evidence provided, the prospects of success have been reassessed as exceeding 50%. The client\'s legal position is stronger than initially assessed. Certificate issued for the scope of proceedings relating to the divorce and ancillary relief.' },
-    // Version 8: Amendment received
-    { timestamp: '18 Mar 2026 11:10', action: 'Amendment received', caseworker: 'N/A', type: 'status_change', statusAfter: 'Amendment Pending', justification: 'The provider has submitted an amendment request to extend the scope to include proceedings relating to child arrangements.' },
-    // Version 9: Amendment assigned
-    { timestamp: '20 Mar 2026 09:30', action: 'Amendment assigned to Sophie Harris', caseworker: 'Sophie Harris', type: 'assignment', details: null },
-    // Version 10: Amendment granted
-    { timestamp: '28 Mar 2026 15:20', action: 'Amendment granted', caseworker: 'Sophie Harris', type: 'decision', statusAfter: 'Granted', justification: 'The amendment request has been approved. The extension to cover child arrangements proceedings is justified given the interrelationship with the divorce proceedings and the welfare considerations involved. Certificate extended to cover the additional proceedings.' }
+    // Version 9: Prior Authority Received
+    { timestamp: '18 Mar 2026 11:10', action: 'Prior authority request received', caseworker: 'N/A', type: 'pa_status_change', paStatusAfter: 'Awaiting', justification: 'Prior authority requested for expert report to support proceedings.' },
+    // Version 10: PA assigned
+    { timestamp: '20 Mar 2026 09:30', action: 'Prior authority assigned to Sophie Harris', caseworker: 'Sophie Harris', type: 'pa_assignment', details: null },
+    // Version 11: PA granted
+    { timestamp: '28 Mar 2026 15:20', action: 'Prior authority granted', caseworker: 'Sophie Harris', type: 'pa_decision', paStatusAfter: 'Granted', justification: 'The prior authority request has been approved. Authority granted for the expert report.' }
   ]
 };
 
