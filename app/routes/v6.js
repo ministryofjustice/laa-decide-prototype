@@ -1013,7 +1013,7 @@ router.get('/application/:reference/history', function(req, res) {
 
 router.post('/application/:reference/add-note', function(req, res) {
   const ref = req.params.reference;
-  const note = req.body.note;
+  const note = req.body.historyNote; // Form field is named "historyNote"
   const caseworkerName = 'Caseworker'; // In real scenario, get from session/auth
   
   if (!req.session.data['app-history']) {
