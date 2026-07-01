@@ -1372,15 +1372,6 @@ router.get('/application/:reference', function(req, res) {
     isViewingPreviousVersion: isViewingPreviousVersion,
     viewVersion: viewVersion,
     versionedTitle: versionedTitle
-  }, (err, html) => {
-    if (err) {
-      return res.status(500).send('Error rendering page');
-    }
-    // Clear toast after rendering (but only if we're not viewing a version)
-    if (!isViewingPreviousVersion && req.session.data.toast) {
-      req.session.data.toast = null;
-    }
-    res.send(html);
   });
   
   console.log('APPLICATION REF:', application.ref, 'REFERENCE:', reference);
