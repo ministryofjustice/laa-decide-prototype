@@ -610,7 +610,7 @@ const SEEDED_HISTORY = {
     // Version 3: Name change
     { timestamp: '20 Feb 2026 09:15', action: 'Client name updated', caseworker: 'Jonathan Lee', type: 'data_change', fieldChanged: 'firstName', oldValue: 'Patriciase', newValue: 'Patricia', justification: 'Name updated following request to correct spelling mistake. Verification of legal documentation completed.' },
     // Version 4: Address change
-    { timestamp: '20 Feb 2026 14:30', action: 'Client correspondence address updated', caseworker: 'Jonathan Lee', type: 'data_change', fieldChanged: 'address', oldValue: '6 Armitage house, 108 petty France, London, SW2 8QT', newValue: '2 Highfield Lane, Sheffield, South Yorkshire, S10 2AB, United Kingdom', justification: 'Correspondence address updated as per client request.' },
+    { timestamp: '20 Feb 2026 14:30', action: 'Client correspondence address updated', caseworker: 'Jonathan Lee', type: 'data_change', fieldChanged: 'correspondenceAddress', oldValue: '6 Armitage house, 108 petty France, London, SW2 8QT', newValue: '2 Highfield Lane, Sheffield, South Yorkshire, S10 2AB, United Kingdom', justification: 'Correspondence address updated as per client request.' },
     // Version 5: Decision to Refuse
     { timestamp: '24 Feb 2026 14:15', action: 'Decision to Refuse application', caseworker: 'Jonathan Lee', type: 'decision', statusAfter: 'Refused', justification: 'The application does not meet the merits criteria required for civil legal aid. The client\'s prospects of success have been assessed as below 50%. While the client\'s financial circumstances fall within the means assessment criteria, the weakness of the legal case prevents grant at this stage.' },
     // Version 6: Appeal received
