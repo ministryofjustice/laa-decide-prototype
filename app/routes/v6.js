@@ -1033,8 +1033,8 @@ router.post('/application/:reference/add-note', function(req, res) {
     minute: '2-digit'
   });
   
-  // Add note using new versioned event structure
-  req.session.data['app-history'][ref].push({
+  // Add note using new versioned event structure (unshift adds to beginning)
+  req.session.data['app-history'][ref].unshift({
     timestamp: timestamp,
     action: 'Caseworker note added',
     caseworker: caseworkerName,
@@ -1367,6 +1367,12 @@ router.get('/application/:reference', function(req, res) {
     viewVersion: viewVersion,
     versionedTitle: versionedTitle
   });
+  
+  // Clear toast message after rendering
+  if (req.session.data.toast) {
+    req.session.data.toast = null;
+  }
+  
   console.log('APPLICATION REF:', application.ref, 'REFERENCE:', reference);
 });
 
