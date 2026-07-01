@@ -20,6 +20,52 @@ function restoreDecisionData(application, decisionStore) {
   }
 }
 
+// Helper function to reconstruct application state at a specific version
+function reconstructApplicationAtVersion(application, history, versionIndex) {
+  if (!application || !history || versionIndex === undefined) {
+    return application;
+  }
+
+  // Clone the application to avoid mutating the original
+  const reconstructed = JSON.parse(JSON.stringify(application));
+  
+  // Apply all events up to and including the specified version
+  for (let i = 0; i <= versionIndex && i < history.length; i++) {
+    const event = history[i];
+    
+    // Handle status changes (for main application or PA decisions)
+    if (event.statusAfter) {
+      if (event.type === 'pa_decision') {
+        reconstructed.priorAuthorityStatus = event.statusAfter;
+      } else {
+        reconstructed.status = event.statusAfter;
+        reconstructed.decisionType = event.statusAfter === 'Granted' ? 'Grant' : 
+                                     event.statusAfter === 'Refused' ? 'Refuse' : null;
+      }
+    }
+    
+    // Handle data changes (name, address, etc.)
+    if (event.fieldChanged) {
+      switch (event.fieldChanged) {
+        case 'firstName':
+          reconstructed.firstName = event.newValue;
+          break;
+        case 'address':
+          reconstructed.address = event.newValue;
+          break;
+        case 'correspondenceAddress':
+          reconstructed.correspondenceAddress = event.newValue;
+          break;
+        case 'priorAuthorityType':
+          reconstructed.priorAuthorityType = event.newValue;
+          break;
+      }
+    }
+  }
+  
+  return reconstructed;
+}
+
 // Password for accessing the prototype
 const PROTOTYPE_PASSWORD = 'prototype';
 
@@ -511,41 +557,72 @@ const SEEDED_APPLICATIONS = [
 
 const SEEDED_HISTORY = {
   'L-FHGR-MNT7': [
-    { timestamp: '03 Jan 2026 09:14', action: 'Initial application received', caseworker: 'N/A', details: null },
-    { timestamp: '05 Jan 2026 10:32', action: 'Caseworker note added', caseworker: 'Sarah Johnson', details: 'Client called to ask what would happen next. Advised on the process and expected timescales.' },
-    { timestamp: '06 Jan 2026 11:05', action: 'Application assigned to Sarah Johnson', caseworker: 'Sarah Johnson', details: null },
-    { timestamp: '14 Jan 2026 14:22', action: 'Initial application granted', caseworker: 'Sarah Johnson', details: null, justification: 'The application meets the merits and means criteria for civil legal aid. The client has a strong arguable case with prospects of success above 50%. Delegated functions were used appropriately given the urgency of the proceedings involving the welfare of children. All supporting evidence has been reviewed and found sufficient.' },
-    { timestamp: '18 Jan 2026 09:47', action: 'Prior authority request received', caseworker: 'N/A', details: null, justification: 'Prior authority requested for a psychiatric expert (Dr Morley Calzoni) to prepare a report for use in proceedings. The expert is required to assess the mental health of the client and provide an opinion on parenting capacity. The requested rate of £100.80 per hour for 60 hours exceeds the standard prescribed rate, hence prior authority is required.' },
-    { timestamp: '20 Jan 2026 10:15', action: 'Prior authority assigned to Mike Chen', caseworker: 'Mike Chen', details: null },
-    { timestamp: '27 Jan 2026 15:33', action: 'Prior authority granted', caseworker: 'Mike Chen', details: null, justification: 'The prior authority request has been approved. The use of a psychiatric expert is justified given the complexity of the parenting capacity issues raised in these proceedings. The hourly rate of £100.80 is considered reasonable given the expert\'s specialism and location. Authority granted for up to 60 hours.' },
-    { timestamp: '02 Feb 2026 08:55', action: 'Amendment', caseworker: 'N/A', details: null, justification: 'The provider has submitted a redetermination request following the original grant decision. The provider contends that the scope of the certificate should be extended to cover additional proceedings relating to contact arrangements. New evidence has been submitted in support of the amendment request.' },
-    { timestamp: '04 Feb 2026 09:20', action: 'Amendment assigned to Emma Wilson', caseworker: 'Emma Wilson', details: null },
-    { timestamp: '12 Feb 2026 16:44', action: 'Amendment refused', caseworker: 'Emma Wilson', details: null, justification: 'The amendment request has been refused. The additional proceedings relating to contact arrangements do not meet the merits criteria required for an extension of scope. The existing certificate adequately covers the current proceedings and there is insufficient evidence to justify the requested extension at this stage.' },
-    { timestamp: '19 Feb 2026 11:10', action: 'Appeal received', caseworker: 'N/A', details: null }
+    // Version 0: Application received
+    { timestamp: '03 Jan 2026 09:14', action: 'Application received', caseworker: 'N/A', type: 'status_change', statusAfter: 'Submitted', justification: 'Initial application submitted by provider.' },
+    // Version 1: Note added
+    { timestamp: '05 Jan 2026 10:32', action: 'Caseworker note added', caseworker: 'Sarah Johnson', type: 'note', details: 'Client called to ask what would happen next. Advised on the process and expected timescales.' },
+    // Version 2: Assigned
+    { timestamp: '06 Jan 2026 11:05', action: 'Application assigned to Sarah Johnson', caseworker: 'Sarah Johnson', type: 'assignment', details: null },
+    // Version 3: Decision to Grant
+    { timestamp: '14 Jan 2026 14:22', action: 'Decision to Grant application', caseworker: 'Sarah Johnson', type: 'decision', statusAfter: 'Granted', justification: 'The application meets the merits and means criteria for civil legal aid. The client has a strong arguable case with prospects of success above 50%. Delegated functions were used appropriately given the urgency of the proceedings involving the welfare of children. All supporting evidence has been reviewed and found sufficient.' },
+    // Version 4: Prior Authority 1 Received
+    { timestamp: '18 Jan 2026 09:47', action: 'Prior authority request received', caseworker: 'N/A', type: 'pa_status_change', paStatusAfter: 'Awaiting', details: null, justification: 'Prior authority requested for a psychiatric expert (Dr Morley Calzoni) to prepare a report for use in proceedings.' },
+    // Version 5: PA 1 Assigned
+    { timestamp: '20 Jan 2026 10:15', action: 'Prior authority assigned to Mike Chen', caseworker: 'Mike Chen', type: 'pa_assignment', details: null },
+    // Version 6: PA 1 Granted
+    { timestamp: '27 Jan 2026 15:33', action: 'Prior authority granted', caseworker: 'Mike Chen', type: 'pa_decision', paStatusAfter: 'Granted', justification: 'The prior authority request has been approved. Authority granted for up to 60 hours.' },
+    // Version 7: Prior Authority 2 Received
+    { timestamp: '02 Feb 2026 08:55', action: 'Prior authority request received', caseworker: 'N/A', type: 'pa_status_change', paStatusAfter: 'Awaiting', justification: 'Second prior authority requested for additional expert report.' },
+    // Version 8: PA 2 Assigned
+    { timestamp: '04 Feb 2026 09:20', action: 'Prior authority assigned to Emma Wilson', caseworker: 'Emma Wilson', type: 'pa_assignment', details: null },
+    // Version 9: PA 2 Refused
+    { timestamp: '12 Feb 2026 16:44', action: 'Prior authority refused', caseworker: 'Emma Wilson', type: 'pa_decision', paStatusAfter: 'Refused', justification: 'The prior authority request has been refused. The requested expert report is not considered necessary at this stage.' },
+    // Version 10: Review Request Received
+    { timestamp: '19 Feb 2026 11:10', action: 'Review request received', caseworker: 'N/A', type: 'status_change', statusAfter: 'Under Review', justification: 'Client has submitted a review request following the PA refusal decision.' }
   ],
   'L-AUTO-GR4N': [
-    { timestamp: '10 Feb 2026 08:30', action: 'Initial application received', caseworker: 'N/A', details: null },
-    { timestamp: '10 Feb 2026 08:31', action: 'Initial application granted', caseworker: 'System', details: null, justification: 'Application automatically granted by the system. The application met all required merits and means criteria and was eligible for automated processing under delegated functions. No manual caseworker review was required at this stage.' },
-    { timestamp: '21 Feb 2026 11:22', action: 'Prior authority request received', caseworker: 'N/A', details: null, justification: 'Prior authority requested for a psychiatric expert (Dr Morley Calzoni) to prepare a report for use in proceedings. The expert is required to assess the mental health of the client and provide an opinion on parenting capacity. The requested rate of £100.80 per hour for 60 hours exceeds the standard prescribed rate, hence prior authority is required.' },
-    { timestamp: '24 Feb 2026 09:40', action: 'Prior authority assigned to David Brown', caseworker: 'David Brown', details: null },
-    { timestamp: '03 Mar 2026 14:55', action: 'Prior authority granted', caseworker: 'David Brown', details: null, justification: 'The prior authority request has been approved. The use of a psychiatric expert is justified given the complexity of the parenting capacity issues raised in these proceedings. The hourly rate of £100.80 is considered reasonable given the expert\'s specialism and location. Authority granted for up to 60 hours.' },
-    { timestamp: '12 Mar 2026 10:05', action: 'Amendment', caseworker: 'N/A', details: null, justification: 'The provider has submitted a redetermination request following the original grant decision. The provider contends that the scope of the certificate should be extended to cover additional proceedings relating to contact arrangements. New evidence has been submitted in support of the amendment request.' },
-    { timestamp: '14 Mar 2026 09:15', action: 'Amendment assigned to Emma Wilson', caseworker: 'Emma Wilson', details: null },
-    { timestamp: '22 Mar 2026 16:30', action: 'Amendment refused', caseworker: 'Emma Wilson', details: null, justification: 'The amendment request has been refused. The additional proceedings relating to contact arrangements do not meet the merits criteria required for an extension of scope. The existing certificate adequately covers the current proceedings and there is insufficient evidence to justify the requested extension at this stage.' },
-    { timestamp: '01 Apr 2026 11:45', action: 'Appeal received', caseworker: 'N/A', details: null }
+    // Version 0: Application received
+    { timestamp: '10 Feb 2026 08:30', action: 'Application received', caseworker: 'N/A', type: 'status_change', statusAfter: 'Submitted', justification: 'Initial application submitted by provider.' },
+    // Version 1: Auto-granted
+    { timestamp: '10 Feb 2026 08:31', action: 'Decision to Grant application', caseworker: 'System', type: 'decision', statusAfter: 'Granted', justification: 'Application automatically granted by the system. The application met all required merits and means criteria and was eligible for automated processing under delegated functions.' },
+    // Version 2: PA 1 Received
+    { timestamp: '21 Feb 2026 11:22', action: 'Prior authority request received', caseworker: 'N/A', type: 'pa_status_change', paStatusAfter: 'Awaiting', justification: 'Prior authority requested for a psychiatric expert to prepare a report.' },
+    // Version 3: PA 1 Assigned
+    { timestamp: '24 Feb 2026 09:40', action: 'Prior authority assigned to David Brown', caseworker: 'David Brown', type: 'pa_assignment', details: null },
+    // Version 4: PA 1 Granted
+    { timestamp: '03 Mar 2026 14:55', action: 'Prior authority granted', caseworker: 'David Brown', type: 'pa_decision', paStatusAfter: 'Granted', justification: 'The prior authority request has been approved. Authority granted for up to 60 hours.' },
+    // Version 5: PA 2 Received
+    { timestamp: '12 Mar 2026 10:05', action: 'Prior authority request received', caseworker: 'N/A', type: 'pa_status_change', paStatusAfter: 'Awaiting', justification: 'Second prior authority requested for additional expert report.' },
+    // Version 6: PA 2 Assigned
+    { timestamp: '14 Mar 2026 09:15', action: 'Prior authority assigned to Emma Wilson', caseworker: 'Emma Wilson', type: 'pa_assignment', details: null },
+    // Version 7: PA 2 Refused
+    { timestamp: '22 Mar 2026 16:30', action: 'Prior authority refused', caseworker: 'Emma Wilson', type: 'pa_decision', paStatusAfter: 'Refused', justification: 'The prior authority request has been refused. The requested expert report is not considered necessary at this stage.' },
+    // Version 8: Review Request Received
+    { timestamp: '01 Apr 2026 11:45', action: 'Review request received', caseworker: 'N/A', type: 'status_change', statusAfter: 'Under Review', justification: 'Client has submitted a review request following the PA refusal decision.' }
   ],
   'L-REFUS-ED1A': [
-    { timestamp: '15 Feb 2026 10:05', action: 'Initial application received', caseworker: 'N/A', details: null },
-    { timestamp: '15 Feb 2026 10:06', action: 'Caseworker note added', caseworker: 'Client Services', details: 'Client called to ask what would happen next. Advised on the process and expected timescales.' },
-    { timestamp: '16 Feb 2026 11:30', action: 'Application assigned to Jonathan Lee', caseworker: 'Jonathan Lee', details: null },
-    { timestamp: '24 Feb 2026 14:15', action: 'Initial application refused', caseworker: 'Jonathan Lee', details: null, justification: 'The application does not meet the merits criteria required for civil legal aid. The client\'s prospects of success have been assessed as below 50%. While the client\'s financial circumstances fall within the means assessment criteria, the weakness of the legal case prevents grant at this stage.' },
-    { timestamp: '28 Feb 2026 09:20', action: 'Appeal received', caseworker: 'N/A', details: null },
-    { timestamp: '01 Mar 2026 10:00', action: 'Appeal assigned to Michelle Foster', caseworker: 'Michelle Foster', details: null },
-    { timestamp: '01 Mar 2026 10:30', action: 'Client first name changed', caseworker: 'Michelle Foster', oldValue: 'Patriciase', newValue: 'Patricia', justification: 'Name updated following request to correct spelling mistake. Verification of legal documentation completed.' },
-    { timestamp: '12 Mar 2026 16:45', action: 'Appeal granted', caseworker: 'Michelle Foster', details: null, justification: 'The appeal has been allowed. Upon reconsideration of the evidence provided, the prospects of success have been reassessed as exceeding 50%. The client\'s legal position is stronger than initially assessed. Certificate issued for the scope of proceedings relating to the divorce and ancillary relief.' },
-    { timestamp: '18 Mar 2026 11:10', action: 'Amendment received', caseworker: 'N/A', details: null, justification: 'The provider has submitted an amendment request to extend the scope to include proceedings relating to child arrangements. Additional evidence supporting the urgency and necessity of the extension has been provided.' },
-    { timestamp: '20 Mar 2026 09:30', action: 'Amendment assigned to Sophie Harris', caseworker: 'Sophie Harris', details: null },
-    { timestamp: '28 Mar 2026 15:20', action: 'Amendment granted', caseworker: 'Sophie Harris', details: null, justification: 'The amendment request has been approved. The extension to cover child arrangements proceedings is justified given the interrelationship with the divorce proceedings and the welfare considerations involved. Certificate extended to cover the additional proceedings.' }
+    // Version 0: Application received
+    { timestamp: '15 Feb 2026 10:05', action: 'Application received', caseworker: 'N/A', type: 'status_change', statusAfter: 'Submitted', justification: 'Initial application submitted by provider.' },
+    // Version 1: Note added
+    { timestamp: '15 Feb 2026 10:06', action: 'Caseworker note added', caseworker: 'Client Services', type: 'note', details: 'Client called to ask what would happen next. Advised on the process and expected timescales.' },
+    // Version 2: Assigned
+    { timestamp: '16 Feb 2026 11:30', action: 'Application assigned to Jonathan Lee', caseworker: 'Jonathan Lee', type: 'assignment', details: null },
+    // Version 3: Decision to Refuse
+    { timestamp: '24 Feb 2026 14:15', action: 'Decision to Refuse application', caseworker: 'Jonathan Lee', type: 'decision', statusAfter: 'Refused', justification: 'The application does not meet the merits criteria required for civil legal aid. The client\'s prospects of success have been assessed as below 50%. While the client\'s financial circumstances fall within the means assessment criteria, the weakness of the legal case prevents grant at this stage.' },
+    // Version 4: Appeal received
+    { timestamp: '28 Feb 2026 09:20', action: 'Appeal received', caseworker: 'N/A', type: 'status_change', statusAfter: 'Under Appeal', justification: 'Client has submitted an appeal against the refusal decision.' },
+    // Version 5: Appeal assigned
+    { timestamp: '01 Mar 2026 10:00', action: 'Appeal assigned to Michelle Foster', caseworker: 'Michelle Foster', type: 'assignment', details: null },
+    // Version 6: Name change
+    { timestamp: '01 Mar 2026 10:30', action: 'Client name updated', caseworker: 'Michelle Foster', type: 'data_change', fieldChanged: 'firstName', oldValue: 'Patriciase', newValue: 'Patricia', justification: 'Name updated following request to correct spelling mistake. Verification of legal documentation completed.' },
+    // Version 7: Appeal granted
+    { timestamp: '12 Mar 2026 16:45', action: 'Appeal granted', caseworker: 'Michelle Foster', type: 'decision', statusAfter: 'Granted', justification: 'The appeal has been allowed. Upon reconsideration of the evidence provided, the prospects of success have been reassessed as exceeding 50%. The client\'s legal position is stronger than initially assessed. Certificate issued for the scope of proceedings relating to the divorce and ancillary relief.' },
+    // Version 8: Amendment received
+    { timestamp: '18 Mar 2026 11:10', action: 'Amendment received', caseworker: 'N/A', type: 'status_change', statusAfter: 'Amendment Pending', justification: 'The provider has submitted an amendment request to extend the scope to include proceedings relating to child arrangements.' },
+    // Version 9: Amendment assigned
+    { timestamp: '20 Mar 2026 09:30', action: 'Amendment assigned to Sophie Harris', caseworker: 'Sophie Harris', type: 'assignment', details: null },
+    // Version 10: Amendment granted
+    { timestamp: '28 Mar 2026 15:20', action: 'Amendment granted', caseworker: 'Sophie Harris', type: 'decision', statusAfter: 'Granted', justification: 'The amendment request has been approved. The extension to cover child arrangements proceedings is justified given the interrelationship with the divorce proceedings and the welfare considerations involved. Certificate extended to cover the additional proceedings.' }
   ]
 };
 
