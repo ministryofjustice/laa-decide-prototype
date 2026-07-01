@@ -1018,7 +1018,7 @@ router.get('/application/:reference/history', function(req, res) {
 router.post('/application/:reference/add-note', function(req, res) {
   const ref = req.params.reference;
   const note = req.body.note;
-  const userInfo = 'Current User'; // In real scenario, get from session
+  const caseworkerName = 'Caseworker'; // In real scenario, get from session/auth
   
   if (!req.session.data['app-history']) {
     req.session.data['app-history'] = {};
@@ -1037,14 +1037,23 @@ router.post('/application/:reference/add-note', function(req, res) {
     minute: '2-digit'
   });
   
+  // Add note using new versioned event structure
   req.session.data['app-history'][ref].push({
     timestamp: timestamp,
     action: 'Caseworker note added',
-    caseworker: userInfo,
+    caseworker: caseworkerName,
+    type: 'note',
     details: note
   });
   
-  res.redirect('/static/application/' + ref + '/history');
+  // Set toast message for success notification
+  req.session.data.toast = {
+    show: true,
+    message: 'Your notes have been successfully added',
+    type: 'success'
+  };
+  
+  res.redirect('/static/application/' + ref);
 });
 
 router.get('/search', function(req, res) {

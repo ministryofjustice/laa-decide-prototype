@@ -79,6 +79,26 @@
       
       <div id="toast-notification"></div>
 
+      {% if sessionData.toast and sessionData.toast.show %}
+        <div class="govuk-notification-banner govuk-notification-banner--success" role="region" aria-labelledby="govuk-notification-banner-title">
+          <div class="govuk-notification-banner__header">
+            <h2 class="govuk-notification-banner__title" id="govuk-notification-banner-title">
+              Success
+            </h2>
+          </div>
+          <div class="govuk-notification-banner__content">
+            <p class="govuk-body">{{ sessionData.toast.message }}</p>
+          </div>
+        </div>
+        <script>
+          // Auto-dismiss toast after 5 seconds
+          setTimeout(() => {
+            const banner = document.querySelector('.govuk-notification-banner--success');
+            if (banner) banner.style.display = 'none';
+          }, 5000);
+        </script>
+      {% endif %}
+
       {% if isViewingPreviousVersion %}
         <div class="govuk-notification-banner" role="region" aria-labelledby="govuk-notification-banner-title">
           <div class="govuk-notification-banner__header">
@@ -560,6 +580,15 @@
                       </summary>
                       <div class="govuk-details__text">
                         {{ event.justification }}
+                      </div>
+                    </details>
+                  {% elif event.details and (event.title | lower).includes('note') %}
+                    <details class="govuk-details govuk-!-margin-bottom-0 govuk-!-margin-top-2">
+                      <summary class="govuk-details__summary">
+                        <span class="govuk-details__summary-text">Expand note</span>
+                      </summary>
+                      <div class="govuk-details__text">
+                        {{ event.details }}
                       </div>
                     </details>
                   {% elif event.notes %}
