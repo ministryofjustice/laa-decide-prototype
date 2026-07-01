@@ -1321,17 +1321,42 @@ router.get('/application/:reference', function(req, res) {
   const viewVersion = req.query.viewVersion ? parseInt(req.query.viewVersion) : null;
   const isViewingPreviousVersion = viewVersion !== null && viewVersion < historyEvents.length - 1;
   
+  // Get history array for reconstruction
+  const historyArray = req.session.data['app-history'] && req.session.data['app-history'][reference] 
+    ? req.session.data['app-history'][reference]
+    : [];
+  
+  // If viewing a specific version, reconstruct the application state at that point
+  let versionedApplication = application;
+  let displayedHistoryEvents = historyEvents;
+  let versionedTitle = null;
+  
+  if (isViewingPreviousVersion && viewVersion !== null) {
+    // Reconstruct application state at this version
+    versionedApplication = reconstructApplicationAtVersion(application, historyArray, viewVersion);
+    
+    // Trim history events to only show up to this version
+    displayedHistoryEvents = historyEvents.slice(0, viewVersion + 1);
+    
+    // Get the event title for display
+    if (historyArray[viewVersion]) {
+      versionedTitle = historyArray[viewVersion].action || 'Unknown event';
+    }
+  }
+  
   res.render('v6/application-details.njk', {
     pageTitle: reference,
     reference: reference,
-    application: application,
+    application: isViewingPreviousVersion ? versionedApplication : application,
     hasLinkedCases: hasLinkedCases,
     hasPriorAuthority: hasPriorAuthority,
     priorAuthorityType: priorAuthorityType,
     sessionData: req.session.data,
     isAssigned: isAssigned,
-    historyEvents: historyEvents,
-    isViewingPreviousVersion: isViewingPreviousVersion
+    historyEvents: displayedHistoryEvents,
+    isViewingPreviousVersion: isViewingPreviousVersion,
+    viewVersion: viewVersion,
+    versionedTitle: versionedTitle
   });
   console.log('APPLICATION REF:', application.ref, 'REFERENCE:', reference);
 });
