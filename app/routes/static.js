@@ -1040,8 +1040,8 @@ router.post('/application/:reference/add-note', function(req, res) {
     minute: '2-digit'
   });
   
-  // Add note using new versioned event structure (unshift adds to beginning)
-  req.session.data['app-history'][ref].unshift({
+  // Add note using new versioned event structure (append to end maintains version indices)
+  req.session.data['app-history'][ref].push({
     timestamp: timestamp,
     action: 'Caseworker note added',
     caseworker: caseworkerName,
