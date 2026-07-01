@@ -87,7 +87,8 @@
             </h2>
           </div>
           <div class="govuk-notification-banner__content">
-            <p class="govuk-body">You are viewing a previous version before an update was made. <a href="/v6/application/{{ reference }}" class="govuk-link">Go to current version</a></p>
+            <p class="govuk-body"><strong>You are viewing this application as it was at:</strong> {{ versionedTitle }}</p>
+            <p class="govuk-body"><a href="/v6/application/{{ reference }}" class="govuk-link">View current version</a></p>
           </div>
         </div>
       {% endif %}
