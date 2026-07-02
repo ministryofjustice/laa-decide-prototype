@@ -964,10 +964,13 @@ router.get('/application/:reference/history', function(req, res) {
   if (!req.session.data['app-history']) {
     req.session.data['app-history'] = {};
   }
-  Object.keys(SEEDED_HISTORY).forEach(r => {
-    req.session.data['app-history'][r] = SEEDED_HISTORY[r];
-  });
 
+  // Only initialize seeded history if not already set (preserve user-added notes)
+  Object.keys(SEEDED_HISTORY).forEach(r => {
+    if (!req.session.data['app-history'][r]) {
+      req.session.data['app-history'][r] = SEEDED_HISTORY[r];
+    }
+  });
   if (!req.session.data['app-history'][ref] || req.session.data['app-history'][ref].length === 0 ||
       (req.session.data['app-history'][ref].length > 0 && !req.session.data['app-history'][ref][0].action)) {
     
@@ -1049,7 +1052,7 @@ router.post('/application/:reference/add-note', function(req, res) {
     type: 'success'
   };
   
-  res.redirect('/v6/application/' + ref);
+  res.redirect('/v6/application/' + ref + '#application-history');
 });
 
 router.get('/search', function(req, res) {

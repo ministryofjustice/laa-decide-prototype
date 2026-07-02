@@ -1056,7 +1056,7 @@ router.post('/application/:reference/add-note', function(req, res) {
     type: 'success'
   };
   
-  res.redirect('/static/application/' + ref);
+  res.redirect('/static/application/' + ref + '#application-history');
 });
 
 router.get('/search', function(req, res) {
