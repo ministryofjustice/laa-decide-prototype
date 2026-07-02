@@ -1014,14 +1014,8 @@ router.get('/application/:reference/history', function(req, res) {
   res.render('v6/application-history.html', {
     reference: ref,
     assignedCaseworker: assignedApp ? assignedApp.caseworker : 'Unassigned',
-    history: history,
-    sessionData: req.session.data
+    history: history
   });
-  
-  // Clear toast after rendering
-  if (req.session.data.toast) {
-    req.session.data.toast = null;
-  }
 });
 
 router.post('/application/:reference/add-note', function(req, res) {
@@ -1062,7 +1056,7 @@ router.post('/application/:reference/add-note', function(req, res) {
     type: 'success'
   };
   
-  res.redirect('/static/application/' + ref + '/history');
+  res.redirect('/static/application/' + ref);
 });
 
 router.get('/search', function(req, res) {
@@ -1386,6 +1380,15 @@ router.get('/application/:reference', function(req, res) {
     isViewingPreviousVersion: isViewingPreviousVersion,
     viewVersion: viewVersion,
     versionedTitle: versionedTitle
+  }, (err, html) => {
+    if (err) {
+      return res.status(500).send('Error rendering page');
+    }
+    // Clear toast after rendering so it only shows once
+    if (req.session.data && req.session.data.toast) {
+      req.session.data.toast = null;
+    }
+    res.send(html);
   });
   
   console.log('APPLICATION REF:', application.ref, 'REFERENCE:', reference);
