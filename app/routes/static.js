@@ -1014,8 +1014,14 @@ router.get('/application/:reference/history', function(req, res) {
   res.render('v6/application-history.html', {
     reference: ref,
     assignedCaseworker: assignedApp ? assignedApp.caseworker : 'Unassigned',
-    history: history
+    history: history,
+    sessionData: req.session.data
   });
+  
+  // Clear toast after rendering
+  if (req.session.data.toast) {
+    req.session.data.toast = null;
+  }
 });
 
 router.post('/application/:reference/add-note', function(req, res) {
@@ -1056,7 +1062,7 @@ router.post('/application/:reference/add-note', function(req, res) {
     type: 'success'
   };
   
-  res.redirect('/static/application/' + ref);
+  res.redirect('/static/application/' + ref + '/history');
 });
 
 router.get('/search', function(req, res) {

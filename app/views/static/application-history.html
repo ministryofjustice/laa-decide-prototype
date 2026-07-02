@@ -11,6 +11,23 @@ Application history
 {% endblock %}
 
 {% block content %}
+{% if sessionData and sessionData.toast and sessionData.toast.show %}
+  <div class="govuk-notification-banner govuk-notification-banner--success" role="region" aria-labelledby="govuk-notification-banner-title">
+    <div class="govuk-notification-banner__header">
+      <h2 class="govuk-notification-banner__title" id="govuk-notification-banner-title">Success</h2>
+    </div>
+    <div class="govuk-notification-banner__content">
+      <p class="govuk-body">{{ sessionData.toast.message }}</p>
+    </div>
+  </div>
+  <script>
+    setTimeout(() => {
+      const banner = document.querySelector('.govuk-notification-banner--success');
+      if (banner) banner.style.display = 'none';
+    }, 5000);
+  </script>
+{% endif %}
+
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">
     <h2 class="govuk-heading-xl govuk-!-margin-bottom-2" ><span class="govuk-!-margin-right-2">L-12Z-13P</span></h2>
@@ -87,15 +104,17 @@ Application history
       </table>
 
       <div class="govuk-form-group">
-        <h1 class="govuk-label-wrapper"><label class="govuk-label govuk-label--s" for="note">
+        <h1 class="govuk-label-wrapper"><label class="govuk-label govuk-label--s" for="historyNote">
             Add a note to the application history
           </label>
         </h1>
-        <div id="note-hint" class="govuk-hint">
+        <div id="historyNote-hint" class="govuk-hint">
           This information is for internal use only
         </div>
-        <textarea class="govuk-textarea" name="note" id="note" rows="5"></textarea>
-        <button class="govuk-button" data-module="govuk-button">Add to application history</button>
+        <form action="/static/application/{{ reference }}/add-note" method="POST">
+          <textarea class="govuk-textarea" name="historyNote" id="historyNote" rows="5"></textarea>
+          <button class="govuk-button" data-module="govuk-button">Add to application history</button>
+        </form>
       </div>
 
   </div>

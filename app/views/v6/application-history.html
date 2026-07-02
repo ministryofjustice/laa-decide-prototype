@@ -8,6 +8,23 @@ Application history - {{ reference }}
 {% block content %}
 <div style="padding: 30px 0;">
   <div style="max-width: 66.66%; margin: 0 auto; padding: 0 30px;">
+    {% if sessionData and sessionData.toast and sessionData.toast.show %}
+      <div class="govuk-notification-banner govuk-notification-banner--success" role="region" aria-labelledby="govuk-notification-banner-title">
+        <div class="govuk-notification-banner__header">
+          <h2 class="govuk-notification-banner__title" id="govuk-notification-banner-title">Success</h2>
+        </div>
+        <div class="govuk-notification-banner__content">
+          <p class="govuk-body">{{ sessionData.toast.message }}</p>
+        </div>
+      </div>
+      <script>
+        setTimeout(() => {
+          const banner = document.querySelector('.govuk-notification-banner--success');
+          if (banner) banner.style.display = 'none';
+        }, 5000);
+      </script>
+    {% endif %}
+    
     <a href="/v6/application/{{ reference }}" style="font-size: 14px; display: inline-block; margin-bottom: 20px; text-decoration: none; color: #0b0c0c;">‹ Back to application</a>
     <br>
     <span style="background-color: #dfebf4; color: #1d70b8; padding: 4px 8px; font-size: 14px; font-weight: bold;">In progress</span>
@@ -83,7 +100,7 @@ Application history - {{ reference }}
           <h3 style="font-size: 19px; margin-bottom: 5px;">Add a note to the application history</h3>
           <div style="font-size: 14px; color: #505a5f; margin-bottom: 10px;">This information is for internal use only</div>
           <form action="/v6/application/{{ reference }}/add-note" method="POST">
-            <textarea name="note" style="width: 100%; height: 120px; border: 1px solid #0b0c0c; padding: 10px; font-family: inherit; box-sizing: border-box;"></textarea>
+            <textarea name="historyNote" style="width: 100%; height: 120px; border: 1px solid #0b0c0c; padding: 10px; font-family: inherit; box-sizing: border-box;"></textarea>
             <button type="submit" style="background: #00703c; color: white; border: none; padding: 10px 20px; font-weight: bold; margin-top: 10px; cursor: pointer;">Add to application history</button>
           </form>
         </div>
