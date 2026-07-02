@@ -1004,7 +1004,7 @@ router.get('/application/:reference/history', function(req, res) {
   const assignedApp = req.session.data['assigned-applications'] ? req.session.data['assigned-applications'].find(app => app.ref === ref) : null;
   const history = req.session.data['app-history'][ref] || [];
   
-  res.render('v6/application-history.html', {
+  res.render('v6/application-history-modern.html', {
     reference: ref,
     assignedCaseworker: assignedApp ? assignedApp.caseworker : 'Unassigned',
     history: history

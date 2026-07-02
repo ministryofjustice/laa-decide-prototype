@@ -1,0 +1,129 @@
+{% extends "layouts/workload.html" %}
+
+{% block pageTitle %}
+Application history
+{% endblock %}
+
+{% block beforeContent %}
+<a class="govuk-back-link" href="/static/my-applications">Back to your list</a>
+{% endblock %}
+
+{% block content %}
+
+{% if sessionData and sessionData.toast and sessionData.toast.show %}
+  <div class="govuk-notification-banner govuk-notification-banner--success" role="region" aria-labelledby="govuk-notification-banner-title">
+    <div class="govuk-notification-banner__header">
+      <h2 class="govuk-notification-banner__title" id="govuk-notification-banner-title">Success</h2>
+    </div>
+    <div class="govuk-notification-banner__content">
+      <p class="govuk-body">{{ sessionData.toast.message }}</p>
+    </div>
+  </div>
+  <script>
+    setTimeout(() => {
+      const banner = document.querySelector('.govuk-notification-banner--success');
+      if (banner) banner.style.display = 'none';
+    }, 5000);
+  </script>
+{% endif %}
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    {{ govukTag({
+      text: "In progress",
+      classes: "govuk-tag--light-blue"
+    }) }}
+    
+    <h1 class="govuk-heading-xl govuk-!-margin-bottom-2">{{ reference }}</h1>
+    
+    <p class="govuk-body">
+      <strong>Assigned to:</strong> {{ assignedCaseworker or 'Unassigned' }}<br>
+      <strong>Date received:</strong> 19 May 2023
+    </p>
+
+    <nav class="moj-sub-navigation" aria-label="Application navigation">
+      <ul class="moj-sub-navigation__list">
+        <li class="moj-sub-navigation__item">
+          <a class="moj-sub-navigation__link" href="/static/application-details">Application details</a>
+        </li>
+        <li class="moj-sub-navigation__item">
+          <a class="moj-sub-navigation__link" href="/static/people">People</a>
+        </li>
+        <li class="moj-sub-navigation__item">
+          <a class="moj-sub-navigation__link" aria-current="page" href="/static/application/{{ reference }}/history">Application history</a>
+        </li>
+      </ul>
+    </nav>
+
+    <table class="govuk-table govuk-!-margin-bottom-9">
+      <thead class="govuk-table__head">
+        <tr class="govuk-table__row">
+          <th scope="col" class="govuk-table__header">Date and time</th>
+          <th scope="col" class="govuk-table__header">Caseworker</th>
+          <th scope="col" class="govuk-table__header">Update</th>
+        </tr>
+      </thead>
+      <tbody class="govuk-table__body">
+        {% if history and history.length > 0 %}
+          {% for event in history %}
+          <tr class="govuk-table__row">
+            <td class="govuk-table__cell">{{ event.timestamp }}</td>
+            <td class="govuk-table__cell">{{ event.caseworker or 'System' }}</td>
+            <td class="govuk-table__cell">
+              <strong>{{ event.action }}</strong>
+              {% if event.details %}
+                <div class="govuk-body-s govuk-!-margin-top-2">
+                  {{ event.details }}
+                </div>
+              {% endif %}
+              {% if event.justification %}
+                <details class="govuk-details govuk-!-margin-top-2">
+                  <summary class="govuk-details__summary">
+                    <span class="govuk-details__summary-text">
+                      Expand
+                    </span>
+                  </summary>
+                  <div class="govuk-details__text">
+                    {{ event.justification }}
+                  </div>
+                </details>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        {% else %}
+          <tr class="govuk-table__row">
+            <td colspan="3" class="govuk-table__cell">No history events yet</td>
+          </tr>
+        {% endif %}
+      </tbody>
+    </table>
+
+    <h2 class="govuk-heading-m">Add a note to the application history</h2>
+    <p class="govuk-body govuk-hint">This information is for internal use only</p>
+
+    <form method="POST" action="/static/application/{{ reference }}/add-note">
+      <div class="govuk-form-group">
+        {{ govukTextarea({
+          name: "historyNote",
+          id: "historyNote",
+          label: {
+            text: "Note",
+            classes: "govuk-label--s"
+          },
+          rows: 5,
+          hint: {
+            text: "Enter any notes or observations about this application"
+          }
+        }) }}
+      </div>
+
+      {{ govukButton({
+        text: "Add to application history"
+      }) }}
+    </form>
+
+  </div>
+</div>
+
+{% endblock %}
