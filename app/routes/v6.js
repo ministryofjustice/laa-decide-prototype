@@ -1373,16 +1373,12 @@ router.get('/application/:reference', function(req, res) {
     isViewingPreviousVersion: isViewingPreviousVersion,
     viewVersion: viewVersion,
     versionedTitle: versionedTitle
-  }, (err, html) => {
-    if (err) {
-      return res.status(500).send('Error rendering page');
-    }
-    // Clear toast after rendering so it only shows once
-    if (req.session.data && req.session.data.toast) {
-      req.session.data.toast = null;
-    }
-    res.send(html);
   });
+  
+  // Clear toast after rendering so it only shows once (clear on next request to this route)
+  if (req.session.data && req.session.data.toast) {
+    req.session.data.toast = null;
+  }
   
   console.log('APPLICATION REF:', application.ref, 'REFERENCE:', reference);
 });
