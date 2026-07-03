@@ -141,6 +141,8 @@
         <strong>Date received:</strong> 19 May 2023
       </p>
 
+      {% set hasDecision = application.decisionType or application.status === "Granted" or application.status === "Refused" %}
+
       {% if sessionData['decision-reference'] !== reference %}
         {% if isAssigned %}
           {{ govukButton({
@@ -148,7 +150,7 @@
             classes: "govuk-button--secondary govuk-!-margin-bottom-8",
             style: "background-color: #00703c; color: white;"
           }) }}
-        {% else %}
+        {% elif not hasDecision %}
           <form id="addToListForm" style="display: inline;">
             <input type="hidden" name="reference" value="{{ reference }}">
             {{ govukButton({
@@ -471,13 +473,15 @@
           </div>
         </div>
 
-        <div class="govuk-!-margin-top-8">
-          {{ govukButton({
-            text: "Make assessment",
-            href: "/v6/decision-start?ref=" ~ reference,
-            style: "background-color: #00703c; color: white;"
-          }) }}
-        </div>
+        {% if not hasDecision %}
+          <div class="govuk-!-margin-top-8">
+            {{ govukButton({
+              text: "Make assessment",
+              href: "/v6/decision-start?ref=" ~ reference,
+              style: "background-color: #00703c; color: white;"
+            }) }}
+          </div>
+        {% endif %}
       {% endset -%}
 
       {% set peopleHtml %}
@@ -535,12 +539,14 @@
           ]
         }) }}
 
-        <div class="govuk-!-margin-top-6">
-          {{ govukButton({
-            text: "Make assessment",
-            style: "background-color: #00703c; color: white;"
-          }) }}
-        </div>
+        {% if not hasDecision %}
+          <div class="govuk-!-margin-top-6">
+            {{ govukButton({
+              text: "Make assessment",
+              style: "background-color: #00703c; color: white;"
+            }) }}
+          </div>
+        {% endif %}
       {% endset -%}
 
       {% set applicationHistoryHtml %}
@@ -941,12 +947,14 @@
             </div>
           </div>
 
-          <div class="govuk-!-margin-top-8">
-            {{ govukButton({
-              text: "Make assessment",
-              style: "background-color: #00703c; color: white;"
-            }) }}
-          </div>
+          {% if not hasDecision %}
+            <div class="govuk-!-margin-top-8">
+              {{ govukButton({
+                text: "Make assessment",
+                style: "background-color: #00703c; color: white;"
+              }) }}
+            </div>
+          {% endif %}
         {% else %}
           <h2 class="govuk-heading-m govuk-!-margin-bottom-4">There are currently no prior authority requests linked to this application</h2>
         {% endif %}
