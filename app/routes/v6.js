@@ -818,10 +818,100 @@ router.get('/open-applications', function(req, res) {
   });
 });
 
+// Isolated reassignment prototype flow (uses auto-stored form data)
+router.get('/your-list', function(req, res) {
+  if (!req.session.data['assigned-applications']) {
+    req.session.data['assigned-applications'] = [];
+  }
+
+  const reassigned = req.session.data['reassigned'];
+  const reassignedTo = req.session.data['reassign-to'];
+  req.session.data['reassigned'] = null;
+  req.session.data['reassign-to'] = null;
+
+  res.render('v6/your-list.html', {
+    pageTitle: 'Your list',
+    applications: req.session.data['assigned-applications'],
+    reassigned: reassigned,
+    reassignedTo: reassignedTo
+  });
+});
+
+router.get('/reassign', function(req, res) {
+  const ref = req.query.reference || req.session.data['reassign-reference'] || null;
+  if (req.query.reference) {
+    req.session.data['reassign-reference'] = req.query.reference;
+  }
+
+  let application = null;
+  if (ref && req.session.data['assigned-applications']) {
+    application = req.session.data['assigned-applications'].find(app => app.ref === ref) || null;
+  }
+
+  res.render('v6/reassign.html', {
+    pageTitle: 'Select who you want to reassign this case to',
+    reference: ref,
+    application: application
+  });
+});
+
+router.post('/confirm-reassign', function(req, res) {
+  if (req.body.reference) {
+    req.session.data['reassign-reference'] = req.body.reference;
+  }
+  res.redirect('/v6/confirm-reassign');
+});
+
+router.get('/confirm-reassign', function(req, res) {
+  const ref = req.session.data['reassign-reference'] || null;
+  let application = null;
+
+  if (ref && req.session.data['assigned-applications']) {
+    application = req.session.data['assigned-applications'].find(app => app.ref === ref) || null;
+  }
+
+  res.render('v6/confirm-reassign.html', {
+    pageTitle: 'Confirm you want to reassign this case?',
+    reference: ref,
+    application: application
+  });
+});
+
+router.post('/your-list', function(req, res) {
+  const ref = req.body.reference || req.session.data['reassign-reference'];
+
+  if (ref && req.session.data['assigned-applications']) {
+    req.session.data['assigned-applications'] = req.session.data['assigned-applications'].filter(app => app.ref !== ref);
+  }
+
+  if (req.body['reassigned']) {
+    req.session.data['reassigned'] = req.body['reassigned'];
+  }
+  if (req.body['reassign-to']) {
+    req.session.data['reassign-to'] = req.body['reassign-to'];
+  }
+
+  req.session.data['reassign-reference'] = null;
+
+  // If we came from the main v6 journey, return there with a success banner
+  if (ref) {
+    res.redirect('/v6/yourlist');
+    return;
+  }
+
+  // Keep isolated example journey working
+  res.redirect('/v6/your-list');
+});
+
 router.get('/yourlist', function(req, res) {
   if (!req.session.data['assigned-applications']) {
     req.session.data['assigned-applications'] = [];
   }
+
+  const reassigned = req.session.data['reassigned'];
+  const reassignedTo = req.session.data['reassign-to'];
+  req.session.data['reassigned'] = null;
+  req.session.data['reassign-to'] = null;
   
   // Restore any stored decisions from decision-store
   if (req.session.data['decision-store']) {
@@ -832,7 +922,9 @@ router.get('/yourlist', function(req, res) {
   
   res.render('v6/my-applications.html', { 
     pageTitle: 'Your list',
-    applications: req.session.data['assigned-applications']
+    applications: req.session.data['assigned-applications'],
+    reassigned: reassigned,
+    reassignedTo: reassignedTo
   });
 });
 

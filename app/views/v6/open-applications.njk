@@ -341,6 +341,10 @@
           .then(response => {
             // Show toast notification using GOV.UK toast component
             const toastContainer = document.getElementById('toast-notification');
+            
+            // Clear any existing toasts first
+            toastContainer.innerHTML = '';
+            
             const toast = document.createElement('div');
             toast.setAttribute('data-module', 'govuk-notification-banner');
             toast.setAttribute('role', 'region');
@@ -351,10 +355,10 @@
             
             toastContainer.appendChild(toast);
             
-            // Hide toast after 3 seconds
+            // Reload page after 1 second to update the list
             setTimeout(() => {
-              toast.remove();
-            }, 3000);
+              window.location.reload();
+            }, 1000);
           })
           .catch(error => console.error('Error:', error));
       });

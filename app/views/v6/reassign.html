@@ -1,0 +1,244 @@
+{% extends "layouts/main.html" %}
+
+{% set pageName="Select who you want to reassign this case to" %}
+
+{# Navigation header #}
+{% block header %}
+  {{ govukHeader({
+    homepageUrl: "/",
+    serviceName: "Legal Aid Agency",
+    serviceUrl: "/",
+    navigation: [
+      {
+        href: "#",
+        text: "jonaan.barton@law.com"
+      },
+      {
+        href: "#",
+        text: "Sign out"
+      }
+    ]
+  }) }}
+
+  <div class="moj-primary-navigation">
+    <div class="moj-primary-navigation__container">
+      <div class="moj-primary-navigation__nav">
+        <nav class="moj-primary-navigation" aria-label="Primary navigation">
+          <ul class="moj-primary-navigation__list">
+            <li class="moj-primary-navigation__item">
+              <a class="moj-primary-navigation__link" href="#">Decide if an applicant can get legal aid</a>
+            </li>
+            <li class="moj-primary-navigation__item">
+              <a class="moj-primary-navigation__link" href="#">Open applications</a>
+            </li>
+            <li class="moj-primary-navigation__item">
+              <a class="moj-primary-navigation__link" aria-current="page" href="/v6/yourlist">Your list</a>
+            </li>
+            <li class="moj-primary-navigation__item">
+              <a class="moj-primary-navigation__link" href="#">Search</a>
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+
+{% block beforeContent %}
+  {{ govukPhaseBanner({
+    tag: {
+      text: "Beta"
+    },
+    html: 'This is a new service – your <a class="govuk-link" href="#">feedback</a> will help us to improve it.'
+  }) }}
+  <a href="javascript:window.history.back()" class="govuk-back-link">Back</a>
+{% endblock %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    <h1 class="govuk-heading-xl" style="margin-bottom: 30px;">Select who you want to reassign this case to</h1>
+
+    <form action="/v6/confirm-reassign" method="post" novalidate>
+      <input type="hidden" name="reference" value="{{ reference }}">
+
+      <div class="govuk-form-group">
+        <label class="govuk-label" for="caseworker">
+          Case worker details
+        </label>
+        <div id="caseworker-hint" class="govuk-hint">
+          Enter case worker name or email address
+        </div>
+        <div id="autocomplete-container"></div>
+      </div>
+
+      <div class="govuk-form-group" style="margin-top: 30px;">
+        <label class="govuk-label govuk-label--m" for="decision-explanation">
+          Explain your decision
+        </label>
+        <div id="decision-explanation-hint" class="govuk-hint">
+          This information is for internal use only.
+        </div>
+        <textarea class="govuk-textarea" id="decision-explanation" name="decision-explanation" rows="5" aria-describedby="decision-explanation-hint">{{ data['decision-explanation'] or '' }}</textarea>
+      </div>
+
+      {{ govukButton({
+        text: "Continue"
+      }) }}
+
+    </form>
+  </div>
+</div>
+{% endblock %}
+
+{% block pageScripts %}
+<script src="https://unpkg.com/accessible-autocomplete@3.0.0/dist/accessible-autocomplete.min.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/accessible-autocomplete@3.0.0/dist/accessible-autocomplete.min.css" />
+<script type="text/javascript">
+  // Generate caseworker suggestions dynamically based on query
+  const firstNames = [
+    'Adam', 'Andrew', 'Angela', 'Anna', 'Anthony', 'Ava',
+    'Benjamin', 'Bethany', 'Brian', 'Bruce', 'Bryan',
+    'Catherine', 'Charles', 'Christopher', 'Claire', 'Clark',
+    'Daniel', 'David', 'Darren', 'Darrin', 'Darryl', 'Donna',
+    'Edward', 'Elizabeth', 'Emma', 'Eric', 'Emily',
+    'Frank', 'Frederick',
+    'George', 'Gloria', 'Gordon', 'Grant',
+    'Hannah', 'Henry', 'Helen', 'Howard',
+    'Isaac', 'Iris', 'Ivan',
+    'James', 'Jennifer', 'Jeremy', 'Jessica', 'John', 'Jonathan', 'Joseph', 'Joshua',
+    'Karen', 'Katherine', 'Kenneth', 'Kevin', 'Kyle',
+    'Laura', 'Lawrence', 'Leonard', 'Leslie', 'Lisa', 'Lois',
+    'Margaret', 'Maria', 'Mark', 'Martha', 'Martin', 'Mary', 'Matthew', 'Michael', 'Michelle', 'Miller',
+    'Nancy', 'Nathan', 'Nicholas', 'Nicole',
+    'Oliver', 'Olivia',
+    'Patricia', 'Patrick', 'Paul', 'Paula', 'Peter', 'Phillip', 'Philip',
+    'Rachel', 'Raymond', 'Rebecca', 'Richard', 'Robert', 'Roger', 'Ronald', 'Rose', 'Roy', 'Ruth', 'Ryan',
+    'Samuel', 'Sandra', 'Sara', 'Sarah', 'Scott', 'Sean', 'Sharon', 'Shirley', 'Simon', 'Sophie', 'Stanley', 'Stephen', 'Steven', 'Susan',
+    'Tamara', 'Tammy', 'Taylor', 'Teresa', 'Terry', 'Theresa', 'Thomas', 'Timothy', 'Todd', 'Tracy',
+    'Ursula',
+    'Valerie', 'Vernon', 'Veronica', 'Victoria', 'Vincent',
+    'Walter', 'Warren', 'Wayne', 'Wesley', 'William', 'Zachary'
+  ]
+
+  const lastNames = [
+    'Adams', 'Alexander', 'Allen', 'Anderson', 'Andrews', 'Armstrong', 'Arnold', 'Austin',
+    'Bailey', 'Baker', 'Baldwin', 'Ball', 'Barker', 'Barton', 'Bates', 'Bauer', 'Baxter', 'Beaumont', 'Beck', 'Bennett', 'Benson', 'Bernard', 'Berry', 'Best', 'Bevans', 'Biggs', 'Bishop', 'Blair', 'Blake', 'Blanchard', 'Blanton', 'Bliss', 'Blount', 'Blow', 'Blue', 'Blythe', 'Boatright', 'Bogart', 'Boggs', 'Boone', 'Boothe', 'Booth', 'Borden', 'Borg', 'Bosworth', 'Bouchette', 'Boudreaux', 'Boudreau', 'Boulanger', 'Bourgeois', 'Boutelle', 'Bowen', 'Bower', 'Bowers', 'Bowles', 'Bowman', 'Bowyer', 'Boyd', 'Boyer', 'Boynton', 'Bozer', 'Bradbury', 'Bradford', 'Bradley', 'Bradshaw', 'Brady', 'Bragg', 'Bragg', 'Braid', 'Brailsford', 'Brammer', 'Brame', 'Bramlett', 'Branch', 'Brandenburg', 'Brandon', 'Brandow', 'Brandt', 'Branham', 'Branigin', 'Brannigan', 'Brannon', 'Branthover', 'Brantley', 'Brantner', 'Brantum', 'Branum', 'Brash', 'Braswell', 'Bratcher', 'Braten', 'Brathwaite', 'Bratkovich', 'Bray', 'Brayden', 'Brayton', 'Brazie', 'Brazil', 'Brazell', 'Brazier', 'Breachard', 'Breachel', 'Breads', 'Breal', 'Breaux', 'Brebner', 'Brecewell', 'Breck', 'Breckels', 'Breckley', 'Breckner', 'Breckon', 'Bredemus', 'Bredeson', 'Bredin', 'Bredshaw', 'Bree', 'Breed', 'Breeding', 'Breeland', 'Breeling', 'Breen', 'Breems', 'Breenan', 'Breer', 'Breers', 'Breese', 'Breesy', 'Breeze', 'Breezy', 'Breffni', 'Bregenzer', 'Bregeois', 'Breh', 'Brehm', 'Breich', 'Breidenbach', 'Breier', 'Breig', 'Breihan', 'Breil', 'Breilinger', 'Breine', 'Breinger', 'Breinig', 'Breininger', 'Breisacher', 'Breisel', 'Breit', 'Breitbarth', 'Breitbuch', 'Breitenstein', 'Breitfuss', 'Breitigam', 'Breitkopf', 'Breitkreutz', 'Breitler', 'Breitling', 'Breitmeyer', 'Breitmeyer', 'Breiton', 'Breitung', 'Breivogel', 'Breiwald', 'Breivald', 'Breivik', 'Breiwish', 'Breizel', 'Breja', 'Brejcha', 'Brejnak', 'Brejniak', 'Brejohn', 'Brejohn', 'Brejta', 'Brejzek', 'Brekelmans', 'Brekendorf', 'Brekenfeld', 'Brekenreid', 'Brekeven', 'Brekhus', 'Brekke', 'Brekken', 'Brekkie', 'Brekus', 'Brel', 'Breland', 'Brelbine', 'Brelford', 'Brelley', 'Brellochs', 'Brelsford', 'Brelsford', 'Breltzer', 'Brely', 'Brem', 'Bremaud', 'Bremba', 'Brembeck', 'Brembre', 'Brember', 'Brembo', 'Bremenfeld', 'Bremengan', 'Bremer', 'Bremers', 'Bremervale', 'Bremfels', 'Bremhall', 'Bremich', 'Bremicker', 'Bremier', 'Bremiller', 'Breminger', 'Breminghoff', 'Bremis', 'Bremker', 'Bremkle', 'Bremleier', 'Bremmels', 'Bremmelsieck', 'Bremmer', 'Bremmers', 'Bremmert', 'Bremmet', 'Bremmett', 'Bremmiel', 'Bremmier', 'Bremminger', 'Bremmire', 'Bremmis', 'Bremmle', 'Bremmling', 'Bremmlung', 'Bremmsen', 'Bremmu', 'Bremmum', 'Bremmuth', 'Bremmy', 'Bremnitz', 'Bremota', 'Bremoulin', 'Bremp', 'Brempt', 'Bremscher', 'Bremsinger', 'Bremslachen', 'Brems', 'Bremser', 'Bremsing', 'Bremsinger', 'Bremsworth', 'Bremuchlen', 'Bremville', 'Bremville', 'Brown', 'Bryan'
+  ]
+
+  function generateEmail(firstName, lastName) {
+    const domain = ['justice.gov.uk', 'gov.uk', 'moj.gov.uk'][Math.floor(Math.random() * 3)]
+    return `${firstName.toLowerCase()}.${lastName.toLowerCase()}@${domain}`
+  }
+
+  function generateSuggestionsForQuery(query) {
+    const suggestions = []
+    const queryLower = query.toLowerCase().trim()
+
+    if (queryLower.length === 0) {
+      return []
+    }
+
+    // Find matching first names
+    const matchingFirstNames = firstNames.filter(fn =>
+      fn.toLowerCase().startsWith(queryLower)
+    )
+
+    // Find matching last names
+    const matchingLastNames = lastNames.filter(ln =>
+      ln.toLowerCase().startsWith(queryLower)
+    )
+
+    // Generate combinations from matching first names + random last names
+    matchingFirstNames.forEach(firstName => {
+      lastNames.slice(0, 3).forEach(lastName => {
+        suggestions.push({
+          name: `${firstName} ${lastName}`,
+          email: generateEmail(firstName, lastName)
+        })
+      })
+    })
+
+    // Generate combinations from matching last names + random first names
+    matchingLastNames.forEach(lastName => {
+      firstNames.slice(0, 2).forEach(firstName => {
+        suggestions.push({
+          name: `${firstName} ${lastName}`,
+          email: generateEmail(firstName, lastName)
+        })
+      })
+    })
+
+    // If no matches found, show suggestions from any names that could match
+    if (suggestions.length === 0) {
+      // Generate diverse suggestions
+      const diverseFirstNames = firstNames.slice(0, 4)
+      const diverseLastNames = lastNames.slice(0, 4)
+      
+      diverseFirstNames.forEach(firstName => {
+        diverseLastNames.forEach(lastName => {
+          suggestions.push({
+            name: `${firstName} ${lastName}`,
+            email: generateEmail(firstName, lastName)
+          })
+        })
+      })
+    }
+
+    // Remove duplicates
+    const unique = Array.from(new Map(
+      suggestions.map(s => [`${s.name}${s.email}`, s])
+    ).values())
+
+    return unique.slice(0, 8) // Limit to 8 suggestions
+  }
+
+  function suggestTemplate (result) {
+    if (!result) return ''
+    return `<span class="govuk-body" style="display:block; margin-bottom: 0;">${result.name}</span>
+            <span class="govuk-hint" style="margin-bottom: 0;">${result.email}</span>`
+  }
+
+  function inputValueTemplate (result) {
+    if (!result) return ''
+    return result.name
+  }
+
+  function sourceFunction (query, populateResults) {
+    const results = generateSuggestionsForQuery(query)
+    populateResults(results)
+  }
+
+  accessibleAutocomplete({
+    element: document.querySelector('#autocomplete-container'),
+    id: 'caseworker',
+    source: sourceFunction,
+    templates: {
+      inputValue: inputValueTemplate,
+      suggestion: suggestTemplate
+    },
+    minLength: 1,
+    name: 'reassign-to',
+    displayMenu: 'overlay',
+    cssNamespace: 'autocomplete'
+  })
+</script>
+<style>
+  /* Styling to match the prototype screenshot */
+  .autocomplete__suggestion {
+    padding-top: 10px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #b1b4b6;
+  }
+  .autocomplete__suggestion:last-child {
+    border-bottom: none;
+  }
+  .autocomplete__suggestion--focused {
+    background-color: #1d70b8;
+    color: #fff;
+  }
+  .autocomplete__suggestion--focused .govuk-hint {
+    color: #fff;
+  }
+</style>
+{% endblock %}

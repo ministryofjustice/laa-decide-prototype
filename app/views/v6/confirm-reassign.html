@@ -1,0 +1,140 @@
+{% extends "layouts/main.html" %}
+
+{% set pageName="Confirm you want to reassign this case?" %}
+
+{# Navigation header #}
+{% block header %}
+  {{ govukHeader({
+    homepageUrl: "/",
+    serviceName: "Legal Aid Agency",
+    serviceUrl: "/",
+    navigation: [
+      {
+        href: "#",
+        text: "jonaan.barton@law.com"
+      },
+      {
+        href: "#",
+        text: "Sign out"
+      }
+    ]
+  }) }}
+
+  <div class="moj-primary-navigation">
+    <div class="moj-primary-navigation__container">
+      <div class="moj-primary-navigation__nav">
+        <nav class="moj-primary-navigation" aria-label="Primary navigation">
+          <ul class="moj-primary-navigation__list">
+            <li class="moj-primary-navigation__item">
+              <a class="moj-primary-navigation__link" href="#">Decide if an applicant can get legal aid</a>
+            </li>
+            <li class="moj-primary-navigation__item">
+              <a class="moj-primary-navigation__link" href="#">Open applications</a>
+            </li>
+            <li class="moj-primary-navigation__item">
+              <a class="moj-primary-navigation__link" aria-current="page" href="/v6/yourlist">Your list</a>
+            </li>
+            <li class="moj-primary-navigation__item">
+              <a class="moj-primary-navigation__link" href="#">Search</a>
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+
+{% block beforeContent %}
+  {{ govukPhaseBanner({
+    tag: {
+      text: "Beta"
+    },
+    html: 'This is a new service – your <a class="govuk-link" href="#">feedback</a> will help us to improve it.'
+  }) }}
+  <a href="{% if reference %}/v6/reassign?reference={{ reference }}{% else %}/v6/reassign{% endif %}" class="govuk-back-link">Back</a>
+{% endblock %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    <h1 class="govuk-heading-xl">Confirm you want to reassign this case?</h1>
+
+    <div class="govuk-summary-card">
+      <div class="govuk-summary-card__title-wrapper">
+        <h2 class="govuk-summary-card__title">Reassignment details</h2>
+        <ul class="govuk-summary-card__actions">
+          <li class="govuk-summary-card__action">
+            <a class="govuk-link" href="/v6/reassign?reference={{ reference }}">
+              Change<span class="govuk-visually-hidden"> reassignment details</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+      <div class="govuk-summary-card__content">
+        <dl class="govuk-summary-list">
+          <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">
+              Reassign to
+            </dt>
+            <dd class="govuk-summary-list__value">
+              {{ data['reassign-to'] or 'Jim Jones' }}
+            </dd>
+            <dd class="govuk-summary-list__actions">
+              <a class="govuk-link" href="/v6/reassign?reference={{ reference }}">
+                Change<span class="govuk-visually-hidden"> who to reassign to</span>
+              </a>
+            </dd>
+          </div>
+          <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">
+              Applicant name
+            </dt>
+            <dd class="govuk-summary-list__value">
+              {{ (application.firstName and application.lastName) and (application.firstName + ' ' + application.lastName) or 'John Doe' }}
+            </dd>
+          </div>
+          <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">
+              Type of application
+            </dt>
+            <dd class="govuk-summary-list__value">
+              {% if application and application.isPriorAuthority %}
+                Prior authority
+              {% elif application and application.type %}
+                {{ application.type }}
+              {% else %}
+                Initial application
+              {% endif %}
+            </dd>
+          </div>
+          {% if data['decision-explanation'] %}
+          <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">
+              Explanation
+            </dt>
+            <dd class="govuk-summary-list__value">
+              {{ data['decision-explanation'] }}
+            </dd>
+            <dd class="govuk-summary-list__actions">
+              <a class="govuk-link" href="/v6/reassign?reference={{ reference }}">
+                Change<span class="govuk-visually-hidden"> explanation</span>
+              </a>
+            </dd>
+          </div>
+          {% endif %}
+        </dl>
+      </div>
+    </div>
+
+    <form action="/v6/your-list" method="post" novalidate>
+      <input type="hidden" name="reassigned" value="true">
+      <input type="hidden" name="reassign-to" value="{{ data['reassign-to'] }}">
+      <input type="hidden" name="reference" value="{{ reference }}">
+      <input type="hidden" name="decision-explanation" value="{{ data['decision-explanation'] }}">
+      {{ govukButton({
+        text: "Confirm reassign"
+      }) }}
+    </form>
+  </div>
+</div>
+{% endblock %}

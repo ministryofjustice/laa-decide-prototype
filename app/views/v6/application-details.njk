@@ -114,10 +114,15 @@
       {% endif %}
 
       <div class="govuk-!-margin-bottom-4">
-        {{ govukTag({
-          text: "In progress",
-          classes: "govuk-tag--light-blue"
-        }) }}
+        {% if application.status === "Granted" %}
+          {{ govukTag({ text: "Granted", classes: "govuk-tag--green" }) }}
+        {% elif application.status === "Refused" %}
+          {{ govukTag({ text: "Refused", classes: "govuk-tag--red" }) }}
+        {% elif isAssigned %}
+          {{ govukTag({ text: "In progress", classes: "govuk-tag--light-blue" }) }}
+        {% else %}
+          {{ govukTag({ text: "Submitted", classes: "govuk-tag--pink" }) }}
+        {% endif %}
       </div>
 
       <h1 class="govuk-heading-xl govuk-!-margin-bottom-4">{{ application.ref or application.reference }}</h1>
@@ -232,9 +237,17 @@
                 <dd class="govuk-summary-list__value">Substantive</dd>
               </div>
               <div class="govuk-summary-list__row">
-                <dt class="govuk-summary-list__key">Merits decision</dt>
+                <dt class="govuk-summary-list__key">Status</dt>
                 <dd class="govuk-summary-list__value">
-                  {{ govukTag({ text: "In progress", classes: "govuk-tag--light-blue" }) }}
+                  {% if application.status === "Granted" %}
+                    {{ govukTag({ text: "Granted", classes: "govuk-tag--green" }) }}
+                  {% elif application.status === "Refused" %}
+                    {{ govukTag({ text: "Refused", classes: "govuk-tag--red" }) }}
+                  {% elif isAssigned %}
+                    {{ govukTag({ text: "In progress", classes: "govuk-tag--light-blue" }) }}
+                  {% else %}
+                    {{ govukTag({ text: "Submitted", classes: "govuk-tag--pink" }) }}
+                  {% endif %}
                 </dd>
               </div>
             </dl>

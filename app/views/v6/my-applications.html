@@ -69,6 +69,21 @@
 {% block content %}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-full" style="width: 70%;">
+
+      {% if reassigned == 'true' %}
+        <div class="govuk-notification-banner govuk-notification-banner--success" role="alert" aria-labelledby="govuk-notification-banner-title" data-module="govuk-notification-banner">
+          <div class="govuk-notification-banner__header">
+            <h2 class="govuk-notification-banner__title" id="govuk-notification-banner-title">
+              Success
+            </h2>
+          </div>
+          <div class="govuk-notification-banner__content">
+            <h3 class="govuk-notification-banner__heading">
+              Application reassigned to {{ reassignedTo or 'John Smith' }}
+            </h3>
+          </div>
+        </div>
+      {% endif %}
       
       <h1 class="govuk-heading-xl govuk-!-margin-bottom-6">Your list</h1>
 
@@ -113,7 +128,7 @@
                   <strong>{{ app.matterType.title }}</strong><br>{{ app.matterType.subtext }}
                 </td>
                 <td class="govuk-table__cell">
-                  <a href="/v6/remove-application/{{ app.ref }}" class="govuk-link">Reassign</a>
+                  <a href="/v6/reassign?reference={{ app.ref }}" class="govuk-link">Reassign</a>
                 </td>
               </tr>
             {% endfor %}

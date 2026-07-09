@@ -1,0 +1,57 @@
+{% extends "layouts/layout.html" %}
+
+{% block pageTitle %}
+Your list
+{% endblock %}
+
+{% block content %}
+  {% if reassigned == 'true' %}
+    <div class="govuk-notification-banner govuk-notification-banner--success" role="alert" aria-labelledby="govuk-notification-banner-title" data-module="govuk-notification-banner">
+      <div class="govuk-notification-banner__header">
+        <h2 class="govuk-notification-banner__title" id="govuk-notification-banner-title">
+          Success
+        </h2>
+      </div>
+      <div class="govuk-notification-banner__content">
+        <h3 class="govuk-notification-banner__heading">
+          Application reassigned to {{ reassignedTo or 'John Smith' }}
+        </h3>
+      </div>
+    </div>
+  {% endif %}
+
+  <h1 class="govuk-heading-xl">Your list</h1>
+
+  {% if applications and applications.length > 0 %}
+    <table class="govuk-table">
+      <thead class="govuk-table__head">
+        <tr class="govuk-table__row">
+          <th scope="col" class="govuk-table__header">Name</th>
+          <th scope="col" class="govuk-table__header">Type of application</th>
+          <th scope="col" class="govuk-table__header">Status</th>
+          <th scope="col" class="govuk-table__header">Action</th>
+        </tr>
+      </thead>
+      <tbody class="govuk-table__body">
+        {% for application in applications %}
+          <tr class="govuk-table__row">
+            <td class="govuk-table__cell">{{ application.firstName }} {{ application.lastName }}</td>
+            <td class="govuk-table__cell">
+              {% if application.isPriorAuthority %}
+                Prior authority
+              {% else %}
+                Initial application
+              {% endif %}
+            </td>
+            <td class="govuk-table__cell">In progress</td>
+            <td class="govuk-table__cell">
+              <a href="/v6/reassign?reference={{ application.ref }}" class="govuk-link">Reassign</a>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p class="govuk-body">You have no applications assigned to you.</p>
+  {% endif %}
+{% endblock %}
