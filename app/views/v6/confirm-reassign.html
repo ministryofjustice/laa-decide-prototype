@@ -87,10 +87,10 @@
           </div>
           <div class="govuk-summary-list__row">
             <dt class="govuk-summary-list__key">
-              Applicant name
+              Caseworker name
             </dt>
             <dd class="govuk-summary-list__value">
-              {{ (application.firstName and application.lastName) and (application.firstName + ' ' + application.lastName) or 'John Doe' }}
+              {{ (application and application.caseworker) or 'Caseworker name unavailable' }}
             </dd>
           </div>
           <div class="govuk-summary-list__row">
