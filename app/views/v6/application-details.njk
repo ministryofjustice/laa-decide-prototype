@@ -127,18 +127,6 @@
 
       <h1 class="govuk-heading-xl govuk-!-margin-bottom-4">{{ application.ref or application.reference }}</h1>
 
-      {% if application.status %}
-        <p class="govuk-!-margin-bottom-4">
-          {% if application.status === "Granted" %}
-            <strong class="govuk-tag govuk-tag--green">{{ application.status }}</strong>
-          {% elif application.status === "Refused" %}
-            <strong class="govuk-tag govuk-tag--red">{{ application.status }}</strong>
-          {% else %}
-            <strong class="govuk-tag govuk-tag--light-blue">{{ application.status }}</strong>
-          {% endif %}
-        </p>
-      {% endif %}
-
       <p class="govuk-body govuk-!-margin-bottom-1">
         <strong>Assigned to:</strong> Caseworker name
       </p>
