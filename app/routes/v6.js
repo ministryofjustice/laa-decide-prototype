@@ -934,7 +934,14 @@ router.get('/add-application/:reference', function(req, res) {
   }
   
   const ref = req.params.reference;
-  const appExists = req.session.data['assigned-applications'].find(app => app.ref === ref && app.isPriorAuthority === req.query.isPriorAuthority);
+  const isPriorAuthorityRequested = req.query.isPriorAuthority === 'true';
+  const hasPriorAuthorityParam = typeof req.query.isPriorAuthority !== 'undefined';
+  const appExists = req.session.data['assigned-applications'].find(app => {
+    if (app.ref !== ref) return false;
+    // If caller specified prior authority type, match exact variant; otherwise match any by ref.
+    if (hasPriorAuthorityParam) return app.isPriorAuthority === isPriorAuthorityRequested;
+    return true;
+  });
   
   if (!appExists) {
     const assignedCaseworker = caseworkers[Math.floor(Math.random() * caseworkers.length)];
@@ -944,8 +951,16 @@ router.get('/add-application/:reference', function(req, res) {
       req.session.data['open-applications'] = generateMockApplications(8);
     }
     
-    // Get the full application data from open applications
-    const openApp = req.session.data['open-applications'] ? req.session.data['open-applications'].find(app => app.ref === ref) : null;
+    // Get the full application data from open applications, matching requested variant when provided.
+    let openApp = null;
+    if (req.session.data['open-applications']) {
+      if (hasPriorAuthorityParam) {
+        openApp = req.session.data['open-applications'].find(app => app.ref === ref && app.isPriorAuthority === isPriorAuthorityRequested) || null;
+      }
+      if (!openApp) {
+        openApp = req.session.data['open-applications'].find(app => app.ref === ref) || null;
+      }
+    }
     
     const addedDate = new Date().toLocaleDateString('en-GB', { 
       day: '2-digit', 

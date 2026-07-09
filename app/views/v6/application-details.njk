@@ -146,6 +146,7 @@
         {% elif not hasDecision %}
           <form id="addToListForm" style="display: inline;">
             <input type="hidden" name="reference" value="{{ reference }}">
+            <input type="hidden" name="isPriorAuthority" value="{{ application.isPriorAuthority and 'true' or 'false' }}">
             {{ govukButton({
               text: "Add to your list",
               classes: "govuk-button--secondary govuk-!-margin-bottom-8",
@@ -157,9 +158,10 @@
             document.getElementById('addToListForm').addEventListener('submit', function(e) {
               e.preventDefault();
               const reference = this.querySelector('input[name="reference"]').value;
+              const isPriorAuthority = this.querySelector('input[name="isPriorAuthority"]').value;
               
               // Add application to list via fetch
-              fetch('/v6/add-application/' + reference, { 
+              fetch('/v6/add-application/' + reference + '?isPriorAuthority=' + isPriorAuthority, { 
                 method: 'GET',
                 headers: {
                   'X-Requested-With': 'XMLHttpRequest'
@@ -178,10 +180,10 @@
                   
                   toastContainer.appendChild(toast);
                   
-                  // Hide toast after 3 seconds
+                  // Redirect to Your list after brief confirmation.
                   setTimeout(() => {
-                    toast.remove();
-                  }, 3000);
+                    window.location.href = '/v6/yourlist';
+                  }, 1000);
                 })
               .catch(error => console.error('Error:', error));
           });

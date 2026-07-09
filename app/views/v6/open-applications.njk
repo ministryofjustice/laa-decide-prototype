@@ -216,7 +216,7 @@
                       <strong>{{ app.matterType.title }}</strong><br>{{ app.matterType.subtext }}
                     </td>
                     <td class="govuk-table__cell">
-                      <a href="#" class="govuk-link add-to-list" data-ref="{{ app.ref }}">Add</a>
+                      <a href="#" class="govuk-link add-to-list" data-ref="{{ app.ref }}" data-is-prior-authority="{{ app.isPriorAuthority and 'true' or 'false' }}">Add</a>
                     </td>
                   </tr>
                 {% endfor %}
@@ -330,9 +330,10 @@
       link.addEventListener('click', function(e) {
         e.preventDefault();
         const reference = this.getAttribute('data-ref');
+        const isPriorAuthority = this.getAttribute('data-is-prior-authority') === 'true';
         
         // Add application to list via fetch
-        fetch('/v6/add-application/' + reference, { 
+        fetch('/v6/add-application/' + reference + '?isPriorAuthority=' + isPriorAuthority, { 
           method: 'GET',
           headers: {
             'X-Requested-With': 'XMLHttpRequest'
