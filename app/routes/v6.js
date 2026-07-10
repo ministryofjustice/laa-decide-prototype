@@ -1262,6 +1262,7 @@ router.get('/search', function(req, res) {
 
 router.get('/application/:reference', function(req, res) {
   const reference = req.params.reference;
+  const requestedPriorAuthority = req.query.isPriorAuthority === 'true';
   const hasLinkedCases = reference === 'L-12Z-13P';
 
   // Ensure seeded applications are always available
@@ -1286,25 +1287,33 @@ router.get('/application/:reference', function(req, res) {
   // Get application data from assigned, completed, or open applications
   let applicationData = {};
   let hasPriorAuthority = false;
+
+  function selectApplicationVariant(apps) {
+    if (!apps || apps.length === 0) return {};
+    if (requestedPriorAuthority) {
+      return apps.find(app => app.isPriorAuthority) || apps[0] || {};
+    }
+    return apps.find(app => !app.isPriorAuthority) || apps[0] || {};
+  }
   
   if (req.session.data['assigned-applications']) {
     // Check if ANY application with this reference has prior authority
     const allAppsWithRef = req.session.data['assigned-applications'].filter(app => app.ref === reference);
-    applicationData = allAppsWithRef.find(app => !app.isPriorAuthority) || allAppsWithRef[0] || {};
+    applicationData = selectApplicationVariant(allAppsWithRef);
     hasPriorAuthority = allAppsWithRef.some(app => app.isPriorAuthority);
   }
   
   if (!applicationData.ref && req.session.data['completed-applications']) {
     // Check if ANY application with this reference has prior authority
     const allAppsWithRef = req.session.data['completed-applications'].filter(app => app.ref === reference);
-    applicationData = allAppsWithRef.find(app => !app.isPriorAuthority) || allAppsWithRef[0] || {};
+    applicationData = selectApplicationVariant(allAppsWithRef);
     hasPriorAuthority = allAppsWithRef.some(app => app.isPriorAuthority);
   }
   
   if (!applicationData.ref && req.session.data['open-applications']) {
     // Check if ANY application with this reference has prior authority
     const allAppsWithRef = req.session.data['open-applications'].filter(app => app.ref === reference);
-    applicationData = allAppsWithRef.find(app => !app.isPriorAuthority) || allAppsWithRef[0] || {};
+    applicationData = selectApplicationVariant(allAppsWithRef);
     hasPriorAuthority = allAppsWithRef.some(app => app.isPriorAuthority);
   }
   
