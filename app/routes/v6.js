@@ -680,7 +680,7 @@ function generateMockApplications(count = 8) {
     const submittedDate = generateRandomDate();
     
     // Create the initial application - delegated functions are always "Used"
-    applications.push({
+    const initialApplication = {
       ref: ref,
       reference: ref,
       firstName: firstName,
@@ -694,10 +694,17 @@ function generateMockApplications(count = 8) {
       delegatedFunctions: 'Used',
       matterType: { title: 'Family', subtext: 'Special Children\'s Act' },
       isPriorAuthority: false
-    });
+    };
+    applications.push(initialApplication);
     
     // Randomly add 1-2 prior authority sub-applications for the same reference - delegated functions are N/A
     if (Math.random() > 0.5) {
+      // Any prior authority request implies the initial application has already been granted.
+      initialApplication.status = 'Granted';
+      initialApplication.decisionType = 'Grant';
+      initialApplication.outcome = 'Granted';
+      initialApplication.outcomeClass = 'green';
+
       const numPriorAuth = Math.random() > 0.6 ? 2 : 1;
       for (let j = 0; j < numPriorAuth; j++) {
         applications.push({
@@ -1284,61 +1291,52 @@ router.get('/application/:reference', function(req, res) {
     }
   });
   
-  // Get application data from assigned, completed, or open applications
-  let applicationData = {};
-  let hasPriorAuthority = false;
+  const applicationCollections = [
+    req.session.data['assigned-applications'] || [],
+    req.session.data['completed-applications'] || [],
+    req.session.data['open-applications'] || []
+  ];
 
-  function selectApplicationVariant(apps) {
-    if (!apps || apps.length === 0) return {};
-    if (requestedPriorAuthority) {
-      return apps.find(app => app.isPriorAuthority) || apps[0] || {};
+  function findApplicationVariant(isPriorAuthority) {
+    for (const collection of applicationCollections) {
+      const match = collection.find(app => app.ref === reference && Boolean(app.isPriorAuthority) === isPriorAuthority);
+      if (match) {
+        return match;
+      }
     }
-    return apps.find(app => !app.isPriorAuthority) || apps[0] || {};
+    return null;
   }
-  
-  if (req.session.data['assigned-applications']) {
-    // Check if ANY application with this reference has prior authority
-    const allAppsWithRef = req.session.data['assigned-applications'].filter(app => app.ref === reference);
-    applicationData = selectApplicationVariant(allAppsWithRef);
-    hasPriorAuthority = allAppsWithRef.some(app => app.isPriorAuthority);
+
+  function applyStoredDecision(app) {
+    if (!app) return null;
+    const hydrated = { ...app };
+    // decision-store is for the initial application decision, not PA requests.
+    if (!hydrated.isPriorAuthority && req.session.data['decision-store'] && req.session.data['decision-store'][reference]) {
+      const stored = req.session.data['decision-store'][reference];
+      hydrated.status = stored.status;
+      hydrated.decisionDate = stored.decisionDate;
+      hydrated.decisionType = stored.decisionType;
+      if (stored.certDate) hydrated.certDate = stored.certDate;
+      if (stored.refusalReason) hydrated.refusalReason = stored.refusalReason;
+    }
+    return hydrated;
   }
-  
-  if (!applicationData.ref && req.session.data['completed-applications']) {
-    // Check if ANY application with this reference has prior authority
-    const allAppsWithRef = req.session.data['completed-applications'].filter(app => app.ref === reference);
-    applicationData = selectApplicationVariant(allAppsWithRef);
-    hasPriorAuthority = allAppsWithRef.some(app => app.isPriorAuthority);
+
+  const initialApplicationData = applyStoredDecision(findApplicationVariant(false));
+  const priorAuthorityApplicationData = applyStoredDecision(findApplicationVariant(true));
+  if (initialApplicationData && priorAuthorityApplicationData && !initialApplicationData.status) {
+    initialApplicationData.status = 'Granted';
+    initialApplicationData.decisionType = 'Grant';
   }
-  
-  if (!applicationData.ref && req.session.data['open-applications']) {
-    // Check if ANY application with this reference has prior authority
-    const allAppsWithRef = req.session.data['open-applications'].filter(app => app.ref === reference);
-    applicationData = selectApplicationVariant(allAppsWithRef);
-    hasPriorAuthority = allAppsWithRef.some(app => app.isPriorAuthority);
-  }
+  const applicationData = requestedPriorAuthority
+    ? (priorAuthorityApplicationData || initialApplicationData || {})
+    : (initialApplicationData || priorAuthorityApplicationData || {});
+  const hasPriorAuthority = Boolean(priorAuthorityApplicationData);
   
   // Get prior authority type from the actual data
   let priorAuthorityType = null;
-  if (applicationData.isPriorAuthority) {
-    priorAuthorityType = applicationData.priorAuthorityType || 'Expert';
-  }
-  if (!priorAuthorityType && req.session.data['open-applications']) {
-    const priorAuthApp = req.session.data['open-applications'].find(app => app.ref === reference && app.isPriorAuthority);
-    if (priorAuthApp) {
-      priorAuthorityType = priorAuthApp.priorAuthorityType || 'Expert';
-    }
-  }
-  if (!priorAuthorityType && req.session.data['completed-applications']) {
-    const priorAuthApp = req.session.data['completed-applications'].find(app => app.ref === reference && app.isPriorAuthority);
-    if (priorAuthApp) {
-      priorAuthorityType = priorAuthApp.priorAuthorityType || 'Expert';
-    }
-  }
-  if (!priorAuthorityType && req.session.data['assigned-applications']) {
-    const priorAuthApp = req.session.data['assigned-applications'].find(app => app.ref === reference && app.isPriorAuthority);
-    if (priorAuthApp) {
-      priorAuthorityType = priorAuthApp.priorAuthorityType || 'Expert';
-    }
+  if (priorAuthorityApplicationData) {
+    priorAuthorityType = priorAuthorityApplicationData.priorAuthorityType || 'Expert';
   }
   if (!priorAuthorityType) priorAuthorityType = 'Expert';
   
@@ -1372,16 +1370,6 @@ router.get('/application/:reference', function(req, res) {
     providerAddress: `${nameLen} Liverpool Road<br>Manchester<br>MW2 5WT`,
     providerPhone: `0712345678${nameLen % 9}`
   };
-  
-  // Restore any stored decision data to the application
-  if (req.session.data['decision-store'] && req.session.data['decision-store'][reference]) {
-    const stored = req.session.data['decision-store'][reference];
-    application.status = stored.status;
-    application.decisionDate = stored.decisionDate;
-    application.decisionType = stored.decisionType;
-    if (stored.certDate) application.certDate = stored.certDate;
-    if (stored.refusalReason) application.refusalReason = stored.refusalReason;
-  }
   
   // Initialize history with initial application received entry if it doesn't exist
   if (!req.session.data['app-history']) {
@@ -1429,8 +1417,12 @@ router.get('/application/:reference', function(req, res) {
   }
   
   // Check if application is already assigned (in your list)
-  const isAssigned = req.session.data['assigned-applications'] && 
-                     req.session.data['assigned-applications'].some(app => app.ref === reference);
+  const assignedApplications = req.session.data['assigned-applications'] || [];
+  const isAssigned = assignedApplications.some(app => app.ref === reference && Boolean(app.isPriorAuthority) === requestedPriorAuthority);
+  const isInitialApplicationAssigned = assignedApplications.some(app => app.ref === reference && !app.isPriorAuthority);
+  const isPriorAuthorityAssigned = assignedApplications.some(app => app.ref === reference && app.isPriorAuthority);
+  const statusApplication = requestedPriorAuthority && initialApplicationData ? initialApplicationData : application;
+  const isStatusApplicationAssigned = requestedPriorAuthority && initialApplicationData ? isInitialApplicationAssigned : isAssigned;
   
   // Convert app-history to historyEvents format for template
   let historyEvents = [];
@@ -1483,11 +1475,18 @@ router.get('/application/:reference', function(req, res) {
     pageTitle: reference,
     reference: reference,
     application: isViewingPreviousVersion ? versionedApplication : application,
+    initialApplication: initialApplicationData,
+    priorAuthorityApplication: priorAuthorityApplicationData,
+    statusApplication: statusApplication,
     hasLinkedCases: hasLinkedCases,
     hasPriorAuthority: hasPriorAuthority,
     priorAuthorityType: priorAuthorityType,
     sessionData: req.session.data,
     isAssigned: isAssigned,
+    isInitialApplicationAssigned: isInitialApplicationAssigned,
+    isPriorAuthorityAssigned: isPriorAuthorityAssigned,
+    isStatusApplicationAssigned: isStatusApplicationAssigned,
+    requestedPriorAuthority: requestedPriorAuthority,
     historyEvents: historyEvents,
     isViewingPreviousVersion: isViewingPreviousVersion,
     viewVersion: viewVersion,

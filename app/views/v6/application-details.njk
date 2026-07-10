@@ -113,12 +113,36 @@
         </div>
       {% endif %}
 
-      <div class="govuk-!-margin-bottom-4">
-        {% if application.status === "Granted" %}
+      <div id="page-status-tag" class="govuk-!-margin-bottom-4">
+        {% if statusApplication.status === "Granted" %}
           {{ govukTag({ text: "Granted", classes: "govuk-tag--green" }) }}
-        {% elif application.status === "Refused" %}
+        {% elif statusApplication.status === "Refused" %}
           {{ govukTag({ text: "Refused", classes: "govuk-tag--red" }) }}
-        {% elif isAssigned %}
+        {% elif isStatusApplicationAssigned %}
+          {{ govukTag({ text: "In progress", classes: "govuk-tag--light-blue" }) }}
+        {% else %}
+          {{ govukTag({ text: "Submitted", classes: "govuk-tag--pink" }) }}
+        {% endif %}
+      </div>
+
+      <div id="initial-status-tag-template" hidden>
+        {% if statusApplication.status === "Granted" %}
+          {{ govukTag({ text: "Granted", classes: "govuk-tag--green" }) }}
+        {% elif statusApplication.status === "Refused" %}
+          {{ govukTag({ text: "Refused", classes: "govuk-tag--red" }) }}
+        {% elif isStatusApplicationAssigned %}
+          {{ govukTag({ text: "In progress", classes: "govuk-tag--light-blue" }) }}
+        {% else %}
+          {{ govukTag({ text: "Submitted", classes: "govuk-tag--pink" }) }}
+        {% endif %}
+      </div>
+
+      <div id="prior-authority-status-tag-template" hidden>
+        {% if priorAuthorityApplication and priorAuthorityApplication.status === "Granted" %}
+          {{ govukTag({ text: "Granted", classes: "govuk-tag--green" }) }}
+        {% elif priorAuthorityApplication and priorAuthorityApplication.status === "Refused" %}
+          {{ govukTag({ text: "Refused", classes: "govuk-tag--red" }) }}
+        {% elif isPriorAuthorityAssigned %}
           {{ govukTag({ text: "In progress", classes: "govuk-tag--light-blue" }) }}
         {% else %}
           {{ govukTag({ text: "Submitted", classes: "govuk-tag--pink" }) }}
@@ -227,11 +251,11 @@
               <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">Status</dt>
                 <dd class="govuk-summary-list__value">
-                  {% if application.status === "Granted" %}
+                  {% if statusApplication.status === "Granted" %}
                     {{ govukTag({ text: "Granted", classes: "govuk-tag--green" }) }}
-                  {% elif application.status === "Refused" %}
+                  {% elif statusApplication.status === "Refused" %}
                     {{ govukTag({ text: "Refused", classes: "govuk-tag--red" }) }}
-                  {% elif isAssigned %}
+                  {% elif isStatusApplicationAssigned %}
                     {{ govukTag({ text: "In progress", classes: "govuk-tag--light-blue" }) }}
                   {% else %}
                     {{ govukTag({ text: "Submitted", classes: "govuk-tag--pink" }) }}
@@ -668,11 +692,21 @@
                 </div>
                 <div class="govuk-summary-list__row">
                   <dt class="govuk-summary-list__key">Date submitted</dt>
-                  <dd class="govuk-summary-list__value">14 May 2026</dd>
+                  <dd class="govuk-summary-list__value">{{ (priorAuthorityApplication and priorAuthorityApplication.submitted) or '14 May 2026' }}</dd>
                 </div>
                 <div class="govuk-summary-list__row">
                   <dt class="govuk-summary-list__key">Status</dt>
-                  <dd class="govuk-summary-list__value"><strong class="govuk-tag govuk-tag--pink">Submitted</strong></dd>
+                  <dd class="govuk-summary-list__value">
+                    {% if priorAuthorityApplication and priorAuthorityApplication.status === "Granted" %}
+                      {{ govukTag({ text: "Granted", classes: "govuk-tag--green" }) }}
+                    {% elif priorAuthorityApplication and priorAuthorityApplication.status === "Refused" %}
+                      {{ govukTag({ text: "Refused", classes: "govuk-tag--red" }) }}
+                    {% elif isPriorAuthorityAssigned %}
+                      {{ govukTag({ text: "In progress", classes: "govuk-tag--light-blue" }) }}
+                    {% else %}
+                      {{ govukTag({ text: "Submitted", classes: "govuk-tag--pink" }) }}
+                    {% endif %}
+                  </dd>
                 </div>
                 <div class="govuk-summary-list__row">
                   <dt class="govuk-summary-list__key">Delegated functions</dt>
@@ -1013,4 +1047,26 @@
   <script type="module" src="/plugin-assets/%40ministryofjustice%2Ffrontend/moj/init.js"></script>
   <script src="/plugin-assets/jquery/dist/jquery.js"></script>
   <script type="module" src="/public/javascripts/application.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const pageStatusTag = document.getElementById('page-status-tag');
+      const initialStatusTemplate = document.getElementById('initial-status-tag-template');
+      const priorAuthorityStatusTemplate = document.getElementById('prior-authority-status-tag-template');
+
+      if (!pageStatusTag || !initialStatusTemplate || !priorAuthorityStatusTemplate) {
+        return;
+      }
+
+      function syncPageStatusTag() {
+        const activeHash = window.location.hash || '#application-details';
+        const usePriorAuthorityStatus = activeHash === '#prior-authority';
+        pageStatusTag.innerHTML = usePriorAuthorityStatus
+          ? priorAuthorityStatusTemplate.innerHTML
+          : initialStatusTemplate.innerHTML;
+      }
+
+      syncPageStatusTag();
+      window.addEventListener('hashchange', syncPageStatusTag);
+    });
+  </script>
 {% endblock %}
