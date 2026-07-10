@@ -138,11 +138,7 @@
 
       {% if sessionData['decision-reference'] !== reference %}
         {% if isAssigned %}
-          {{ govukButton({
-            text: "Reassign",
-            classes: "govuk-button--secondary govuk-!-margin-bottom-8",
-            style: "background-color: #00703c; color: white;"
-          }) }}
+          <a href="/v6/reassign?reference={{ reference }}" class="govuk-button govuk-button--secondary govuk-!-margin-bottom-8" data-module="govuk-button" style="background-color: #00703c; color: white;">Reassign</a>
         {% elif not hasDecision %}
           <form id="addToListForm" style="display: inline;">
             <input type="hidden" name="reference" value="{{ reference }}">
@@ -170,6 +166,7 @@
                 .then(response => {
                   // Show toast notification using GOV.UK toast component
                   const toastContainer = document.getElementById('toast-notification');
+                  toastContainer.innerHTML = '';
                   const toast = document.createElement('div');
                   toast.setAttribute('data-module', 'govuk-notification-banner');
                   toast.setAttribute('role', 'region');
@@ -179,11 +176,12 @@
                   toast.innerHTML = '<div class="govuk-notification-banner__header"><h2 id="govuk-notification-banner-title" class="govuk-notification-banner__title">Success</h2></div><div class="govuk-notification-banner__content"><p class="govuk-notification-banner__heading">You added this application to your list</p></div>';
                   
                   toastContainer.appendChild(toast);
-                  
-                  // Redirect to Your list after brief confirmation.
-                  setTimeout(() => {
-                    window.location.href = '/v6/yourlist';
-                  }, 1000);
+
+                  // Stay on this page and switch CTA to Reassign once added.
+                  const form = document.getElementById('addToListForm');
+                  if (form) {
+                    form.outerHTML = '<a href="/v6/reassign?reference=' + encodeURIComponent(reference) + '" class="govuk-button govuk-button--secondary govuk-!-margin-bottom-8" data-module="govuk-button" style="background-color: #00703c; color: white;">Reassign</a>';
+                  }
                 })
               .catch(error => console.error('Error:', error));
           });
