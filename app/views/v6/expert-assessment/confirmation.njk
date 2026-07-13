@@ -1,0 +1,72 @@
+{% extends "layouts/main.html" %}
+
+{% from "govuk/components/header/macro.njk" import govukHeader %}
+{% from "moj/components/primary-navigation/macro.njk" import mojPrimaryNavigation %}
+
+{% block pageTitle %}
+  Assessment for prior authority completed - Prior Authority - GOV.UK
+{% endblock %}
+
+{% block header %}
+  {{ govukHeader({
+    homepageUrl: "#",
+    productName: "Legal Aid Agency",
+    navigationClasses: "govuk-header__navigation--end",
+    navigation: [
+      {
+        href: "#",
+        text: "joann.barton@law.com"
+      },
+      {
+        href: "#",
+        text: "Sign out"
+      }
+    ]
+  }) }}
+
+  {{ mojPrimaryNavigation({
+    label: 'Primary navigation',
+    items: [
+      {
+        text: 'Decide if an applicant can get legal aid',
+        href: '#'
+      },
+      {
+        text: 'Open applications',
+        href: '/v6/open-applications'
+      },
+      {
+        text: 'Your list',
+        href: '/v6/yourlist'
+      },
+      {
+        text: 'Search',
+        href: '/v6/search'
+      }
+    ]
+  }) }}
+{% endblock %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    {{ govukPanel({
+      titleText: "Assessment for prior authority completed",
+      html: "Your reference number is<br><strong>" + (reference or 'CRM4-Expert-123') + "</strong>"
+    }) }}
+
+    <h2 class="govuk-heading-m">What happens next</h2>
+
+    <p class="govuk-body">
+      We have recorded your decision. The provider will be notified.
+    </p>
+
+    {{ govukButton({
+      text: "Return to your list",
+      href: "/v6/yourlist"
+    }) }}
+
+  </div>
+</div>
+{% endblock %}

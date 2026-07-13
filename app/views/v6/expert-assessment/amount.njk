@@ -1,0 +1,308 @@
+{% extends "layouts/main.html" %}
+
+{% from "govuk/components/header/macro.njk" import govukHeader %}
+{% from "moj/components/primary-navigation/macro.njk" import mojPrimaryNavigation %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/textarea/macro.njk" import govukTextarea %}
+
+{% block head %}
+  {{ super() }}
+  <style>
+    .expert-detail-row {
+      display: flex;
+      align-items: center;
+      margin-bottom: 12px;
+      gap: 12px;
+    }
+
+    .expert-detail-label {
+      width: 220px;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .expert-detail-input {
+      width: 320px;
+      max-width: 100%;
+    }
+
+    .expert-time-wrap {
+      display: flex;
+      gap: 15px;
+    }
+
+    .expert-time-wrap .govuk-input__wrapper {
+      width: 152px;
+      max-width: 100%;
+    }
+
+    .expert-time-wrap .govuk-input--width-3 {
+      width: 100%;
+      max-width: 100%;
+    }
+
+    .expert-readonly {
+      background-color: #f3f2f1;
+    }
+
+    .expert-requested-block,
+    .expert-new-block {
+      margin-left: 38px;
+      margin-top: 10px;
+      margin-bottom: 30px;
+    }
+  </style>
+{% endblock %}
+
+{% block pageTitle %}
+  Make a decision - Prior Authority - GOV.UK
+{% endblock %}
+
+{% block header %}
+  {{ govukHeader({
+    homepageUrl: "#",
+    productName: "Legal Aid Agency",
+    navigationClasses: "govuk-header__navigation--end",
+    navigation: [
+      {
+        href: "#",
+        text: "joann.barton@law.com"
+      },
+      {
+        href: "#",
+        text: "Sign out"
+      }
+    ]
+  }) }}
+
+  {{ mojPrimaryNavigation({
+    label: 'Primary navigation',
+    items: [
+      {
+        text: 'Decide if an applicant can get legal aid',
+        href: '#'
+      },
+      {
+        text: 'Open applications',
+        href: '/v6/open-applications'
+      },
+      {
+        text: 'Your list',
+        href: '/v6/yourlist'
+      },
+      {
+        text: 'Search',
+        href: '/v6/search'
+      }
+    ]
+  }) }}
+{% endblock %}
+
+{% block beforeContent %}
+  {{ govukBackLink({
+    text: "Back",
+    href: "javascript:window.history.back()"
+  }) }}
+{% endblock %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    {% set amountDecisionErrorMessage = null %}
+    {% set justificationErrorMessage = null %}
+    {% if errors and errors.amountDecision %}
+      {% set amountDecisionErrorMessage = { text: errors.amountDecision } %}
+    {% endif %}
+    {% if errors and errors.justification %}
+      {% set justificationErrorMessage = { text: errors.justification } %}
+    {% endif %}
+
+    {% if errors and errors.amountDecision and errors.justification %}
+      {{ govukErrorSummary({
+        titleText: "There is a problem",
+        errorList: [
+          {
+            text: errors.amountDecision,
+            href: "#expert-amount-decision"
+          },
+          {
+            text: errors.justification,
+            href: "#expert-justification"
+          }
+        ]
+      }) }}
+    {% elif errors and errors.amountDecision %}
+      {{ govukErrorSummary({
+        titleText: "There is a problem",
+        errorList: [
+          {
+            text: errors.amountDecision,
+            href: "#expert-amount-decision"
+          }
+        ]
+      }) }}
+    {% elif errors and errors.justification %}
+      {{ govukErrorSummary({
+        titleText: "There is a problem",
+        errorList: [
+          {
+            text: errors.justification,
+            href: "#expert-justification"
+          }
+        ]
+      }) }}
+    {% endif %}
+
+    <h1 class="govuk-heading-l govuk-!-margin-bottom-1">Make a decision</h1>
+    <p class="govuk-heading-m govuk-!-margin-top-0 govuk-!-margin-bottom-6">{{ reference or 'L-12Z-13P' }}</p>
+
+    <p class="govuk-body">
+      Use this section to make a decision about the request.
+      This decision will be shared with the provider and recorded in application history.
+    </p>
+
+    <h2 class="govuk-heading-m govuk-!-margin-bottom-4">How much should be granted for this application?</h2>
+
+    <form action="/v6/expert-assessment/amount-handler" method="post" novalidate>
+      <div class="govuk-form-group{% if amountDecisionErrorMessage %} govuk-form-group--error{% endif %}">
+        {% if amountDecisionErrorMessage %}
+          <p id="expert-amount-decision-error" class="govuk-error-message">
+            <span class="govuk-visually-hidden">Error:</span> {{ amountDecisionErrorMessage.text }}
+          </p>
+        {% endif %}
+
+        <div class="govuk-radios" data-module="govuk-radios">
+          <div class="govuk-radios__item">
+            <input
+              class="govuk-radios__input"
+              id="expert-amount-decision"
+              name="expert-amount-decision"
+              type="radio"
+              value="requested"
+              data-aria-controls="conditional-expert-amount-decision"
+              {% if data['expert-amount-decision'] == 'requested' or not data['expert-amount-decision'] %}checked{% endif %}
+            >
+            <label class="govuk-label govuk-radios__label" for="expert-amount-decision">
+              Requested amount
+            </label>
+          </div>
+
+          <div class="govuk-radios__conditional{% if data['expert-amount-decision'] == 'new' %} govuk-radios__conditional--hidden{% endif %}" id="conditional-expert-amount-decision">
+          <div class="expert-requested-block">
+            <div class="expert-detail-row">
+              <div class="expert-detail-label govuk-body-s">Expert name</div>
+              <input class="govuk-input expert-detail-input expert-readonly" type="text" value="{{ data['expert-default-name'] or 'Not provided' }}" readonly>
+            </div>
+            <div class="expert-detail-row">
+              <div class="expert-detail-label govuk-body-s">Expert type</div>
+              <input class="govuk-input expert-detail-input expert-readonly" type="text" value="{{ data['expert-default-type'] or 'Not provided' }}" readonly>
+            </div>
+            <div class="expert-detail-row">
+              <div class="expert-detail-label govuk-body-s">Expert location</div>
+              <input class="govuk-input expert-detail-input expert-readonly" type="text" value="{{ data['expert-default-location'] or 'Not provided' }}" readonly>
+            </div>
+            <div class="expert-detail-row">
+              <div class="expert-detail-label govuk-body-s">Expert fee hourly rate</div>
+              <input class="govuk-input expert-detail-input expert-readonly" type="text" value="£{{ data['expert-default-rate'] or 'Not provided' }}" readonly>
+            </div>
+            <div class="expert-detail-row">
+              <div class="expert-detail-label govuk-body-s">Hours requested</div>
+              <div class="expert-time-wrap">
+                <div class="govuk-input__wrapper">
+                  <input class="govuk-input govuk-input--width-3 expert-readonly" type="text" value="{{ data['expert-default-hours'] or '00' }}" inputmode="numeric" spellcheck="false" aria-label="Hours" readonly>
+                  <div class="govuk-input__suffix" aria-hidden="true">hours</div>
+                </div>
+                <div class="govuk-input__wrapper">
+                  <input class="govuk-input govuk-input--width-3 expert-readonly" type="text" value="{{ data['expert-default-minutes'] or '00' }}" inputmode="numeric" spellcheck="false" aria-label="Minutes" readonly>
+                  <div class="govuk-input__suffix" aria-hidden="true">minutes</div>
+                </div>
+              </div>
+            </div>
+            <div class="expert-detail-row govuk-!-margin-bottom-0">
+              <div class="expert-detail-label govuk-body-s">Total amount</div>
+              <input class="govuk-input expert-detail-input expert-readonly" type="text" value="{{ requestedAmount or 'Not provided' }}" readonly>
+            </div>
+          </div>
+          </div>
+
+          <div class="govuk-radios__item govuk-!-margin-bottom-6">
+            <input
+              class="govuk-radios__input"
+              id="expert-amount-decision-2"
+              name="expert-amount-decision"
+              type="radio"
+              value="new"
+              data-aria-controls="conditional-expert-amount-decision-2"
+              {% if data['expert-amount-decision'] == 'new' %}checked{% endif %}
+            >
+            <label class="govuk-label govuk-radios__label" for="expert-amount-decision-2">
+              New amount
+            </label>
+          </div>
+
+          <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-expert-amount-decision-2">
+            <div class="expert-new-block" id="expert-new-amount-fields">
+              <div class="expert-detail-row">
+                <div class="expert-detail-label govuk-body-s">Expert name</div>
+                <input class="govuk-input expert-detail-input" type="text" name="expert-new-name" value="{{ data['expert-new-name'] or '' }}">
+              </div>
+              <div class="expert-detail-row">
+                <div class="expert-detail-label govuk-body-s">Expert type</div>
+                <input class="govuk-input expert-detail-input" type="text" name="expert-new-type" value="{{ data['expert-new-type'] or '' }}">
+              </div>
+              <div class="expert-detail-row">
+                <div class="expert-detail-label govuk-body-s">Expert location</div>
+                <input class="govuk-input expert-detail-input" type="text" name="expert-new-location" value="{{ data['expert-new-location'] or '' }}">
+              </div>
+              <div class="expert-detail-row">
+                <div class="expert-detail-label govuk-body-s">Expert fee hourly rate</div>
+                <input class="govuk-input expert-detail-input" type="text" name="expert-new-rate" value="{{ data['expert-new-rate'] or '' }}">
+              </div>
+              <div class="expert-detail-row">
+                <div class="expert-detail-label govuk-body-s">Hours requested</div>
+                <div class="expert-time-wrap">
+                  <div class="govuk-input__wrapper">
+                    <input class="govuk-input govuk-input--width-3" id="expert-new-hours" name="expert-new-hours" type="text" value="{{ data['expert-new-hours'] or '' }}" inputmode="numeric" spellcheck="false" aria-label="Hours">
+                    <div class="govuk-input__suffix" aria-hidden="true">hours</div>
+                  </div>
+                  <div class="govuk-input__wrapper">
+                    <input class="govuk-input govuk-input--width-3" id="expert-new-minutes" name="expert-new-minutes" type="text" value="{{ data['expert-new-minutes'] or '' }}" inputmode="numeric" spellcheck="false" aria-label="Minutes">
+                    <div class="govuk-input__suffix" aria-hidden="true">minutes</div>
+                  </div>
+                </div>
+              </div>
+              <div class="expert-detail-row govuk-!-margin-bottom-0">
+                <div class="expert-detail-label govuk-body-s">Total amount</div>
+                <input class="govuk-input expert-detail-input" type="text" id="expert-new-total-amount" name="expert-new-total-amount" value="{{ data['expert-new-total-amount'] or '' }}">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <h2 class="govuk-heading-m govuk-!-margin-top-6 govuk-!-margin-bottom-2">Justification</h2>
+      <p class="govuk-body govuk-!-margin-bottom-4">
+        We will share this justification with the provider in the grant notification email. You will also find this saved in the application history.
+      </p>
+
+      {{ govukTextarea({
+        id: "expert-justification",
+        name: "expert-justification",
+        errorMessage: justificationErrorMessage,
+        label: {
+          text: "Justification",
+          classes: "govuk-visually-hidden"
+        },
+        rows: 8,
+        value: data['expert-justification']
+      }) }}
+
+      <p class="govuk-hint govuk-!-margin-top-2">You can enter up to 350 words</p>
+
+      {{ govukButton({
+        text: "Continue"
+      }) }}
+    </form>
+  </div>
+</div>
+{% endblock %}

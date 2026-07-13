@@ -1,0 +1,104 @@
+{% extends "layouts/main.html" %}
+
+{% from "govuk/components/header/macro.njk" import govukHeader %}
+{% from "moj/components/primary-navigation/macro.njk" import mojPrimaryNavigation %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+
+{% block pageTitle %}
+  Make a decision - Prior Authority - GOV.UK
+{% endblock %}
+
+{% block header %}
+  {{ govukHeader({
+    homepageUrl: "#",
+    productName: "Legal Aid Agency",
+    navigationClasses: "govuk-header__navigation--end",
+    navigation: [
+      {
+        href: "#",
+        text: "joann.barton@law.com"
+      },
+      {
+        href: "#",
+        text: "Sign out"
+      }
+    ]
+  }) }}
+
+  {{ mojPrimaryNavigation({
+    label: 'Primary navigation',
+    items: [
+      {
+        text: 'Decide if an applicant can get legal aid',
+        href: '#'
+      },
+      {
+        text: 'Open applications',
+        href: '/v6/open-applications'
+      },
+      {
+        text: 'Your list',
+        href: '/v6/yourlist'
+      },
+      {
+        text: 'Search',
+        href: '/v6/search'
+      }
+    ]
+  }) }}
+{% endblock %}
+
+{% block beforeContent %}
+  {{ govukBackLink({
+    text: "Back",
+    href: "javascript:window.history.back()"
+  }) }}
+{% endblock %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    {% set newAmountErrorMessage = null %}
+    {% if errors and errors.newAmount %}
+      {% set newAmountErrorMessage = { text: errors.newAmount } %}
+    {% endif %}
+
+    {% if errors and errors.newAmount %}
+      {{ govukErrorSummary({
+        titleText: "There is a problem",
+        errorList: [
+          {
+            text: errors.newAmount,
+            href: "#expert-new-amount"
+          }
+        ]
+      }) }}
+    {% endif %}
+
+    <form action="/v6/expert-assessment/new-amount-handler" method="post" novalidate>
+      {{ govukInput({
+        id: "expert-new-amount",
+        name: "expert-new-amount",
+        classes: "govuk-input--width-10",
+        label: {
+          text: "Set a new amount",
+          classes: "govuk-label--l",
+          isPageHeading: true
+        },
+        hint: {
+          text: "Requested amount: " + (requestedAmount or 'Not provided')
+        },
+        prefix: {
+          text: "£"
+        },
+        value: data['expert-new-amount'],
+        errorMessage: newAmountErrorMessage
+      }) }}
+
+      {{ govukButton({
+        text: "Save and continue"
+      }) }}
+    </form>
+  </div>
+</div>
+{% endblock %}

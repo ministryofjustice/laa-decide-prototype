@@ -504,7 +504,15 @@ const SEEDED_APPLICATIONS = [
     delegatedFunctions: 'N/A',
     matterType: { title: 'Family', subtext: "Special Children's Act" },
     isPriorAuthority: true,
-    priorAuthorityType: 'Expert - Psychiatrist'
+    priorAuthorityType: 'Expert - Psychiatrist',
+    expertName: 'Dr Morley Calzoni',
+    expertType: 'Psychiatrist',
+    expertLocation: 'London',
+    expertHours: '60',
+    expertMinutes: '00',
+    expertRate: '100.80',
+    expertRequestedAmount: '6048.00',
+    expertJustification: 'Expert required to undertake psychiatric assessment on client, ordered by the court'
   },
   {
     ref: 'L-AUTO-GR4N',
@@ -533,7 +541,15 @@ const SEEDED_APPLICATIONS = [
     delegatedFunctions: 'N/A',
     matterType: { title: 'Family', subtext: "Special Children's Act" },
     isPriorAuthority: true,
-    priorAuthorityType: 'Expert - Psychiatrist'
+    priorAuthorityType: 'Expert - Psychiatrist',
+    expertName: 'Dr Morley Calzoni',
+    expertType: 'Psychiatrist',
+    expertLocation: 'London',
+    expertHours: '60',
+    expertMinutes: '00',
+    expertRate: '100.80',
+    expertRequestedAmount: '6048.00',
+    expertJustification: 'Expert required to undertake psychiatric assessment on client, ordered by the court'
   },
   {
     ref: 'L-REFUS-ED1A',
@@ -660,6 +676,33 @@ function generateRandomDate() {
   return formatted;
 }
 
+const expertProfiles = {
+  Psychiatrist: [
+    { name: 'Dr Morley Calzoni',    type: 'Psychiatrist',    location: 'London',     hours: '60', minutes: '00', rate: '100.80', requestedAmount: '6048.00', justification: 'Expert required to undertake psychiatric assessment on client, ordered by the court' },
+    { name: 'Dr Sarah Whitfield',   type: 'Psychiatrist',    location: 'Manchester', hours: '50', minutes: '00', rate: '98.00',  requestedAmount: '4900.00', justification: 'Psychiatric assessment required to establish mental capacity for proceedings' },
+    { name: 'Dr James Okonkwo',     type: 'Psychiatrist',    location: 'Leeds',      hours: '55', minutes: '00', rate: '95.50', requestedAmount: '5252.50', justification: 'Court-ordered psychiatric report to assess client welfare and risk' },
+    { name: 'Dr Fiona Baxter',      type: 'Psychiatrist',    location: 'Bristol',    hours: '45', minutes: '00', rate: '102.00', requestedAmount: '4590.00', justification: 'Psychiatric evaluation needed to support evidence in care proceedings' }
+  ],
+  Physiotherapist: [
+    { name: 'Dr Rachel Thompson',   type: 'Physiotherapist', location: 'Manchester', hours: '40', minutes: '00', rate: '85.50',  requestedAmount: '3420.00', justification: "Expert physiotherapy assessment needed to establish client's functional capacity" },
+    { name: 'Ms Linda Patel',       type: 'Physiotherapist', location: 'Leeds',      hours: '35', minutes: '00', rate: '80.00',  requestedAmount: '2800.00', justification: 'Physiotherapy assessment required to support evidence in proceedings' },
+    { name: 'Mr David Crane',       type: 'Physiotherapist', location: 'Birmingham', hours: '30', minutes: '00', rate: '88.00',  requestedAmount: '2640.00', justification: 'Independent physiotherapy review required for injury assessment' }
+  ],
+  'Medical examiner': [
+    { name: 'Dr Andrew Wilson',     type: 'Medical examiner', location: 'Birmingham', hours: '50', minutes: '00', rate: '95.00', requestedAmount: '4750.00', justification: 'Expert medical assessment required for case preparation' },
+    { name: 'Dr Priya Nair',        type: 'Medical examiner', location: 'Bristol',    hours: '45', minutes: '00', rate: '90.00', requestedAmount: '4050.00', justification: 'Medical examination required to support evidence for proceedings' },
+    { name: 'Dr Thomas Ellery',     type: 'Medical examiner', location: 'London',     hours: '55', minutes: '00', rate: '97.00', requestedAmount: '5335.00', justification: 'Independent medical report needed to assess client condition and capacity' }
+  ]
+};
+
+function pickExpertProfile(priorAuthorityType) {
+  let pool;
+  if (priorAuthorityType.includes('Psychiatrist')) pool = expertProfiles.Psychiatrist;
+  else if (priorAuthorityType.includes('Physiotherapist')) pool = expertProfiles.Physiotherapist;
+  else pool = expertProfiles['Medical examiner'];
+  return pool[Math.floor(Math.random() * pool.length)];
+}
+
 function generateMockApplications(count = 8) {
   const applications = [];
   const generatedRefs = new Set();
@@ -707,7 +750,10 @@ function generateMockApplications(count = 8) {
 
       const numPriorAuth = Math.random() > 0.6 ? 2 : 1;
       for (let j = 0; j < numPriorAuth; j++) {
-        applications.push({
+        const paType = priorAuthorityTypes[Math.floor(Math.random() * priorAuthorityTypes.length)];
+        const isExpert = paType.includes('Expert');
+        const expertProfile = isExpert ? pickExpertProfile(paType) : null;
+        const paApp = {
           ref: ref,
           reference: ref,
           firstName: firstName,
@@ -718,11 +764,22 @@ function generateMockApplications(count = 8) {
           outcome: outcome,
           outcomeClass: outcomeClasses[outcome],
           type: 'Prior authority',
-          priorAuthorityType: priorAuthorityTypes[Math.floor(Math.random() * priorAuthorityTypes.length)],
+          priorAuthorityType: paType,
           delegatedFunctions: 'N/A',
           matterType: { title: 'Family', subtext: 'Special Children\'s Act' },
           isPriorAuthority: true
-        });
+        };
+        if (expertProfile) {
+          paApp.expertName = expertProfile.name;
+          paApp.expertType = expertProfile.type;
+          paApp.expertLocation = expertProfile.location;
+          paApp.expertHours = expertProfile.hours;
+          paApp.expertMinutes = expertProfile.minutes;
+          paApp.expertRate = expertProfile.rate;
+          paApp.expertRequestedAmount = expertProfile.requestedAmount;
+          paApp.expertJustification = expertProfile.justification;
+        }
+        applications.push(paApp);
       }
     }
   }
@@ -735,8 +792,15 @@ router.get('/open-applications', function(req, res) {
     req.session.data['assigned-applications'] = [];
   }
   
-  // Always regenerate open applications on each request to ensure prior authority apps appear
-  let applications = generateMockApplications(8);
+  // Keep a stable open-applications source for the session so references remain searchable.
+  if (!req.session.data['open-applications-all']) {
+    req.session.data['open-applications-all'] = req.session.data['open-applications'] || generateMockApplications(8);
+  }
+  let applications = [...req.session.data['open-applications-all']];
+
+  // Remove applications already in a caseworker's list from open applications.
+  const assignedKeys = new Set((req.session.data['assigned-applications'] || []).map(app => `${app.ref}|${Boolean(app.isPriorAuthority)}`));
+  applications = applications.filter(app => !assignedKeys.has(`${app.ref}|${Boolean(app.isPriorAuthority)}`));
   
   // Restore any stored decisions from decision-store
   if (req.session.data['decision-store']) {
@@ -816,7 +880,8 @@ router.get('/open-applications', function(req, res) {
   
   console.log('Final filtered apps:', filteredApps.length);
   
-  req.session.data['open-applications'] = filteredApps;
+  // Keep full, unfiltered open applications in session for routes like search and add-by-reference.
+  req.session.data['open-applications'] = applications;
   
   res.render('v6/open-applications.njk', { 
     pageTitle: 'Open applications',
@@ -1652,6 +1717,451 @@ router.post('/change/:reference/:field/confirm', function(req, res) {
   delete req.session.data['change-justification'];
   
   res.redirect(`/v6/application/${reference}#people`);
+});
+
+// =========================================================
+// PRIOR AUTHORITY (COUNSEL) - MAKE ASSESSMENT FLOW (V6)
+// =========================================================
+
+function findApplicationByReference(req, reference, isPriorAuthority) {
+  const collections = [
+    req.session.data['assigned-applications'] || [],
+    req.session.data['completed-applications'] || [],
+    req.session.data['open-applications'] || []
+  ];
+
+  for (const collection of collections) {
+    const match = collection.find(app => app.ref === reference && Boolean(app.isPriorAuthority) === Boolean(isPriorAuthority));
+    if (match) {
+      return match;
+    }
+  }
+
+  return null;
+}
+
+function defaultCounselTypeForApplication(application) {
+  const priorAuthorityType = (application && application.priorAuthorityType) || '';
+  if (priorAuthorityType.includes("King's Counsel and Two Junior Counsel")) return "King's Counsel and Two Junior Counsel";
+  if (priorAuthorityType.includes("King's Counsel and Junior Counsel")) return "King's Counsel and Junior Counsel";
+  if (priorAuthorityType.includes('Two Junior Counsel')) return 'Two Junior Counsel';
+  if (priorAuthorityType.includes("King's Counsel")) return "King's Counsel alone";
+  if (priorAuthorityType.includes('Junior Counsel')) return 'Two Junior Counsel';
+  return "King's Counsel alone";
+}
+
+function updatePriorAuthorityStatusForReference(req, reference, decision) {
+  const collections = [
+    req.session.data['assigned-applications'] || [],
+    req.session.data['completed-applications'] || [],
+    req.session.data['open-applications'] || []
+  ];
+
+  const status = decision === 'Refuse' ? 'Refused' : 'Granted';
+  const decisionType = decision === 'Refuse' ? 'Refuse' : 'Grant';
+
+  collections.forEach(collection => {
+    collection.forEach(app => {
+      if (app.ref === reference && app.isPriorAuthority) {
+        app.status = status;
+        app.decisionType = decisionType;
+      }
+    });
+  });
+}
+
+function removePriorAuthorityFromAssignedList(req, reference) {
+  const assigned = req.session.data['assigned-applications'] || [];
+  req.session.data['assigned-applications'] = assigned.filter(app => !(app.ref === reference && app.isPriorAuthority));
+}
+
+router.get('/counsel-assessment/decision', function (req, res) {
+  const reference = req.query.reference || req.session.data['counsel-assessment-reference'] || '';
+  if (reference) {
+    // Entering from application details starts a fresh decision step; do not preselect Grant.
+    delete req.session.data['counsel-decision'];
+    delete req.session.data['counsel-covers'];
+    delete req.session.data['counsel-justification'];
+    req.session.data['counsel-assessment-reference'] = reference;
+  }
+
+  const priorAuthorityApplication = reference
+    ? findApplicationByReference(req, reference, true)
+    : null;
+
+  const priorAuthorityAlreadyDecided = priorAuthorityApplication &&
+    (priorAuthorityApplication.status === 'Granted' || priorAuthorityApplication.status === 'Refused');
+
+  // Do not allow a new assessment when a decision already exists.
+  if (reference && priorAuthorityAlreadyDecided) {
+    res.redirect(`/v6/application/${reference}?isPriorAuthority=true#prior-authority`);
+    return;
+  }
+
+  const defaultCounselType = defaultCounselTypeForApplication(priorAuthorityApplication);
+  req.session.data['counsel-default-counsel-type'] = defaultCounselType;
+
+  if (!req.session.data['counsel-type-granted']) {
+    req.session.data['counsel-type-granted'] = defaultCounselType;
+  }
+
+  req.session.data['counsel-application-type'] = (priorAuthorityApplication && priorAuthorityApplication.priorAuthorityType)
+    ? `Prior authority - ${priorAuthorityApplication.priorAuthorityType}`
+    : 'Prior authority - Counsel';
+
+  const errors = req.session.data['counsel-assessment-errors'] || null;
+  delete req.session.data['counsel-assessment-errors'];
+
+  res.render('v6/counsel-assessment/decision.njk', {
+    pageTitle: 'Make your decision - Prior Authority',
+    reference: reference,
+    defaultCounselType: defaultCounselType,
+    errors: errors
+  });
+});
+
+router.post('/counsel-assessment/decision-handler', function (req, res) {
+  const decision = req.body['counsel-decision'];
+  const justification = (req.body['counsel-justification'] || '').trim();
+
+  const errors = {};
+  if (!decision) {
+    errors.decision = 'Select Grant or Refuse';
+  }
+  if (!justification) {
+    errors.justification = 'Enter justification';
+  }
+
+  req.session.data['counsel-justification'] = justification;
+
+  if (Object.keys(errors).length > 0) {
+    req.session.data['counsel-assessment-errors'] = errors;
+    res.redirect('/v6/counsel-assessment/decision');
+    return;
+  }
+
+  // Counsel type should always resolve to a value (selected or pre-selected default).
+  if (!req.session.data['counsel-type-granted']) {
+    req.session.data['counsel-type-granted'] = req.session.data['counsel-default-counsel-type'] || "King's Counsel";
+  }
+
+  if (decision === 'Refuse') {
+    res.redirect('/v6/counsel-assessment/check-your-answers');
+    return;
+  }
+
+  res.redirect('/v6/counsel-assessment/what-it-covers');
+});
+
+router.get('/counsel-assessment/what-it-covers', function (req, res) {
+  res.render('v6/counsel-assessment/what-it-covers.njk', {
+    pageTitle: 'What does this application cover? - Prior Authority',
+    reference: req.session.data['counsel-assessment-reference'] || ''
+  });
+});
+
+router.post('/counsel-assessment/covers-handler', function (req, res) {
+  res.redirect('/v6/counsel-assessment/check-your-answers');
+});
+
+router.get('/counsel-assessment/check-your-answers', function (req, res) {
+  res.render('v6/counsel-assessment/check-your-answers.njk', {
+    pageTitle: 'Check your answers - Prior Authority',
+    reference: req.session.data['counsel-assessment-reference'] || ''
+  });
+});
+
+router.post('/counsel-assessment/submit-assessment', function (req, res) {
+  const reference = req.session.data['counsel-assessment-reference'];
+  const decision = req.session.data['counsel-decision'];
+
+  if (!decision) {
+    res.redirect(`/v6/counsel-assessment/decision?reference=${reference || ''}`);
+    return;
+  }
+
+  if (reference) {
+    updatePriorAuthorityStatusForReference(req, reference, decision);
+    removePriorAuthorityFromAssignedList(req, reference);
+  }
+  res.redirect('/v6/counsel-assessment/confirmation');
+});
+
+router.get('/counsel-assessment/confirmation', function (req, res) {
+  res.render('v6/counsel-assessment/confirmation.njk', {
+    pageTitle: 'Assessment for prior authority completed - Prior Authority',
+    reference: req.session.data['counsel-assessment-reference'] || 'CRM4-Counsel-123'
+  });
+});
+
+// =========================================================
+// PRIOR AUTHORITY (EXPERT) - MAKE ASSESSMENT FLOW (V6)
+// =========================================================
+
+function expertDetailsForApplication(application) {
+  const priorAuthorityType = (application && application.priorAuthorityType) || '';
+
+  // Read from application data fields if present
+  if (application && application.expertName) {
+    return {
+      requestType: priorAuthorityType || 'Expert',
+      name: application.expertName,
+      type: application.expertType || 'Not provided',
+      location: application.expertLocation || 'Not provided',
+      hours: application.expertHours || '00',
+      minutes: application.expertMinutes || '00',
+      rate: application.expertRate || '0',
+      requestedAmount: application.expertRequestedAmount || '0'
+    };
+  }
+
+  // Fallback defaults based on type
+  if (priorAuthorityType.includes('Psychiatrist')) {
+    return {
+      requestType: priorAuthorityType || 'Expert - Psychiatrist',
+      name: 'Dr Morley Calzoni',
+      type: 'Psychiatrist',
+      location: 'London',
+      hours: '60',
+      minutes: '00',
+      rate: '100.80',
+      requestedAmount: '6048.00'
+    };
+  }
+
+  if (priorAuthorityType.includes('Physiotherapist')) {
+    return {
+      requestType: priorAuthorityType || 'Expert - Physiotherapist',
+      name: 'Dr Rachel Thompson',
+      type: 'Physiotherapist',
+      location: 'Manchester',
+      hours: '40',
+      minutes: '00',
+      rate: '85.50',
+      requestedAmount: '3420.00'
+    };
+  }
+
+  return {
+    requestType: priorAuthorityType || 'Expert',
+    name: 'Dr Andrew Wilson',
+    type: 'Medical examiner',
+    location: 'Birmingham',
+    hours: '50',
+    minutes: '00',
+    rate: '95.00',
+    requestedAmount: '4750.00'
+  };
+}
+
+function formatCurrencyGBP(amountString) {
+  const numeric = Number(String(amountString || '').replace(/,/g, ''));
+  if (!Number.isFinite(numeric)) return 'Not provided';
+  return `£${numeric.toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+}
+
+router.get('/expert-assessment/decision', function (req, res) {
+  const reference = req.query.reference || req.session.data['expert-assessment-reference'] || '';
+
+  if (reference) {
+    // Starting from the details page resets this flow.
+    delete req.session.data['expert-decision'];
+    delete req.session.data['expert-justification'];
+    delete req.session.data['expert-amount-decision'];
+    delete req.session.data['expert-new-amount'];
+    delete req.session.data['expert-new-name'];
+    delete req.session.data['expert-new-type'];
+    delete req.session.data['expert-new-location'];
+    delete req.session.data['expert-new-rate'];
+    delete req.session.data['expert-new-hours'];
+    delete req.session.data['expert-new-minutes'];
+    delete req.session.data['expert-new-total-amount'];
+    req.session.data['expert-assessment-reference'] = reference;
+  }
+
+  const priorAuthorityApplication = reference
+    ? findApplicationByReference(req, reference, true)
+    : null;
+
+  const priorAuthorityAlreadyDecided = priorAuthorityApplication &&
+    (priorAuthorityApplication.status === 'Granted' || priorAuthorityApplication.status === 'Refused');
+
+  if (reference && priorAuthorityAlreadyDecided) {
+    res.redirect(`/v6/application/${reference}?isPriorAuthority=true#prior-authority`);
+    return;
+  }
+
+  const expertDetails = expertDetailsForApplication(priorAuthorityApplication);
+
+  req.session.data['expert-application-type'] = (priorAuthorityApplication && priorAuthorityApplication.priorAuthorityType)
+    ? `Prior authority - ${priorAuthorityApplication.priorAuthorityType}`
+    : 'Prior authority - Expert';
+  req.session.data['expert-request-type'] = expertDetails.requestType;
+  req.session.data['expert-default-name'] = expertDetails.name;
+  req.session.data['expert-default-type'] = expertDetails.type;
+  req.session.data['expert-default-location'] = expertDetails.location;
+  req.session.data['expert-default-rate'] = expertDetails.rate;
+  req.session.data['expert-default-hours'] = expertDetails.hours;
+  req.session.data['expert-default-minutes'] = expertDetails.minutes;
+  req.session.data['expert-requested-amount'] = expertDetails.requestedAmount;
+
+  const errors = req.session.data['expert-assessment-errors'] || null;
+  delete req.session.data['expert-assessment-errors'];
+
+  res.render('v6/expert-assessment/decision.njk', {
+    pageTitle: 'Make a decision - Prior Authority',
+    reference: reference,
+    errors: errors
+  });
+});
+
+router.post('/expert-assessment/decision-handler', function (req, res) {
+  const decision = req.body['expert-decision'];
+
+  const errors = {};
+  if (!decision) errors.decision = 'Select Grant or Refuse';
+
+  if (Object.keys(errors).length > 0) {
+    req.session.data['expert-assessment-errors'] = errors;
+    res.redirect('/v6/expert-assessment/decision');
+    return;
+  }
+
+  if (decision === 'Refuse') {
+    res.redirect('/v6/expert-assessment/check-your-answers');
+    return;
+  }
+
+  res.redirect('/v6/expert-assessment/amount');
+});
+
+router.get('/expert-assessment/amount', function (req, res) {
+  const errors = req.session.data['expert-assessment-amount-errors'] || null;
+  delete req.session.data['expert-assessment-amount-errors'];
+
+  res.render('v6/expert-assessment/amount.njk', {
+    pageTitle: 'Make a decision - Prior Authority',
+    reference: req.session.data['expert-assessment-reference'] || '',
+    requestedAmount: formatCurrencyGBP(req.session.data['expert-requested-amount']),
+    errors: errors
+  });
+});
+
+router.post('/expert-assessment/amount-handler', function (req, res) {
+  const amountDecision = req.body['expert-amount-decision'];
+  const justification = (req.body['expert-justification'] || '').trim();
+
+  const errors = {};
+  if (!amountDecision) errors.amountDecision = 'Select the amount to grant';
+  if (!justification) errors.justification = 'Enter justification';
+
+  if (Object.keys(errors).length > 0) {
+    req.session.data['expert-assessment-amount-errors'] = errors;
+    res.redirect('/v6/expert-assessment/amount');
+    return;
+  }
+
+  req.session.data['expert-justification'] = justification;
+
+  if (amountDecision === 'new') {
+    req.session.data['expert-new-name'] = (req.body['expert-new-name'] || '').trim() || req.session.data['expert-default-name'] || 'Dr Andrew Wilson';
+    req.session.data['expert-new-type'] = (req.body['expert-new-type'] || '').trim() || req.session.data['expert-default-type'] || 'Medical examiner';
+    req.session.data['expert-new-location'] = (req.body['expert-new-location'] || '').trim() || req.session.data['expert-default-location'] || 'Birmingham';
+    req.session.data['expert-new-rate'] = (req.body['expert-new-rate'] || '').trim() || req.session.data['expert-default-rate'] || '95.00';
+    req.session.data['expert-new-hours'] = (req.body['expert-new-hours'] || '').trim() || req.session.data['expert-default-hours'] || '50';
+    req.session.data['expert-new-minutes'] = (req.body['expert-new-minutes'] || '').trim() || req.session.data['expert-default-minutes'] || '00';
+
+    const rawTotalAmount = (req.body['expert-new-total-amount'] || '').trim();
+    req.session.data['expert-new-total-amount'] = rawTotalAmount;
+
+    const normalized = rawTotalAmount.replace(/[£,\s]/g, '');
+    const parsed = Number(normalized);
+    req.session.data['expert-new-amount'] = Number.isFinite(parsed) && parsed > 0
+      ? parsed.toFixed(2)
+      : req.session.data['expert-requested-amount'];
+  } else {
+    delete req.session.data['expert-new-name'];
+    delete req.session.data['expert-new-type'];
+    delete req.session.data['expert-new-location'];
+    delete req.session.data['expert-new-rate'];
+    delete req.session.data['expert-new-hours'];
+    delete req.session.data['expert-new-minutes'];
+    delete req.session.data['expert-new-total-amount'];
+    delete req.session.data['expert-new-amount'];
+  }
+
+  res.redirect('/v6/expert-assessment/check-your-answers');
+});
+
+router.get('/expert-assessment/new-amount', function (req, res) {
+  const errors = req.session.data['expert-assessment-new-amount-errors'] || null;
+  delete req.session.data['expert-assessment-new-amount-errors'];
+
+  res.render('v6/expert-assessment/new-amount.njk', {
+    pageTitle: 'Make a decision - Prior Authority',
+    reference: req.session.data['expert-assessment-reference'] || '',
+    requestedAmount: formatCurrencyGBP(req.session.data['expert-requested-amount']),
+    errors: errors
+  });
+});
+
+router.post('/expert-assessment/new-amount-handler', function (req, res) {
+  const rawAmount = (req.body['expert-new-amount'] || '').trim();
+  const normalized = rawAmount.replace(/[£,\s]/g, '');
+  const parsed = Number(normalized);
+
+  if (!normalized || !Number.isFinite(parsed) || parsed <= 0) {
+    req.session.data['expert-assessment-new-amount-errors'] = {
+      newAmount: 'Enter a valid new amount'
+    };
+    res.redirect('/v6/expert-assessment/new-amount');
+    return;
+  }
+
+  req.session.data['expert-new-amount'] = parsed.toFixed(2);
+  res.redirect('/v6/expert-assessment/check-your-answers');
+});
+
+router.get('/expert-assessment/check-your-answers', function (req, res) {
+  const requestedAmount = req.session.data['expert-requested-amount'];
+  const newAmount = req.session.data['expert-new-amount'];
+  const amountDecision = req.session.data['expert-amount-decision'];
+
+  let grantedAmount = null;
+  if (req.session.data['expert-decision'] === 'Grant') {
+    grantedAmount = amountDecision === 'new' ? newAmount : requestedAmount;
+  }
+
+  res.render('v6/expert-assessment/check-your-answers.njk', {
+    pageTitle: 'Check your answers - Prior Authority',
+    reference: req.session.data['expert-assessment-reference'] || '',
+    requestedAmount: formatCurrencyGBP(requestedAmount),
+    grantedAmount: formatCurrencyGBP(grantedAmount)
+  });
+});
+
+router.post('/expert-assessment/submit-assessment', function (req, res) {
+  const reference = req.session.data['expert-assessment-reference'];
+  const decision = req.session.data['expert-decision'];
+
+  if (!decision) {
+    res.redirect(`/v6/expert-assessment/decision?reference=${reference || ''}`);
+    return;
+  }
+
+  if (reference) {
+    updatePriorAuthorityStatusForReference(req, reference, decision);
+    removePriorAuthorityFromAssignedList(req, reference);
+  }
+
+  res.redirect('/v6/expert-assessment/confirmation');
+});
+
+router.get('/expert-assessment/confirmation', function (req, res) {
+  res.render('v6/expert-assessment/confirmation.njk', {
+    pageTitle: 'Assessment for prior authority completed - Prior Authority',
+    reference: req.session.data['expert-assessment-reference'] || 'CRM4-Expert-123'
+  });
 });
 
 

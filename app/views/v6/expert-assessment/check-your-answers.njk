@@ -1,0 +1,306 @@
+{% extends "layouts/main.html" %}
+
+{% from "govuk/components/header/macro.njk" import govukHeader %}
+{% from "moj/components/primary-navigation/macro.njk" import mojPrimaryNavigation %}
+
+{% block pageTitle %}
+  Check your answers - Prior Authority - GOV.UK
+{% endblock %}
+
+{% block header %}
+  {{ govukHeader({
+    homepageUrl: "#",
+    productName: "Legal Aid Agency",
+    navigationClasses: "govuk-header__navigation--end",
+    navigation: [
+      {
+        href: "#",
+        text: "joann.barton@law.com"
+      },
+      {
+        href: "#",
+        text: "Sign out"
+      }
+    ]
+  }) }}
+
+  {{ mojPrimaryNavigation({
+    label: 'Primary navigation',
+    items: [
+      {
+        text: 'Decide if an applicant can get legal aid',
+        href: '#'
+      },
+      {
+        text: 'Open applications',
+        href: '/v6/open-applications'
+      },
+      {
+        text: 'Your list',
+        href: '/v6/yourlist'
+      },
+      {
+        text: 'Search',
+        href: '/v6/search'
+      }
+    ]
+  }) }}
+{% endblock %}
+
+{% block beforeContent %}
+  {{ govukBackLink({
+    text: "Back",
+    href: "javascript:window.history.back()"
+  }) }}
+{% endblock %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds-from-desktop">
+
+    <h1 class="govuk-heading-l">Check your answers</h1>
+
+    {% set decisionHref = "/v6/expert-assessment/decision" %}
+    {% set amountHref = "/v6/expert-assessment/amount" %}
+    {% if reference %}
+      {% set decisionHref = decisionHref + "?reference=" + reference %}
+      {% set amountHref = amountHref + "?reference=" + reference %}
+    {% endif %}
+
+    {% if data['expert-decision'] == 'Grant' %}
+      {% set isNewAmount = data['expert-amount-decision'] == 'new' %}
+      {% set expertName = isNewAmount and (data['expert-new-name'] or data['expert-default-name'] or 'Not provided') or (data['expert-default-name'] or 'Not provided') %}
+      {% set expertType = isNewAmount and (data['expert-new-type'] or data['expert-default-type'] or 'Not provided') or (data['expert-default-type'] or 'Not provided') %}
+      {% set expertHours = isNewAmount and (data['expert-new-hours'] or data['expert-default-hours'] or '00') or (data['expert-default-hours'] or '00') %}
+      {% set expertMinutes = isNewAmount and (data['expert-new-minutes'] or data['expert-default-minutes'] or '00') or (data['expert-default-minutes'] or '00') %}
+      {% set expertRate = isNewAmount and (data['expert-new-rate'] or data['expert-default-rate'] or 'Not provided') or (data['expert-default-rate'] or 'Not provided') %}
+      {% set totalAmountValue = isNewAmount and (grantedAmount or 'Not provided') or (requestedAmount or 'Not provided') %}
+      {% set amountChangeAnchor = isNewAmount and (amountHref + '#expert-new-total-amount') or amountHref %}
+      {% set hoursChangeAnchor = isNewAmount and (amountHref + '#expert-new-hours') or (amountHref + '#expert-amount-decision') %}
+      {% set rateChangeAnchor = isNewAmount and (amountHref + '#expert-new-rate') or (amountHref + '#expert-amount-decision') %}
+      {% set requestType = (data['expert-application-type'] and ('Expert' in data['expert-application-type'])) and 'Expert' or 'Not provided' %}
+
+      <div class="govuk-summary-card govuk-!-margin-bottom-9">
+        <div class="govuk-summary-card__title-wrapper">
+          <h2 class="govuk-summary-card__title">Overview</h2>
+        </div>
+        <div class="govuk-summary-card__content">
+          {{ govukSummaryList({
+            rows: [
+              {
+                key: {
+                  text: "Application type"
+                },
+                value: {
+                  text: "Prior authority"
+                }
+              },
+              {
+                key: {
+                  text: "Request type"
+                },
+                value: {
+                  text: requestType
+                }
+              },
+              {
+                key: {
+                  text: "Expert name"
+                },
+                value: {
+                  text: expertName
+                }
+              },
+              {
+                key: {
+                  text: "Expert type"
+                },
+                value: {
+                  text: expertType
+                }
+              },
+              {
+                key: {
+                  text: "Prior authority assessment"
+                },
+                value: {
+                  text: data['expert-decision'] or 'Not provided'
+                },
+                actions: {
+                  items: [
+                    {
+                      href: decisionHref + "#expert-decision",
+                      text: "Change",
+                      visuallyHiddenText: "prior authority assessment"
+                    }
+                  ]
+                }
+              },
+              {
+                key: {
+                  text: "Hours requested"
+                },
+                value: {
+                  text: expertHours + "." + expertMinutes
+                },
+                actions: {
+                  items: [
+                    {
+                      href: hoursChangeAnchor,
+                      text: "Change",
+                      visuallyHiddenText: "hours requested"
+                    }
+                  ]
+                }
+              },
+              {
+                key: {
+                  text: "Expert fee hourly rate"
+                },
+                value: {
+                  text: "£" + (expertRate | replace('£', ''))
+                },
+                actions: {
+                  items: [
+                    {
+                      href: rateChangeAnchor,
+                      text: "Change",
+                      visuallyHiddenText: "expert fee hourly rate"
+                    }
+                  ]
+                }
+              },
+              {
+                key: {
+                  text: "Total amount"
+                },
+                value: {
+                  text: totalAmountValue
+                },
+                actions: {
+                  items: [
+                    {
+                      href: amountChangeAnchor,
+                      text: "Change",
+                      visuallyHiddenText: "total amount"
+                    }
+                  ]
+                }
+              },
+              {
+                key: {
+                  text: "Justification"
+                },
+                value: {
+                  text: data['expert-justification'] or 'Not provided'
+                },
+                actions: {
+                  items: [
+                    {
+                      href: amountHref + "#expert-justification",
+                      text: "Change",
+                      visuallyHiddenText: "justification"
+                    }
+                  ]
+                }
+              }
+            ]
+          }) }}
+        </div>
+      </div>
+    {% else %}
+      <div class="govuk-summary-card govuk-!-margin-bottom-9">
+        <div class="govuk-summary-card__title-wrapper">
+          <h2 class="govuk-summary-card__title">Overview</h2>
+        </div>
+        <div class="govuk-summary-card__content">
+          {{ govukSummaryList({
+            rows: [
+              {
+                key: {
+                  text: "Application type"
+                },
+                value: {
+                  text: "Prior authority"
+                }
+              },
+              {
+                key: {
+                  text: "Request type"
+                },
+                value: {
+                  text: data['expert-request-type'] or data['expert-default-type'] or 'Not provided'
+                }
+              },
+              {
+                key: {
+                  text: "Expert name"
+                },
+                value: {
+                  text: data['expert-default-name'] or 'Not provided'
+                }
+              },
+              {
+                key: {
+                  text: "Expert type"
+                },
+                value: {
+                  text: data['expert-default-type'] or 'Not provided'
+                }
+              },
+              {
+                key: {
+                  text: "Prior authority assessment"
+                },
+                value: {
+                  text: data['expert-decision'] or 'Not provided'
+                },
+                actions: {
+                  items: [
+                    {
+                      href: decisionHref + "#expert-decision",
+                      text: "Change",
+                      visuallyHiddenText: "prior authority assessment"
+                    }
+                  ]
+                }
+              },
+              {
+                key: {
+                  text: "Hours requested"
+                },
+                value: {
+                  text: (data['expert-default-hours'] or '0') + "." + (data['expert-default-minutes'] or '00')
+                }
+              },
+              {
+                key: {
+                  text: "Expert fee hourly rate"
+                },
+                value: {
+                  text: "£" + (data['expert-default-rate'] | replace('£', ''))
+                }
+              },
+              {
+                key: {
+                  text: "Total amount requested"
+                },
+                value: {
+                  text: requestedAmount
+                }
+              }
+            ]
+          }) }}
+        </div>
+      </div>
+    {% endif %}
+
+    <form action="/v6/expert-assessment/submit-assessment" method="post" novalidate>
+      {{ govukButton({
+        text: "Confirm and submit"
+      }) }}
+    </form>
+
+  </div>
+</div>
+{% endblock %}

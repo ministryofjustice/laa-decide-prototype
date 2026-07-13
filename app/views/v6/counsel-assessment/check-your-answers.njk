@@ -1,0 +1,176 @@
+{% extends "layouts/main.html" %}
+
+{% from "govuk/components/header/macro.njk" import govukHeader %}
+{% from "moj/components/primary-navigation/macro.njk" import mojPrimaryNavigation %}
+
+{% block pageTitle %}
+  Check your answers - Prior Authority - GOV.UK
+{% endblock %}
+
+{% block header %}
+  {{ govukHeader({
+    homepageUrl: "#",
+    productName: "Legal Aid Agency",
+    navigationClasses: "govuk-header__navigation--end",
+    navigation: [
+      {
+        href: "#",
+        text: "joann.barton@law.com"
+      },
+      {
+        href: "#",
+        text: "Sign out"
+      }
+    ]
+  }) }}
+
+  {{ mojPrimaryNavigation({
+    label: 'Primary navigation',
+    items: [
+      {
+        text: 'Decide if an applicant can get legal aid',
+        href: '#'
+      },
+      {
+        text: 'Open applications',
+        href: '/v6/open-applications'
+      },
+      {
+        text: 'Your list',
+        href: '/v6/yourlist'
+      },
+      {
+        text: 'Search',
+        href: '/v6/search'
+      }
+    ]
+  }) }}
+{% endblock %}
+
+{% block beforeContent %}
+  {{ govukBackLink({
+    text: "Back",
+    href: "javascript:window.history.back()"
+  }) }}
+{% endblock %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds-from-desktop">
+
+    <h1 class="govuk-heading-l">Check your answers</h1>
+
+    {% set resolvedCounselType = data['counsel-type-granted'] or data['counsel-default-counsel-type'] or "King's Counsel alone" %}
+    {% set decisionHref = "/v6/counsel-assessment/decision" %}
+    {% set coversHref = "/v6/counsel-assessment/what-it-covers" %}
+    {% if reference %}
+      {% set decisionHref = decisionHref + "?reference=" + reference %}
+      {% set coversHref = coversHref + "?reference=" + reference %}
+    {% endif %}
+
+    <div class="govuk-summary-card govuk-!-margin-bottom-9">
+      <div class="govuk-summary-card__title-wrapper">
+        <h2 class="govuk-summary-card__title">Overall Decision</h2>
+      </div>
+      <div class="govuk-summary-card__content">
+        {{ govukSummaryList({
+          rows: [
+            {
+              key: {
+                text: "Application type"
+              },
+              value: {
+                text: data['counsel-application-type'] or 'Prior authority - Counsel'
+              },
+              actions: {
+                items: [
+                  {
+                    href: decisionHref,
+                    text: "Change",
+                    visuallyHiddenText: "application type"
+                  }
+                ]
+              }
+            },
+            {
+              key: {
+                text: "Counsel type"
+              },
+              value: {
+                text: resolvedCounselType
+              },
+              actions: {
+                items: [
+                  {
+                    href: decisionHref + "#counsel-type-granted",
+                    text: "Change",
+                    visuallyHiddenText: "counsel type"
+                  }
+                ]
+              }
+            },
+            {
+              key: {
+                text: "Prior authority assessment"
+              },
+              value: {
+                text: data['counsel-decision'] or 'Grant'
+              },
+              actions: {
+                items: [
+                  {
+                    href: decisionHref + "#counsel-decision",
+                    text: "Change",
+                    visuallyHiddenText: "decision"
+                  }
+                ]
+              }
+            },
+            {
+              key: {
+                text: "What the application covers"
+              },
+              value: {
+                text: data['counsel-covers'] or 'Not provided'
+              },
+              actions: {
+                items: [
+                  {
+                    href: coversHref + "#counsel-covers",
+                    text: "Change",
+                    visuallyHiddenText: "what this application covers"
+                  }
+                ]
+              }
+            },
+            {
+              key: {
+                text: "Justification"
+              },
+              value: {
+                text: data['counsel-justification'] or 'No justification provided'
+              },
+              actions: {
+                items: [
+                  {
+                    href: decisionHref + "#counsel-justification",
+                    text: "Change",
+                    visuallyHiddenText: "justification"
+                  }
+                ]
+              }
+            }
+          ]
+        }) }}
+      </div>
+    </div>
+
+    <form action="/v6/counsel-assessment/submit-assessment" method="post" novalidate>
+      {{ govukButton({
+        text: "Confirm and submit"
+      }) }}
+    </form>
+
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,238 @@
+{% extends "layouts/main.html" %}
+
+{% from "govuk/components/header/macro.njk" import govukHeader %}
+{% from "moj/components/primary-navigation/macro.njk" import mojPrimaryNavigation %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+
+{% block pageTitle %}
+  Make a decision - Prior Authority - GOV.UK
+{% endblock %}
+
+{% block header %}
+  {{ govukHeader({
+    homepageUrl: "#",
+    productName: "Legal Aid Agency",
+    navigationClasses: "govuk-header__navigation--end",
+    navigation: [
+      {
+        href: "#",
+        text: "joann.barton@law.com"
+      },
+      {
+        href: "#",
+        text: "Sign out"
+      }
+    ]
+  }) }}
+
+  {{ mojPrimaryNavigation({
+    label: 'Primary navigation',
+    items: [
+      {
+        text: 'Decide if an applicant can get legal aid',
+        href: '#'
+      },
+      {
+        text: 'Open applications',
+        href: '/v6/open-applications'
+      },
+      {
+        text: 'Your list',
+        href: '/v6/yourlist'
+      },
+      {
+        text: 'Search',
+        href: '/v6/search'
+      }
+    ]
+  }) }}
+{% endblock %}
+
+{% block beforeContent %}
+  {{ govukBackLink({
+    text: "Back",
+    href: "javascript:window.history.back()"
+  }) }}
+{% endblock %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    {% set decisionErrorMessage = null %}
+    {% set justificationErrorMessage = null %}
+
+    {% if errors and errors.decision %}
+      {% set decisionErrorMessage = { text: errors.decision } %}
+    {% endif %}
+    {% if errors and errors.justification %}
+      {% set justificationErrorMessage = { text: errors.justification } %}
+    {% endif %}
+
+    {% if errors and errors.decision and errors.justification %}
+      {{ govukErrorSummary({
+        titleText: "There is a problem",
+        errorList: [
+          {
+            text: errors.decision,
+            href: "#counsel-decision"
+          },
+          {
+            text: errors.justification,
+            href: "#counsel-justification"
+          }
+        ]
+      }) }}
+    {% elif errors and errors.decision %}
+      {{ govukErrorSummary({
+        titleText: "There is a problem",
+        errorList: [
+          {
+            text: errors.decision,
+            href: "#counsel-decision"
+          }
+        ]
+      }) }}
+    {% elif errors and errors.justification %}
+      {{ govukErrorSummary({
+        titleText: "There is a problem",
+        errorList: [
+          {
+            text: errors.justification,
+            href: "#counsel-justification"
+          }
+        ]
+      }) }}
+    {% endif %}
+
+    <form action="/v6/counsel-assessment/decision-handler" method="post" novalidate>
+
+      {% set selectedCounselType = data['counsel-type-granted'] or defaultCounselType or "King's Counsel alone" %}
+
+      {% set grantHtml %}
+        <h2 class="govuk-heading-m govuk-!-margin-bottom-2">Select Grant Options</h2>
+        <p class="govuk-body govuk-!-margin-bottom-4">The options requested by the provider are pre-selected below. You can review and adjust these selections before granting the application.</p>
+
+        {{ govukRadios({
+          name: "counsel-type-granted",
+          fieldset: {
+            legend: {
+              text: "Counsel type",
+              classes: "govuk-fieldset__legend--m"
+            }
+          },
+          hint: {
+            text: "This is what the provider applied for."
+          },
+          items: [
+            {
+              value: "King's Counsel alone",
+              text: "King's Counsel alone",
+              checked: selectedCounselType == "King's Counsel alone"
+            },
+            {
+              value: "Two Junior Counsel",
+              text: "Two Junior Counsel",
+              checked: selectedCounselType == "Two Junior Counsel"
+            },
+            {
+              value: "King's Counsel and Junior Counsel",
+              text: "King's Counsel and Junior Counsel",
+              checked: selectedCounselType == "King's Counsel and Junior Counsel"
+            },
+            {
+              value: "King's Counsel and Two Junior Counsel",
+              text: "King's Counsel and Two Junior Counsel",
+              checked: selectedCounselType == "King's Counsel and Two Junior Counsel"
+            }
+          ]
+        }) }}
+      {% endset -%}
+
+      {{ govukRadios({
+        name: "counsel-decision",
+        idPrefix: "counsel-decision",
+        fieldset: {
+          legend: {
+            text: "Make a decision",
+            isPageHeading: true,
+            classes: "govuk-fieldset__legend--l"
+          }
+        },
+        errorMessage: decisionErrorMessage,
+        hint: {
+          text: "Use this section to provide more details about your decision. This will be shared with the provider and recorded in application history."
+        },
+        items: [
+          {
+            value: "Grant",
+            text: "Grant",
+            checked: data['counsel-decision'] == 'Grant',
+            conditional: {
+              html: grantHtml
+            }
+          },
+          {
+            value: "Refuse",
+            text: "Refuse",
+            checked: data['counsel-decision'] == 'Refuse'
+          }
+        ]
+      }) }}
+
+      {{ govukTextarea({
+        id: "counsel-justification",
+        name: "counsel-justification",
+        errorMessage: justificationErrorMessage,
+        label: {
+          text: "Justification"
+        },
+        hint: {
+          text: "Use this section to provide more details about your decision. This will be shared with the provider and recorded in application history."
+        },
+        value: data['counsel-justification']
+      }) }}
+
+      {{ govukButton({
+        text: "Save and continue"
+      }) }}
+
+    </form>
+  </div>
+</div>
+{% endblock %}
+
+{% block pageScripts %}
+  <script>
+    (function () {
+      const decisionRadios = document.querySelectorAll('input[name="counsel-decision"]');
+      if (!decisionRadios.length) return;
+
+      function clearVisibleErrors() {
+        const errorSummary = document.querySelector('.govuk-error-summary');
+        if (errorSummary) {
+          errorSummary.remove();
+        }
+
+        document.querySelectorAll('.govuk-error-message').forEach(function (el) {
+          el.remove();
+        });
+
+        document.querySelectorAll('.govuk-form-group--error').forEach(function (el) {
+          el.classList.remove('govuk-form-group--error');
+        });
+
+        document.querySelectorAll('.govuk-textarea--error').forEach(function (el) {
+          el.classList.remove('govuk-textarea--error');
+        });
+
+        document.querySelectorAll('.govuk-radios--error').forEach(function (el) {
+          el.classList.remove('govuk-radios--error');
+        });
+      }
+
+      decisionRadios.forEach(function (radio) {
+        radio.addEventListener('change', clearVisibleErrors);
+      });
+    })();
+  </script>
+{% endblock %}

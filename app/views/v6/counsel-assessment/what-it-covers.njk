@@ -1,0 +1,112 @@
+{% extends "layouts/main.html" %}
+
+{% from "govuk/components/header/macro.njk" import govukHeader %}
+{% from "moj/components/primary-navigation/macro.njk" import mojPrimaryNavigation %}
+
+{% block pageTitle %}
+  What does this application cover? - Prior Authority - GOV.UK
+{% endblock %}
+
+{% block header %}
+  {{ govukHeader({
+    homepageUrl: "#",
+    productName: "Legal Aid Agency",
+    navigationClasses: "govuk-header__navigation--end",
+    navigation: [
+      {
+        href: "#",
+        text: "joann.barton@law.com"
+      },
+      {
+        href: "#",
+        text: "Sign out"
+      }
+    ]
+  }) }}
+
+  {{ mojPrimaryNavigation({
+    label: 'Primary navigation',
+    items: [
+      {
+        text: 'Decide if an applicant can get legal aid',
+        href: '#'
+      },
+      {
+        text: 'Open applications',
+        href: '/v6/open-applications'
+      },
+      {
+        text: 'Your list',
+        href: '/v6/yourlist'
+      },
+      {
+        text: 'Search',
+        href: '/v6/search'
+      }
+    ]
+  }) }}
+{% endblock %}
+
+{% block beforeContent %}
+  {{ govukBackLink({
+    text: "Back",
+    href: "javascript:window.history.back()"
+  }) }}
+{% endblock %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    <form action="/v6/counsel-assessment/covers-handler" method="post" novalidate>
+
+      <div class="govuk-form-group">
+        <h1 class="govuk-label-wrapper">
+          <label class="govuk-label govuk-label--l" for="counsel-covers">
+            What does this application cover?
+          </label>
+        </h1>
+
+        <div class="govuk-hint">Select one of the options</div>
+
+        <div id="autocomplete-container"></div>
+      </div>
+
+      {{ govukButton({
+        text: "Save and continue",
+        classes: "govuk-!-margin-top-4"
+      }) }}
+
+    </form>
+  </div>
+</div>
+{% endblock %}
+
+{% block pageScripts %}
+<script src="https://unpkg.com/accessible-autocomplete@3.0.0/dist/accessible-autocomplete.min.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/accessible-autocomplete@3.0.0/dist/accessible-autocomplete.min.css" />
+
+<script type="text/javascript">
+  const options = [
+    'Advice only',
+    'To next hearing',
+    'To Fact Find/Composite',
+    'Hearing',
+    'Advice on interim appeal',
+    'Interim appeal - Court of Appeal',
+    'Interim appeal - UK Supreme Court',
+    'Jurisdictional issues',
+    'Medical issues'
+  ];
+
+  accessibleAutocomplete({
+    element: document.querySelector('#autocomplete-container'),
+    id: 'counsel-covers',
+    source: options,
+    name: 'counsel-covers',
+    defaultValue: '{{ data["counsel-covers"] or "" }}',
+    displayMenu: 'overlay',
+    minLength: 1,
+    cssNamespace: 'autocomplete'
+  })
+</script>
+{% endblock %}

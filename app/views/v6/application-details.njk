@@ -670,6 +670,7 @@
 
       {% set priorAuthorityHtml %}
         {% if hasPriorAuthority %}
+          {% set priorAuthorityHasDecision = priorAuthorityApplication and (priorAuthorityApplication.status === "Granted" or priorAuthorityApplication.status === "Refused") %}
           <h2 class="govuk-heading-l">Overview</h2>
           
           <div class="govuk-summary-card">
@@ -728,37 +729,19 @@
                   <div class="govuk-summary-list__row">
                     <dt class="govuk-summary-list__key">Expert name</dt>
                     <dd class="govuk-summary-list__value">
-                      {% if 'Psychiatrist' in priorAuthorityType %}
-                        Dr Morley Calzoni
-                      {% elif 'Physiotherapist' in priorAuthorityType %}
-                        Dr Rachel Thompson
-                      {% else %}
-                        Dr Andrew Wilson
-                      {% endif %}
+                      {{ priorAuthorityApplication.expertName or ('Dr Morley Calzoni' if 'Psychiatrist' in priorAuthorityType else ('Dr Rachel Thompson' if 'Physiotherapist' in priorAuthorityType else 'Dr Andrew Wilson')) }}
                     </dd>
                   </div>
                   <div class="govuk-summary-list__row">
                     <dt class="govuk-summary-list__key">Expert type</dt>
                     <dd class="govuk-summary-list__value">
-                      {% if 'Psychiatrist' in priorAuthorityType %}
-                        Psychiatrist
-                      {% elif 'Physiotherapist' in priorAuthorityType %}
-                        Physiotherapist
-                      {% else %}
-                        Medical examiner
-                      {% endif %}
+                      {{ priorAuthorityApplication.expertType or ('Psychiatrist' if 'Psychiatrist' in priorAuthorityType else ('Physiotherapist' if 'Physiotherapist' in priorAuthorityType else 'Medical examiner')) }}
                     </dd>
                   </div>
                   <div class="govuk-summary-list__row">
                     <dt class="govuk-summary-list__key">Location</dt>
                     <dd class="govuk-summary-list__value">
-                      {% if 'Psychiatrist' in priorAuthorityType %}
-                        London
-                      {% elif 'Physiotherapist' in priorAuthorityType %}
-                        Manchester
-                      {% else %}
-                        Birmingham
-                      {% endif %}
+                      {{ priorAuthorityApplication.expertLocation or ('London' if 'Psychiatrist' in priorAuthorityType else ('Manchester' if 'Physiotherapist' in priorAuthorityType else 'Birmingham')) }}
                     </dd>
                   </div>
                 </dl>
@@ -778,49 +761,25 @@
                   <div class="govuk-summary-list__row">
                     <dt class="govuk-summary-list__key">Hours requested</dt>
                     <dd class="govuk-summary-list__value">
-                      {% if 'Psychiatrist' in priorAuthorityType %}
-                        60
-                      {% elif 'Physiotherapist' in priorAuthorityType %}
-                        40
-                      {% else %}
-                        50
-                      {% endif %}
+                      {{ priorAuthorityApplication.expertHours or ('60' if 'Psychiatrist' in priorAuthorityType else ('40' if 'Physiotherapist' in priorAuthorityType else '50')) }}
                     </dd>
                   </div>
                   <div class="govuk-summary-list__row">
                     <dt class="govuk-summary-list__key">Expert fee hourly rate</dt>
                     <dd class="govuk-summary-list__value">
-                      {% if 'Psychiatrist' in priorAuthorityType %}
-                        £100.80
-                      {% elif 'Physiotherapist' in priorAuthorityType %}
-                        £85.50
-                      {% else %}
-                        £95.00
-                      {% endif %}
+                      £{{ priorAuthorityApplication.expertRate or ('100.80' if 'Psychiatrist' in priorAuthorityType else ('85.50' if 'Physiotherapist' in priorAuthorityType else '95.00')) }}
                     </dd>
                   </div>
                   <div class="govuk-summary-list__row">
                     <dt class="govuk-summary-list__key">Total amount requested</dt>
                     <dd class="govuk-summary-list__value">
-                      {% if 'Psychiatrist' in priorAuthorityType %}
-                        £6,048.00
-                      {% elif 'Physiotherapist' in priorAuthorityType %}
-                        £3,420.00
-                      {% else %}
-                        £4,750.00
-                      {% endif %}
+                      £{{ priorAuthorityApplication.expertRequestedAmount or ('6,048.00' if 'Psychiatrist' in priorAuthorityType else ('3,420.00' if 'Physiotherapist' in priorAuthorityType else '4,750.00')) }}
                     </dd>
                   </div>
                   <div class="govuk-summary-list__row">
                     <dt class="govuk-summary-list__key">Justification of request</dt>
                     <dd class="govuk-summary-list__value">
-                      {% if 'Psychiatrist' in priorAuthorityType %}
-                        Expert required to undertake psychiatric assessment on client, ordered by the court
-                      {% elif 'Physiotherapist' in priorAuthorityType %}
-                        Expert physiotherapy assessment needed to establish client's functional capacity
-                      {% else %}
-                        Expert medical assessment required for case preparation
-                      {% endif %}
+                      {{ priorAuthorityApplication.expertJustification or ('Expert required to undertake psychiatric assessment on client, ordered by the court' if 'Psychiatrist' in priorAuthorityType else ('Expert physiotherapy assessment needed to establish client\'s functional capacity' if 'Physiotherapist' in priorAuthorityType else 'Expert medical assessment required for case preparation')) }}
                     </dd>
                   </div>
                 </dl>
@@ -982,10 +941,15 @@
             </div>
           </div>
 
-          {% if not hasDecision %}
+          {% if not priorAuthorityHasDecision %}
+            {% set priorAuthorityAssessmentHref = "/v6/counsel-assessment/decision?reference=" + reference %}
+            {% if priorAuthorityType and 'Expert' in priorAuthorityType %}
+              {% set priorAuthorityAssessmentHref = "/v6/expert-assessment/decision?reference=" + reference %}
+            {% endif %}
             <div class="govuk-!-margin-top-8">
               {{ govukButton({
                 text: "Make assessment",
+                href: priorAuthorityAssessmentHref,
                 style: "background-color: #00703c; color: white;"
               }) }}
             </div>
