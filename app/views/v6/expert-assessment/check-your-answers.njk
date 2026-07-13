@@ -288,6 +288,23 @@
                 value: {
                   text: requestedAmount
                 }
+              },
+              {
+                key: {
+                  text: "Justification"
+                },
+                value: {
+                  text: data['expert-refuse-justification'] or 'Not provided'
+                },
+                actions: {
+                  items: [
+                    {
+                      href: decisionHref + "#expert-refuse-justification",
+                      text: "Change",
+                      visuallyHiddenText: "justification"
+                    }
+                  ]
+                }
               }
             ]
           }) }}

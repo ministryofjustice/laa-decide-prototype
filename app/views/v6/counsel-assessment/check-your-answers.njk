@@ -148,12 +148,12 @@
                 text: "Justification"
               },
               value: {
-                text: data['counsel-justification'] or 'No justification provided'
+                text: data['counsel-refuse-justification'] or data['counsel-justification'] or 'Not provided'
               },
               actions: {
                 items: [
                   {
-                    href: decisionHref + "#counsel-justification",
+                    href: decisionHref + "#counsel-refuse-justification",
                     text: "Change",
                     visuallyHiddenText: "justification"
                   }

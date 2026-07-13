@@ -1,0 +1,102 @@
+{% extends "layouts/main.html" %}
+
+{% from "govuk/components/header/macro.njk" import govukHeader %}
+{% from "moj/components/primary-navigation/macro.njk" import mojPrimaryNavigation %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/textarea/macro.njk" import govukTextarea %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+{% block pageTitle %}
+  Why are you refusing this request? - Prior Authority - GOV.UK
+{% endblock %}
+
+{% block header %}
+  {{ govukHeader({
+    homepageUrl: "#",
+    productName: "Legal Aid Agency",
+    navigationClasses: "govuk-header__navigation--end",
+    navigation: [
+      {
+        href: "#",
+        text: "joann.barton@law.com"
+      },
+      {
+        href: "#",
+        text: "Sign out"
+      }
+    ]
+  }) }}
+
+  {{ mojPrimaryNavigation({
+    label: 'Primary navigation',
+    items: [
+      {
+        text: 'Decide if an applicant can get legal aid',
+        href: '#'
+      },
+      {
+        text: 'Open applications',
+        href: '/v6/open-applications'
+      },
+      {
+        text: 'Your list',
+        href: '/v6/yourlist'
+      },
+      {
+        text: 'Search',
+        href: '/v6/search'
+      }
+    ]
+  }) }}
+{% endblock %}
+
+{% block beforeContent %}
+  {{ govukBackLink({
+    text: "Back",
+    href: "javascript:window.history.back()"
+  }) }}
+{% endblock %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds-from-desktop">
+
+    {% if errors %}
+      {{ govukErrorSummary({
+        titleText: "There is a problem",
+        errorList: [
+          {
+            text: errors.justification,
+            href: "#expert-refuse-justification"
+          }
+        ] if errors.justification else []
+      }) }}
+    {% endif %}
+
+    <h1 class="govuk-heading-l">Make a decision</h1>
+    {% if reference %}
+      <p class="govuk-body-m govuk-!-margin-bottom-1"><strong>{{ reference }}</strong></p>
+    {% endif %}
+    <p class="govuk-body">Use this section to make a decision about the request. This decision will be shared with the provider and recorded in application history.</p>
+
+    <h2 class="govuk-heading-m govuk-!-margin-top-7">Justification</h2>
+    <p class="govuk-body">We will share this justification with the provider in the grant notification email. You will also find this saved in the application history.</p>
+
+    <form action="/v6/expert-assessment/refuse-justification-handler" method="post" novalidate>
+
+      {{ govukTextarea({
+        name: "expert-refuse-justification",
+        id: "expert-refuse-justification",
+        value: data['expert-refuse-justification'],
+        errorMessage: errors.justification
+      }) }}
+
+      {{ govukButton({
+        text: "Continue"
+      }) }}
+
+    </form>
+
+  </div>
+</div>
+{% endblock %}

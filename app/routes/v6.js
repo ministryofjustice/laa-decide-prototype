@@ -1822,17 +1822,11 @@ router.get('/counsel-assessment/decision', function (req, res) {
 
 router.post('/counsel-assessment/decision-handler', function (req, res) {
   const decision = req.body['counsel-decision'];
-  const justification = (req.body['counsel-justification'] || '').trim();
 
   const errors = {};
   if (!decision) {
     errors.decision = 'Select Grant or Refuse';
   }
-  if (!justification) {
-    errors.justification = 'Enter justification';
-  }
-
-  req.session.data['counsel-justification'] = justification;
 
   if (Object.keys(errors).length > 0) {
     req.session.data['counsel-assessment-errors'] = errors;
@@ -1846,11 +1840,40 @@ router.post('/counsel-assessment/decision-handler', function (req, res) {
   }
 
   if (decision === 'Refuse') {
-    res.redirect('/v6/counsel-assessment/check-your-answers');
+    res.redirect('/v6/counsel-assessment/refuse-justification');
     return;
   }
 
   res.redirect('/v6/counsel-assessment/what-it-covers');
+});
+
+router.get('/counsel-assessment/refuse-justification', function (req, res) {
+  const errors = req.session.data['counsel-refuse-justification-errors'] || null;
+  delete req.session.data['counsel-refuse-justification-errors'];
+
+  res.render('v6/counsel-assessment/refuse-justification.njk', {
+    pageTitle: 'Why are you refusing this request? - Prior Authority',
+    reference: req.session.data['counsel-assessment-reference'] || '',
+    errors: errors
+  });
+});
+
+router.post('/counsel-assessment/refuse-justification-handler', function (req, res) {
+  const justification = (req.body['counsel-refuse-justification'] || '').trim();
+
+  const errors = {};
+  if (!justification) {
+    errors.justification = 'Enter justification for refusing this request';
+  }
+
+  if (Object.keys(errors).length > 0) {
+    req.session.data['counsel-refuse-justification-errors'] = errors;
+    res.redirect('/v6/counsel-assessment/refuse-justification');
+    return;
+  }
+
+  req.session.data['counsel-refuse-justification'] = justification;
+  res.redirect('/v6/counsel-assessment/check-your-answers');
 });
 
 router.get('/counsel-assessment/what-it-covers', function (req, res) {
@@ -2028,11 +2051,40 @@ router.post('/expert-assessment/decision-handler', function (req, res) {
   }
 
   if (decision === 'Refuse') {
-    res.redirect('/v6/expert-assessment/check-your-answers');
+    res.redirect('/v6/expert-assessment/refuse-justification');
     return;
   }
 
   res.redirect('/v6/expert-assessment/amount');
+});
+
+router.get('/expert-assessment/refuse-justification', function (req, res) {
+  const errors = req.session.data['expert-refuse-justification-errors'] || null;
+  delete req.session.data['expert-refuse-justification-errors'];
+
+  res.render('v6/expert-assessment/refuse-justification.njk', {
+    pageTitle: 'Why are you refusing this request? - Prior Authority',
+    reference: req.session.data['expert-assessment-reference'] || '',
+    errors: errors
+  });
+});
+
+router.post('/expert-assessment/refuse-justification-handler', function (req, res) {
+  const justification = (req.body['expert-refuse-justification'] || '').trim();
+
+  const errors = {};
+  if (!justification) {
+    errors.justification = 'Enter justification for refusing this request';
+  }
+
+  if (Object.keys(errors).length > 0) {
+    req.session.data['expert-refuse-justification-errors'] = errors;
+    res.redirect('/v6/expert-assessment/refuse-justification');
+    return;
+  }
+
+  req.session.data['expert-refuse-justification'] = justification;
+  res.redirect('/v6/expert-assessment/check-your-answers');
 });
 
 router.get('/expert-assessment/amount', function (req, res) {
