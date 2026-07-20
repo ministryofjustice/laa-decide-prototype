@@ -706,84 +706,84 @@ function pickExpertProfile(priorAuthorityType) {
 function generateMockApplications(count = 8) {
   const applications = [];
   const generatedRefs = new Set();
-  const priorAuthorityTypes = ['Expert (Psychiatrist)', 'Expert (Physiotherapist)', 'Counsel', 'King\'s Counsel'];
-  
-  for (let i = 0; i < count; i++) {
+  const priorAuthorityTypes = ['Expert - Psychiatrist', 'Expert - Physiotherapist', 'Counsel', "King's Counsel"];
+
+  function uniqueRef() {
     let ref = generateRandomRef();
-    while (generatedRefs.has(ref)) {
-      ref = generateRandomRef();
-    }
+    while (generatedRefs.has(ref)) ref = generateRandomRef();
     generatedRefs.add(ref);
-    
+    return ref;
+  }
+
+  // Split the count: roughly half initial applications awaiting assessment,
+  // half prior authority applications awaiting assessment (with their own refs so
+  // they don't bleed into the initial application detail pages).
+  const initialCount = Math.ceil(count / 2);
+  const paCount = count - initialCount;
+
+  // --- Pending initial applications (no status — awaiting decision) ---
+  for (let i = 0; i < initialCount; i++) {
+    const ref = uniqueRef();
     const firstName = firstNames[Math.floor(Math.random() * firstNames.length)];
-    const lastName = lastNames[Math.floor(Math.random() * lastNames.length)];
-    const outcomes = ['In progress', 'Submitted', 'Returned'];
-    const outcome = outcomes[Math.floor(Math.random() * outcomes.length)];
-    const outcomeClasses = { 'In progress': 'light-blue', 'Submitted': 'purple', 'Returned': 'turquoise' };
+    const lastName  = lastNames[Math.floor(Math.random() * lastNames.length)];
     const submittedDate = generateRandomDate();
-    
-    // Create the initial application - delegated functions are always "Used"
-    const initialApplication = {
-      ref: ref,
+
+    applications.push({
+      ref,
       reference: ref,
-      firstName: firstName,
-      lastName: lastName,
+      firstName,
+      lastName,
       dob: '12 Jan 1980',
       submitted: submittedDate,
       firm: 'WATKINS SOLICITORS INC<br>OK514R',
-      outcome: outcome,
-      outcomeClass: outcomeClasses[outcome],
       type: 'Initial application',
       delegatedFunctions: 'Used',
-      matterType: { title: 'Family', subtext: 'Special Children\'s Act' },
+      matterType: { title: 'Family', subtext: "Special Children's Act" },
       isPriorAuthority: false
-    };
-    applications.push(initialApplication);
-    
-    // Randomly add 1-2 prior authority sub-applications for the same reference - delegated functions are N/A
-    if (Math.random() > 0.5) {
-      // Any prior authority request implies the initial application has already been granted.
-      initialApplication.status = 'Granted';
-      initialApplication.decisionType = 'Grant';
-      initialApplication.outcome = 'Granted';
-      initialApplication.outcomeClass = 'green';
-
-      const numPriorAuth = Math.random() > 0.6 ? 2 : 1;
-      for (let j = 0; j < numPriorAuth; j++) {
-        const paType = priorAuthorityTypes[Math.floor(Math.random() * priorAuthorityTypes.length)];
-        const isExpert = paType.includes('Expert');
-        const expertProfile = isExpert ? pickExpertProfile(paType) : null;
-        const paApp = {
-          ref: ref,
-          reference: ref,
-          firstName: firstName,
-          lastName: lastName,
-          dob: '12 Jan 1980',
-          submitted: submittedDate,
-          firm: 'WATKINS SOLICITORS INC<br>OK514R',
-          outcome: outcome,
-          outcomeClass: outcomeClasses[outcome],
-          type: 'Prior authority',
-          priorAuthorityType: paType,
-          delegatedFunctions: 'N/A',
-          matterType: { title: 'Family', subtext: 'Special Children\'s Act' },
-          isPriorAuthority: true
-        };
-        if (expertProfile) {
-          paApp.expertName = expertProfile.name;
-          paApp.expertType = expertProfile.type;
-          paApp.expertLocation = expertProfile.location;
-          paApp.expertHours = expertProfile.hours;
-          paApp.expertMinutes = expertProfile.minutes;
-          paApp.expertRate = expertProfile.rate;
-          paApp.expertRequestedAmount = expertProfile.requestedAmount;
-          paApp.expertJustification = expertProfile.justification;
-        }
-        applications.push(paApp);
-      }
-    }
+      // No status — these are awaiting assessment
+    });
   }
-  
+
+  // --- Pending prior authority applications (own refs — awaiting PA assessment) ---
+  for (let i = 0; i < paCount; i++) {
+    const ref = uniqueRef();
+    const firstName = firstNames[Math.floor(Math.random() * firstNames.length)];
+    const lastName  = lastNames[Math.floor(Math.random() * lastNames.length)];
+    const submittedDate = generateRandomDate();
+    const paType = priorAuthorityTypes[Math.floor(Math.random() * priorAuthorityTypes.length)];
+    const isExpert = paType.includes('Expert');
+    const expertProfile = isExpert ? pickExpertProfile(paType) : null;
+
+    const paApp = {
+      ref,
+      reference: ref,
+      firstName,
+      lastName,
+      dob: '12 Jan 1980',
+      submitted: submittedDate,
+      firm: 'WATKINS SOLICITORS INC<br>OK514R',
+      type: 'Prior authority',
+      priorAuthorityType: paType,
+      delegatedFunctions: 'N/A',
+      matterType: { title: 'Family', subtext: "Special Children's Act" },
+      isPriorAuthority: true
+      // No status — these are awaiting PA assessment
+    };
+
+    if (expertProfile) {
+      paApp.expertName            = expertProfile.name;
+      paApp.expertType            = expertProfile.type;
+      paApp.expertLocation        = expertProfile.location;
+      paApp.expertHours           = expertProfile.hours;
+      paApp.expertMinutes         = expertProfile.minutes;
+      paApp.expertRate            = expertProfile.rate;
+      paApp.expertRequestedAmount = expertProfile.requestedAmount;
+      paApp.expertJustification   = expertProfile.justification;
+    }
+
+    applications.push(paApp);
+  }
+
   return applications;
 }
 
@@ -794,7 +794,8 @@ router.get('/open-applications', function(req, res) {
   
   // Keep a stable open-applications source for the session so references remain searchable.
   if (!req.session.data['open-applications-all']) {
-    req.session.data['open-applications-all'] = req.session.data['open-applications'] || generateMockApplications(8);
+    req.session.data['open-applications-all'] = generateMockApplications(8);
+    req.session.data['open-applications'] = null; // reset derived copy
   }
   let applications = [...req.session.data['open-applications-all']];
 
