@@ -128,7 +128,7 @@ router.post('/decision-check', function(request, response) {
   var errors = {}
 
   if (!decisionCheck) {
-    errors.overallDecision = 'Select Grant or Refuse'
+    errors.overallDecision = 'Select grant or refuse to continue'
   }
 
   if (Object.keys(errors).length > 0) {
@@ -2007,7 +2007,7 @@ router.post('/counsel-assessment/decision-handler', function (req, res) {
 
   const errors = {};
   if (!decision) {
-    errors.decision = 'Select Grant or Refuse';
+    errors.decision = 'Select grant or refuse to continue';
   }
 
   if (Object.keys(errors).length > 0) {
@@ -2249,7 +2249,7 @@ router.post('/expert-assessment/decision-handler', function (req, res) {
   const decision = req.body['expert-decision'];
 
   const errors = {};
-  if (!decision) errors.decision = 'Select Grant or Refuse';
+  if (!decision) errors.decision = 'Select grant or refuse to continue';
 
   if (Object.keys(errors).length > 0) {
     req.session.data['expert-assessment-errors'] = errors;
