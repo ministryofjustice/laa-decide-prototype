@@ -7,6 +7,7 @@
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/fieldset/macro.njk" import govukFieldset %}
 {% from "govuk/components/radios/macro.njk" import govukRadios %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 {% from "moj/components/primary-navigation/macro.njk" import mojPrimaryNavigation %}
 
@@ -78,6 +79,20 @@ Make a decision
   <div class="govuk-grid-column-full" style="width: 85%;">
     <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
+
+    {% set overallDecisionErrorMessage = null %}
+    {% if errors and errors.overallDecision %}
+      {% set overallDecisionErrorMessage = { text: errors.overallDecision } %}
+      {{ govukErrorSummary({
+        titleText: "There is a problem",
+        errorList: [
+          {
+            text: errors.overallDecision,
+            href: "#overall-decision"
+          }
+        ]
+      }) }}
+    {% endif %}
     
     <h1 class="govuk-heading-xl govuk-!-margin-bottom-2">Make a decision</h1>
     <p class="govuk-heading-l govuk-!-margin-bottom-4" style="font-weight: normal;">{{ decisionReference or 'L-12Z-13P' }}</p>
@@ -109,20 +124,24 @@ Make a decision
     <form action="/v6/decision-check" method="POST">
       {{ govukRadios({
         name: "overall-decision",
+        idPrefix: "overall-decision",
         fieldset: {
           legend: {
             text: "What is your overall decision?",
             classes: "govuk-fieldset__legend--l"
           }
         },
+        errorMessage: overallDecisionErrorMessage,
         items: [
           {
             value: "grant",
-            text: "Grant"
+            text: "Grant",
+            checked: data['overall-decision'] == 'grant'
           },
           {
             value: "refuse",
-            text: "Refuse"
+            text: "Refuse",
+            checked: data['overall-decision'] == 'refuse'
           }
         ]
       }) }}

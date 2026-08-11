@@ -6,6 +6,7 @@
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/radios/macro.njk" import govukRadios %}
 {% from "govuk/components/textarea/macro.njk" import govukTextarea %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 {% from "moj/components/primary-navigation/macro.njk" import mojPrimaryNavigation %}
 
 {% block head %}
@@ -76,6 +77,51 @@ Make a decision
   <div class="govuk-grid-column-full" style="width: 85%;">
     <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
+
+    {% set refusalReasonErrorMessage = null %}
+    {% set refuseJustificationErrorMessage = null %}
+    {% if errors and errors.refusalReason %}
+      {% set refusalReasonErrorMessage = { text: errors.refusalReason } %}
+    {% endif %}
+    {% if errors and errors.refuseJustification %}
+      {% set refuseJustificationErrorMessage = { text: errors.refuseJustification } %}
+    {% endif %}
+
+    {% if errors and errors.refusalReason and errors.refuseJustification %}
+      {{ govukErrorSummary({
+        titleText: "There is a problem",
+        errorList: [
+          {
+            text: errors.refusalReason,
+            href: "#refusal-reason"
+          },
+          {
+            text: errors.refuseJustification,
+            href: "#refuse-justification"
+          }
+        ]
+      }) }}
+    {% elif errors and errors.refusalReason %}
+      {{ govukErrorSummary({
+        titleText: "There is a problem",
+        errorList: [
+          {
+            text: errors.refusalReason,
+            href: "#refusal-reason"
+          }
+        ]
+      }) }}
+    {% elif errors and errors.refuseJustification %}
+      {{ govukErrorSummary({
+        titleText: "There is a problem",
+        errorList: [
+          {
+            text: errors.refuseJustification,
+            href: "#refuse-justification"
+          }
+        ]
+      }) }}
+    {% endif %}
     
     <h1 class="govuk-heading-xl govuk-!-margin-bottom-2">Make a decision</h1>
     <p class="govuk-heading-l govuk-!-margin-bottom-4" style="font-weight: normal;">{{ decisionReference or 'L-12Z-13P' }}</p>
@@ -83,16 +129,19 @@ Make a decision
     <form action="/v6/refuse-submit" method="POST">
       {{ govukRadios({
         name: "refusal-reason",
+        idPrefix: "refusal-reason",
         fieldset: {
           legend: {
             text: "Select a reason for refusal",
             classes: "govuk-fieldset__legend--m"
           }
         },
+        errorMessage: refusalReasonErrorMessage,
         items: [
           {
             value: "Not funded",
             text: "Not funded",
+            checked: data['refusal-reason'] == 'Not funded',
             hint: {
               text: "The specific statutory requirement or legal matter class code does not meet criteria parameters."
             }
@@ -100,6 +149,7 @@ Make a decision
           {
             value: "Merits not satisfied",
             text: "Merits not satisfied",
+            checked: data['refusal-reason'] == 'Merits not satisfied',
             hint: {
               text: "The case lacks reasonable prospects of clear success or cost-benefit justification."
             }
@@ -107,6 +157,7 @@ Make a decision
           {
             value: "Duplicate request",
             text: "Duplicate request",
+            checked: data['refusal-reason'] == 'Duplicate request',
             hint: {
               text: "An identical live funding certificate application already exists inside system records."
             }
@@ -117,13 +168,15 @@ Make a decision
       {{ govukTextarea({
         name: "refuse-justification",
         id: "refuse-justification",
+          value: data['refuse-justification'],
         label: {
           text: "Justification",
           classes: "govuk-label--m"
         },
         hint: {
           text: "Provide clear additional arguments and contextual notes for this refusal response."
-        }
+          },
+          errorMessage: refuseJustificationErrorMessage
       }) }}
 
       <div class="govuk-button-group">

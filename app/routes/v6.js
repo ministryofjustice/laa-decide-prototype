@@ -102,6 +102,21 @@ router.post('/merits-check2', function(request, response) {
 
 router.get('/decision-start', function(req, res) {
   const reference = req.query.ref;
+  const currentReference = req.session.data['decision-reference'];
+
+  if (reference && reference !== currentReference) {
+    delete req.session.data['overall-decision'];
+    delete req.session.data['overall-decision-errors'];
+    delete req.session.data['cert-date-type'];
+    delete req.session.data['cert-date-day'];
+    delete req.session.data['cert-date-month'];
+    delete req.session.data['cert-date-year'];
+    delete req.session.data['cert-date-display'];
+    delete req.session.data['refusal-reason'];
+    delete req.session.data['refuse-justification'];
+    delete req.session.data['refuse-reason-errors'];
+  }
+
   if (reference) {
     req.session.data['decision-reference'] = reference;
   }
@@ -109,17 +124,50 @@ router.get('/decision-start', function(req, res) {
 });
 
 router.post('/decision-check', function(request, response) {
-    var decisionCheck = request.session.data['overall-decision']
-    if (decisionCheck == "refuse") {
-        response.redirect("/v6/refuse-reason")
-    } else {
-      response.redirect("/v6/grant-certificate-date")
-    }
+  var decisionCheck = request.body['overall-decision']
+  var errors = {}
+
+  if (!decisionCheck) {
+    errors.overallDecision = 'Select Grant or Refuse'
+  }
+
+  if (Object.keys(errors).length > 0) {
+    request.session.data['overall-decision-errors'] = errors
+    response.redirect('/v6/overall-decision')
+    return
+  }
+
+  if (decisionCheck == "refuse") {
+    response.redirect("/v6/refuse-reason")
+  } else {
+    response.redirect("/v6/grant-certificate-date")
+  }
 });
 
 router.post('/grant-date-submit', function(request, response) {
+  var certDateType = request.body['cert-date-type']
+  var certDateDay = (request.body['cert-date-day'] || '').trim()
+  var certDateMonth = (request.body['cert-date-month'] || '').trim()
+  var certDateYear = (request.body['cert-date-year'] || '').trim()
+  var errors = {}
+
+  if (!certDateType) {
+    errors.certDateType = 'Select when the substantive certificate should be granted from'
+  }
+
+  if (certDateType === 'another-date') {
+    if (!certDateDay || !certDateMonth || !certDateYear) {
+      errors.certDate = 'Enter the date the substantive certificate should be granted from'
+    }
+  }
+
+  if (Object.keys(errors).length > 0) {
+    request.session.data['grant-certificate-date-errors'] = errors
+    response.redirect('/v6/grant-certificate-date')
+    return
+  }
+
     // Certificate date data stored in session from form
-    var certDateType = request.session.data['cert-date-type']
     var displayDate = "12 June 2026" // Default
     
     // Get the application to find its submitted date
@@ -160,8 +208,28 @@ router.post('/grant-date-submit', function(request, response) {
 });
 
 router.post('/refuse-submit', function(request, response) {
-    // Refusal reason and justification stored in session from form
-    response.redirect("/v6/check-answers")
+  var refusalReason = request.body['refusal-reason']
+  var refuseJustification = (request.body['refuse-justification'] || '').trim()
+  var errors = {}
+
+  if (!refusalReason) {
+    errors.refusalReason = 'You must select a refusal reason to continue'
+  }
+
+  if (!refuseJustification) {
+    errors.refuseJustification = 'A justification reason must be entered'
+  }
+
+  if (Object.keys(errors).length > 0) {
+    request.session.data['refuse-reason-errors'] = errors
+    response.redirect('/v6/refuse-reason')
+    return
+  }
+
+  request.session.data['refuse-justification'] = refuseJustification
+
+  // Refusal reason and justification stored in session from form
+  response.redirect("/v6/check-answers")
 });
 
 router.post('/refuse-decision-submit', function(request, response) {
@@ -343,12 +411,26 @@ const mockResults = [
 
 router.get('/grant-certificate-date', function(req, res) {
   const decisionReference = req.session.data['decision-reference'] || 'L-12Z-13P';
-  res.render('v6/grant-certificate-date.html', { pageTitle: 'Make a decision', decisionReference: decisionReference });
+  const errors = req.session.data['grant-certificate-date-errors'] || null;
+  delete req.session.data['grant-certificate-date-errors'];
+
+  res.render('v6/grant-certificate-date.html', {
+    pageTitle: 'Make a decision',
+    decisionReference: decisionReference,
+    errors: errors
+  });
 });
 
 router.get('/refuse-reason', function(req, res) {
   const decisionReference = req.session.data['decision-reference'] || 'L-12Z-13P';
-  res.render('v6/refuse-reason.html', { pageTitle: 'Make a decision', decisionReference: decisionReference });
+  const errors = req.session.data['refuse-reason-errors'] || null;
+  delete req.session.data['refuse-reason-errors'];
+
+  res.render('v6/refuse-reason.html', {
+    pageTitle: 'Make a decision',
+    decisionReference: decisionReference,
+    errors: errors
+  });
 });
 
 router.get('/check-answers', function(req, res) {
@@ -362,7 +444,14 @@ router.get('/check-answers', function(req, res) {
 
 router.get('/overall-decision', function(req, res) {
   const decisionReference = req.session.data['decision-reference'] || 'L-12Z-13P';
-  res.render('v6/overall-decision.html', { pageTitle: 'Make a decision', decisionReference: decisionReference });
+  const errors = req.session.data['overall-decision-errors'] || null;
+  delete req.session.data['overall-decision-errors'];
+
+  res.render('v6/overall-decision.html', {
+    pageTitle: 'Make a decision',
+    decisionReference: decisionReference,
+    errors: errors
+  });
 });
 
 router.get('/confirmation-screen', function(req, res) {
@@ -812,6 +901,24 @@ function generateMockApplications(count = 8) {
   return { open: openApplications, completed: completedApplications };
 }
 
+function generateReplacementOpenApplication(preferredType) {
+  const refillData = generateMockApplications(4);
+  let candidates = refillData.open;
+
+  if (preferredType === 'initial') {
+    candidates = candidates.filter(app => !app.isPriorAuthority);
+  } else if (preferredType === 'prior') {
+    candidates = candidates.filter(app => app.isPriorAuthority);
+  }
+
+  const replacement = candidates[Math.floor(Math.random() * candidates.length)] || refillData.open[0];
+
+  return {
+    replacement: replacement,
+    completed: refillData.completed
+  };
+}
+
 router.get('/open-applications', function(req, res) {
   if (!req.session.data['assigned-applications']) {
     req.session.data['assigned-applications'] = [];
@@ -1060,6 +1167,10 @@ router.get('/add-application/:reference', function(req, res) {
     if (!req.session.data['open-applications']) {
       req.session.data['open-applications'] = req.session.data['open-applications-all'] || [];
     }
+
+    if (!req.session.data['open-applications-all']) {
+      req.session.data['open-applications-all'] = [];
+    }
     
     // Get the full application data from open applications, matching requested variant when provided.
     let openApp = null;
@@ -1094,6 +1205,33 @@ router.get('/add-application/:reference', function(req, res) {
       addedDate: addedDate,
       lastUpdated: addedDate
     };
+
+    req.session.data['open-applications-all'] = req.session.data['open-applications-all'].filter(app => {
+      if (app.ref !== ref) return true;
+      if (hasPriorAuthorityParam) return app.isPriorAuthority !== isPriorAuthorityRequested;
+      return false;
+    });
+
+    const remainingOpenApplications = req.session.data['open-applications-all'];
+    const initialCount = remainingOpenApplications.filter(app => !app.isPriorAuthority).length;
+    const priorCount = remainingOpenApplications.filter(app => app.isPriorAuthority).length;
+    const preferredReplacementType = initialCount > priorCount
+      ? 'prior'
+      : priorCount > initialCount
+        ? 'initial'
+        : (Math.random() > 0.5 ? 'initial' : 'prior');
+
+    const refillData = generateReplacementOpenApplication(preferredReplacementType);
+    req.session.data['open-applications-all'].push(refillData.replacement);
+
+    if (!req.session.data['completed-applications']) {
+      req.session.data['completed-applications'] = [];
+    }
+
+    refillData.completed.forEach(app => {
+      app._mockGenerated = true;
+      req.session.data['completed-applications'].push(app);
+    });
     
     // Restore any stored decision data to the assigned application
     if (req.session.data['decision-store'] && req.session.data['decision-store'][ref]) {
@@ -1815,11 +1953,17 @@ function removePriorAuthorityFromAssignedList(req, reference) {
 
 router.get('/counsel-assessment/decision', function (req, res) {
   const reference = req.query.reference || req.session.data['counsel-assessment-reference'] || '';
-  if (reference) {
+  const currentReference = req.session.data['counsel-assessment-reference'];
+
+  if (reference && reference !== currentReference) {
     // Entering from application details starts a fresh decision step; do not preselect Grant.
     delete req.session.data['counsel-decision'];
     delete req.session.data['counsel-covers'];
     delete req.session.data['counsel-justification'];
+    delete req.session.data['counsel-refuse-justification'];
+    delete req.session.data['counsel-type-granted'];
+    delete req.session.data['counsel-assessment-errors'];
+    delete req.session.data['counsel-refuse-justification-errors'];
     req.session.data['counsel-assessment-reference'] = reference;
   }
 
@@ -1982,7 +2126,7 @@ function expertDetailsForApplication(application) {
       requestType: priorAuthorityType || 'Expert - Psychiatrist',
       name: 'Dr Morley Calzoni',
       type: 'Psychiatrist',
-      location: 'London',
+      location: 'SW1A 1AA',
       hours: '60',
       minutes: '00',
       rate: '100.80',
@@ -1995,7 +2139,7 @@ function expertDetailsForApplication(application) {
       requestType: priorAuthorityType || 'Expert - Physiotherapist',
       name: 'Dr Rachel Thompson',
       type: 'Physiotherapist',
-      location: 'Manchester',
+      location: 'M1 1AE',
       hours: '40',
       minutes: '00',
       rate: '85.50',
@@ -2007,7 +2151,7 @@ function expertDetailsForApplication(application) {
     requestType: priorAuthorityType || 'Expert',
     name: 'Dr Andrew Wilson',
     type: 'Medical examiner',
-    location: 'Birmingham',
+    location: 'B1 1AA',
     hours: '50',
     minutes: '00',
     rate: '95.00',
@@ -2021,13 +2165,34 @@ function formatCurrencyGBP(amountString) {
   return `£${numeric.toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 }
 
+function postcodeForExpertLocation(location, priorAuthorityType) {
+  const locationText = String(location || '');
+  const typeText = String(priorAuthorityType || '');
+
+  if (/[A-Z]{1,2}\d/.test(locationText)) {
+    return locationText;
+  }
+
+  if (locationText === 'Manchester' || typeText.includes('Physiotherapist')) {
+    return 'M1 1AE';
+  }
+
+  if (locationText === 'Birmingham') {
+    return 'B1 1AA';
+  }
+
+  return 'SW1A 1AA';
+}
+
 router.get('/expert-assessment/decision', function (req, res) {
   const reference = req.query.reference || req.session.data['expert-assessment-reference'] || '';
+  const currentReference = req.session.data['expert-assessment-reference'];
 
-  if (reference) {
+  if (reference && reference !== currentReference) {
     // Starting from the details page resets this flow.
     delete req.session.data['expert-decision'];
     delete req.session.data['expert-justification'];
+    delete req.session.data['expert-refuse-justification'];
     delete req.session.data['expert-amount-decision'];
     delete req.session.data['expert-new-amount'];
     delete req.session.data['expert-new-name'];
@@ -2037,6 +2202,10 @@ router.get('/expert-assessment/decision', function (req, res) {
     delete req.session.data['expert-new-hours'];
     delete req.session.data['expert-new-minutes'];
     delete req.session.data['expert-new-total-amount'];
+    delete req.session.data['expert-assessment-errors'];
+    delete req.session.data['expert-refuse-justification-errors'];
+    delete req.session.data['expert-assessment-amount-errors'];
+    delete req.session.data['expert-assessment-new-amount-errors'];
     req.session.data['expert-assessment-reference'] = reference;
   }
 
@@ -2060,7 +2229,7 @@ router.get('/expert-assessment/decision', function (req, res) {
   req.session.data['expert-request-type'] = expertDetails.requestType;
   req.session.data['expert-default-name'] = expertDetails.name;
   req.session.data['expert-default-type'] = expertDetails.type;
-  req.session.data['expert-default-location'] = expertDetails.location;
+  req.session.data['expert-default-location'] = postcodeForExpertLocation(expertDetails.location, priorAuthorityApplication && priorAuthorityApplication.priorAuthorityType);
   req.session.data['expert-default-rate'] = expertDetails.rate;
   req.session.data['expert-default-hours'] = expertDetails.hours;
   req.session.data['expert-default-minutes'] = expertDetails.minutes;
@@ -2156,7 +2325,7 @@ router.post('/expert-assessment/amount-handler', function (req, res) {
   if (amountDecision === 'new') {
     req.session.data['expert-new-name'] = (req.body['expert-new-name'] || '').trim() || req.session.data['expert-default-name'] || 'Dr Andrew Wilson';
     req.session.data['expert-new-type'] = (req.body['expert-new-type'] || '').trim() || req.session.data['expert-default-type'] || 'Medical examiner';
-    req.session.data['expert-new-location'] = (req.body['expert-new-location'] || '').trim() || req.session.data['expert-default-location'] || 'Birmingham';
+    req.session.data['expert-new-location'] = (req.body['expert-new-location'] || '').trim() || req.session.data['expert-default-location'] || 'B1 1AA';
     req.session.data['expert-new-rate'] = (req.body['expert-new-rate'] || '').trim() || req.session.data['expert-default-rate'] || '95.00';
     req.session.data['expert-new-hours'] = (req.body['expert-new-hours'] || '').trim() || req.session.data['expert-default-hours'] || '50';
     req.session.data['expert-new-minutes'] = (req.body['expert-new-minutes'] || '').trim() || req.session.data['expert-default-minutes'] || '00';
