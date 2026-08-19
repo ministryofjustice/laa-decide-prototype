@@ -1534,6 +1534,11 @@ router.get('/search', function(req, res) {
   });
 });
 
+router.get('/application-details', function(req, res) {
+  const reference = req.query.reference || req.query.ref || req.session.data['decision-reference'] || 'L-12Z-13P';
+  res.redirect('/v6/application/' + encodeURIComponent(reference));
+});
+
 router.get('/application/:reference', function(req, res) {
   const reference = req.params.reference;
   const requestedPriorAuthority = req.query.isPriorAuthority === 'true';
