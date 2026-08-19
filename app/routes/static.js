@@ -1159,7 +1159,16 @@ router.get('/search', function(req, res) {
 
 router.get('/application/:reference', function(req, res) {
   const reference = req.params.reference;
-  const hasLinkedCases = reference === 'L-12Z-13P';
+  const linkedCasesByReference = {
+    'L-12Z-13P': [
+      { role: 'Lead', firstName: 'Haylie', middleName: '', lastName: 'Septimus', reference: 'L-12Z-13P', status: 'In progress', statusClass: 'govuk-tag--light-blue' },
+      { role: 'Associated', firstName: 'Jocelyn Bergson', middleName: '', lastName: 'Puran', reference: 'L-12Z-14X', status: 'In progress', statusClass: 'govuk-tag--light-blue' },
+      { role: 'Associated', firstName: 'Davis David Allen George', middleName: '', lastName: 'Devine Schleifer', reference: 'L-12Z-15Y', status: 'In progress', statusClass: 'govuk-tag--light-blue' },
+      { role: 'Associated', firstName: 'Mira Saris', middleName: '', lastName: 'Howell', reference: 'L-12Z-16Z', status: 'In progress', statusClass: 'govuk-tag--light-blue' }
+    ]
+  };
+  const linkedCases = linkedCasesByReference[reference] || [];
+  const hasLinkedCases = linkedCases.length > 0;
 
   // Ensure seeded applications are always available
   if (!req.session.data['completed-applications']) {
@@ -1372,6 +1381,8 @@ router.get('/application/:reference', function(req, res) {
     reference: reference,
     application: isViewingPreviousVersion ? versionedApplication : application,
     hasLinkedCases: hasLinkedCases,
+    linkedCases: linkedCases,
+    applicationRoutePrefix: '/static',
     hasPriorAuthority: hasPriorAuthority,
     priorAuthorityType: priorAuthorityType,
     sessionData: req.session.data,

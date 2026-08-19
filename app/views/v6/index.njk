@@ -5,6 +5,40 @@
 {% block head %}
   <!-- Include our compiled CSS which imports both GOV.UK and MOJ styles -->
   <link href="/public/stylesheets/application.css" rel="stylesheet">
+  <style>
+    .version-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+    }
+
+    .version-status-stack {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 8px;
+    }
+
+    .version-status-tag {
+      display: inline-block;
+      padding: 6px 12px;
+      font-family: "GDS Transport", arial, sans-serif;
+      font-size: 20px;
+      line-height: 1;
+      white-space: nowrap;
+    }
+
+    .version-status-tag--previous {
+      background-color: #d8d8d8;
+      color: #0b0c0c;
+    }
+
+    .version-status-tag--ur-complete {
+      background-color: #d6ede5;
+      color: #0b4b3e;
+    }
+  </style>
 {% endblock %}
 
 {% block header %}
@@ -34,21 +68,65 @@
 {% block content %}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
-      <h1 class="govuk-heading-xl">Welcome to the Civil Decide prototype</h1>
-      
-      <p class="govuk-body">
-        Thank you for taking part in our testing. We will be using this prototype as part of today's research session. You will be asked to use the prototype to complete some tasks related to your role.
+      <h1 class="govuk-heading-xl govuk-!-margin-bottom-6">LAA Civil Decide prototypes</h1>
+
+      <p class="govuk-body govuk-!-margin-bottom-6">
+        This prototype is not a real service. The data shown here is mock data and no real user information is used.
+        <br><br>
+        You can use this prototype during user testing, to present early designs and vision to stakeholders and teams,
+        to review design versions and history, and to view work in progress.
       </p>
 
-      <p class="govuk-body">
-        Please note, as this is a prototype, it uses dummy data, and some of the links may not work as expected. If you have any queries during the testing please ask the user researcher for support.
-      </p>
+      <div class="govuk-summary-card govuk-!-margin-bottom-6">
+        <div class="govuk-summary-card__title-wrapper version-header">
+          <div>
+            <h3 class="govuk-summary-card__title govuk-!-margin-bottom-2">Version 1</h3>
+            <p class="govuk-body govuk-!-margin-bottom-0">August 2025</p>
+          </div>
+          <div class="version-status-stack">
+            <span class="version-status-tag version-status-tag--previous">Previous</span>
+            <span class="version-status-tag version-status-tag--ur-complete">UR complete</span>
+          </div>
+        </div>
+        <div class="govuk-summary-card__content">
+          <h4 class="govuk-heading-m govuk-!-margin-bottom-3">What you can do with this prototype</h4>
+          <ul class="govuk-list govuk-list--bullet govuk-!-margin-bottom-5">
+            <li>Make an initial application assessment</li>
+            <li>Make a prior authority assessment</li>
+            <li>Reassign a case to another caseworker</li>
+            <li>View application history</li>
+            <li>Open applications</li>
+          </ul>
 
-      {{ govukButton({
-        text: "Start now",
-        href: "/v6/open-applications",
-        isStartButton: true
-      }) }}
+          <h4 class="govuk-heading-m govuk-!-margin-bottom-3">Notes</h4>
+          <ul class="govuk-list govuk-list--bullet govuk-!-margin-bottom-6">
+            <li>Add to your list</li>
+            <li>Grant and refuse journey</li>
+            <li>Prior authority tab added to application details</li>
+            <li>Make a prior authority assessment (Expert journey)</li>
+            <li>Prior authority assessment counsel journey</li>
+            <li>Reassign to another case worker</li>
+            <li>Open applications (Inlcudes initial applications and prior authourity applications)</li>
+          </ul>
+
+          {{ govukButton({
+            text: "Start version 1",
+            href: "/v6/open-applications"
+          }) }}
+        </div>
+      </div>
+
+      <div class="govuk-summary-card govuk-!-margin-bottom-2">
+        <div class="govuk-summary-card__title-wrapper" style="display: block;">
+          <h3 class="govuk-summary-card__title govuk-!-margin-bottom-2">Version 2</h3>
+          <p class="govuk-body govuk-!-margin-bottom-0">Coming soon</p>
+        </div>
+        <div class="govuk-summary-card__content">
+          <p class="govuk-body govuk-!-margin-bottom-0">
+            This section will contain the next project version and its notes.
+          </p>
+        </div>
+      </div>
     </div>
   </div>
 {% endblock %}

@@ -901,21 +901,39 @@ function generateMockApplications(count = 8) {
   return { open: openApplications, completed: completedApplications };
 }
 
-function generateReplacementOpenApplication(preferredType) {
-  const refillData = generateMockApplications(4);
-  let candidates = refillData.open;
+function applicationVariantKey(app) {
+  return `${app.ref}|${Boolean(app.isPriorAuthority)}`;
+}
 
-  if (preferredType === 'initial') {
-    candidates = candidates.filter(app => !app.isPriorAuthority);
-  } else if (preferredType === 'prior') {
-    candidates = candidates.filter(app => app.isPriorAuthority);
+function generateReplacementOpenApplication(preferredType, existingVariantKeys = new Set()) {
+  const maxAttempts = 8;
+
+  for (let attempt = 0; attempt < maxAttempts; attempt++) {
+    const refillData = generateMockApplications(6);
+    let candidates = refillData.open;
+
+    if (preferredType === 'initial') {
+      candidates = candidates.filter(app => !app.isPriorAuthority);
+    } else if (preferredType === 'prior') {
+      candidates = candidates.filter(app => app.isPriorAuthority);
+    }
+
+    candidates = candidates.filter(app => !existingVariantKeys.has(applicationVariantKey(app)));
+
+    if (candidates.length > 0) {
+      const replacement = candidates[Math.floor(Math.random() * candidates.length)];
+      return {
+        replacement: replacement,
+        completed: refillData.completed
+      };
+    }
   }
 
-  const replacement = candidates[Math.floor(Math.random() * candidates.length)] || refillData.open[0];
-
+  const fallback = generateMockApplications(6);
+  const fallbackReplacement = fallback.open.find(app => !existingVariantKeys.has(applicationVariantKey(app))) || fallback.open[0];
   return {
-    replacement: replacement,
-    completed: refillData.completed
+    replacement: fallbackReplacement,
+    completed: fallback.completed
   };
 }
 
@@ -1221,7 +1239,15 @@ router.get('/add-application/:reference', function(req, res) {
         ? 'initial'
         : (Math.random() > 0.5 ? 'initial' : 'prior');
 
-    const refillData = generateReplacementOpenApplication(preferredReplacementType);
+    const existingVariantKeys = new Set();
+    (req.session.data['open-applications-all'] || []).forEach(app => {
+      existingVariantKeys.add(applicationVariantKey(app));
+    });
+    (req.session.data['assigned-applications'] || []).forEach(app => {
+      existingVariantKeys.add(applicationVariantKey(app));
+    });
+
+    const refillData = generateReplacementOpenApplication(preferredReplacementType, existingVariantKeys);
     req.session.data['open-applications-all'].push(refillData.replacement);
 
     if (!req.session.data['completed-applications']) {
@@ -1511,7 +1537,16 @@ router.get('/search', function(req, res) {
 router.get('/application/:reference', function(req, res) {
   const reference = req.params.reference;
   const requestedPriorAuthority = req.query.isPriorAuthority === 'true';
-  const hasLinkedCases = reference === 'L-12Z-13P';
+  const linkedCasesByReference = {
+    'L-12Z-13P': [
+      { role: 'Lead', firstName: 'Haylie', middleName: '', lastName: 'Septimus', reference: 'L-12Z-13P', status: 'In progress', statusClass: 'govuk-tag--light-blue' },
+      { role: 'Associated', firstName: 'Jocelyn Bergson', middleName: '', lastName: 'Puran', reference: 'L-12Z-14X', status: 'In progress', statusClass: 'govuk-tag--light-blue' },
+      { role: 'Associated', firstName: 'Davis David Allen George', middleName: '', lastName: 'Devine Schleifer', reference: 'L-12Z-15Y', status: 'In progress', statusClass: 'govuk-tag--light-blue' },
+      { role: 'Associated', firstName: 'Mira Saris', middleName: '', lastName: 'Howell', reference: 'L-12Z-16Z', status: 'In progress', statusClass: 'govuk-tag--light-blue' }
+    ]
+  };
+  const linkedCases = linkedCasesByReference[reference] || [];
+  const hasLinkedCases = linkedCases.length > 0;
 
   // Ensure seeded applications are always available
   if (!req.session.data['completed-applications']) {
@@ -1720,6 +1755,8 @@ router.get('/application/:reference', function(req, res) {
     priorAuthorityApplication: priorAuthorityApplicationData,
     statusApplication: statusApplication,
     hasLinkedCases: hasLinkedCases,
+    linkedCases: linkedCases,
+    applicationRoutePrefix: '/v6',
     hasPriorAuthority: hasPriorAuthority,
     priorAuthorityType: priorAuthorityType,
     sessionData: req.session.data,

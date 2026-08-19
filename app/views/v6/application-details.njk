@@ -409,34 +409,15 @@
             {% if hasLinkedCases %}
               <table class="govuk-table govuk-!-margin-bottom-0">
                 <tbody class="govuk-table__body">
-                  <tr class="govuk-table__row">
-                    <td class="govuk-table__cell"><strong>Lead</strong></td>
-                    <td class="govuk-table__cell">Haylie</td>
-                    <td class="govuk-table__cell">Septimus</td>
-                    <td class="govuk-table__cell"><a href="#" class="govuk-link">L-12Z-13P</a></td>
-                    <td class="govuk-table__cell">{{ govukTag({ text: "In progress", classes: "govuk-tag--light-blue" }) }}</td>
-                  </tr>
-                  <tr class="govuk-table__row">
-                    <td class="govuk-table__cell"><strong>Associated</strong></td>
-                    <td class="govuk-table__cell">Jocelyn<br>Bergson</td>
-                    <td class="govuk-table__cell">Puran</td>
-                    <td class="govuk-table__cell"><a href="#" class="govuk-link">L-12Z-14X</a></td>
-                    <td class="govuk-table__cell">{{ govukTag({ text: "In progress", classes: "govuk-tag--light-blue" }) }}</td>
-                  </tr>
-                  <tr class="govuk-table__row">
-                    <td class="govuk-table__cell"><strong>Associated</strong></td>
-                    <td class="govuk-table__cell">Davis David<br>Allen George</td>
-                    <td class="govuk-table__cell">Devine<br>Schleifer</td>
-                    <td class="govuk-table__cell"><a href="#" class="govuk-link">L-12Z-15Y</a></td>
-                    <td class="govuk-table__cell">{{ govukTag({ text: "In progress", classes: "govuk-tag--light-blue" }) }}</td>
-                  </tr>
-                  <tr class="govuk-table__row">
-                    <td class="govuk-table__cell"><strong>Associated</strong></td>
-                    <td class="govuk-table__cell">Mira Saris</td>
-                    <td class="govuk-table__cell">Howell</td>
-                    <td class="govuk-table__cell"><a href="#" class="govuk-link">L-12Z-16Z</a></td>
-                    <td class="govuk-table__cell">{{ govukTag({ text: "In progress", classes: "govuk-tag--light-blue" }) }}</td>
-                  </tr>
+                  {% for linkedCase in linkedCases %}
+                    <tr class="govuk-table__row">
+                      <td class="govuk-table__cell"><strong>{{ linkedCase.role }}</strong></td>
+                      <td class="govuk-table__cell">{{ linkedCase.firstName }}</td>
+                      <td class="govuk-table__cell">{{ linkedCase.lastName }}</td>
+                      <td class="govuk-table__cell"><a href="{{ applicationRoutePrefix }}/application/{{ linkedCase.reference }}" class="govuk-link">{{ linkedCase.reference }}</a></td>
+                      <td class="govuk-table__cell">{{ govukTag({ text: linkedCase.status, classes: linkedCase.statusClass }) }}</td>
+                    </tr>
+                  {% endfor %}
                 </tbody>
               </table>
             {% else %}
