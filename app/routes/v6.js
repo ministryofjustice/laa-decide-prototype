@@ -509,6 +509,13 @@ router.post('/password-submit', function(req, res) {
   }
 });
 
+router.get('/sign-out', function(req, res) {
+  if (req.session.data) {
+    delete req.session.data['v6-authenticated'];
+  }
+  res.redirect('/v6/');
+});
+
 // Welcome/index page - requires auth
 router.get('/index', function(req, res) {
   // Check authentication

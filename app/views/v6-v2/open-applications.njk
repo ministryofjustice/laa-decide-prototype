@@ -1,0 +1,391 @@
+{% extends "govuk/template.njk" %}
+
+{% from "govuk/components/header/macro.njk" import govukHeader %}
+{% from "govuk/components/phase-banner/macro.njk" import govukPhaseBanner %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+{% from "govuk/components/table/macro.njk" import govukTable %}
+{% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
+{% from "moj/components/primary-navigation/macro.njk" import mojPrimaryNavigation %}
+{% from "moj/components/filter/macro.njk" import mojFilter %}
+
+{% block head %}
+  <link href="/public/stylesheets/application.css" rel="stylesheet">
+  <style>
+    .moj-primary-navigation__item:first-child .moj-primary-navigation__link { color: #0b0c0c; }
+    .moj-primary-navigation__item:first-child .moj-primary-navigation__link:hover { color: #0b0c0c; }
+    .moj-filter-layout {
+      display: flex;
+      gap: 0px;
+    }
+    .moj-filter-layout__filter {
+      width: 130px;
+      flex-shrink: 0;
+      overflow-y: scroll;
+      max-height: none;
+      scrollbar-width: none;
+      margin-right: 20px;
+    }
+    .moj-filter-layout__filter::-webkit-scrollbar {
+      display: none;
+    }
+    .moj-filter-layout__content {
+      flex: 1;
+      min-width: 0;
+      overflow-x: auto;
+    }
+    .moj-filter__selected:not(:has(.moj-filter-tags))::after {
+      content: "No filters selected";
+      display: block;
+      font-family: "GDS Transport", arial, sans-serif;
+      font-size: 19px;
+      margin-top: 15px;
+    }
+  </style>
+{% endblock %}
+
+{% block header %}
+  {{ govukHeader({
+    homepageUrl: "#",
+    productName: "Legal Aid Agency",
+    navigationClasses: "govuk-header__navigation--end",
+    navigation: [
+      {
+        href: '#',
+        text: "joann.barton@law.com"
+      },
+      {
+        href: '/v6-v2/sign-out',
+        text: "Sign out"
+      }
+    ]
+  }) }}
+
+  {{ mojPrimaryNavigation({
+    label: 'Primary navigation',
+    items: [
+      {
+        text: 'Decide if an applicant can get legal aid',
+        href: '#'
+      },
+      {
+        text: 'Open applications',
+        href: '/v6-v2/open-applications'
+      },
+      {
+        text: 'Your list',
+        href: '/v6-v2/yourlist'
+      },
+      {
+        text: 'Search',
+        href: '/v6-v2/search'
+      }
+    ]
+  }) }}
+{% endblock %}
+
+{% block beforeContent %}
+  {{ govukPhaseBanner({
+    tag: { text: "Beta" },
+    html: 'This is a new service – your <a class="govuk-link" href="#">feedback</a> will help us to improve it.'
+  }) }}
+  {{ govukBackLink({
+    text: "Back",
+    href: "javascript:history.back()"
+  }) }}
+{% endblock %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+      
+      <div id="toast-notification"></div>
+      
+      <h1 class="govuk-heading-xl govuk-!-margin-bottom-6">Open applications</h1>
+
+      {% set filterOptionsHtml %}
+        <div class="govuk-form-group">
+          <label class="govuk-label govuk-!-font-weight-bold" for="date-submitted">Date submitted</label>
+          <input class="govuk-input" id="date-submitted" name="date-submitted" type="date">
+        </div>
+
+        <div class="govuk-form-group">
+          <label class="govuk-label govuk-!-font-weight-bold" for="date-last-updated">Date last updated</label>
+          <input class="govuk-input" id="date-last-updated" name="date-last-updated" type="date">
+        </div>
+
+        {{ govukCheckboxes({
+          idPrefix: "application-type",
+          name: "applicationType",
+          classes: "govuk-checkboxes--small",
+          fieldset: {
+            legend: { text: "Application type", classes: "govuk-fieldset__legend--s govuk-!-font-weight-bold" }
+          },
+          items: [
+            { value: "initial", text: "Initial application", checked: query.applicationType and ("initial" in query.applicationType) },
+            { value: "prior", text: "Prior authority", checked: query.applicationType and ("prior" in query.applicationType) }
+          ]
+        }) }}
+
+        {{ govukCheckboxes({
+          idPrefix: "matter-type",
+          name: "matterType",
+          classes: "govuk-checkboxes--small",
+          fieldset: {
+            legend: { text: "Matter type", classes: "govuk-fieldset__legend--s govuk-!-font-weight-bold" }
+          },
+          items: [
+            { value: "sca", text: "Special Children's Act", checked: query.matterType and ("sca" in query.matterType) }
+          ]
+        }) }}
+
+        {{ govukCheckboxes({
+          idPrefix: "categories",
+          name: "categories",
+          classes: "govuk-checkboxes--small",
+          fieldset: {
+            legend: { text: "Categories", classes: "govuk-fieldset__legend--s govuk-!-font-weight-bold" }
+          },
+          items: [
+            { value: "expert", text: "Expert", checked: query.categories and ("expert" in query.categories) },
+            { value: "junior-counsel", text: "Junior counsel", checked: query.categories and ("junior-counsel" in query.categories) },
+            { value: "expenses", text: "Expenses", checked: query.categories and ("expenses" in query.categories) }
+          ]
+        }) }}
+      {% endset %}
+
+      <div class="moj-filter-layout">
+        <div class="moj-filter-layout__filter" id="filter-panel">
+          <form method="GET" action="/v6-v2/open-applications">
+            {{ mojFilter({
+              heading: { text: 'Filter' },
+              selectedFilters: {
+                heading: { text: 'Selected filters' },
+                clearLink: { text: 'Clear filters', href: '/v6-v2/open-applications' },
+                categories: []
+              },
+              optionsHtml: filterOptionsHtml
+            }) }}
+          </form>
+        </div>
+
+        <div class="moj-filter-layout__content">
+          <div class="moj-action-bar">
+            <div class="moj-action-bar__filter">
+              <button class="govuk-button govuk-button--secondary" id="custom-filter-toggle">Show filter</button>
+            </div>
+          </div>
+
+          {% if applications and applications.length > 0 %}
+            <table class="govuk-table moj-sortable-table" data-module="moj-sortable-table">
+              <thead class="govuk-table__head">
+                <tr class="govuk-table__row">
+                  <th scope="col" class="govuk-table__header">Reference</th>
+                  <th scope="col" class="govuk-table__header" aria-sort="none" data-sort-type="date">Submitted</th>
+                  <th scope="col" class="govuk-table__header" aria-sort="none" data-sort-type="date">Last updated</th>
+                  <th scope="col" class="govuk-table__header">Type</th>
+                  <th scope="col" class="govuk-table__header" aria-sort="none">Delegated Functions</th>
+                  <th scope="col" class="govuk-table__header" aria-sort="none">Matter type</th>
+                  <th scope="col" class="govuk-table__header">Actions</th>
+                </tr>
+              </thead>
+              <tbody class="govuk-table__body">
+                {% for app in applications %}
+                  <tr class="govuk-table__row">
+                    <td class="govuk-table__cell">
+                      <a href="/v6-v2/application/{{ app.ref }}{% if app.isPriorAuthority %}?isPriorAuthority=true#prior-authority{% endif %}" class="govuk-link">
+                        {{ app.ref }}
+                      </a>
+                    </td>
+                    <td class="govuk-table__cell" data-sort-value="{{ app.submitted | replace(' ', '') }}">
+                      {{ app.submitted }}
+                    </td>
+                    <td class="govuk-table__cell" data-sort-value="{{ app.submitted | replace(' ', '') }}">
+                      {{ app.submitted }}
+                    </td>
+                    <td class="govuk-table__cell">
+                      {% if app.isPriorAuthority %}
+                        Prior authority<br><strong>{{ app.priorAuthorityType }}</strong>
+                      {% else %}
+                        Initial application
+                      {% endif %}
+                    </td>
+                    <td class="govuk-table__cell">
+                      {{ app.delegatedFunctions }}
+                    </td>
+                    <td class="govuk-table__cell">
+                      <strong>{{ app.matterType.title }}</strong><br>{{ app.matterType.subtext }}
+                    </td>
+                    <td class="govuk-table__cell">
+                      <a href="#" class="govuk-link add-to-list" data-ref="{{ app.ref }}" data-is-prior-authority="{{ app.isPriorAuthority and 'true' or 'false' }}">Add</a>
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          {% else %}
+            <p class="govuk-body">No open applications found.</p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const toggleBtn = document.getElementById('custom-filter-toggle');
+      const filterPanel = document.getElementById('filter-panel');
+      const hasFilters = window.location.search.length > 0;
+
+      // Default state: Keep open if filters were just applied
+      if (hasFilters) {
+        filterPanel.style.display = 'block';
+        toggleBtn.textContent = 'Hide filter';
+      } else {
+        filterPanel.style.display = 'none';
+        toggleBtn.textContent = 'Show filter';
+      }
+
+      toggleBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        if (filterPanel.style.display === 'none') {
+          filterPanel.style.display = 'block';
+          toggleBtn.textContent = 'Hide filter';
+        } else {
+          filterPanel.style.display = 'none';
+          toggleBtn.textContent = 'Show filter';
+        }
+      });
+
+      // Display filter chips in the filter panel
+      const filterLabels = {
+        'initial': 'Initial application',
+        'prior': 'Prior authority',
+        'sca': "Special Children's Act",
+        'expert': 'Expert',
+        'junior-counsel': 'Junior counsel',
+        'expenses': 'Expenses'
+      };
+
+      // Populate chips from query parameters in the moj-filter__selected section
+      const queryParams = new URLSearchParams(window.location.search);
+      const selectedFiltersSection = filterPanel.querySelector('.moj-filter__selected');
+      
+      if (selectedFiltersSection) {
+        const chipsContainer = selectedFiltersSection.querySelector('.moj-filter-tags');
+        if (chipsContainer) {
+          // Clear existing chips
+          chipsContainer.innerHTML = '';
+          
+          queryParams.forEach((value, key) => {
+            if (key === 'applicationType' || key === 'matterType' || key === 'categories') {
+              const values = value.split(',').filter(v => v);
+              values.forEach(val => {
+                const label = filterLabels[val] || val;
+                const chip = document.createElement('span');
+                chip.className = 'moj-filter-tags__item';
+                chip.innerHTML = `
+                  <strong class="moj-filter-tags__label">${label}</strong>
+                  <a href="#" class="moj-filter-tags__remove" data-filter="${key}" data-value="${val}" aria-label="Remove ${label}">✕</a>
+                `;
+                chipsContainer.appendChild(chip);
+              });
+            }
+          });
+
+          // Handle removing individual chips
+          chipsContainer.querySelectorAll('.moj-filter-tags__remove').forEach(removeBtn => {
+            removeBtn.addEventListener('click', function(e) {
+              e.preventDefault();
+              const filterKey = this.getAttribute('data-filter');
+              const filterValue = this.getAttribute('data-value');
+              
+              // Uncheck the corresponding checkbox
+              const checkbox = filterPanel.querySelector(`input[name="${filterKey}"][value="${filterValue}"]`);
+              if (checkbox) {
+                checkbox.checked = false;
+              }
+            });
+          });
+        }
+      }
+
+      // Handle "Clear filters" - keep panel open but clear selections
+      const clearLinks = filterPanel.querySelectorAll('a[href*="/v6-v2/open-applications"]');
+      clearLinks.forEach(link => {
+        if (link.textContent.includes('Clear')) {
+          link.addEventListener('click', function(e) {
+            e.preventDefault();
+            // Uncheck all checkboxes
+            const checkboxes = filterPanel.querySelectorAll('input[type="checkbox"]');
+            checkboxes.forEach(cb => cb.checked = false);
+            // Navigate to clean URL
+            window.location.href = '/v6-v2/open-applications';
+          });
+        }
+      });
+    });
+
+    // Handle "Add" link clicks for adding applications to list
+    document.querySelectorAll('.add-to-list').forEach(link => {
+      link.addEventListener('click', function(e) {
+        e.preventDefault();
+        const reference = this.getAttribute('data-ref');
+        const isPriorAuthority = this.getAttribute('data-is-prior-authority') === 'true';
+        
+        // Add application to list via fetch
+        fetch('/v6-v2/add-application/' + reference + '?isPriorAuthority=' + isPriorAuthority, { 
+          method: 'GET',
+          headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+          }
+        })
+          .then(response => response.json())
+          .then(data => {
+            // Show toast notification using GOV.UK toast component
+            const toastContainer = document.getElementById('toast-notification');
+            const addedCount = data && Number.isFinite(Number(data.addedCount)) ? Number(data.addedCount) : 1;
+            const linkedAddedCount = data && Number.isFinite(Number(data.linkedAddedCount)) ? Number(data.linkedAddedCount) : Math.max(0, addedCount - 1);
+            const referenceHref = '/v6-v2/application/' + reference + (isPriorAuthority ? '?isPriorAuthority=true#prior-authority' : '');
+            const referenceLink = '<a class="govuk-link" href="' + referenceHref + '">' + reference + '</a>';
+            const linkedLabel = linkedAddedCount === 1 ? 'linked case' : 'linked cases';
+            let toastMessage = linkedAddedCount > 0
+              ? 'You assigned this application ' + referenceLink + ' and ' + linkedAddedCount + ' ' + linkedLabel + ' to your list'
+              : 'You assigned this application ' + referenceLink + ' to your list';
+
+            if (addedCount === 0) {
+              toastMessage = referenceLink + ' is already in your list';
+            }
+            
+            // Clear any existing toasts first
+            toastContainer.innerHTML = '';
+            
+            const toast = document.createElement('div');
+            toast.setAttribute('data-module', 'govuk-notification-banner');
+            toast.setAttribute('role', 'region');
+            toast.setAttribute('aria-labelledby', 'govuk-notification-banner-title');
+            toast.className = 'govuk-notification-banner govuk-notification-banner--success';
+            toast.style.cssText = 'margin-bottom: 20px;';
+            toast.innerHTML = '<div class="govuk-notification-banner__header"><h2 id="govuk-notification-banner-title" class="govuk-notification-banner__title">Success</h2></div><div class="govuk-notification-banner__content"><p class="govuk-notification-banner__heading">' + toastMessage + '</p></div>';
+            
+            toastContainer.appendChild(toast);
+            
+            // Reload page after 1 second to update the list
+            setTimeout(() => {
+              window.location.reload();
+            }, 1000);
+          })
+          .catch(error => console.error('Error:', error));
+      });
+    });
+  </script>
+{% endblock %}
+
+{% block bodyEnd %}
+  <script src="/plugin-assets/govuk-prototype-kit/lib/assets/javascripts/kit.js"></script>
+  <script src="/plugin-assets/govuk-prototype-kit/lib/assets/javascripts/auto-store-data.js"></script>
+  <script type="module" src="/plugin-assets/govuk-frontend/dist/govuk/govuk-frontend.min.js"></script>
+  <script type="module" src="/plugin-assets/govuk-frontend/dist/govuk-prototype-kit/init.js"></script>
+  <script type="module" src="/plugin-assets/%40ministryofjustice%2Ffrontend/moj/moj-frontend.min.js"></script>
+  <script type="module" src="/plugin-assets/%40ministryofjustice%2Ffrontend/moj/init.js"></script>
+  <script src="/plugin-assets/jquery/dist/jquery.js"></script>
+{% endblock %}

@@ -1,0 +1,76 @@
+{% extends "govuk/template.njk" %}
+
+{% from "govuk/components/header/macro.njk" import govukHeader %}
+{% from "govuk/components/phase-banner/macro.njk" import govukPhaseBanner %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+{% from "moj/components/primary-navigation/macro.njk" import mojPrimaryNavigation %}
+
+{% block pageTitle %}
+Manage linked cases
+{% endblock %}
+
+{% block header %}
+  {{ govukHeader({
+    homepageUrl: "#",
+    productName: "Legal Aid Agency",
+    navigationClasses: "govuk-header__navigation--end",
+    navigation: [
+      { href: "#", text: "joann.barton@law.com" },
+      { href: "/v6-v2/sign-out", text: "Sign out" }
+    ]
+  }) }}
+
+  {{ mojPrimaryNavigation({
+    label: "Primary navigation",
+    items: [
+      { text: "Decide if an applicant can get legal aid", href: "#" },
+      { text: "Open applications", href: "/v6-v2/open-applications" },
+      { text: "Your list", href: "/v6-v2/yourlist" },
+      { text: "Search", href: "/v6-v2/search" }
+    ]
+  }) }}
+{% endblock %}
+
+{% block beforeContent %}
+  {{ govukPhaseBanner({
+    tag: { text: "Beta" },
+    html: "This is a new service - your <a class=\"govuk-link\" href=\"#\">feedback</a> will help us to improve it."
+  }) }}
+  {{ govukBackLink({
+    text: "Back",
+    href: "/v6-v2/application/" ~ reference
+  }) }}
+{% endblock %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      <h1 class="govuk-heading-xl">Manage linked cases</h1>
+      <p class="govuk-body">Add a standalone application as a new link to <strong>{{ reference }}</strong>. It will be assigned to your list and remain a separate case for decision-making.</p>
+
+      {% if candidates and candidates.length > 0 %}
+        <form action="/v6-v2/manage-linked-cases/{{ reference }}" method="post">
+          <fieldset class="govuk-fieldset">
+            <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">Choose a standalone application to link</legend>
+            <div class="govuk-radios" data-module="govuk-radios">
+              {% for candidate in candidates %}
+                <div class="govuk-radios__item">
+                  <input class="govuk-radios__input" id="new-linked-reference-{{ loop.index }}" name="new-linked-reference" type="radio" value="{{ candidate.reference }}">
+                  <label class="govuk-label govuk-radios__label" for="new-linked-reference-{{ loop.index }}">
+                    {{ candidate.reference }} - {{ candidate.firstName }} {{ candidate.lastName }}
+                  </label>
+                  <div class="govuk-hint govuk-radios__hint">Submitted {{ candidate.submitted }}</div>
+                </div>
+              {% endfor %}
+            </div>
+          </fieldset>
+          {{ govukButton({ text: "Assign and add new link" }) }}
+        </form>
+      {% else %}
+        <p class="govuk-body">There are no standalone applications available to link.</p>
+      {% endif %}
+    </div>
+  </div>
+{% endblock %}

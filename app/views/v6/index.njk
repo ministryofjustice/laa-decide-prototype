@@ -59,7 +59,7 @@
         active: true
       }, {
         text: 'Sign out',
-        href: '#'
+        href: '/v6/sign-out'
       }]
     }
   }) }}
@@ -119,12 +119,17 @@
       <div class="govuk-summary-card govuk-!-margin-bottom-2">
         <div class="govuk-summary-card__title-wrapper" style="display: block;">
           <h3 class="govuk-summary-card__title govuk-!-margin-bottom-2">Version 2</h3>
-          <p class="govuk-body govuk-!-margin-bottom-0">Coming soon</p>
+          <p class="govuk-body govuk-!-margin-bottom-0">In progress</p>
         </div>
         <div class="govuk-summary-card__content">
-          <p class="govuk-body govuk-!-margin-bottom-0">
-            This section will contain the next project version and its notes.
+          <p class="govuk-body govuk-!-margin-bottom-5">
+            Use this version for upcoming issue fixes while keeping Version 1 unchanged.
           </p>
+
+          {{ govukButton({
+            text: "Start version 2",
+            href: "/v6-v2/open-applications"
+          }) }}
         </div>
       </div>
     </div>
