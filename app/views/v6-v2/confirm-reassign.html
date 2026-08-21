@@ -51,7 +51,7 @@
     },
     html: 'This is a new service – your <a class="govuk-link" href="#">feedback</a> will help us to improve it.'
   }) }}
-  <a href="{% if reference %}/v6-v2/reassign?reference={{ reference }}{% else %}/v6-v2/reassign{% endif %}" class="govuk-back-link">Back</a>
+  <a href="{% if reference %}/v6-v2/reassign?reference={{ reference }}&isPriorAuthority={{ isPriorAuthority and 'true' or 'false' }}{% else %}/v6-v2/reassign{% endif %}" class="govuk-back-link">Back</a>
 {% endblock %}
 
 {% block content %}
@@ -64,7 +64,7 @@
         <h2 class="govuk-summary-card__title">Reassignment details</h2>
         <ul class="govuk-summary-card__actions">
           <li class="govuk-summary-card__action">
-            <a class="govuk-link" href="/v6-v2/reassign?reference={{ reference }}">
+            <a class="govuk-link" href="/v6-v2/reassign?reference={{ reference }}&isPriorAuthority={{ isPriorAuthority and 'true' or 'false' }}">
               Change<span class="govuk-visually-hidden"> reassignment details</span>
             </a>
           </li>
@@ -80,7 +80,7 @@
               {{ data['reassign-to'] or 'Jim Jones' }}
             </dd>
             <dd class="govuk-summary-list__actions">
-              <a class="govuk-link" href="/v6-v2/reassign?reference={{ reference }}">
+              <a class="govuk-link" href="/v6-v2/reassign?reference={{ reference }}&isPriorAuthority={{ isPriorAuthority and 'true' or 'false' }}">
                 Change<span class="govuk-visually-hidden"> who to reassign to</span>
               </a>
             </dd>
@@ -116,7 +116,7 @@
               {{ data['decision-explanation'] }}
             </dd>
             <dd class="govuk-summary-list__actions">
-              <a class="govuk-link" href="/v6-v2/reassign?reference={{ reference }}">
+              <a class="govuk-link" href="/v6-v2/reassign?reference={{ reference }}&isPriorAuthority={{ isPriorAuthority and 'true' or 'false' }}">
                 Change<span class="govuk-visually-hidden"> explanation</span>
               </a>
             </dd>
@@ -130,6 +130,7 @@
       <input type="hidden" name="reassigned" value="true">
       <input type="hidden" name="reassign-to" value="{{ data['reassign-to'] }}">
       <input type="hidden" name="reference" value="{{ reference }}">
+      <input type="hidden" name="isPriorAuthority" value="{{ isPriorAuthority and 'true' or 'false' }}">
       <input type="hidden" name="decision-explanation" value="{{ data['decision-explanation'] }}">
       {{ govukButton({
         text: "Confirm reassign"

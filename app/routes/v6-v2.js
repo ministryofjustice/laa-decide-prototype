@@ -1242,32 +1242,53 @@ router.get('/your-list', function(req, res) {
 
   const reassigned = req.session.data['reassigned'];
   const reassignedTo = req.session.data['reassign-to'];
+  const reassignedCaseCount = Number(req.session.data['reassigned-case-count'] || 0);
   req.session.data['reassigned'] = null;
   req.session.data['reassign-to'] = null;
+  req.session.data['reassigned-case-count'] = null;
 
   res.render('v6-v2/your-list.html', {
     pageTitle: 'Your list',
     applications: req.session.data['assigned-applications'],
     reassigned: reassigned,
-    reassignedTo: reassignedTo
+    reassignedTo: reassignedTo,
+    reassignedCaseCount: reassignedCaseCount
   });
 });
 
 router.get('/reassign', function(req, res) {
   const ref = req.query.reference || req.session.data['reassign-reference'] || null;
+  const queryIsPriorAuthority = req.query.isPriorAuthority;
+  const requestedIsPriorAuthority = queryIsPriorAuthority === 'true';
+  const hasVariantQuery = typeof queryIsPriorAuthority !== 'undefined';
   if (req.query.reference) {
     req.session.data['reassign-reference'] = req.query.reference;
+  }
+  if (hasVariantQuery) {
+    req.session.data['reassign-is-prior-authority'] = requestedIsPriorAuthority;
   }
 
   let application = null;
   if (ref && req.session.data['assigned-applications']) {
-    application = req.session.data['assigned-applications'].find(app => app.ref === ref) || null;
+    if (hasVariantQuery) {
+      application = req.session.data['assigned-applications'].find(app => app.ref === ref && Boolean(app.isPriorAuthority) === requestedIsPriorAuthority) || null;
+    }
+    if (!application && typeof req.session.data['reassign-is-prior-authority'] !== 'undefined') {
+      application = req.session.data['assigned-applications'].find(app => app.ref === ref && Boolean(app.isPriorAuthority) === Boolean(req.session.data['reassign-is-prior-authority'])) || null;
+    }
+    if (!application) {
+      application = req.session.data['assigned-applications'].find(app => app.ref === ref) || null;
+    }
   }
+
+  const isPriorAuthority = application ? Boolean(application.isPriorAuthority) : requestedIsPriorAuthority;
+  req.session.data['reassign-is-prior-authority'] = isPriorAuthority;
 
   res.render('v6-v2/reassign.html', {
     pageTitle: 'Select who you want to reassign this case to',
     reference: ref,
-    application: application
+    application: application,
+    isPriorAuthority: isPriorAuthority
   });
 });
 
@@ -1275,30 +1296,66 @@ router.post('/confirm-reassign', function(req, res) {
   if (req.body.reference) {
     req.session.data['reassign-reference'] = req.body.reference;
   }
+  if (typeof req.body.isPriorAuthority !== 'undefined') {
+    req.session.data['reassign-is-prior-authority'] = req.body.isPriorAuthority === 'true';
+  }
   res.redirect('/v6-v2/confirm-reassign');
 });
 
 router.get('/confirm-reassign', function(req, res) {
   const ref = req.session.data['reassign-reference'] || null;
+  const isPriorAuthority = Boolean(req.session.data['reassign-is-prior-authority']);
   let application = null;
 
   if (ref && req.session.data['assigned-applications']) {
-    application = req.session.data['assigned-applications'].find(app => app.ref === ref) || null;
+    application = req.session.data['assigned-applications'].find(app => app.ref === ref && Boolean(app.isPriorAuthority) === isPriorAuthority) || null;
+    if (!application) {
+      application = req.session.data['assigned-applications'].find(app => app.ref === ref) || null;
+    }
   }
 
   res.render('v6-v2/confirm-reassign.html', {
     pageTitle: 'Confirm you want to reassign this case?',
     reference: ref,
-    application: application
+    application: application,
+    isPriorAuthority: application ? Boolean(application.isPriorAuthority) : isPriorAuthority
   });
 });
 
 router.post('/your-list', function(req, res) {
   const ref = req.body.reference || req.session.data['reassign-reference'];
+  const isPriorAuthority = (typeof req.body.isPriorAuthority !== 'undefined')
+    ? req.body.isPriorAuthority === 'true'
+    : Boolean(req.session.data['reassign-is-prior-authority']);
 
-  if (ref && req.session.data['assigned-applications']) {
-    req.session.data['assigned-applications'] = req.session.data['assigned-applications'].filter(app => app.ref !== ref);
+  const assignedApplications = req.session.data['assigned-applications'] || [];
+  const beforeCount = assignedApplications.length;
+
+  if (ref && assignedApplications.length > 0) {
+    const linkedGroupRows = req.session.data['linked-cases-by-reference-v2'] && req.session.data['linked-cases-by-reference-v2'][ref]
+      ? req.session.data['linked-cases-by-reference-v2'][ref]
+      : [];
+    const linkedGroupRefs = [...new Set(linkedGroupRows.map(row => row.reference).filter(Boolean))];
+
+    req.session.data['assigned-applications'] = assignedApplications.filter(app => {
+      if (isPriorAuthority) {
+        return !(app.ref === ref && Boolean(app.isPriorAuthority));
+      }
+
+      if (Boolean(app.isPriorAuthority)) {
+        return true;
+      }
+
+      if (linkedGroupRefs.length > 0) {
+        return !linkedGroupRefs.includes(app.ref);
+      }
+
+      return app.ref !== ref;
+    });
   }
+
+  const afterCount = (req.session.data['assigned-applications'] || []).length;
+  req.session.data['reassigned-case-count'] = Math.max(beforeCount - afterCount, 0);
 
   if (req.body['reassigned']) {
     req.session.data['reassigned'] = req.body['reassigned'];
@@ -1308,6 +1365,7 @@ router.post('/your-list', function(req, res) {
   }
 
   req.session.data['reassign-reference'] = null;
+  req.session.data['reassign-is-prior-authority'] = null;
 
   // If we came from the main v6 journey, return there with a success banner
   if (ref) {
@@ -1326,8 +1384,10 @@ router.get('/yourlist', function(req, res) {
 
   const reassigned = req.session.data['reassigned'];
   const reassignedTo = req.session.data['reassign-to'];
+  const reassignedCaseCount = Number(req.session.data['reassigned-case-count'] || 0);
   req.session.data['reassigned'] = null;
   req.session.data['reassign-to'] = null;
+  req.session.data['reassigned-case-count'] = null;
   
   // Restore any stored decisions from decision-store
   if (req.session.data['decision-store']) {
@@ -1340,7 +1400,8 @@ router.get('/yourlist', function(req, res) {
     pageTitle: 'Your list',
     applications: req.session.data['assigned-applications'],
     reassigned: reassigned,
-    reassignedTo: reassignedTo
+    reassignedTo: reassignedTo,
+    reassignedCaseCount: reassignedCaseCount
   });
 });
 

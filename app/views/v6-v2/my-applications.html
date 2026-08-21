@@ -79,7 +79,11 @@
           </div>
           <div class="govuk-notification-banner__content">
             <h3 class="govuk-notification-banner__heading">
-              Application reassigned to {{ reassignedTo or 'John Smith' }}
+              {% if reassignedCaseCount and reassignedCaseCount > 1 %}
+                You have assigned this application and {{ reassignedCaseCount - 1 }} {{ 'linked case' if reassignedCaseCount - 1 == 1 else 'linked cases' }} to {{ reassignedTo or 'John Smith' }}
+              {% else %}
+                You have assigned this application to {{ reassignedTo or 'John Smith' }}
+              {% endif %}
             </h3>
           </div>
         </div>
@@ -129,7 +133,7 @@
                   <strong>{{ app.matterType.title }}</strong><br>{{ app.matterType.subtext }}
                 </td>
                 <td class="govuk-table__cell">
-                  <a href="/v6-v2/reassign?reference={{ app.ref }}" class="govuk-link">Reassign</a>
+                  <a href="/v6-v2/reassign?reference={{ app.ref }}&isPriorAuthority={{ app.isPriorAuthority and 'true' or 'false' }}" class="govuk-link">Reassign</a>
                 </td>
               </tr>
             {% endfor %}

@@ -61,6 +61,7 @@
 
     <form action="/v6-v2/confirm-reassign" method="post" novalidate>
       <input type="hidden" name="reference" value="{{ reference }}">
+      <input type="hidden" name="isPriorAuthority" value="{{ isPriorAuthority and 'true' or 'false' }}">
 
       <div class="govuk-form-group">
         <label class="govuk-label" for="caseworker">
