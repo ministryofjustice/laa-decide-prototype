@@ -15,9 +15,9 @@ Your list
       <div class="govuk-notification-banner__content">
         <h3 class="govuk-notification-banner__heading">
           {% if reassignedCaseCount and reassignedCaseCount > 1 %}
-            You have assigned this application and {{ reassignedCaseCount - 1 }} {{ 'linked case' if reassignedCaseCount - 1 == 1 else 'linked cases' }} to {{ reassignedTo or 'John Smith' }}
+            You have assigned this case and {{ reassignedCaseCount - 1 }} {{ 'linked case' if reassignedCaseCount - 1 == 1 else 'linked cases' }} to {{ reassignedTo or 'John Smith' }}
           {% else %}
-            You have assigned this application to {{ reassignedTo or 'John Smith' }}
+            You have assigned this case to {{ reassignedTo or 'John Smith' }}
           {% endif %}
         </h3>
       </div>

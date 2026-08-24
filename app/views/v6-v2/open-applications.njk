@@ -326,6 +326,7 @@
     });
 
     // Handle "Add" link clicks for adding applications to list
+    let addToListReloadTimeout = null;
     document.querySelectorAll('.add-to-list').forEach(link => {
       link.addEventListener('click', function(e) {
         e.preventDefault();
@@ -356,7 +357,7 @@
               toastMessage = referenceLink + ' is already in your list';
             }
             
-            // Clear any existing toasts first
+            // Clear any existing toast so only the latest success message is shown
             toastContainer.innerHTML = '';
             
             const toast = document.createElement('div');
@@ -369,10 +370,13 @@
             
             toastContainer.appendChild(toast);
             
-            // Reload page after 1 second to update the list
-            setTimeout(() => {
+            // Cancel any pending reload from a previous add so it doesn't cut off this message
+            if (addToListReloadTimeout) {
+              clearTimeout(addToListReloadTimeout);
+            }
+            addToListReloadTimeout = setTimeout(() => {
               window.location.reload();
-            }, 1000);
+            }, 10000);
           })
           .catch(error => console.error('Error:', error));
       });
