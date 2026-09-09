@@ -966,7 +966,8 @@ router.get('/open-applications', function(req, res) {
       req.session.data['completed-applications'].push(a);
     });
   }
-  let applications = [...req.session.data['open-applications-all']];
+  let applications = [...req.session.data['open-applications-all']]
+    .filter(app => !app.isRedetermination);
 
   // Remove applications already in a caseworker's list from open applications.
   const assignedKeys = new Set((req.session.data['assigned-applications'] || []).map(app => `${app.ref}|${Boolean(app.isPriorAuthority)}`));

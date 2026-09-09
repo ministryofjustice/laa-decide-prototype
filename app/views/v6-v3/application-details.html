@@ -1,0 +1,317 @@
+{% extends "layouts/open.html" %}
+
+
+{% block pageTitle %}
+Application details
+{% endblock %}
+
+{% block beforeContent %}
+<a class="govuk-back-link" href="open-applications">Back</a>
+{% endblock %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    <h2 class="govuk-heading-xl govuk-!-margin-bottom-2" ><span class="govuk-!-margin-right-2">L-12Z-13P</span>
+    </h2>
+    <!-- linked applications TBC
+    <details class="govuk-details" data-module="govuk-details">
+      <summary class="govuk-details__summary">
+        <span class="govuk-details__summary-text">
+          Linked applications found
+        </span>
+      </summary>
+      <div class="govuk-details__text">
+       <table class="govuk-table">
+            <thead class="govuk-table__head">
+              <tr class="govuk-table__row">
+                <th scope="col" class="govuk-table__header">Reference number</th>
+                <th scope="col" class="govuk-table__header">Status</th>
+              </tr>
+            </thead>
+            <tbody class="govuk-table__body">
+              {% for linkedApplication in application['linkedApplications'] %}
+              <tr class="govuk-table__row">
+                <td class="govuk-table__cell"><a href="#">{{ linkedApplication['refNo'] }}</a></td>
+                <td class="govuk-table__cell">{{ linkedApplication['status'] }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+      </div>
+    </details>
+  -->
+
+  </div>
+  <div class="govuk-grid-column-one-third">
+    {% from "govuk/components/button/macro.njk" import govukButton %}
+
+    {{ govukButton({
+      text: "Add to your list",
+      href: "application-details-added"
+    }) }}
+  </div>
+</div>
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-one-half">
+    <p class="govuk-body-m">
+      <strong>Date submitted: </strong>{{ application['dateSubmitted'] | date }}<br>
+<!--
+      <strong>Assigned to: </strong>Mo Bradshaw
+-->
+    </p>
+  </div>
+</div>
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    <nav class="moj-sub-navigation" aria-label="Sub navigation">
+      <ul class="moj-sub-navigation__list">
+        <li class="moj-sub-navigation__item">
+          <a class="moj-sub-navigation__link" aria-current="page" href="application-details">Application details</a>
+        </li>
+        <li class="moj-sub-navigation__item">
+          <a class="moj-sub-navigation__link" href="people">People</a>
+        </li>
+        <li class="moj-sub-navigation__item">
+          <a class="moj-sub-navigation__link" href="application-history">Application history</a>
+        </li>
+      </ul>
+    </nav>
+
+    <table class="govuk-table">
+      <caption class="govuk-table__caption govuk-table__caption--l">Overview</caption>
+      <tbody class="govuk-table__body">
+        <tr class="govuk-table__row">
+          <td class="govuk-table__header govuk-!-width-one-half">CCMS reference number</td>
+          <td class="govuk-table__cell"><span id="reference-number">300000651984</span><button class="govuk-link--no-visited-state" style="background: none; border: none; color: #1d70b8; text-decoration: underline; cursor: copy;" onclick="copyContent()">Copy reference number</button>
+
+            <script>
+              let text = document.getElementById('reference-number').innerHTML;
+              const copyContent = async () => {
+                try {
+                  await navigator.clipboard.writeText(text);
+                  console.log('Content copied to clipboard');
+                } catch (err) {
+                  console.error('Failed to copy: ', err);
+                }
+              }
+            </script>
+
+          </td>
+        </tr>
+         <tr class="govuk-table__row">
+          <td class="govuk-table__header govuk-!-width-one-half">Application type</td>
+          <td class="govuk-table__cell">Initial application</td>
+        </tr>
+        <tr class="govuk-table__row">
+          <td class="govuk-table__header">Delegated functions</td>
+          <td class="govuk-table__cell">Used</td>
+        </tr>
+        <tr class="govuk-table__row">
+          <td class="govuk-table__header">Certificate type</td>
+          <td class="govuk-table__cell">Emergency and substantive</td>
+        </tr>
+        <tr class="govuk-table__row">
+          <td class="govuk-table__header">Means assessment</td>
+          <td class="govuk-table__cell">
+            <span class="moj-badge moj-badge--green">Granted</span>
+          </td>
+        </tr>
+        <tr class="govuk-table__row">
+          <td class="govuk-table__header">Merits assessment</td>
+          <td class="govuk-table__cell">
+            <span class="moj-badge moj-badge--grey">Not started</span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <table class="govuk-table">
+      <caption class="govuk-table__caption govuk-table__caption--m">Delegated functions</caption>
+      <tbody class="govuk-table__body">
+
+        <tr class="govuk-table__row">
+          <td class="govuk-table__header govuk-!-width-one-half">Non-molestation order</td>
+          <td class="govuk-table__cell">30 Nov 2023</td>
+        </tr>
+
+        <tr class="govuk-table__row">
+          <td class="govuk-table__header govuk-!-width-one-half">Child arrangements order (contact)</td>
+          <td class="govuk-table__cell">Not used</td>
+        </tr>
+
+      </tbody>
+    </table>
+
+
+    <h2 class="govuk-heading-l govuk-!-margin-top-9">Proceedings</h2>
+    <ol class="govuk-list govuk-list--number">
+      <li><h2 class="govuk-heading-m">Non-molestation order</h2>
+        <div class="govuk-summary-card">
+          <div class="govuk-summary-card__title-wrapper">
+            <h2 class="govuk-summary-card__title">Emergency certificate</h2>
+          </div>
+          <div class="govuk-summary-card__content">
+            <dl class="govuk-summary-list">
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">
+                  Level of service
+                </dt>
+                <dd class="govuk-summary-list__value">
+                  Full representation
+                </dd>
+               
+              </div>
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">
+                  Scope limitations
+                </dt>
+                <dd class="govuk-summary-list__value">
+                  <strong>Interim order inc. return date.</strong>
+                  <br>Limited to all steps necessary to apply for an interim order; where application is made without notice to include representation on the return date.
+                </dd>  
+              </div>
+
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">
+                  Means decision
+                </dt>
+                <dd class="govuk-summary-list__value">
+                  <span class="moj-badge moj-badge--green">Granted</span>
+                </dd>           
+              </div>
+
+            </dl>
+          </div>
+        </div>
+
+        <div class="govuk-summary-card">
+          <div class="govuk-summary-card__title-wrapper">
+            <h2 class="govuk-summary-card__title">Substantive certificate</h2>
+          </div>
+          <div class="govuk-summary-card__content">
+            <dl class="govuk-summary-list">
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">
+                  Level of service
+                </dt>
+                <dd class="govuk-summary-list__value">
+                  Full representation
+                </dd>
+               
+              </div>
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">
+                  Scope limitations
+                </dt>
+                <dd class="govuk-summary-list__value">
+                  <strong>Injunction FLA-to final hearing</strong>
+                  <br>As to proceedings under Part IV Family Law Act1996 limited to all steps up to and including obtaining and serving a final order and in the event of breach leading to the exercise of a power of arrest to representation on the consideration of the breach by the court (but excluding applying for a warrant of arrest, if not attached, and representation in contempt proceedings).
+                </dd>  
+              </div>
+
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">
+                  Means decision
+                </dt>
+                <dd class="govuk-summary-list__value">
+                  <span class="moj-badge moj-badge--green">Granted</span>
+                </dd>           
+              </div>
+
+            </dl>
+          </div>
+        </div>
+      </li>
+
+      <li><h2 class="govuk-heading-m">Chid arrangements order (contact)</h2>
+        <div class="govuk-summary-card">
+          <div class="govuk-summary-card__title-wrapper">
+            <h2 class="govuk-summary-card__title">Substantive certificate</h2>
+          </div>
+          <div class="govuk-summary-card__content">
+            <dl class="govuk-summary-list">
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">
+                  Level of service
+                </dt>
+                <dd class="govuk-summary-list__value">
+                  Full representation
+                </dd>
+               
+              </div>
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">
+                  Scope limitations
+                </dt>
+                <dd class="govuk-summary-list__value">
+                  <strong>Hearing-children.</strong>
+                  <br>Limited to all steps up to and including trial/final hearing and any action necessary to implement (but not enforce) the judgment or order.
+                </dd>  
+              </div>
+
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">
+                  Means decision
+                </dt>
+                <dd class="govuk-summary-list__value">
+                  <span class="moj-badge moj-badge--green">Granted</span>
+                </dd>           
+              </div>
+
+            </dl>
+          </div>
+        </div>
+      </li>
+    </ol>
+
+    <table class="govuk-table govuk-!-margin-top-9">
+      <caption class="govuk-table__caption govuk-table__caption--l">Requested cost limits</caption>
+      <tbody class="govuk-table__body">
+        <tr class="govuk-table__row">
+          <td class="govuk-table__header govuk-!-width-one-half">Emergency certificate</td>
+          <td class="govuk-table__cell">£5,000</td>
+        </tr>
+        <tr class="govuk-table__row">
+          <td class="govuk-table__header govuk-!-width-one-half">Substantive certificate</td>
+          <td class="govuk-table__cell">£25,000</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2 class="govuk-heading-l govuk-!-margin-top-9">Documents</h2>
+    <table class="govuk-table">
+      <thead class="govuk-table__head">
+        <tr class="govuk-table__row">
+          <th scope="col" class="govuk-table__header">Category</th>
+          <th scope="col" class="govuk-table__header">Date</th>
+        </tr>
+      </thead>
+      <tbody class="govuk-table__body">
+        <tr class="govuk-table__row">
+          <td class="govuk-table__cell govuk-!-width-one-half"><a href="/public/downloads/means-report.pdf" class="govuk-link" rel="noreferrer noopener" target="_blank">Means report</a></td>
+          <td class="govuk-table__cell">28 Nov 2023</td>
+        </tr>
+
+        <tr class="govuk-table__row">
+          <td class="govuk-table__cell govuk-!-width-one-half"><a href="/public/downloads/merits-report.pdf" class="govuk-link" rel="noreferrer noopener" target="_blank">Merits report</a></td>
+          <td class="govuk-table__cell">28 Nov 2023</td>
+        </tr>
+
+        <tr class="govuk-table__row">
+          <td class="govuk-table__cell govuk-!-width-one-half"><a href="/public/downloads/police-report.pdf" class="govuk-link" rel="noreferrer noopener" target="_blank">Gateway evidence</a></td>
+          <td class="govuk-table__cell">26 Nov 2023</td>
+        </tr>
+
+        <tr class="govuk-table__row">
+          <td class="govuk-table__cell govuk-!-width-one-half"><a href="/public/downloads/statement-of-case.pdf" class="govuk-link" rel="noreferrer noopener" target="_blank">Statement of case</a></td>
+          <td class="govuk-table__cell">25 Nov 2023</td>
+        </tr>
+
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

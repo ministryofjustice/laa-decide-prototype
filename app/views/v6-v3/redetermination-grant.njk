@@ -1,0 +1,114 @@
+{% extends "govuk/template.njk" %}
+
+{% from "govuk/components/header/macro.njk" import govukHeader %}
+{% from "govuk/components/phase-banner/macro.njk" import govukPhaseBanner %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/textarea/macro.njk" import govukTextarea %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "moj/components/primary-navigation/macro.njk" import mojPrimaryNavigation %}
+
+{% block head %}
+  <link href="/public/stylesheets/application.css" rel="stylesheet">
+  <style>
+    .redetermination-field-row {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 15px;
+    }
+    .redetermination-field-row .govuk-label {
+      width: 140px;
+      flex-shrink: 0;
+      margin-bottom: 0;
+    }
+    .redetermination-field-row .govuk-input,
+    .redetermination-field-row .govuk-textarea {
+      flex: 1;
+      max-width: none;
+    }
+  </style>
+{% endblock %}
+{% block pageTitle %}Proceeding you are granting{% endblock %}
+
+{% block header %}
+  {{ govukHeader({ homepageUrl: "#", productName: "Legal Aid Agency", navigationClasses: "govuk-header__navigation--end", navigation: [{ href: "#", text: "joann.barton@justice.gov.uk" }, { href: "/v6-v3/sign-out", text: "Sign out" }] }) }}
+  {{ mojPrimaryNavigation({ label: "Primary navigation", items: [{ text: "Decide if an applicant can get legal aid", href: "#" }, { text: "Open applications", href: "/v6-v3/open-applications" }, { text: "Your list", href: "/v6-v3/yourlist" }, { text: "Search", href: "/v6-v3/search" }] }) }}
+{% endblock %}
+
+{% block beforeContent %}
+  {{ govukPhaseBanner({ tag: { text: "Beta" }, html: "This is a new service - your <a class=\"govuk-link\" href=\"#\">feedback</a> will help us to improve it." }) }}
+  {{ govukBackLink({ text: "Back", href: "/v6-v3/application/" ~ reference ~ "/redetermination/" ~ index ~ "/decision" }) }}
+{% endblock %}
+
+{% block content %}
+  <div class="govuk-grid-row"><div class="govuk-grid-column-two-thirds">
+    {% if error %}{{ govukErrorSummary({ titleText: "There is a problem", errorList: [{ text: error, href: "#justification" if errorField == "justification" else "#proceeding" }] }) }}{% endif %}
+    <p class="govuk-body-l govuk-!-margin-bottom-1">Application reference:</p>
+    <p class="govuk-heading-l govuk-!-margin-bottom-4">{{ reference }}</p>
+    <h1 class="govuk-heading-xl govuk-!-margin-bottom-6">Proceeding you are granting</h1>
+    {% set newProceedingHtml %}
+      <div class="govuk-form-group">
+        <div class="redetermination-field-row">
+          <label class="govuk-label" for="new-proceeding-certificate-type">Certificate type</label>
+          <input class="govuk-input" id="new-proceeding-certificate-type" name="new-proceeding-certificate-type" type="text" value="{{ newProceeding.certificateType or 'Substantive certificate' }}">
+        </div>
+        <div class="redetermination-field-row">
+          <label class="govuk-label" for="new-proceeding-name">Proceeding</label>
+          <input class="govuk-input" id="new-proceeding-name" name="new-proceeding-name" type="text" value="{{ newProceeding.proceedingName }}">
+        </div>
+        <div class="redetermination-field-row">
+          <label class="govuk-label" for="new-proceeding-client-role">Client role</label>
+          <input class="govuk-input" id="new-proceeding-client-role" name="new-proceeding-client-role" type="text" value="{{ newProceeding.clientRole }}">
+        </div>
+        <div class="redetermination-field-row">
+          <label class="govuk-label" for="new-proceeding-scope-limitations">Scope limitations</label>
+          <textarea class="govuk-textarea" id="new-proceeding-scope-limitations" name="new-proceeding-scope-limitations" rows="5">{{ newProceeding.scopeLimitations or 'Hearing - Limited to all steps up to and including final hearing and any action necessary to implement (but not enforce) the order.' }}</textarea>
+        </div>
+        <div class="redetermination-field-row">
+          <label class="govuk-label" for="new-proceeding-level-of-service">Level of service</label>
+          <input class="govuk-input" id="new-proceeding-level-of-service" name="new-proceeding-level-of-service" type="text" value="{{ newProceeding.levelOfService or 'Full representation' }}">
+        </div>
+      </div>
+    {% endset %}
+    {% set selectedProceedingHtml %}
+      <dl class="govuk-summary-list govuk-!-margin-top-4">
+        <div class="govuk-summary-list__row">
+          <dt class="govuk-summary-list__key">Certificate type</dt>
+          <dd class="govuk-summary-list__value">Substantive certificate</dd>
+        </div>
+        <div class="govuk-summary-list__row">
+          <dt class="govuk-summary-list__key">Proceeding</dt>
+          <dd class="govuk-summary-list__value">{{ proceedingName or 'Child assessment order' }}</dd>
+        </div>
+        <div class="govuk-summary-list__row">
+          <dt class="govuk-summary-list__key">Client role</dt>
+          <dd class="govuk-summary-list__value">{{ clientRole or 'Applicant' }}</dd>
+        </div>
+        <div class="govuk-summary-list__row">
+          <dt class="govuk-summary-list__key">Scope limitation</dt>
+          <dd class="govuk-summary-list__value">Hearing<br><br>Limited to all steps up to and including final hearing and any action necessary to implement (but not enforce) the order.</dd>
+        </div>
+        <div class="govuk-summary-list__row">
+          <dt class="govuk-summary-list__key">Level of service</dt>
+          <dd class="govuk-summary-list__value">Full representation</dd>
+        </div>
+      </dl>
+    {% endset %}
+    <form action="/v6-v3/application/{{ reference }}/redetermination/{{ index }}/grant" method="post">
+      {{ govukRadios({ name: "proceeding", idPrefix: "proceeding", errorMessage: (error and { text: error } or null) if errorField != "justification" else null, items: [{ value: "child-assessment-order", text: "Selected proceeding", checked: selectedProceeding != 'new-proceeding', conditional: { html: selectedProceedingHtml } }, { value: "new-proceeding", text: "New proceeding", checked: selectedProceeding == 'new-proceeding', conditional: { html: newProceedingHtml } }] }) }}
+      {{ govukTextarea({ name: "justification", id: "justification", value: justification, label: { text: "Explain your decision", classes: "govuk-label--m" }, hint: { text: "We will share this justification with the provider in the grant notification email. You will also find this saved in the application history." }, errorMessage: (error and { text: error } or null) if errorField == "justification" else null, attributes: { maxlength: 350 } }) }}
+      <p class="govuk-hint">You can enter up to 350 words</p>
+      {{ govukButton({ text: "Continue" }) }}
+    </form>
+  </div></div>
+{% endblock %}
+
+{% block bodyEnd %}
+  <script src="/plugin-assets/govuk-prototype-kit/lib/assets/javascripts/kit.js"></script>
+  <script src="/plugin-assets/govuk-prototype-kit/lib/assets/javascripts/auto-store-data.js"></script>
+  <script type="module" src="/plugin-assets/govuk-frontend/dist/govuk/govuk-frontend.min.js"></script>
+  <script type="module" src="/plugin-assets/govuk-frontend/dist/govuk-prototype-kit/init.js"></script>
+{% endblock %}

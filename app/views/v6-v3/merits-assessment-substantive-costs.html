@@ -1,0 +1,96 @@
+{% extends "layouts/layout.html" %}
+
+{% block pageTitle %}
+Merits assessment - substantive costs
+{% endblock %}
+
+{% block beforeContent %}
+<a class="govuk-back-link" href="application-details">Back to application details</a>
+{% endblock %}
+
+{% set application = data['application']['applicationDetails'] %}
+{% set cert_id_to_change = data['cert_id_to_change'] %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    <h1 class="govuk-heading-xl govuk-!-margin-bottom-4">Make a merits assessment</h1>
+    <p class="govuk-!-font-size-36">L-I2Z-I3P</p>
+    <div class="govuk-!-padding-top-4"></div>
+  </div>
+</div>
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    <h2 class="govuk-heading-l govuk-!-margin-bottom-4">Substantive proceedings</h2>
+    <form action="decision-communication" method="POST">
+
+      <table class="govuk-table govuk-!-margin-top-9">
+        <caption class="govuk-table__caption govuk-table__caption--l">Cost limits</caption>
+        <tbody class="govuk-table__body">
+          <tr class="govuk-table__row">
+            <td class="govuk-table__header">Certificate type</td>
+            <td class="govuk-table__cell">Substantive certificate</td>
+          </tr>
+          <tr class=" govuk-table__row">
+            <td class="govuk-table__header">Default</td>
+            <td class="govuk-table__cell">£25,000</td>
+          </tr>
+          <tr class="govuk-table__row">
+            <td class="govuk-table__header">Requested</td>
+            <td class="govuk-table__cell">£25,000</td>
+          </tr>
+        </tbody>
+      </table>
+
+      {% from "govuk/components/radios/macro.njk" import govukRadios %}
+      {% from "govuk/components/input/macro.njk" import govukInput %}
+
+      {% set limitHtml %}
+      <div class="govuk-input__wrapper">
+        <div class="govuk-input__prefix" aria-hidden="true">£</div>
+        <label name="costLabel" for="emergencyCostAmount" class="govuk-visually-hidden">New cost limit</label>
+        <input class="govuk-input govuk-input--width-5" id="emergencyCostAmount" describedby="costLabel" name="emergencyCostAmount" value="{{ data['granted-emergency'] }}" type="text" spellcheck="false">
+      </div>
+      {% endset -%}
+
+        {{ govukRadios({
+          name: "emergencyCost",
+          fieldset: {
+            legend: {
+              text: "How much should be granted for the substantive certificate?",
+              isPageHeading: true,
+              classes: "govuk-fieldset__legend--s"
+            }
+          },
+          items: [
+            {
+              value: "Default limit (amount)",
+              text: "Default limit"
+            },
+            {
+              value: "Requested limit (amount)",
+              text: "Requested limit"
+            },
+            {
+              value: "New limit set by assessor (amount)",
+              text: "New limit",
+              conditional: {
+                html: limitHtml
+              }
+            }
+          ]
+        }) }}
+
+        <div class="govuk-button-group">
+          <input type="submit" name="merits_continue_button" value="Save and continue" id="continue" class="govuk-button form-button" data-module="govuk-button" data-disable-with="Save and continue">
+          <input type="submit" name="merits_continue_button" value="Save and come back later" id="continue" class="govuk-button form-button govuk-button--secondary govuk-!-margin-left-3" data-module="govuk-button"
+            data-disable-with="Save and come back later">
+        </div>
+
+    </form>
+
+  </div>
+</div>
+
+{% endblock %}
