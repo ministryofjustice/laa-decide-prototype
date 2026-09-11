@@ -2431,7 +2431,8 @@ router.get('/application/:reference/redetermination/:index/check-answers', funct
     proceedingName: isNewProceeding ? answers.newProceeding.proceedingName : (redetermination ? redetermination.redeterminationProceeding : 'Child assessment order'),
     clientRole: isNewProceeding ? answers.newProceeding.clientRole : (redetermination ? redetermination.redeterminationClientRole : 'Applicant'),
     scopeLimitations: isNewProceeding ? answers.newProceeding.scopeLimitations : 'Hearing<br><br>Limited to all steps up to and including final hearing and any action necessary to implement (but not enforce) the order.',
-    levelOfService: isNewProceeding ? answers.newProceeding.levelOfService : 'Full representation'
+    levelOfService: isNewProceeding ? answers.newProceeding.levelOfService : 'Full representation',
+    justification: answers.justification
   });
 });
 
