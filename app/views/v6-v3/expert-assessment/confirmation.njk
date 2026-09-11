@@ -7,66 +7,30 @@
   Assessment for prior authority completed - Prior Authority - GOV.UK
 {% endblock %}
 
-{% block header %}
-  {{ govukHeader({
-    homepageUrl: "#",
-    productName: "Legal Aid Agency",
-    navigationClasses: "govuk-header__navigation--end",
-    navigation: [
-      {
-        href: '#',
-        text: "joann.barton@law.com"
-      },
-      {
-        href: '/v6-v3/sign-out',
-        text: "Sign out"
-      }
-    ]
-  }) }}
+{% block head %}
+  <link href="/public/stylesheets/application.css" rel="stylesheet">
+  <style>
+    .v3-confirmation-screen { box-sizing: border-box; margin-bottom: 32px; padding: 30px; color: #fff; text-align: center; background-color: #00703c; font-family: "GDS Transport", Arial, sans-serif; }
+    .v3-confirmation-screen h1 { margin: 0 0 7vh; color: #fff; font-size: clamp(2.5rem, 6vw, 5.5rem); line-height: 1.1; }
+    .v3-confirmation-screen p { margin: 0; color: #fff; font-size: clamp(2rem, 5vw, 4.25rem); line-height: 1.2; }
+    .v3-confirmation-screen .v3-confirmation-reference { margin-top: 1vh; font-weight: 400; }
+  </style>
+{% endblock %}
 
-  {{ mojPrimaryNavigation({
-    label: 'Primary navigation',
-    items: [
-      {
-        text: 'Decide if an applicant can get legal aid',
-        href: '#'
-      },
-      {
-        text: 'Open applications',
-        href: '/v6-v3/open-applications'
-      },
-      {
-        text: 'Your list',
-        href: '/v6-v3/yourlist'
-      },
-      {
-        text: 'Search',
-        href: '/v6-v3/search'
-      }
-    ]
-  }) }}
+{% block header %}
+  {{ govukHeader({ homepageUrl: "#", productName: "Legal Aid Agency", navigationClasses: "govuk-header__navigation--end", navigation: [{ href: '#', text: "joann.barton@law.com" }, { href: '/v6-v3/sign-out', text: "Sign out" }] }) }}
+  {{ mojPrimaryNavigation({ label: 'Primary navigation', items: [{ text: 'Decide if an applicant can get legal aid', href: '#' }, { text: 'Open applications', href: '/v6-v3/open-applications' }, { text: 'Your list', href: '/v6-v3/yourlist' }, { text: 'Search', href: '/v6-v3/search' }] }) }}
 {% endblock %}
 
 {% block content %}
-<div class="govuk-grid-row">
-  <div class="govuk-grid-column-two-thirds">
-
-    {{ govukPanel({
-      titleText: "Assessment for prior authority completed",
-      html: "Your reference number is<br><strong>" + (reference or 'CRM4-Expert-123') + "</strong>"
-    }) }}
-
-    <h2 class="govuk-heading-m">What happens next</h2>
-
-    <p class="govuk-body">
-      We have recorded your decision. The provider will be notified.
-    </p>
-
-    {{ govukButton({
-      text: "Return to your list",
-      href: "/v6-v3/yourlist"
-    }) }}
-
-  </div>
-</div>
+<section class="v3-confirmation-screen">
+  <h1>Assessment complete</h1>
+  <p>Reference number:</p>
+  <p class="v3-confirmation-reference">{{ reference or 'CRM4-Expert-123' }}</p>
+</section>
+<div class="govuk-grid-row"><div class="govuk-grid-column-two-thirds">
+  <h2 class="govuk-heading-m">What happens next</h2>
+  <p class="govuk-body">We have recorded your decision. The provider will be notified.</p>
+  {{ govukButton({ text: "Return to your list", href: "/v6-v3/yourlist" }) }}
+</div></div>
 {% endblock %}

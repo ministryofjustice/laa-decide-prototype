@@ -6,7 +6,15 @@
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "moj/components/primary-navigation/macro.njk" import mojPrimaryNavigation %}
 
-{% block head %}<link href="/public/stylesheets/application.css" rel="stylesheet">{% endblock %}
+{% block head %}
+  <link href="/public/stylesheets/application.css" rel="stylesheet">
+  <style>
+    .v3-confirmation-screen { box-sizing: border-box; margin-bottom: 32px; padding: 30px; color: #fff; text-align: center; background-color: #00703c; font-family: "GDS Transport", Arial, sans-serif; }
+    .v3-confirmation-screen h1 { margin: 0 0 7vh; color: #fff; font-size: clamp(2.5rem, 6vw, 5.5rem); line-height: 1.1; }
+    .v3-confirmation-screen p { margin: 0; color: #fff; font-size: clamp(2rem, 5vw, 4.25rem); line-height: 1.2; }
+    .v3-confirmation-screen .v3-confirmation-reference { margin-top: 1vh; font-weight: 400; }
+  </style>
+{% endblock %}
 {% block pageTitle %}Confirmation{% endblock %}
 
 {% block header %}
@@ -20,17 +28,14 @@
 {% endblock %}
 
 {% block content %}
+  <section class="v3-confirmation-screen">
+    <h1>Assessment complete</h1>
+    <p>Reference number:</p>
+    <p class="v3-confirmation-reference">{{ reference }}</p>
+  </section>
   <div class="govuk-grid-row"><div class="govuk-grid-column-two-thirds">
-    <div class="govuk-panel govuk-panel--confirmation">
-      <h1 class="govuk-panel__title">Assessment successfully completed</h1>
-      <div class="govuk-panel__body">
-        LAA reference number: <strong>{{ reference }}</strong>
-      </div>
-    </div>
-
     <h2 class="govuk-heading-m">What happens next</h2>
     <p class="govuk-body">We've saved your decision and it has been sent to the provider.</p>
-
     {{ govukButton({ text: "View your list", href: "/v6-v3/yourlist" }) }}
   </div></div>
 {% endblock %}
