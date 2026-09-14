@@ -945,7 +945,11 @@ function generateReplacementOpenApplication(preferredType, existingVariantKeys =
 }
 
 router.get('/open-applications', function(req, res) {
-  const consolidated = req.query.consolidated === 'true';
+  const consolidated = req.query.consolidated === 'true' || req.session.data['consolidated-v6'] === true;
+
+  if (req.query.consolidated === 'true') {
+    req.session.data['consolidated-v6'] = true;
+  }
 
   if (!req.session.data['assigned-applications']) {
     req.session.data['assigned-applications'] = [];
@@ -1257,6 +1261,14 @@ router.get('/add-application/:reference', function(req, res) {
       if (hasPriorAuthorityParam) return app.isPriorAuthority !== isPriorAuthorityRequested;
       return false;
     });
+
+    if (req.session.data['consolidated-extra-initial-applications-v6']) {
+      req.session.data['consolidated-extra-initial-applications-v6'] = req.session.data['consolidated-extra-initial-applications-v6'].filter(app => {
+        if (app.ref !== ref) return true;
+        if (hasPriorAuthorityParam) return app.isPriorAuthority !== isPriorAuthorityRequested;
+        return false;
+      });
+    }
 
     const remainingOpenApplications = req.session.data['open-applications-all'];
     const initialCount = remainingOpenApplications.filter(app => !app.isPriorAuthority).length;
