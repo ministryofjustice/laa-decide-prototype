@@ -154,7 +154,7 @@
       {% endset %}
 
       <div class="moj-filter-layout">
-        <div class="moj-filter-layout__filter" id="filter-panel">
+        <div class="moj-filter-layout__filter" id="filter-panel" style="display: none;">
           <form method="GET" action="/v6/open-applications{% if consolidated %}?consolidated=true{% endif %}">
             {{ mojFilter({
               heading: { text: 'Filter' },
