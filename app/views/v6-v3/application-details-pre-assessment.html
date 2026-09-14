@@ -1,0 +1,303 @@
+{% extends "layouts/open.html" %}
+
+{% block pageTitle %}
+Application details
+{% endblock %}
+
+{% block content %}
+
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    <h2 class="govuk-heading-xl govuk-!-margin-bottom-2"><span class="govuk-!-margin-right-2">L-B3H-J8L</span>
+    </h2>
+    
+  </div>
+  
+  <div class="govuk-grid-column-one-third">
+    <form action="https://laa-decide-prototype.apps.live.cloud-platform.service.justice.gov.uk/latest/remove-from-my-list">
+      <button class="govuk-button govuk-button--secondary" data-module="govuk-button">Remove from your list</button>
+      <input type="hidden" name="refNoToRemove" value="L-B3H-J8L">
+    </form>
+  </div>
+  
+</div>
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-one-half">
+    <p class="govuk-body-m">
+  
+    
+      <strong>Assigned to: </strong>Mo Bradshaw
+    
+    </p>
+  </div>
+</div>
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    <nav class="moj-sub-navigation" aria-label="Sub navigation">
+      <ul class="moj-sub-navigation__list">
+        <li class="moj-sub-navigation__item">
+          <a class="moj-sub-navigation__link" aria-current="page" href="https://laa-decide-prototype.apps.live.cloud-platform.service.justice.gov.uk/latest/application-details">Application details</a>
+        </li>
+        <li class="moj-sub-navigation__item">
+          <a class="moj-sub-navigation__link" href="https://laa-decide-prototype.apps.live.cloud-platform.service.justice.gov.uk/latest/people">People</a>
+        </li>
+        <li class="moj-sub-navigation__item">
+          <a class="moj-sub-navigation__link" href="https://laa-decide-prototype.apps.live.cloud-platform.service.justice.gov.uk/latest/application-history">Application history</a>
+        </li>
+      </ul>
+    </nav>
+
+    <table class="govuk-table">
+      <caption class="govuk-table__caption govuk-table__caption--l">Overview</caption>
+      <tbody class="govuk-table__body">
+        <tr class="govuk-table__row">
+          <td class="govuk-table__header govuk-!-width-one-half">CCMS reference number</td>
+          <td class="govuk-table__cell"><span id="reference-number">300000651984</span><button class="govuk-link--no-visited-state" style="background: none; border: none; color: #1d70b8; text-decoration: underline; cursor: copy;" onclick="copyContent()">Copy reference number</button>
+
+            <script>
+              let text = document.getElementById('reference-number').innerHTML;
+              const copyContent = async () => {
+                try {
+                  await navigator.clipboard.writeText(text);
+                  console.log('Content copied to clipboard');
+                } catch (err) {
+                  console.error('Failed to copy: ', err);
+                }
+              }
+            </script>
+
+          </td>
+        </tr>
+         <tr class="govuk-table__row">
+          <td class="govuk-table__header govuk-!-width-one-half">Submission type</td>
+          <td class="govuk-table__cell">Initial application</td>
+        </tr>
+      
+        <tr class="govuk-table__row">
+          <td class="govuk-table__header">Certificate type</td>
+          <td class="govuk-table__cell">Emergency and substantive</td>
+        </tr>
+        <tr class="govuk-table__row">
+          <td class="govuk-table__header">Date submitted</td>
+          <td class="govuk-table__cell">26 Aug 2023</td>
+        </tr>
+        <tr class="govuk-table__row">
+          <td class="govuk-table__header">Delegated functions</td>
+          <td class="govuk-table__cell">Non-molestation order
+            <br>28 Aug 2021</td>
+        </tr>
+             
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+
+    <h2 class="govuk-heading-l">Proceedings</h2>
+   
+  
+
+   <h2 class="govuk-heading-m">Non-molestation order</h2>
+    
+        
+        <div class="govuk-summary-card">
+          <div class="govuk-summary-card__title-wrapper">
+            <h2 class="govuk-summary-card__title">Emergency certificate</h2>
+            <ul class="govuk-summary-card__actions">
+              <li class="govuk-summary-card__action"> <a class="govuk-link" href="#">
+                  Grant<span class="govuk-visually-hidden"> Emergency certificate</span>
+                </a>
+              </li>
+              <li class="govuk-summary-card__action"> <a class="govuk-link" href="#">
+                  Refuse<span class="govuk-visually-hidden"> Emergency certificate</span>
+                </a>
+              </li>
+            </ul>
+          </div>
+          <div class="govuk-summary-card__content">
+            <dl class="govuk-summary-list">
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">
+                  Level of service
+                </dt>
+                <dd class="govuk-summary-list__value">
+                  Full representation
+                </dd>
+                <dd class="govuk-summary-list__actions">
+                  <a class="govuk-link" href="#">
+                    Change<span class="govuk-visually-hidden"> name</span>
+                  </a>
+                </dd>
+              </div>
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">
+                  Scope limitations
+                </dt>
+                <dd class="govuk-summary-list__value">
+                  <strong>Example scope</strong>
+                  <br>All steps up to and including the hearing on 21 September 2021.
+                </dd>
+                <dd class="govuk-summary-list__actions">
+                  <a class="govuk-link" href="#">
+                    Change<span class="govuk-visually-hidden"> name</span>
+                  </a>
+                </dd>
+              </div>
+
+            </dl>
+          </div>
+        </div>
+      
+        <div class="govuk-summary-card">
+          <div class="govuk-summary-card__title-wrapper">
+            <h2 class="govuk-summary-card__title">Substantive certificate</h2>
+            <ul class="govuk-summary-card__actions">
+              <li class="govuk-summary-card__action"> <a class="govuk-link" href="#">
+                  Grant<span class="govuk-visually-hidden"> Substantive certificate</span>
+                </a>
+              </li>
+              <li class="govuk-summary-card__action"> <a class="govuk-link" href="#">
+                  Refuse<span class="govuk-visually-hidden"> Substantive certificate</span>
+                </a>
+              </li>
+            </ul>
+          </div>
+          <div class="govuk-summary-card__content">
+            <dl class="govuk-summary-list">
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">
+                  Level of service
+                </dt>
+                <dd class="govuk-summary-list__value">
+                  Full representation
+                </dd>
+                <dd class="govuk-summary-list__actions">
+                  <a class="govuk-link" href="#">
+                    Change<span class="govuk-visually-hidden"> name</span>
+                  </a>
+                </dd>
+              </div>
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">
+                  Scope limitations
+                </dt>
+                <dd class="govuk-summary-list__value">
+                  <strong>Example scope</strong>
+                  <br>All steps up to and including getting and serving a final order. If the order is breached you can apply for power of arrest. You cannot apply for a warrant of arrest or contempt of court proceedings.
+                </dd>
+                <dd class="govuk-summary-list__actions">
+                  <a class="govuk-link" href="#">
+                    Change<span class="govuk-visually-hidden"> name</span>
+                  </a>
+                </dd>
+              </div>
+
+
+            </dl>
+          </div>
+        </div>
+     
+        </li>
+
+    </ol>
+
+
+
+    <h2 class="govuk-heading-l">Requested cost limits</h2>
+    <dl class="govuk-summary-list">
+      <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">
+          Emergency certificate
+        </dt>
+        <dd class="govuk-summary-list__value">
+          £1,350
+        </dd>
+        <dd class="govuk-summary-list__actions">
+          <a class="govuk-link" href="#">
+            Change<span class="govuk-visually-hidden"> name</span>
+          </a>
+        </dd>
+      </div>
+      <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">
+          Substantive certificate
+        </dt>
+        <dd class="govuk-summary-list__value">
+          £25,000
+        </dd>
+        <dd class="govuk-summary-list__actions">
+          <a class="govuk-link" href="#">
+            Change<span class="govuk-visually-hidden"> date of birth</span>
+          </a>
+        </dd>
+      </div>     
+      
+    </dl>
+
+
+    <h2 class="govuk-heading-l govuk-!-margin-top-9">Documents</h2>
+    <table class="govuk-table">
+      <thead class="govuk-table__head">
+        <tr class="govuk-table__row">
+          <th scope="col" class="govuk-table__header">Category</th>
+          <th scope="col" class="govuk-table__header">Date</th>
+        </tr>
+      </thead>
+      <tbody class="govuk-table__body">
+        
+        <tr class="govuk-table__row">
+          <td class="govuk-table__cell govuk-!-width-one-half"><a href="https://drive.google.com/file/d/16V-j11_Na8_bBz4fazl-TP5k8odpPbBX/view" class="govuk-link" rel="noreferrer noopener" target="_blank">Means report</a></td>
+          <td class="govuk-table__cell">30 Aug 2021</td>
+        </tr>
+        
+        <tr class="govuk-table__row">
+          <td class="govuk-table__cell govuk-!-width-one-half"><a href="https://drive.google.com/file/d/19TddAL5MpWAPhDqRCsbggQVVngEHCQA5/view" class="govuk-link" rel="noreferrer noopener" target="_blank">Merits report</a></td>
+          <td class="govuk-table__cell">30 Aug 2021</td>
+        </tr>
+        
+        <tr class="govuk-table__row">
+          <td class="govuk-table__cell govuk-!-width-one-half"><a href="https://drive.google.com/file/d/1m2SvoKEuJySNk3wxpjvfIYHqMTZlisQf/view" class="govuk-link" rel="noreferrer noopener" target="_blank">Gateway evidence</a></td>
+          <td class="govuk-table__cell">30 Aug 2021</td>
+        </tr>
+        
+        <tr class="govuk-table__row">
+          <td class="govuk-table__cell govuk-!-width-one-half"><a href="https://drive.google.com/file/d/11iq0Auzzlbmz2IqLmgatDaqeg_ct_y2z/view" class="govuk-link" rel="noreferrer noopener" target="_blank">Statement of case</a></td>
+          <td class="govuk-table__cell">18 Aug 2021</td>
+        </tr>
+        
+      </tbody>
+    </table>
+
+
+
+  </div>
+</div>
+
+
+
+<div class="govuk-grid-row">
+
+    <div class="govuk-grid-column-two-thirds">
+
+      
+
+      <div class="govuk-button-group">
+        <form action="https://laa-decide-prototype.apps.live.cloud-platform.service.justice.gov.uk/latest/merits-assessment-emergency">
+          <button class="govuk-button" data-module="govuk-button">Confirm and send</button>
+          <button class="govuk-button govuk-button--warning" data-module="govuk-button">
+            Overall refuse or withdraw
+          </button>
+        <form action="https://laa-decide-prototype.apps.live.cloud-platform.service.justice.gov.uk/latest/reject-application">
+          <button class="govuk-button govuk-button--secondary" data-module="govuk-button">Send back to provider</button>
+        </form>
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+  {% endblock %}

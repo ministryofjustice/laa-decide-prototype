@@ -945,6 +945,12 @@ function generateReplacementOpenApplication(preferredType, existingVariantKeys =
 }
 
 router.get('/open-applications', function(req, res) {
+  const consolidated = req.query.consolidated === 'true' || req.session.data['consolidated-v6'] === true;
+
+  if (req.query.consolidated === 'true') {
+    req.session.data['consolidated-v6'] = true;
+  }
+
   if (!req.session.data['assigned-applications']) {
     req.session.data['assigned-applications'] = [];
   }
@@ -966,7 +972,19 @@ router.get('/open-applications', function(req, res) {
       req.session.data['completed-applications'].push(a);
     });
   }
-  let applications = [...req.session.data['open-applications-all']];
+  let applications = [...req.session.data['open-applications-all']]
+    .filter(app => !app.isRedetermination);
+
+  if (consolidated) {
+    if (!req.session.data['consolidated-extra-initial-applications-v6']) {
+      const existingRefs = new Set(applications.map(app => app.ref));
+      req.session.data['consolidated-extra-initial-applications-v6'] = generateMockApplications(8).open
+        .filter(app => !app.isPriorAuthority && !existingRefs.has(app.ref))
+        .slice(0, 4);
+    }
+    applications = applications.concat(req.session.data['consolidated-extra-initial-applications-v6']);
+    applications = applications.filter(app => !app.priorAuthorityType || !app.priorAuthorityType.includes('Counsel'));
+  }
 
   // Remove applications already in a caseworker's list from open applications.
   const assignedKeys = new Set((req.session.data['assigned-applications'] || []).map(app => `${app.ref}|${Boolean(app.isPriorAuthority)}`));
@@ -1047,6 +1065,12 @@ router.get('/open-applications', function(req, res) {
       console.log('After categories filter:', filteredApps.length);
     }
   }
+
+  if (consolidated) {
+    filteredApps = filteredApps.filter(app => {
+      return !app.isRedetermination && (!app.priorAuthorityType || !app.priorAuthorityType.includes('Counsel'));
+    });
+  }
   
   console.log('Final filtered apps:', filteredApps.length);
   
@@ -1056,7 +1080,8 @@ router.get('/open-applications', function(req, res) {
   res.render('v6/open-applications.njk', { 
     pageTitle: 'Open applications',
     applications: filteredApps,
-    query: req.query
+    query: req.query,
+    consolidated
   });
 });
 
@@ -1236,6 +1261,14 @@ router.get('/add-application/:reference', function(req, res) {
       if (hasPriorAuthorityParam) return app.isPriorAuthority !== isPriorAuthorityRequested;
       return false;
     });
+
+    if (req.session.data['consolidated-extra-initial-applications-v6']) {
+      req.session.data['consolidated-extra-initial-applications-v6'] = req.session.data['consolidated-extra-initial-applications-v6'].filter(app => {
+        if (app.ref !== ref) return true;
+        if (hasPriorAuthorityParam) return app.isPriorAuthority !== isPriorAuthorityRequested;
+        return false;
+      });
+    }
 
     const remainingOpenApplications = req.session.data['open-applications-all'];
     const initialCount = remainingOpenApplications.filter(app => !app.isPriorAuthority).length;

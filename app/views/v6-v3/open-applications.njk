@@ -40,6 +40,11 @@
       font-size: 19px;
       margin-top: 15px;
     }
+    /* The MOJ sort icon is a 22px SVG with built-in padding, which reads as a
+       large gap once the header text wraps onto two lines. */
+    [aria-sort] button svg {
+      margin-left: -6px;
+    }
   </style>
 {% endblock %}
 
@@ -54,7 +59,7 @@
         text: "joann.barton@law.com"
       },
       {
-        href: '/v6/sign-out',
+        href: '/v6-v3/sign-out',
         text: "Sign out"
       }
     ]
@@ -69,15 +74,15 @@
       },
       {
         text: 'Open applications',
-        href: '/v6/open-applications'
+        href: '/v6-v3/open-applications'
       },
       {
         text: 'Your list',
-        href: '/v6/yourlist'
+        href: '/v6-v3/yourlist'
       },
       {
         text: 'Search',
-        href: '/v6/search'
+        href: '/v6-v3/search'
       }
     ]
   }) }}
@@ -122,7 +127,8 @@
           },
           items: [
             { value: "initial", text: "Initial application", checked: query.applicationType and ("initial" in query.applicationType) },
-            { value: "prior", text: "Prior authority", checked: query.applicationType and ("prior" in query.applicationType) }
+            { value: "prior", text: "Prior authority", checked: query.applicationType and ("prior" in query.applicationType) },
+            { value: "redetermination", text: "Redetermination", checked: query.applicationType and ("redetermination" in query.applicationType) }
           ]
         }) }}
 
@@ -154,13 +160,13 @@
       {% endset %}
 
       <div class="moj-filter-layout">
-        <div class="moj-filter-layout__filter" id="filter-panel" style="display: none;">
-          <form method="GET" action="/v6/open-applications{% if consolidated %}?consolidated=true{% endif %}">
+        <div class="moj-filter-layout__filter" id="filter-panel">
+          <form method="GET" action="/v6-v3/open-applications">
             {{ mojFilter({
               heading: { text: 'Filter' },
               selectedFilters: {
                 heading: { text: 'Selected filters' },
-                clearLink: { text: 'Clear filters', href: '/v6/open-applications{% if consolidated %}?consolidated=true{% endif %}' },
+                clearLink: { text: 'Clear filters', href: '/v6-v3/open-applications' },
                 categories: []
               },
               optionsHtml: filterOptionsHtml
@@ -192,7 +198,7 @@
                 {% for app in applications %}
                   <tr class="govuk-table__row">
                     <td class="govuk-table__cell">
-                      <a href="/v6/application/{{ app.ref }}{% if app.isPriorAuthority %}?isPriorAuthority=true#prior-authority{% endif %}" class="govuk-link">
+                      <a href="/v6-v3/application/{{ app.ref }}{% if app.isPriorAuthority %}?isPriorAuthority=true#prior-authority{% elif app.isRedetermination %}?isRedetermination=true{% endif %}" class="govuk-link">
                         {{ app.ref }}
                       </a>
                     </td>
@@ -205,6 +211,8 @@
                     <td class="govuk-table__cell">
                       {% if app.isPriorAuthority %}
                         Prior authority<br><strong>{{ app.priorAuthorityType }}</strong>
+                      {% elif app.isRedetermination %}
+                        Redetermination<br><strong>{{ app.redeterminationType }}</strong>
                       {% else %}
                         Initial application
                       {% endif %}
@@ -216,7 +224,7 @@
                       <strong>{{ app.matterType.title }}</strong><br>{{ app.matterType.subtext }}
                     </td>
                     <td class="govuk-table__cell">
-                      <a href="#" class="govuk-link add-to-list" data-ref="{{ app.ref }}" data-is-prior-authority="{{ app.isPriorAuthority and 'true' or 'false' }}">Add</a>
+                      <a href="#" class="govuk-link add-to-list" data-ref="{{ app.ref }}" data-is-prior-authority="{{ app.isPriorAuthority and 'true' or 'false' }}" data-is-redetermination="{{ app.isRedetermination and 'true' or 'false' }}">Add</a>
                     </td>
                   </tr>
                 {% endfor %}
@@ -234,9 +242,7 @@
     document.addEventListener('DOMContentLoaded', function() {
       const toggleBtn = document.getElementById('custom-filter-toggle');
       const filterPanel = document.getElementById('filter-panel');
-      const hasFilters = ['applicationType', 'matterType', 'categories'].some(key => {
-        return new URLSearchParams(window.location.search).has(key);
-      });
+      const hasFilters = window.location.search.length > 0;
 
       // Default state: Keep open if filters were just applied
       if (hasFilters) {
@@ -262,6 +268,7 @@
       const filterLabels = {
         'initial': 'Initial application',
         'prior': 'Prior authority',
+        'redetermination': 'Redetermination',
         'sca': "Special Children's Act",
         'expert': 'Expert',
         'junior-counsel': 'Junior counsel',
@@ -312,7 +319,7 @@
       }
 
       // Handle "Clear filters" - keep panel open but clear selections
-      const clearLinks = filterPanel.querySelectorAll('a[href*="/v6/open-applications"]');
+      const clearLinks = filterPanel.querySelectorAll('a[href*="/v6-v3/open-applications"]');
       clearLinks.forEach(link => {
         if (link.textContent.includes('Clear')) {
           link.addEventListener('click', function(e) {
@@ -321,31 +328,46 @@
             const checkboxes = filterPanel.querySelectorAll('input[type="checkbox"]');
             checkboxes.forEach(cb => cb.checked = false);
             // Navigate to clean URL
-            window.location.href = '/v6/open-applications{% if consolidated %}?consolidated=true{% endif %}';
+            window.location.href = '/v6-v3/open-applications';
           });
         }
       });
     });
 
     // Handle "Add" link clicks for adding applications to list
+    let addToListReloadTimeout = null;
     document.querySelectorAll('.add-to-list').forEach(link => {
       link.addEventListener('click', function(e) {
         e.preventDefault();
         const reference = this.getAttribute('data-ref');
         const isPriorAuthority = this.getAttribute('data-is-prior-authority') === 'true';
+        const isRedetermination = this.getAttribute('data-is-redetermination') === 'true';
         
         // Add application to list via fetch
-        fetch('/v6/add-application/' + reference + '?isPriorAuthority=' + isPriorAuthority, { 
+        fetch('/v6-v3/add-application/' + reference + '?isPriorAuthority=' + isPriorAuthority + '&isRedetermination=' + isRedetermination, {
           method: 'GET',
           headers: {
             'X-Requested-With': 'XMLHttpRequest'
           }
         })
-          .then(response => {
+          .then(response => response.json())
+          .then(data => {
             // Show toast notification using GOV.UK toast component
             const toastContainer = document.getElementById('toast-notification');
+            const addedCount = data && Number.isFinite(Number(data.addedCount)) ? Number(data.addedCount) : 1;
+            const linkedAddedCount = data && Number.isFinite(Number(data.linkedAddedCount)) ? Number(data.linkedAddedCount) : Math.max(0, addedCount - 1);
+            const referenceHref = '/v6-v3/application/' + reference + (isPriorAuthority ? '?isPriorAuthority=true#prior-authority' : isRedetermination ? '?isRedetermination=true' : '');
+            const referenceLink = '<a class="govuk-link" href="' + referenceHref + '">' + reference + '</a>';
+            const linkedLabel = linkedAddedCount === 1 ? 'linked case' : 'linked cases';
+            let toastMessage = linkedAddedCount > 0
+              ? 'You assigned this application ' + referenceLink + ' and ' + linkedAddedCount + ' ' + linkedLabel + ' to your list'
+              : 'You assigned this application ' + referenceLink + ' to your list';
+
+            if (addedCount === 0) {
+              toastMessage = referenceLink + ' is already in your list';
+            }
             
-            // Clear any existing toasts first
+            // Clear any existing toast so only the latest success message is shown
             toastContainer.innerHTML = '';
             
             const toast = document.createElement('div');
@@ -354,14 +376,17 @@
             toast.setAttribute('aria-labelledby', 'govuk-notification-banner-title');
             toast.className = 'govuk-notification-banner govuk-notification-banner--success';
             toast.style.cssText = 'margin-bottom: 20px;';
-            toast.innerHTML = '<div class="govuk-notification-banner__header"><h2 id="govuk-notification-banner-title" class="govuk-notification-banner__title">Success</h2></div><div class="govuk-notification-banner__content"><p class="govuk-notification-banner__heading">You added this application to your list</p></div>';
+            toast.innerHTML = '<div class="govuk-notification-banner__header"><h2 id="govuk-notification-banner-title" class="govuk-notification-banner__title">Success</h2></div><div class="govuk-notification-banner__content"><p class="govuk-notification-banner__heading">' + toastMessage + '</p></div>';
             
             toastContainer.appendChild(toast);
             
-            // Reload page after 1 second to update the list
-            setTimeout(() => {
+            // Cancel any pending reload from a previous add so it doesn't cut off this message
+            if (addToListReloadTimeout) {
+              clearTimeout(addToListReloadTimeout);
+            }
+            addToListReloadTimeout = setTimeout(() => {
               window.location.reload();
-            }, 1000);
+            }, 10000);
           })
           .catch(error => console.error('Error:', error));
       });
