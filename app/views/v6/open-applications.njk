@@ -155,12 +155,12 @@
 
       <div class="moj-filter-layout">
         <div class="moj-filter-layout__filter" id="filter-panel">
-          <form method="GET" action="/v6/open-applications">
+          <form method="GET" action="/v6/open-applications{% if consolidated %}?consolidated=true{% endif %}">
             {{ mojFilter({
               heading: { text: 'Filter' },
               selectedFilters: {
                 heading: { text: 'Selected filters' },
-                clearLink: { text: 'Clear filters', href: '/v6/open-applications' },
+                clearLink: { text: 'Clear filters', href: '/v6/open-applications{% if consolidated %}?consolidated=true{% endif %}' },
                 categories: []
               },
               optionsHtml: filterOptionsHtml
@@ -234,7 +234,9 @@
     document.addEventListener('DOMContentLoaded', function() {
       const toggleBtn = document.getElementById('custom-filter-toggle');
       const filterPanel = document.getElementById('filter-panel');
-      const hasFilters = window.location.search.length > 0;
+      const hasFilters = ['applicationType', 'matterType', 'categories'].some(key => {
+        return new URLSearchParams(window.location.search).has(key);
+      });
 
       // Default state: Keep open if filters were just applied
       if (hasFilters) {
@@ -319,7 +321,7 @@
             const checkboxes = filterPanel.querySelectorAll('input[type="checkbox"]');
             checkboxes.forEach(cb => cb.checked = false);
             // Navigate to clean URL
-            window.location.href = '/v6/open-applications';
+            window.location.href = '/v6/open-applications{% if consolidated %}?consolidated=true{% endif %}';
           });
         }
       });

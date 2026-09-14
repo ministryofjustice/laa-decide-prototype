@@ -60,7 +60,6 @@
       label: 'Account navigation',
       items: [{
         text: 'My account',
-        href: '#',
         active: true
       }, {
         text: 'Sign out',
@@ -81,6 +80,34 @@
         You can use this prototype during user testing, to present early designs and vision to stakeholders and teams,
         to review design versions and history, and to view work in progress.
       </p>
+
+      <div class="govuk-summary-card govuk-!-margin-bottom-6">
+        <div class="govuk-summary-card__title-wrapper version-header">
+          <div>
+            <h3 class="govuk-summary-card__title govuk-!-margin-bottom-2">Updated prototype</h3>
+          </div>
+          <div class="version-status-stack">
+            <span class="version-status-tag version-status-tag--previous">Stakeholders</span>
+            <span class="version-status-tag version-status-tag--ur-complete">Up to date changes</span>
+          </div>
+        </div>
+        <div class="govuk-summary-card__content">
+          <h4 class="govuk-heading-m govuk-!-margin-bottom-3">Notes</h4>
+          <ul class="govuk-list govuk-list--bullet govuk-!-margin-bottom-6">
+            <li>This prototype consolidates all flows from:</li>
+            <li>Open applications</li>
+            <li>Make a decision (Grant/Refuse)</li>
+            <li>Prior authority experts</li>
+            <li>Apportionment and disbursement</li>
+            <li>Linked cases and managing linked cases</li>
+          </ul>
+
+          {{ govukButton({
+            text: "Start updated prototype",
+            href: "/v6/open-applications?consolidated=true"
+          }) }}
+        </div>
+      </div>
 
       <div class="govuk-summary-card govuk-!-margin-bottom-6">
         <div class="govuk-summary-card__title-wrapper version-header">
