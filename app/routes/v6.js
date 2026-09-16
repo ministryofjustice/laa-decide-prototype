@@ -467,7 +467,12 @@ router.get('/overall-decision', function(req, res) {
 
 router.get('/confirmation-screen', function(req, res) {
   const decisionReference = req.session.data['decision-reference'] || 'L-12Z-13P';
-  res.render('v6/confirmation-screen.html', { pageTitle: 'Confirmation', decisionReference: decisionReference });
+  res.render(req.session.data['consolidated-v6'] === true
+    ? 'v6/consolidated-confirmation.njk'
+    : 'v6/confirmation-screen.html', {
+    pageTitle: 'Confirmation',
+    decisionReference: decisionReference
+  });
 });
 
 router.get('/overall-decision-error', function(req, res) {
@@ -2653,7 +2658,9 @@ router.post('/counsel-assessment/submit-assessment', function (req, res) {
 });
 
 router.get('/counsel-assessment/confirmation', function (req, res) {
-  res.render('v6/counsel-assessment/confirmation.njk', {
+  res.render(req.session.data['consolidated-v6'] === true
+    ? 'v6/consolidated-confirmation.njk'
+    : 'v6/counsel-assessment/confirmation.njk', {
     pageTitle: 'Assessment for prior authority completed - Prior Authority',
     reference: req.session.data['counsel-assessment-reference'] || 'CRM4-Counsel-123'
   });
@@ -2977,7 +2984,9 @@ router.post('/expert-assessment/submit-assessment', function (req, res) {
 });
 
 router.get('/expert-assessment/confirmation', function (req, res) {
-  res.render('v6/expert-assessment/confirmation.njk', {
+  res.render(req.session.data['consolidated-v6'] === true
+    ? 'v6/consolidated-confirmation.njk'
+    : 'v6/expert-assessment/confirmation.njk', {
     pageTitle: 'Assessment for prior authority completed - Prior Authority',
     reference: req.session.data['expert-assessment-reference'] || 'CRM4-Expert-123'
   });

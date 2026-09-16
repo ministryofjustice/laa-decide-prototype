@@ -1,0 +1,61 @@
+{% extends "govuk/template.njk" %}
+
+{% from "govuk/components/header/macro.njk" import govukHeader %}
+{% from "govuk/components/phase-banner/macro.njk" import govukPhaseBanner %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/panel/macro.njk" import govukPanel %}
+{% from "moj/components/primary-navigation/macro.njk" import mojPrimaryNavigation %}
+
+{% block pageTitle %}Assessment complete{% endblock %}
+
+{% block head %}
+  <link href="/public/stylesheets/application.css" rel="stylesheet">
+{% endblock %}
+
+{% block header %}
+  {{ govukHeader({
+    homepageUrl: "#",
+    productName: "Legal Aid Agency",
+    navigationClasses: "govuk-header__navigation--end",
+    navigation: [
+      { href: '#', text: "jonaan.barton@justice.gov.uk" },
+      { href: '/v6/sign-out', text: "Sign out" }
+    ]
+  }) }}
+
+  {{ mojPrimaryNavigation({
+    label: 'Primary navigation',
+    items: [
+      { text: 'Decide if an applicant can get legal aid', href: '#' },
+      { text: 'Open applications', href: '/v6/open-applications' },
+      { text: 'Your list', href: '/v6/yourlist' },
+      { text: 'Search', href: '/v6/search' }
+    ]
+  }) }}
+{% endblock %}
+
+{% block beforeContent %}
+  {{ govukPhaseBanner({
+    tag: { text: "Beta" },
+    html: 'This is a new service – your <a class="govuk-link" href="#">feedback</a> will help us to improve it.'
+  }) }}
+{% endblock %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      {{ govukPanel({
+        titleText: "Assessment complete",
+        html: "Reference number:<br><strong>" + (reference or decisionReference or 'L-12Z-13P') + "</strong>"
+      }) }}
+
+      <h2 class="govuk-heading-m">What happens next</h2>
+      <p class="govuk-body">We have saved your decision and the provider will be informed.</p>
+
+      {{ govukButton({
+        text: "View your list",
+        href: "/v6/yourlist"
+      }) }}
+    </div>
+  </div>
+{% endblock %}

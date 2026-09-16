@@ -149,6 +149,9 @@
         {% endif %}
       </div>
 
+      {% if sessionData['consolidated-v6'] === true %}
+        <p class="govuk-caption-l">Application reference</p>
+      {% endif %}
       <h1 class="govuk-heading-xl govuk-!-margin-bottom-4">{{ application.ref or application.reference }}</h1>
 
       <p class="govuk-body govuk-!-margin-bottom-1">
