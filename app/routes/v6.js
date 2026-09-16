@@ -2808,7 +2808,8 @@ router.get('/expert-assessment/decision', function (req, res) {
   res.render('v6/expert-assessment/decision.njk', {
     pageTitle: 'Make a decision - Prior Authority',
     reference: reference,
-    errors: errors
+    errors: errors,
+    consolidated: req.session.data['consolidated-v6'] === true
   });
 });
 
@@ -2869,6 +2870,7 @@ router.get('/expert-assessment/amount', function (req, res) {
     pageTitle: 'Make a decision - Prior Authority',
     reference: req.session.data['expert-assessment-reference'] || '',
     requestedAmount: formatCurrencyGBP(req.session.data['expert-requested-amount']),
+    consolidated: req.session.data['consolidated-v6'] === true,
     errors: errors
   });
 });
