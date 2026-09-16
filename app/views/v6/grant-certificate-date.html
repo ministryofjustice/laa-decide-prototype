@@ -124,8 +124,8 @@ Make a decision
       }) }}
     {% endif %}
     
-    <h1 class="govuk-heading-xl">Make a decision</h1>
-    <p class="govuk-heading-l" style="font-weight: normal; margin-bottom: 30px;">{{ decisionReference or 'L-12Z-13P' }}</p>
+    <p class="govuk-caption-l">Application reference</p>
+    <p class="govuk-body-l govuk-!-margin-bottom-8">{{ decisionReference or 'L-12Z-13P' }}</p>
 
     <form action="/v6/grant-date-submit" method="POST">
       {% set anotherDateHtml %}
@@ -166,10 +166,10 @@ Make a decision
         name: "cert-date-type",
         idPrefix: "cert-date-type",
         fieldset: {
-          legend: {
-            text: "When should the substantive certificate be granted from?",
-            classes: "govuk-fieldset__legend--m"
-          }
+            legend: {
+              text: "When should the substantive certificate be granted from?",
+              classes: "govuk-fieldset__legend--xl"
+            }
         },
         errorMessage: certDateTypeErrorMessage,
         items: [
@@ -193,6 +193,26 @@ Make a decision
           }
         ]
       }) }}
+
+      <script>
+        document.addEventListener('DOMContentLoaded', function() {
+          const dateTypeRadios = document.querySelectorAll('input[name="cert-date-type"]');
+          const dateConditional = document.getElementById('conditional-cert-date-type-3');
+
+          function updateDateConditional() {
+            const showDateFields = document.querySelector('input[name="cert-date-type"]:checked')?.value === 'another-date';
+            if (dateConditional) {
+              dateConditional.classList.toggle('govuk-radios__conditional--hidden', !showDateFields);
+              dateConditional.hidden = !showDateFields;
+            }
+          }
+
+          dateTypeRadios.forEach(function(radio) {
+            radio.addEventListener('change', updateDateConditional);
+          });
+          updateDateConditional();
+        });
+      </script>
 
       <div class="govuk-button-group">
         {{ govukButton({

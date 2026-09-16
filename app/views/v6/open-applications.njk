@@ -40,6 +40,32 @@
       font-size: 19px;
       margin-top: 15px;
     }
+    .moj-sortable-table.govuk-table .govuk-table__header:last-child,
+    .moj-sortable-table.govuk-table .govuk-table__cell:last-child {
+      white-space: nowrap;
+    }
+    .moj-sortable-table.govuk-table th.govuk-table__header button {
+      white-space: nowrap;
+    }
+    .moj-sortable-table.govuk-table th.govuk-table__header:nth-child(4) button {
+      display: inline;
+      white-space: normal;
+    }
+    .moj-sortable-table.govuk-table th.govuk-table__header:nth-child(4) button svg {
+      vertical-align: middle;
+      margin-left: 4px;
+    }
+    .moj-sortable-table.govuk-table td.govuk-table__cell:nth-child(2) {
+      white-space: nowrap;
+    }
+    .moj-sortable-table.govuk-table th.govuk-table__header:nth-child(4),
+    .moj-sortable-table.govuk-table td.govuk-table__cell:nth-child(4) {
+      padding-right: 5px;
+    }
+    .moj-sortable-table.govuk-table th.govuk-table__header:nth-child(5),
+    .moj-sortable-table.govuk-table td.govuk-table__cell:nth-child(5) {
+      padding-left: 5px;
+    }
   </style>
 {% endblock %}
 
@@ -99,6 +125,17 @@
     <div class="govuk-grid-column-full">
       
       <div id="toast-notification"></div>
+
+      {% if toast and toast.show %}
+        <div class="govuk-notification-banner govuk-notification-banner--success" role="region" aria-labelledby="open-applications-toast-title">
+          <div class="govuk-notification-banner__header">
+            <h2 class="govuk-notification-banner__title" id="open-applications-toast-title">Success</h2>
+          </div>
+          <div class="govuk-notification-banner__content">
+            <p class="govuk-notification-banner__heading">{{ toast.message }}</p>
+          </div>
+        </div>
+      {% endif %}
       
       <h1 class="govuk-heading-xl govuk-!-margin-bottom-6">Open applications</h1>
 
@@ -181,10 +218,9 @@
                 <tr class="govuk-table__row">
                   <th scope="col" class="govuk-table__header">Reference</th>
                   <th scope="col" class="govuk-table__header" aria-sort="none" data-sort-type="date">Submitted</th>
-                  <th scope="col" class="govuk-table__header" aria-sort="none" data-sort-type="date">Last updated</th>
                   <th scope="col" class="govuk-table__header">Type</th>
-                  <th scope="col" class="govuk-table__header" aria-sort="none">Delegated Functions</th>
-                  <th scope="col" class="govuk-table__header" aria-sort="none">Matter type</th>
+                  <th scope="col" class="govuk-table__header" aria-sort="none">Delegated functions</th>
+                  <th scope="col" class="govuk-table__header">Matter type</th>
                   <th scope="col" class="govuk-table__header">Actions</th>
                 </tr>
               </thead>
@@ -195,9 +231,6 @@
                       <a href="/v6/application/{{ app.ref }}{% if app.isPriorAuthority %}?isPriorAuthority=true#prior-authority{% endif %}" class="govuk-link">
                         {{ app.ref }}
                       </a>
-                    </td>
-                    <td class="govuk-table__cell" data-sort-value="{{ app.submitted | replace(' ', '') }}">
-                      {{ app.submitted }}
                     </td>
                     <td class="govuk-table__cell" data-sort-value="{{ app.submitted | replace(' ', '') }}">
                       {{ app.submitted }}
@@ -216,7 +249,7 @@
                       <strong>{{ app.matterType.title }}</strong><br>{{ app.matterType.subtext }}
                     </td>
                     <td class="govuk-table__cell">
-                      <a href="#" class="govuk-link add-to-list" data-ref="{{ app.ref }}" data-is-prior-authority="{{ app.isPriorAuthority and 'true' or 'false' }}">Add</a>
+                      <a href="#" class="govuk-link add-to-list" data-ref="{{ app.ref }}" data-is-prior-authority="{{ app.isPriorAuthority and 'true' or 'false' }}">Assign to your list</a>
                     </td>
                   </tr>
                 {% endfor %}
@@ -341,7 +374,15 @@
             'X-Requested-With': 'XMLHttpRequest'
           }
         })
-          .then(response => {
+          .then(response => response.json())
+          .then(data => {
+            const addedCount = data && Number.isFinite(Number(data.addedCount)) ? Number(data.addedCount) : 1;
+            const linkedAddedCount = data && Number.isFinite(Number(data.linkedAddedCount)) ? Number(data.linkedAddedCount) : Math.max(0, addedCount - 1);
+            const linkedLabel = linkedAddedCount === 1 ? 'linked case' : 'linked cases';
+            const toastMessage = linkedAddedCount > 0
+              ? 'You have added ' + reference + ' and ' + linkedAddedCount + ' ' + linkedLabel + ' to your list'
+              : 'You have added ' + reference + ' to your list';
+
             // Show toast notification using GOV.UK toast component
             const toastContainer = document.getElementById('toast-notification');
             
@@ -354,7 +395,7 @@
             toast.setAttribute('aria-labelledby', 'govuk-notification-banner-title');
             toast.className = 'govuk-notification-banner govuk-notification-banner--success';
             toast.style.cssText = 'margin-bottom: 20px;';
-            toast.innerHTML = '<div class="govuk-notification-banner__header"><h2 id="govuk-notification-banner-title" class="govuk-notification-banner__title">Success</h2></div><div class="govuk-notification-banner__content"><p class="govuk-notification-banner__heading">You added this application to your list</p></div>';
+            toast.innerHTML = '<div class="govuk-notification-banner__header"><h2 id="govuk-notification-banner-title" class="govuk-notification-banner__title">Success</h2></div><div class="govuk-notification-banner__content"><p class="govuk-notification-banner__heading">' + toastMessage + '</p></div>';
             
             toastContainer.appendChild(toast);
             

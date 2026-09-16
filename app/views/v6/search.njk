@@ -181,7 +181,7 @@
                   <td class="govuk-table__cell">{{ row.lastName }}</td>
                   <td class="govuk-table__cell">{{ row.dob }}</td>
                   <td class="govuk-table__cell">{{ row.submitted }}</td>
-                  <td class="govuk-table__cell">{{ row.firm | safe }}</td>
+                  <td class="govuk-table__cell">{{ row.firmName }}<br>{{ row.firmNumber }}</td>
                   <td class="govuk-table__cell"><strong class="govuk-tag govuk-tag--{{ row.outcomeClass }}">{{ row.outcome }}</strong></td>
                 </tr>
               {% endfor %}

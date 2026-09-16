@@ -158,11 +158,23 @@
         <strong>Date received:</strong> 19 May 2023
       </p>
 
+      {% if isAssociatedLinkedCase %}
+        <div class="govuk-inset-text govuk-!-margin-bottom-6">
+          This is an associated case linked to lead application
+          {% if linkedLeadReference %}
+            <a class="govuk-link" href="{{ applicationRoutePrefix }}/application/{{ linkedLeadReference }}">{{ linkedLeadReference }}</a>.
+          {% else %}
+            in this linked case group.
+          {% endif %}
+          Add this application to your list to assign it.
+        </div>
+      {% endif %}
+
       {% set hasDecision = application.decisionType or application.status === "Granted" or application.status === "Refused" %}
 
       {% if sessionData['decision-reference'] !== reference %}
         {% if isAssigned %}
-          <a href="/v6/reassign?reference={{ reference }}" class="govuk-button govuk-button--secondary govuk-!-margin-bottom-8" data-module="govuk-button" style="background-color: #00703c; color: white;">Reassign</a>
+          <a href="/v6/reassign?reference={{ reference }}&isPriorAuthority={{ application.isPriorAuthority and 'true' or 'false' }}" class="govuk-button govuk-button--secondary govuk-!-margin-bottom-8" data-module="govuk-button" style="background-color: #00703c; color: white;">Reassign</a>
         {% elif not hasDecision %}
           <form id="addToListForm" style="display: inline;">
             <input type="hidden" name="reference" value="{{ reference }}">
@@ -187,9 +199,23 @@
                   'X-Requested-With': 'XMLHttpRequest'
                 }
               })
-                .then(response => {
+                .then(response => response.json())
+                .then(data => {
                   // Show toast notification using GOV.UK toast component
                   const toastContainer = document.getElementById('toast-notification');
+                  const addedCount = data && Number.isFinite(Number(data.addedCount)) ? Number(data.addedCount) : 1;
+                  const linkedAddedCount = data && Number.isFinite(Number(data.linkedAddedCount)) ? Number(data.linkedAddedCount) : Math.max(0, addedCount - 1);
+                  const referenceHref = '/v6/application/' + reference + (isPriorAuthority === 'true' ? '?isPriorAuthority=true#prior-authority' : '');
+                  const referenceLink = '<a class="govuk-link" href="' + referenceHref + '">' + reference + '</a>';
+                  const linkedLabel = linkedAddedCount === 1 ? 'linked case' : 'linked cases';
+                  let toastMessage = linkedAddedCount > 0
+                    ? 'You assigned this application ' + referenceLink + ' and ' + linkedAddedCount + ' ' + linkedLabel + ' to your list'
+                    : 'You assigned this application ' + referenceLink + ' to your list';
+
+                  if (addedCount === 0) {
+                    toastMessage = referenceLink + ' is already in your list';
+                  }
+
                   toastContainer.innerHTML = '';
                   const toast = document.createElement('div');
                   toast.setAttribute('data-module', 'govuk-notification-banner');
@@ -197,14 +223,14 @@
                   toast.setAttribute('aria-labelledby', 'govuk-notification-banner-title');
                   toast.className = 'govuk-notification-banner govuk-notification-banner--success';
                   toast.style.cssText = 'margin-bottom: 20px;';
-                  toast.innerHTML = '<div class="govuk-notification-banner__header"><h2 id="govuk-notification-banner-title" class="govuk-notification-banner__title">Success</h2></div><div class="govuk-notification-banner__content"><p class="govuk-notification-banner__heading">You added this application to your list</p></div>';
+                  toast.innerHTML = '<div class="govuk-notification-banner__header"><h2 id="govuk-notification-banner-title" class="govuk-notification-banner__title">Success</h2></div><div class="govuk-notification-banner__content"><p class="govuk-notification-banner__heading">' + toastMessage + '</p></div>';
                   
                   toastContainer.appendChild(toast);
 
                   // Stay on this page and switch CTA to Reassign once added.
                   const form = document.getElementById('addToListForm');
                   if (form) {
-                    form.outerHTML = '<a href="/v6/reassign?reference=' + encodeURIComponent(reference) + '" class="govuk-button govuk-button--secondary govuk-!-margin-bottom-8" data-module="govuk-button" style="background-color: #00703c; color: white;">Reassign</a>';
+                    form.outerHTML = '<a href="/v6/reassign?reference=' + encodeURIComponent(reference) + '&isPriorAuthority=' + encodeURIComponent(isPriorAuthority) + '" class="govuk-button govuk-button--secondary govuk-!-margin-bottom-8" data-module="govuk-button" style="background-color: #00703c; color: white;">Reassign</a>';
                   }
                 })
               .catch(error => console.error('Error:', error));
@@ -403,7 +429,9 @@
         <div class="govuk-!-margin-bottom-6" style="border: 1px solid #b1b4b6;">
           <div style="background-color: #f3f2f1; padding: 15px; border-bottom: 1px solid #b1b4b6; display: flex; justify-content: space-between; align-items: center;">
             <h2 class="govuk-heading-s govuk-!-margin-bottom-0">Cases linked to this application</h2>
-            <a href="#" class="govuk-link govuk-heading-s govuk-!-margin-bottom-0">Manage cases</a>
+            {% if hasLinkedCases %}
+              <a href="/v6/manage-linked-cases/{{ reference }}" class="govuk-link govuk-heading-s govuk-!-margin-bottom-0">Manage cases</a>
+            {% endif %}
           </div>
           <div style="padding: 15px;">
             {% if hasLinkedCases %}
@@ -439,7 +467,7 @@
             <dl class="govuk-summary-list">
               <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">Substantive certificate</dt>
-                <dd class="govuk-summary-list__value">£25,000</dd>
+                <dd class="govuk-summary-list__value">{{ "£0" if isAssociatedLinkedCase else "£25,000" }}</dd>
               </div>
             </dl>
           </div>
