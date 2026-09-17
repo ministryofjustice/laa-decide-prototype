@@ -23,11 +23,12 @@ Manage linked cases
     .manage-linked-table td:nth-child(2) { white-space: nowrap; }
     .manage-linked-table th:nth-child(1), .manage-linked-table td:nth-child(1) { width: 15%; }
     .manage-linked-table th:nth-child(2), .manage-linked-table td:nth-child(2) { width: 14%; }
-    .manage-linked-table th:nth-child(3), .manage-linked-table td:nth-child(3) { width: 17%; }
-    .manage-linked-table th:nth-child(4), .manage-linked-table td:nth-child(4) { width: 15%; }
-    .manage-linked-table th:nth-child(5), .manage-linked-table td:nth-child(5) { width: 21%; }
-    .manage-linked-table th:nth-child(6), .manage-linked-table td:nth-child(6) { width: 18%; }
+    .manage-linked-table th:nth-child(3), .manage-linked-table td:nth-child(3) { width: 16%; }
+    .manage-linked-table th:nth-child(4), .manage-linked-table td:nth-child(4) { width: 14%; }
+    .manage-linked-table th:nth-child(5), .manage-linked-table td:nth-child(5) { width: 20%; }
+    .manage-linked-table th:nth-child(6), .manage-linked-table td:nth-child(6) { width: 21%; }
     .manage-linked-actions { white-space: nowrap; }
+    .manage-linked-actions .govuk-link + .govuk-link { margin-left: 12px; }
   </style>
 {% endblock %}
 
@@ -86,7 +87,7 @@ Manage linked cases
               <tbody class="govuk-table__body"><tr class="govuk-table__row">
                 <td class="govuk-table__cell"><a class="govuk-link" href="/v6/application/{{ leadApplication.ref }}">{{ leadApplication.ref }}</a></td>
                 <td class="govuk-table__cell">{{ leadApplication.submitted }}</td><td class="govuk-table__cell">{{ leadApplication.type }}</td><td class="govuk-table__cell">{{ leadApplication.delegatedFunctions }}</td><td class="govuk-table__cell"><strong>{{ leadApplication.matterType.title }}</strong><br>{{ leadApplication.matterType.subtext }}</td>
-                <td class="govuk-table__cell manage-linked-actions"><a class="govuk-link" href="/v6/change-linked-lead/{{ leadApplication.ref }}">Change lead</a> | <a class="govuk-link" href="/v6/unlink-linked-case/{{ leadApplication.ref }}">Unlink</a></td>
+                <td class="govuk-table__cell manage-linked-actions"><a class="govuk-link" href="/v6/change-linked-lead/{{ leadApplication.ref }}">Change lead</a><a class="govuk-link" href="/v6/unlink-linked-case/{{ leadApplication.ref }}">Unlink</a></td>
               </tr></tbody>
             </table>
           </div>
