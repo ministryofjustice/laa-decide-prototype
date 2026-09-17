@@ -1963,6 +1963,43 @@ router.get('/unlink-linked-case/:reference', function(req, res) {
     return;
   }
 
+  if (currentRow.role === 'Lead') {
+    res.redirect('/v6/change-linked-lead/' + encodeURIComponent(caseReference) + '?mode=unlink');
+    return;
+  }
+
+  res.redirect('/v6/confirm-unlink-case/' + encodeURIComponent(caseReference));
+});
+
+router.get('/confirm-unlink-case/:reference', function(req, res) {
+  const caseReference = req.params.reference;
+  const linkedCases = (req.session.data['linked-cases-by-reference-v6'] || {})[caseReference] || [];
+  const currentRow = linkedCases.find(row => row.reference === caseReference && row.role === 'Associated');
+  const application = findInitialApplication(req, caseReference);
+
+  if (!currentRow || !application) {
+    res.redirect('/v6/manage-linked-cases/' + encodeURIComponent(caseReference));
+    return;
+  }
+
+  res.render('v6/confirm-unlink-case.njk', {
+    pageTitle: 'Confirm unlink case',
+    application: application,
+    reference: caseReference
+  });
+});
+
+router.post('/confirm-unlink-case/:reference', function(req, res) {
+  const caseReference = req.params.reference;
+  const linkedCases = (req.session.data['linked-cases-by-reference-v6'] || {})[caseReference] || [];
+  const currentRow = linkedCases.find(row => row.reference === caseReference && row.role === 'Associated');
+  const leadCase = linkedCases.find(row => row.role === 'Lead');
+
+  if (!currentRow || !leadCase) {
+    res.redirect('/v6/application/' + encodeURIComponent(caseReference));
+    return;
+  }
+
   if (linkedCases.length === 2) {
     replaceLinkedGroup(req, linkedCases, []);
     req.session.data.toast = {
@@ -1971,11 +2008,6 @@ router.get('/unlink-linked-case/:reference', function(req, res) {
       detail: 'Both applications are now standalone and have been assigned their own cost limits.'
     };
     res.redirect('/v6/application/' + encodeURIComponent(caseReference));
-    return;
-  }
-
-  if (currentRow.role === 'Lead') {
-    res.redirect('/v6/change-linked-lead/' + encodeURIComponent(caseReference) + '?mode=unlink');
     return;
   }
 
