@@ -1751,6 +1751,12 @@ router.get('/select-lead-case', function(req, res) {
   const reference = req.query.reference;
   const linkedReference = req.query.linkedReference;
   const leadReference = req.query.leadReference || reference;
+  const existingGroup = (req.session.data['linked-cases-by-reference-v6'] || {})[reference] || [];
+  const groupReferences = [...new Set([
+    ...existingGroup.map(row => row.reference),
+    reference,
+    linkedReference
+  ].filter(Boolean))];
   const applications = [
     ...(req.session.data['open-applications'] || []),
     ...(req.session.data['open-applications-all'] || []),
@@ -1759,7 +1765,7 @@ router.get('/select-lead-case', function(req, res) {
   ];
   const uniqueApplications = [...new Map(
     applications
-      .filter(application => application && [reference, linkedReference].includes(application.ref))
+      .filter(application => application && groupReferences.includes(application.ref))
       .map(application => [applicationVariantKey(application), application])
   ).values()];
 
@@ -1776,6 +1782,12 @@ router.post('/select-lead-case', function(req, res) {
   const reference = req.body.reference;
   const linkedReference = req.body.linkedReference;
   const leadReference = req.body.leadReference;
+  const existingGroup = (req.session.data['linked-cases-by-reference-v6'] || {})[reference] || [];
+  const groupReferences = [...new Set([
+    ...existingGroup.map(row => row.reference),
+    reference,
+    linkedReference
+  ].filter(Boolean))];
   const applications = [
     ...(req.session.data['open-applications'] || []),
     ...(req.session.data['open-applications-all'] || []),
@@ -1784,13 +1796,12 @@ router.post('/select-lead-case', function(req, res) {
   ];
   const groupApplications = [...new Map(
     applications
-      .filter(application => application && [reference, linkedReference].includes(application.ref))
+      .filter(application => application && groupReferences.includes(application.ref))
       .map(application => [applicationVariantKey(application), application])
   ).values()];
   const leadApplication = groupApplications.find(application => application.ref === leadReference);
-  const associatedApplication = groupApplications.find(application => application.ref !== leadReference);
 
-  if (!leadApplication || !associatedApplication) {
+  if (!leadApplication || groupApplications.length < 2) {
     res.redirect('/v6/select-lead-case?reference=' + encodeURIComponent(reference) + '&linkedReference=' + encodeURIComponent(linkedReference));
     return;
   }
@@ -1802,16 +1813,27 @@ router.get('/confirm-link-cases', function(req, res) {
   const reference = req.query.reference;
   const linkedReference = req.query.linkedReference;
   const leadReference = req.query.leadReference;
+  const existingGroup = (req.session.data['linked-cases-by-reference-v6'] || {})[reference] || [];
+  const groupReferences = [...new Set([
+    ...existingGroup.map(row => row.reference),
+    reference,
+    linkedReference
+  ].filter(Boolean))];
   const applications = [
     ...(req.session.data['open-applications'] || []),
     ...(req.session.data['open-applications-all'] || []),
     ...(req.session.data['assigned-applications'] || []),
     ...(req.session.data['completed-applications'] || [])
   ];
-  const leadApplication = applications.find(application => application.ref === leadReference);
-  const associatedApplication = applications.find(application => application.ref === (leadReference === reference ? linkedReference : reference));
+  const groupApplications = [...new Map(
+    applications
+      .filter(application => application && groupReferences.includes(application.ref))
+      .map(application => [applicationVariantKey(application), application])
+  ).values()];
+  const leadApplication = groupApplications.find(application => application.ref === leadReference);
+  const associatedApplications = groupApplications.filter(application => application.ref !== leadReference);
 
-  if (!leadApplication || !associatedApplication) {
+  if (!leadApplication || !associatedApplications.length) {
     res.redirect('/v6/select-lead-case?reference=' + encodeURIComponent(reference) + '&linkedReference=' + encodeURIComponent(linkedReference));
     return;
   }
@@ -1822,7 +1844,7 @@ router.get('/confirm-link-cases', function(req, res) {
     linkedReference: linkedReference,
     leadReference: leadReference,
     leadApplication: leadApplication,
-    associatedApplication: associatedApplication
+    associatedApplications: associatedApplications
   });
 });
 
@@ -1830,21 +1852,32 @@ router.post('/confirm-link-cases', function(req, res) {
   const reference = req.body.reference;
   const linkedReference = req.body.linkedReference;
   const leadReference = req.body.leadReference;
+  const existingGroup = (req.session.data['linked-cases-by-reference-v6'] || {})[reference] || [];
+  const groupReferences = [...new Set([
+    ...existingGroup.map(row => row.reference),
+    reference,
+    linkedReference
+  ].filter(Boolean))];
   const applications = [
     ...(req.session.data['open-applications'] || []),
     ...(req.session.data['open-applications-all'] || []),
     ...(req.session.data['assigned-applications'] || []),
     ...(req.session.data['completed-applications'] || [])
   ];
-  const leadApplication = applications.find(application => application.ref === leadReference);
-  const associatedApplication = applications.find(application => application.ref === (leadReference === reference ? linkedReference : reference));
+  const groupApplications = [...new Map(
+    applications
+      .filter(application => application && groupReferences.includes(application.ref))
+      .map(application => [applicationVariantKey(application), application])
+  ).values()];
+  const leadApplication = groupApplications.find(application => application.ref === leadReference);
+  const associatedApplications = groupApplications.filter(application => application.ref !== leadReference);
 
-  if (!leadApplication || !associatedApplication) {
+  if (!leadApplication || !associatedApplications.length) {
     res.redirect('/v6/select-lead-case?reference=' + encodeURIComponent(reference) + '&linkedReference=' + encodeURIComponent(linkedReference));
     return;
   }
 
-  const linkedCases = [leadApplication, associatedApplication].map((application, index) => ({
+  const linkedCases = [leadApplication, ...associatedApplications].map((application, index) => ({
     role: index === 0 ? 'Lead' : 'Associated',
     firstName: application.firstName || 'Unknown',
     middleName: '',
@@ -1861,7 +1894,7 @@ router.post('/confirm-link-cases', function(req, res) {
 
   req.session.data.toast = {
     show: true,
-    message: `You have linked this application ${associatedApplication.ref} to ${leadReference}`,
+    message: `You have linked this application ${linkedReference} to ${leadReference}`,
     detail: 'Cost limits have been updated.'
   };
 
@@ -2315,6 +2348,9 @@ router.get('/search', function(req, res) {
       if (req.query.linkToReference) {
         const storedStatus = req.session.data['decision-store'] && req.session.data['decision-store'][app.ref] && req.session.data['decision-store'][app.ref].status;
         if (app.isPriorAuthority || app.status === 'Granted' || storedStatus === 'Granted') match = false;
+        const linkedGroup = req.session.data['linked-cases-by-reference-v6'] && req.session.data['linked-cases-by-reference-v6'][app.ref];
+        const currentGroup = req.session.data['linked-cases-by-reference-v6'] && req.session.data['linked-cases-by-reference-v6'][req.query.linkToReference];
+        if (linkedGroup && linkedGroup !== currentGroup) match = false;
       }
       if (req.query.reference && !app.ref.toLowerCase().includes(req.query.reference.toLowerCase())) match = false;
       if (req.query.firstName && !app.firstName.toLowerCase().includes(req.query.firstName.toLowerCase())) match = false;

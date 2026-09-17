@@ -120,6 +120,41 @@
   </div>
 {% endmacro %}
 
+{% macro associatedTable(applications) %}
+  <div class="confirm-link-section">
+    <div class="confirm-link-section__header">
+      <h2 class="govuk-heading-s">Associated</h2>
+      <a class="govuk-link" href="/v6/select-lead-case?reference={{ reference }}&linkedReference={{ linkedReference }}&leadReference={{ leadReference }}">Change<span class="govuk-visually-hidden"> associated cases</span></a>
+    </div>
+    <div class="confirm-link-section__content">
+      <table class="govuk-table confirm-link-table">
+        <thead class="govuk-table__head">
+          <tr class="govuk-table__row">
+            <th scope="col" class="govuk-table__header">Reference</th>
+            <th scope="col" class="govuk-table__header">Submitted</th>
+            <th scope="col" class="govuk-table__header">Type</th>
+            <th scope="col" class="govuk-table__header">Delegated Functions</th>
+            <th scope="col" class="govuk-table__header">Matter type</th>
+            <th scope="col" class="govuk-table__header">Status</th>
+          </tr>
+        </thead>
+        <tbody class="govuk-table__body">
+          {% for application in applications %}
+            <tr class="govuk-table__row">
+              <td class="govuk-table__cell"><a href="/v6/application/{{ application.ref }}" class="govuk-link">{{ application.ref }}</a></td>
+              <td class="govuk-table__cell">{{ application.submitted or 'Not available' }}</td>
+              <td class="govuk-table__cell">{{ application.type or 'Initial application' }}</td>
+              <td class="govuk-table__cell">{{ application.delegatedFunctions or 'Used' }}</td>
+              <td class="govuk-table__cell"><strong>{{ application.matterType.title if application.matterType else 'Family' }}</strong><br>{{ application.matterType.subtext if application.matterType else "Special Children's Act" }}</td>
+              <td class="govuk-table__cell"><span class="govuk-tag govuk-tag--light-blue">In progress</span></td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+{% endmacro %}
+
 {% block content %}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
@@ -128,7 +163,7 @@
 
       <div class="confirm-link-panel">
         {{ caseTable('Lead', leadApplication) }}
-        {{ caseTable('Associated', associatedApplication) }}
+        {{ associatedTable(associatedApplications) }}
       </div>
 
       <h2 class="govuk-heading-s govuk-!-margin-top-6">Explain your decision</h2>
