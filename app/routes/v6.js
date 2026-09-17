@@ -1093,6 +1093,46 @@ function assignLinkedCaseMetadata(openApplications, existingLinkedCases = {}) {
   return linkedCasesByReference;
 }
 
+function assignRealLinkedCaseGroups(applications, decisionStore = {}) {
+  const uniqueInitialApplications = [...new Map(
+    applications
+      .filter(application => {
+        if (!application || application.isPriorAuthority || application.isRedetermination) return false;
+        const storedStatus = decisionStore[application.ref] && decisionStore[application.ref].status;
+        return application.status !== 'Granted' && storedStatus !== 'Granted';
+      })
+      .map(application => [application.ref, application])
+  ).values()];
+
+  const shuffled = [...uniqueInitialApplications].sort(() => Math.random() - 0.5);
+  const standaloneCount = Math.min(Math.max(2, Math.floor(shuffled.length / 4)), shuffled.length);
+  const groupedApplications = shuffled.slice(standaloneCount);
+  const linkedCasesByReference = {};
+
+  while (groupedApplications.length >= 2) {
+    let groupSize = Math.min(2 + Math.floor(Math.random() * 4), groupedApplications.length);
+    if (groupedApplications.length - groupSize === 1) groupSize -= 1;
+    if (groupSize < 2) break;
+
+    const group = groupedApplications.splice(0, groupSize);
+    const rows = group.map((application, index) => ({
+      role: index === 0 ? 'Lead' : 'Associated',
+      firstName: application.firstName || 'Unknown',
+      middleName: '',
+      lastName: application.lastName || 'Unknown',
+      reference: application.ref,
+      status: application.status || 'Submitted',
+      statusClass: application.status === 'Refused' ? 'govuk-tag--red' : 'govuk-tag--pink'
+    }));
+
+    rows.forEach(row => {
+      linkedCasesByReference[row.reference] = rows;
+    });
+  }
+
+  return linkedCasesByReference;
+}
+
 function applicationVariantKey(app) {
   return `${app.ref}|${Boolean(app.isPriorAuthority)}`;
 }
@@ -1153,11 +1193,12 @@ router.get('/open-applications', function(req, res) {
   if (!req.session.data['open-applications-all']) {
     const mockData = generateMockApplications(8);
     req.session.data['open-applications-all'] = mockData.open;
-    const generatedLinkedCases = assignLinkedCaseMetadata(
-      req.session.data['open-applications-all'],
-      req.session.data['linked-cases-by-reference-v6'] || {}
-    );
-    req.session.data['linked-cases-by-reference-v6'] = generatedLinkedCases;
+    if (!consolidated) {
+      req.session.data['linked-cases-by-reference-v6'] = assignLinkedCaseMetadata(
+        req.session.data['open-applications-all'],
+        req.session.data['linked-cases-by-reference-v6'] || {}
+      );
+    }
     req.session.data['open-applications'] = null; // reset derived copy
     // Seed completed-applications with the granted initial apps linked to PA requests
     if (!req.session.data['completed-applications']) {
@@ -1196,11 +1237,23 @@ router.get('/open-applications', function(req, res) {
     });
   }
 
-  const generatedLinkedCases = assignLinkedCaseMetadata(
-    applications,
-    req.session.data['linked-cases-by-reference-v6'] || {}
-  );
-  req.session.data['linked-cases-by-reference-v6'] = generatedLinkedCases;
+  if (consolidated && !req.session.data['real-linked-cases-v6-initialized']) {
+    const realApplications = [
+      ...req.session.data['open-applications-all'],
+      ...(req.session.data['consolidated-extra-initial-applications-v6'] || []),
+      ...(req.session.data['assigned-applications'] || [])
+    ];
+    req.session.data['linked-cases-by-reference-v6'] = assignRealLinkedCaseGroups(
+      realApplications,
+      req.session.data['decision-store'] || {}
+    );
+    req.session.data['real-linked-cases-v6-initialized'] = true;
+  } else if (!consolidated) {
+    req.session.data['linked-cases-by-reference-v6'] = assignLinkedCaseMetadata(
+      applications,
+      req.session.data['linked-cases-by-reference-v6'] || {}
+    );
+  }
   
   // Apply filters based on query parameters
   const { applicationType, matterType, categories } = req.query;
@@ -1613,11 +1666,12 @@ router.get('/add-application/:reference', function(req, res) {
   req.session.data['demo-replacement-scenario-index-v6'] = replacementScenarioIndex + 1;
   const refillData = generateReplacementOpenApplication(preferredReplacementType, existingVariantKeys, replacementScenario);
   req.session.data['open-applications-all'].push(refillData.replacement);
-  const refreshedLinkedCases = assignLinkedCaseMetadata(
-    req.session.data['open-applications-all'],
-    req.session.data['linked-cases-by-reference-v6'] || {}
-  );
-  req.session.data['linked-cases-by-reference-v6'] = refreshedLinkedCases;
+  if (req.session.data['consolidated-v6'] !== true) {
+    req.session.data['linked-cases-by-reference-v6'] = assignLinkedCaseMetadata(
+      req.session.data['open-applications-all'],
+      req.session.data['linked-cases-by-reference-v6'] || {}
+    );
+  }
 
   if (!req.session.data['completed-applications']) {
     req.session.data['completed-applications'] = [];
@@ -1693,24 +1747,305 @@ router.get('/remove-application/:reference', function(req, res) {
   res.redirect('/v6/yourlist');
 });
 
+router.get('/select-lead-case', function(req, res) {
+  const reference = req.query.reference;
+  const linkedReference = req.query.linkedReference;
+  const leadReference = req.query.leadReference || reference;
+  const applications = [
+    ...(req.session.data['open-applications'] || []),
+    ...(req.session.data['open-applications-all'] || []),
+    ...(req.session.data['assigned-applications'] || []),
+    ...(req.session.data['completed-applications'] || [])
+  ];
+  const uniqueApplications = [...new Map(
+    applications
+      .filter(application => application && [reference, linkedReference].includes(application.ref))
+      .map(application => [applicationVariantKey(application), application])
+  ).values()];
+
+  res.render('v6/select-lead-case.njk', {
+    pageTitle: 'Select the lead case',
+    reference: reference,
+    linkedReference: linkedReference,
+    leadReference: leadReference,
+    applications: uniqueApplications
+  });
+});
+
+router.post('/select-lead-case', function(req, res) {
+  const reference = req.body.reference;
+  const linkedReference = req.body.linkedReference;
+  const leadReference = req.body.leadReference;
+  const applications = [
+    ...(req.session.data['open-applications'] || []),
+    ...(req.session.data['open-applications-all'] || []),
+    ...(req.session.data['assigned-applications'] || []),
+    ...(req.session.data['completed-applications'] || [])
+  ];
+  const groupApplications = [...new Map(
+    applications
+      .filter(application => application && [reference, linkedReference].includes(application.ref))
+      .map(application => [applicationVariantKey(application), application])
+  ).values()];
+  const leadApplication = groupApplications.find(application => application.ref === leadReference);
+  const associatedApplication = groupApplications.find(application => application.ref !== leadReference);
+
+  if (!leadApplication || !associatedApplication) {
+    res.redirect('/v6/select-lead-case?reference=' + encodeURIComponent(reference) + '&linkedReference=' + encodeURIComponent(linkedReference));
+    return;
+  }
+
+  res.redirect('/v6/confirm-link-cases?reference=' + encodeURIComponent(reference) + '&linkedReference=' + encodeURIComponent(linkedReference) + '&leadReference=' + encodeURIComponent(leadReference));
+});
+
+router.get('/confirm-link-cases', function(req, res) {
+  const reference = req.query.reference;
+  const linkedReference = req.query.linkedReference;
+  const leadReference = req.query.leadReference;
+  const applications = [
+    ...(req.session.data['open-applications'] || []),
+    ...(req.session.data['open-applications-all'] || []),
+    ...(req.session.data['assigned-applications'] || []),
+    ...(req.session.data['completed-applications'] || [])
+  ];
+  const leadApplication = applications.find(application => application.ref === leadReference);
+  const associatedApplication = applications.find(application => application.ref === (leadReference === reference ? linkedReference : reference));
+
+  if (!leadApplication || !associatedApplication) {
+    res.redirect('/v6/select-lead-case?reference=' + encodeURIComponent(reference) + '&linkedReference=' + encodeURIComponent(linkedReference));
+    return;
+  }
+
+  res.render('v6/confirm-link-cases.njk', {
+    pageTitle: 'Confirm linked cases',
+    reference: reference,
+    linkedReference: linkedReference,
+    leadReference: leadReference,
+    leadApplication: leadApplication,
+    associatedApplication: associatedApplication
+  });
+});
+
+router.post('/confirm-link-cases', function(req, res) {
+  const reference = req.body.reference;
+  const linkedReference = req.body.linkedReference;
+  const leadReference = req.body.leadReference;
+  const applications = [
+    ...(req.session.data['open-applications'] || []),
+    ...(req.session.data['open-applications-all'] || []),
+    ...(req.session.data['assigned-applications'] || []),
+    ...(req.session.data['completed-applications'] || [])
+  ];
+  const leadApplication = applications.find(application => application.ref === leadReference);
+  const associatedApplication = applications.find(application => application.ref === (leadReference === reference ? linkedReference : reference));
+
+  if (!leadApplication || !associatedApplication) {
+    res.redirect('/v6/select-lead-case?reference=' + encodeURIComponent(reference) + '&linkedReference=' + encodeURIComponent(linkedReference));
+    return;
+  }
+
+  const linkedCases = [leadApplication, associatedApplication].map((application, index) => ({
+    role: index === 0 ? 'Lead' : 'Associated',
+    firstName: application.firstName || 'Unknown',
+    middleName: '',
+    lastName: application.lastName || 'Unknown',
+    reference: application.ref,
+    status: 'Submitted',
+    statusClass: 'govuk-tag--pink'
+  }));
+  const linkedCasesByReference = req.session.data['linked-cases-by-reference-v6'] || {};
+  linkedCases.forEach(linkedCase => {
+    linkedCasesByReference[linkedCase.reference] = linkedCases;
+  });
+  req.session.data['linked-cases-by-reference-v6'] = linkedCasesByReference;
+
+  req.session.data.toast = {
+    show: true,
+    message: `You have linked this application ${associatedApplication.ref} to ${leadReference}`,
+    detail: 'Cost limits have been updated.'
+  };
+
+  res.redirect('/v6/application/' + encodeURIComponent(leadReference));
+});
+
+function findInitialApplication(req, reference) {
+  const applications = [
+    ...(req.session.data['assigned-applications'] || []),
+    ...(req.session.data['open-applications'] || []),
+    ...(req.session.data['open-applications-all'] || []),
+    ...(req.session.data['consolidated-extra-initial-applications-v6'] || []),
+    ...(req.session.data['completed-applications'] || [])
+  ];
+  return applications.find(application => application.ref === reference && !application.isPriorAuthority) || null;
+}
+
+function replaceLinkedGroup(req, previousRows, nextRows) {
+  const linkedCasesByReference = req.session.data['linked-cases-by-reference-v6'] || {};
+  previousRows.forEach(row => delete linkedCasesByReference[row.reference]);
+  if (nextRows.length >= 2) {
+    nextRows.forEach(row => {
+      linkedCasesByReference[row.reference] = nextRows;
+    });
+  }
+  req.session.data['linked-cases-by-reference-v6'] = linkedCasesByReference;
+}
+
+function reorderLinkedGroup(rows, leadReference) {
+  const selectedLead = rows.find(row => row.reference === leadReference);
+  if (!selectedLead) return null;
+  return [selectedLead, ...rows.filter(row => row.reference !== leadReference)].map((row, index) => ({
+    ...row,
+    role: index === 0 ? 'Lead' : 'Associated'
+  }));
+}
+
+router.get('/change-linked-lead/:reference', function(req, res) {
+  const reference = req.params.reference;
+  const mode = req.query.mode === 'unlink' ? 'unlink' : 'change';
+  const linkedCases = (req.session.data['linked-cases-by-reference-v6'] || {})[reference] || [];
+  const leadCase = linkedCases.find(row => row.role === 'Lead');
+  const associatedCases = linkedCases
+    .filter(row => row.role === 'Associated')
+    .map(row => findInitialApplication(req, row.reference))
+    .filter(Boolean);
+
+  if (!leadCase || !associatedCases.length) {
+    res.redirect('/v6/manage-linked-cases/' + encodeURIComponent(reference));
+    return;
+  }
+
+  res.render('v6/select-new-lead.njk', {
+    pageTitle: 'Select a new lead case',
+    reference: reference,
+    currentLeadReference: leadCase.reference,
+    applications: associatedCases,
+    mode: mode
+  });
+});
+
+router.post('/change-linked-lead/:reference', function(req, res) {
+  const reference = req.params.reference;
+  const mode = req.body.mode === 'unlink' ? 'unlink' : 'change';
+  const selectedLeadReference = req.body.leadReference;
+  const linkedCases = (req.session.data['linked-cases-by-reference-v6'] || {})[reference] || [];
+  const currentLead = linkedCases.find(row => row.role === 'Lead');
+  let nextRows = linkedCases;
+
+  if (mode === 'unlink' && currentLead) {
+    nextRows = linkedCases.filter(row => row.reference !== currentLead.reference);
+  }
+  nextRows = reorderLinkedGroup(nextRows, selectedLeadReference);
+
+  if (!nextRows) {
+    res.redirect('/v6/change-linked-lead/' + encodeURIComponent(reference) + '?mode=' + mode);
+    return;
+  }
+
+  replaceLinkedGroup(req, linkedCases, nextRows);
+  req.session.data.toast = {
+    show: true,
+    message: mode === 'unlink'
+      ? `You have unlinked ${currentLead.reference} and selected ${selectedLeadReference} as the new lead case`
+      : `You have selected a new lead case ${selectedLeadReference}`,
+    detail: 'Cost limits have been updated.'
+  };
+  res.redirect('/v6/application/' + encodeURIComponent(selectedLeadReference));
+});
+
+router.get('/unlink-linked-case/:reference', function(req, res) {
+  const caseReference = req.params.reference;
+  const linkedCases = (req.session.data['linked-cases-by-reference-v6'] || {})[caseReference] || [];
+  const currentRow = linkedCases.find(row => row.reference === caseReference);
+  const leadCase = linkedCases.find(row => row.role === 'Lead');
+
+  if (!currentRow || !leadCase) {
+    res.redirect('/v6/application/' + encodeURIComponent(caseReference));
+    return;
+  }
+
+  if (linkedCases.length === 2) {
+    replaceLinkedGroup(req, linkedCases, []);
+    req.session.data.toast = {
+      show: true,
+      message: `You have unlinked ${caseReference}`,
+      detail: 'Both applications are now standalone and have been assigned their own cost limits.'
+    };
+    res.redirect('/v6/application/' + encodeURIComponent(caseReference));
+    return;
+  }
+
+  if (currentRow.role === 'Lead') {
+    res.redirect('/v6/change-linked-lead/' + encodeURIComponent(caseReference) + '?mode=unlink');
+    return;
+  }
+
+  const nextRows = linkedCases.filter(row => row.reference !== caseReference);
+  replaceLinkedGroup(req, linkedCases, nextRows);
+  req.session.data.toast = {
+    show: true,
+    message: `You have unlinked ${caseReference}`,
+    detail: 'The application is now standalone and has been assigned its own cost limit.'
+  };
+  res.redirect('/v6/application/' + encodeURIComponent(leadCase.reference));
+});
+
 router.get('/manage-linked-cases/:reference', function(req, res) {
   const reference = req.params.reference;
   const linkedCasesByReference = req.session.data['linked-cases-by-reference-v6'] || {};
-  const linkedCases = linkedCasesByReference[reference] || [];
-  const candidates = (req.session.data['open-applications-all'] || [])
-    .filter(application => application.isStandaloneLinkedCase && !application.isPriorAuthority)
-    .map(application => ({
-      reference: application.ref,
-      firstName: application.firstName,
-      lastName: application.lastName,
-      submitted: application.submitted
-    }));
+  let linkedCases = linkedCasesByReference[reference] || [];
+
+  const linkReference = req.query.linkReference;
+  if (!linkedCases.length && linkReference && linkReference !== reference) {
+    const applications = [
+      ...(req.session.data['open-applications'] || []),
+      ...(req.session.data['open-applications-all'] || []),
+      ...(req.session.data['assigned-applications'] || []),
+      ...(req.session.data['completed-applications'] || [])
+    ];
+    const currentApplication = applications.find(application => application.ref === reference);
+    const linkedApplication = applications.find(application => application.ref === linkReference);
+
+    if (currentApplication && linkedApplication) {
+      linkedCases = [
+        {
+          role: 'Lead',
+          firstName: currentApplication.firstName || 'Unknown',
+          middleName: '',
+          lastName: currentApplication.lastName || 'Unknown',
+          reference: reference,
+          status: 'Submitted',
+          statusClass: 'govuk-tag--pink'
+        },
+        {
+          role: 'Associated',
+          firstName: linkedApplication.firstName || 'Unknown',
+          middleName: '',
+          lastName: linkedApplication.lastName || 'Unknown',
+          reference: linkReference,
+          status: 'Submitted',
+          statusClass: 'govuk-tag--pink'
+        }
+      ];
+      linkedCases.forEach(linkedCase => {
+        linkedCasesByReference[linkedCase.reference] = linkedCases;
+      });
+      req.session.data['linked-cases-by-reference-v6'] = linkedCasesByReference;
+    }
+  }
+
+  const leadCase = linkedCases.find(row => row.role === 'Lead') || null;
+  const leadApplication = leadCase && findInitialApplication(req, leadCase.reference);
+  const associatedApplications = linkedCases
+    .filter(row => row.role === 'Associated')
+    .map(row => findInitialApplication(req, row.reference))
+    .filter(Boolean);
 
   res.render('v6/manage-linked-cases.njk', {
     pageTitle: 'Manage linked cases',
     reference: reference,
     hasLinkedCases: linkedCases.length > 0,
-    candidates: candidates
+    leadApplication: leadApplication,
+    associatedApplications: associatedApplications
   });
 });
 
@@ -1886,7 +2221,8 @@ router.post('/application/:reference/add-note', function(req, res) {
 });
 
 router.get('/search', function(req, res) {
-  const showResults = Object.keys(req.query).length > 0;
+  const searchFields = ['reference', 'firstName', 'lastName', 'dob-day', 'dob-month', 'dob-year'];
+  const showResults = searchFields.some(field => req.query[field]);
   let results = [];
 
   // Always ensure seeded applications are in completed-applications
@@ -1944,6 +2280,10 @@ router.get('/search', function(req, res) {
     // Filter applications based on search criteria
     results = Object.values(uniqueApps).filter(app => {
       let match = true;
+      if (req.query.linkToReference) {
+        const storedStatus = req.session.data['decision-store'] && req.session.data['decision-store'][app.ref] && req.session.data['decision-store'][app.ref].status;
+        if (app.isPriorAuthority || app.status === 'Granted' || storedStatus === 'Granted') match = false;
+      }
       if (req.query.reference && !app.ref.toLowerCase().includes(req.query.reference.toLowerCase())) match = false;
       if (req.query.firstName && !app.firstName.toLowerCase().includes(req.query.firstName.toLowerCase())) match = false;
       if (req.query.lastName && !app.lastName.toLowerCase().includes(req.query.lastName.toLowerCase())) match = false;
@@ -1972,6 +2312,10 @@ router.get('/search', function(req, res) {
         lastName: app.lastName,
         dob: app.dob,
         submitted: app.submitted,
+        type: app.type || (app.isPriorAuthority ? 'Prior authority' : 'Initial application'),
+        delegatedFunctions: app.delegatedFunctions || (app.isPriorAuthority ? 'N/A' : 'Used'),
+        matterTypeTitle: app.matterType && app.matterType.title,
+        matterTypeSubtext: app.matterType && app.matterType.subtext,
         firmName: firmName,
         firmNumber: firmNumber || 'OK514R',
         outcome: outcome,

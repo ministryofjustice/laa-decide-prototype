@@ -1,0 +1,103 @@
+{% extends "govuk/template.njk" %}
+
+{% from "govuk/components/header/macro.njk" import govukHeader %}
+{% from "govuk/components/phase-banner/macro.njk" import govukPhaseBanner %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+{% from "moj/components/primary-navigation/macro.njk" import mojPrimaryNavigation %}
+
+{% block pageTitle %}Select a new lead case{% endblock %}
+
+{% block head %}
+  <link href="/public/stylesheets/application.css" rel="stylesheet">
+  <style>
+    .new-lead-table { width: 100%; table-layout: fixed; }
+    .new-lead-table th, .new-lead-table td { padding-left: 10px; padding-right: 10px; }
+    .new-lead-table td:nth-child(2), .new-lead-table td:last-child { white-space: nowrap; }
+    .new-lead-table .govuk-radios { margin: 0; }
+    .new-lead-justification { width: 100%; max-width: 610px; }
+  </style>
+{% endblock %}
+
+{% block header %}
+  {{ govukHeader({
+    homepageUrl: "#",
+    productName: "Legal Aid Agency",
+    navigationClasses: "govuk-header__navigation--end",
+    navigation: [
+      { href: '#', text: "jonaan.barton@law.com" },
+      { href: '/v6/sign-out', text: "Sign out" }
+    ]
+  }) }}
+  {{ mojPrimaryNavigation({
+    label: 'Primary navigation',
+    items: [
+      { text: 'Decide if an applicant can get legal aid', href: '#' },
+      { text: 'Open applications', href: '/v6/open-applications' },
+      { text: 'Your list', href: '/v6/yourlist' },
+      { text: 'Search', href: '/v6/search' }
+    ]
+  }) }}
+{% endblock %}
+
+{% block beforeContent %}
+  {{ govukPhaseBanner({ tag: { text: "Beta" }, html: 'This is a new service - your <a class="govuk-link" href="#">feedback</a> will help us to improve it.' }) }}
+  {{ govukBackLink({ text: "Back", href: "/v6/manage-linked-cases/" ~ reference }) }}
+{% endblock %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+      <h1 class="govuk-heading-xl">Select a new lead case</h1>
+      <p class="govuk-body">We will assign the full cost limit to the new lead case. All other associated cases will be assigned a £0.00 cost limit.</p>
+
+      <form action="/v6/change-linked-lead/{{ reference }}" method="post">
+        <input type="hidden" name="mode" value="{{ mode }}">
+        <table class="govuk-table new-lead-table">
+          <thead class="govuk-table__head">
+            <tr class="govuk-table__row">
+              <th scope="col" class="govuk-table__header">Reference</th>
+              <th scope="col" class="govuk-table__header">Submitted</th>
+              <th scope="col" class="govuk-table__header">Type</th>
+              <th scope="col" class="govuk-table__header">Delegated Functions</th>
+              <th scope="col" class="govuk-table__header">Matter type</th>
+              <th scope="col" class="govuk-table__header">Status</th>
+            </tr>
+          </thead>
+          <tbody class="govuk-table__body">
+            {% for application in applications %}
+              <tr class="govuk-table__row">
+                <td class="govuk-table__cell">
+                  {{ govukRadios({
+                    idPrefix: "new-lead-" ~ loop.index,
+                    name: "leadReference",
+                    classes: "govuk-radios--small",
+                    items: [{
+                      value: application.ref,
+                      html: '<a href="/v6/application/' ~ application.ref ~ '" class="govuk-link">' ~ application.ref ~ '</a>'
+                    }]
+                  }) }}
+                </td>
+                <td class="govuk-table__cell">{{ application.submitted or 'Not available' }}</td>
+                <td class="govuk-table__cell">{{ application.type or 'Initial application' }}</td>
+                <td class="govuk-table__cell">{{ application.delegatedFunctions or 'Used' }}</td>
+                <td class="govuk-table__cell"><strong>{{ application.matterType.title if application.matterType else 'Family' }}</strong><br>{{ application.matterType.subtext if application.matterType else "Special Children's Act" }}</td>
+                <td class="govuk-table__cell"><span class="govuk-tag govuk-tag--light-blue">In progress</span></td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+
+        <h2 class="govuk-heading-s govuk-!-margin-top-6">Explain your decision</h2>
+        <p class="govuk-body">This information is for internal use only and will not be shared with the provider.</p>
+        <textarea class="govuk-textarea new-lead-justification" name="lead-change-justification" rows="5"></textarea>
+
+        <div class="govuk-button-group govuk-!-margin-top-4">
+          {{ govukButton({ text: "Unlink case" if mode == 'unlink' else "Continue" }) }}
+          <a href="/v6/manage-linked-cases/{{ reference }}" class="govuk-link">Cancel</a>
+        </div>
+      </form>
+    </div>
+  </div>
+{% endblock %}

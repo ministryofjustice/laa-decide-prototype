@@ -88,6 +88,9 @@
           </div>
           <div class="govuk-notification-banner__content">
             <p class="govuk-body">{{ sessionData.toast.message }}</p>
+            {% if sessionData.toast.detail %}
+              <p class="govuk-body govuk-!-margin-bottom-0">{{ sessionData.toast.detail }}</p>
+            {% endif %}
           </div>
         </div>
         <script>
@@ -169,7 +172,6 @@
           {% else %}
             in this linked case group.
           {% endif %}
-          Add this application to your list to assign it.
         </div>
       {% endif %}
 
@@ -432,9 +434,7 @@
         <div class="govuk-!-margin-bottom-6" style="border: 1px solid #b1b4b6;">
           <div style="background-color: #f3f2f1; padding: 15px; border-bottom: 1px solid #b1b4b6; display: flex; justify-content: space-between; align-items: center;">
             <h2 class="govuk-heading-s govuk-!-margin-bottom-0">Cases linked to this application</h2>
-            {% if hasLinkedCases %}
-              <a href="/v6/manage-linked-cases/{{ reference }}" class="govuk-link govuk-heading-s govuk-!-margin-bottom-0">Manage cases</a>
-            {% endif %}
+            <a href="/v6/manage-linked-cases/{{ reference }}" class="govuk-link govuk-heading-s govuk-!-margin-bottom-0">Manage cases</a>
           </div>
           <div style="padding: 15px;">
             {% if hasLinkedCases %}

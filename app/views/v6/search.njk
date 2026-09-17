@@ -79,6 +79,9 @@
 
       <form action="/v6/search" method="GET">
         <div class="govuk-!-padding-6" style="background-color: #f3f2f1;">
+          {% if query.linkToReference %}
+            <input type="hidden" name="linkToReference" value="{{ query.linkToReference }}">
+          {% endif %}
           
           {{ govukInput({
             label: {
@@ -163,27 +166,55 @@
         {% if resultCount > 0 %}
           <table class="govuk-table govuk-!-font-size-16">
             <thead class="govuk-table__head">
-              <tr class="govuk-table__row">
-                <th scope="col" class="govuk-table__header">Reference</th>
-                <th scope="col" class="govuk-table__header">First name's</th>
-                <th scope="col" class="govuk-table__header">Last name</th>
-                <th scope="col" class="govuk-table__header">Date of birth</th>
-                <th scope="col" class="govuk-table__header">Submitted</th>
-                <th scope="col" class="govuk-table__header">Firm name & number</th>
-                <th scope="col" class="govuk-table__header">Outcome</th>
-              </tr>
+              {% if query.linkToReference %}
+                <tr class="govuk-table__row">
+                  <th scope="col" class="govuk-table__header">Reference</th>
+                  <th scope="col" class="govuk-table__header" aria-sort="none">Submitted</th>
+                  <th scope="col" class="govuk-table__header" aria-sort="none">Type</th>
+                  <th scope="col" class="govuk-table__header" aria-sort="none">Delegated Functions</th>
+                  <th scope="col" class="govuk-table__header" aria-sort="none">Matter type</th>
+                  <th scope="col" class="govuk-table__header">Actions</th>
+                </tr>
+              {% else %}
+                <tr class="govuk-table__row">
+                  <th scope="col" class="govuk-table__header">Reference</th>
+                  <th scope="col" class="govuk-table__header">First name's</th>
+                  <th scope="col" class="govuk-table__header">Last name</th>
+                  <th scope="col" class="govuk-table__header">Date of birth</th>
+                  <th scope="col" class="govuk-table__header">Submitted</th>
+                  <th scope="col" class="govuk-table__header">Firm name & number</th>
+                  <th scope="col" class="govuk-table__header">Outcome</th>
+                </tr>
+              {% endif %}
             </thead>
             <tbody class="govuk-table__body">
               {% for row in results %}
-                <tr class="govuk-table__row">
-                  <td class="govuk-table__cell"><a href="/v6/application/{{ row.ref }}" class="govuk-link">{{ row.ref }}</a></td>
-                  <td class="govuk-table__cell">{{ row.firstName }}</td>
-                  <td class="govuk-table__cell">{{ row.lastName }}</td>
-                  <td class="govuk-table__cell">{{ row.dob }}</td>
-                  <td class="govuk-table__cell">{{ row.submitted }}</td>
-                  <td class="govuk-table__cell">{{ row.firmName }}<br>{{ row.firmNumber }}</td>
-                  <td class="govuk-table__cell"><strong class="govuk-tag govuk-tag--{{ row.outcomeClass }}">{{ row.outcome }}</strong></td>
-                </tr>
+                {% if query.linkToReference %}
+                  <tr class="govuk-table__row">
+                    <td class="govuk-table__cell"><a href="/v6/application/{{ row.ref }}" class="govuk-link">{{ row.ref }}</a></td>
+                    <td class="govuk-table__cell">{{ row.submitted }}</td>
+                    <td class="govuk-table__cell">{{ row.type or 'Initial application' }}</td>
+                    <td class="govuk-table__cell">{{ row.delegatedFunctions or 'Used' }}</td>
+                    <td class="govuk-table__cell"><strong>{{ row.matterTypeTitle or 'Family' }}</strong><br>{{ row.matterTypeSubtext or "Special Children's Act" }}</td>
+                    <td class="govuk-table__cell">
+                      {% if row.ref !== query.linkToReference %}
+                        <a href="/v6/select-lead-case?reference={{ query.linkToReference }}&linkedReference={{ row.ref }}" class="govuk-link">Link case</a>
+                      {% else %}
+                        Current case
+                      {% endif %}
+                    </td>
+                  </tr>
+                {% else %}
+                  <tr class="govuk-table__row">
+                    <td class="govuk-table__cell"><a href="/v6/application/{{ row.ref }}" class="govuk-link">{{ row.ref }}</a></td>
+                    <td class="govuk-table__cell">{{ row.firstName }}</td>
+                    <td class="govuk-table__cell">{{ row.lastName }}</td>
+                    <td class="govuk-table__cell">{{ row.dob }}</td>
+                    <td class="govuk-table__cell">{{ row.submitted }}</td>
+                    <td class="govuk-table__cell">{{ row.firmName }}<br>{{ row.firmNumber }}</td>
+                    <td class="govuk-table__cell"><strong class="govuk-tag govuk-tag--{{ row.outcomeClass }}">{{ row.outcome }}</strong></td>
+                  </tr>
+                {% endif %}
               {% endfor %}
             </tbody>
           </table>
