@@ -76,6 +76,14 @@
       }) }}
     {% endif %}
 
+    {% if consolidated %}
+      <p class="govuk-caption-l">Application reference</p>
+      <p class="govuk-body-l govuk-!-margin-bottom-6">{{ reference or 'L-12Z-13P' }}</p>
+      <p class="govuk-body govuk-!-margin-bottom-8">
+        This decision will be shared with the provider and recorded in application history.
+      </p>
+    {% endif %}
+
     <form action="/v6/expert-assessment/decision-handler" method="post" novalidate>
       {{ govukRadios({
         name: "expert-decision",

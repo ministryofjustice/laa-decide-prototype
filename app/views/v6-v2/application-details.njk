@@ -429,9 +429,7 @@
         <div class="govuk-!-margin-bottom-6" style="border: 1px solid #b1b4b6;">
           <div style="background-color: #f3f2f1; padding: 15px; border-bottom: 1px solid #b1b4b6; display: flex; justify-content: space-between; align-items: center;">
             <h2 class="govuk-heading-s govuk-!-margin-bottom-0">Cases linked to this application</h2>
-            {% if hasLinkedCases %}
-              <a href="/v6-v2/manage-linked-cases/{{ reference }}" class="govuk-link govuk-heading-s govuk-!-margin-bottom-0">Manage cases</a>
-            {% endif %}
+            <a href="/v6-v2/manage-linked-cases/{{ reference }}" class="govuk-link govuk-heading-s govuk-!-margin-bottom-0">Manage cases</a>
           </div>
           <div style="padding: 15px;">
             {% if hasLinkedCases %}
@@ -496,7 +494,7 @@
                   </td>
                 </tr>
                 <tr class="govuk-table__row">
-                  <td class="govuk-table__cell">PR Evidence</td>
+                  <td class="govuk-table__cell">Parental evidence</td>
                   <td class="govuk-table__cell">
                     <a href="#" class="govuk-link">parental_responsibility.pdf</a><br>
                     14 July 2024

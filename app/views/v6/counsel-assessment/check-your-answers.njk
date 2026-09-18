@@ -58,7 +58,9 @@
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds-from-desktop">
 
-    <h1 class="govuk-heading-l">Check your answers</h1>
+    <p class="govuk-caption-l">Application reference</p>
+    <p class="govuk-body-l govuk-!-margin-bottom-6">{{ reference }}</p>
+    <h1 class="govuk-heading-l govuk-!-margin-bottom-6">Check your answers</h1>
 
     {% set resolvedCounselType = data['counsel-type-granted'] or data['counsel-default-counsel-type'] or "King's Counsel alone" %}
     {% set decisionHref = "/v6/counsel-assessment/decision" %}

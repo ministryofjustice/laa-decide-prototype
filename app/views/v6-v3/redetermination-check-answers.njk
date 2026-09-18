@@ -1,0 +1,85 @@
+{% extends "govuk/template.njk" %}
+
+{% from "govuk/components/header/macro.njk" import govukHeader %}
+{% from "govuk/components/phase-banner/macro.njk" import govukPhaseBanner %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "moj/components/primary-navigation/macro.njk" import mojPrimaryNavigation %}
+
+{% block head %}<link href="/public/stylesheets/application.css" rel="stylesheet">{% endblock %}
+{% block pageTitle %}Check your answers{% endblock %}
+
+{% block header %}
+  {{ govukHeader({ homepageUrl: "#", productName: "Legal Aid Agency", navigationClasses: "govuk-header__navigation--end", navigation: [{ href: "#", text: "joann.barton@justice.gov.uk" }, { href: "/v6-v3/sign-out", text: "Sign out" }] }) }}
+  {{ mojPrimaryNavigation({ label: "Primary navigation", items: [{ text: "Decide if an applicant can get legal aid", href: "#" }, { text: "Open applications", href: "/v6-v3/open-applications" }, { text: "Your list", href: "/v6-v3/yourlist" }, { text: "Search", href: "/v6-v3/search" }] }) }}
+{% endblock %}
+
+{% block beforeContent %}
+  {{ govukPhaseBanner({ tag: { text: "Beta" }, html: "This is a new service - your <a class=\"govuk-link\" href=\"#\">feedback</a> will help us to improve it." }) }}
+  {{ govukBackLink({ text: "Back to application", href: "/v6-v3/application/" ~ reference }) }}
+{% endblock %}
+
+{% set changeHref = "/v6-v3/application/" ~ reference ~ "/redetermination/" ~ index ~ "/grant" %}
+{% set decisionChangeHref = "/v6-v3/application/" ~ reference ~ "/redetermination/" ~ index ~ "/decision" %}
+
+{% block content %}
+  <div class="govuk-grid-row"><div class="govuk-grid-column-two-thirds">
+    <p class="govuk-body-l govuk-!-margin-bottom-1">Application reference:</p>
+    <p class="govuk-heading-l govuk-!-margin-bottom-4">{{ reference }}</p>
+    <h1 class="govuk-heading-xl govuk-!-margin-bottom-6">Check your answers</h1>
+
+    <div class="govuk-summary-card govuk-!-margin-bottom-6">
+      <div class="govuk-summary-card__title-wrapper" style="background-color: #f3f2f1; padding: 15px;">
+        <h2 class="govuk-summary-card__title govuk-heading-s govuk-!-margin-bottom-0">Overall decision</h2>
+      </div>
+      <div class="govuk-summary-card__content">
+        <dl class="govuk-summary-list">
+          <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">Decision</dt>
+            <dd class="govuk-summary-list__value">{{ decision }}</dd>
+            <dd class="govuk-summary-list__actions"><a class="govuk-link" href="{{ decisionChangeHref }}">Change</a></dd>
+          </div>
+          <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">Certificate type</dt>
+            <dd class="govuk-summary-list__value">{{ certificateType }}</dd>
+          </div>
+          <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">Proceeding</dt>
+            <dd class="govuk-summary-list__value">{{ proceedingName }}</dd>
+            <dd class="govuk-summary-list__actions"><a class="govuk-link" href="{{ changeHref }}">Change</a></dd>
+          </div>
+          <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">Client role</dt>
+            <dd class="govuk-summary-list__value">{{ clientRole }}</dd>
+          </div>
+          <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">Scope limitations</dt>
+            <dd class="govuk-summary-list__value">{{ scopeLimitations | safe }}</dd>
+            <dd class="govuk-summary-list__actions"><a class="govuk-link" href="{{ changeHref }}">Change</a></dd>
+          </div>
+          <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">Level of service</dt>
+            <dd class="govuk-summary-list__value">{{ levelOfService }}</dd>
+            <dd class="govuk-summary-list__actions"><a class="govuk-link" href="{{ changeHref }}">Change</a></dd>
+          </div>
+          <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">Justification of request</dt>
+            <dd class="govuk-summary-list__value">{{ justification }}</dd>
+            <dd class="govuk-summary-list__actions"><a class="govuk-link" href="{{ changeHref }}#justification">Change</a></dd>
+          </div>
+        </dl>
+      </div>
+    </div>
+
+    <form action="/v6-v3/application/{{ reference }}/redetermination/{{ index }}/check-answers" method="post">
+      {{ govukButton({ text: "Submit decision" }) }}
+    </form>
+  </div></div>
+{% endblock %}
+
+{% block bodyEnd %}
+  <script src="/plugin-assets/govuk-prototype-kit/lib/assets/javascripts/kit.js"></script>
+  <script src="/plugin-assets/govuk-prototype-kit/lib/assets/javascripts/auto-store-data.js"></script>
+  <script type="module" src="/plugin-assets/govuk-frontend/dist/govuk/govuk-frontend.min.js"></script>
+  <script type="module" src="/plugin-assets/govuk-frontend/dist/govuk-prototype-kit/init.js"></script>
+{% endblock %}

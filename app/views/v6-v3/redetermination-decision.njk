@@ -1,0 +1,48 @@
+{% extends "govuk/template.njk" %}
+
+{% from "govuk/components/header/macro.njk" import govukHeader %}
+{% from "govuk/components/phase-banner/macro.njk" import govukPhaseBanner %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "moj/components/primary-navigation/macro.njk" import mojPrimaryNavigation %}
+
+{% block head %}
+  <link href="/public/stylesheets/application.css" rel="stylesheet">
+{% endblock %}
+
+{% block pageTitle %}Make a decision{% endblock %}
+
+{% block header %}
+  {{ govukHeader({ homepageUrl: "#", productName: "Legal Aid Agency", navigationClasses: "govuk-header__navigation--end", navigation: [{ href: "#", text: "joann.barton@justice.gov.uk" }, { href: "/v6-v3/sign-out", text: "Sign out" }] }) }}
+  {{ mojPrimaryNavigation({ label: "Primary navigation", items: [{ text: "Decide if an applicant can get legal aid", href: "#" }, { text: "Open applications", href: "/v6-v3/open-applications" }, { text: "Your list", href: "/v6-v3/yourlist" }, { text: "Search", href: "/v6-v3/search" }] }) }}
+{% endblock %}
+
+{% block beforeContent %}
+  {{ govukPhaseBanner({ tag: { text: "Beta" }, html: "This is a new service - your <a class=\"govuk-link\" href=\"#\">feedback</a> will help us to improve it." }) }}
+  {{ govukBackLink({ text: "Back", href: "/v6-v3/application/" ~ reference }) }}
+{% endblock %}
+
+{% block content %}
+  <div class="govuk-grid-row"><div class="govuk-grid-column-two-thirds">
+    {% if error %}
+      {{ govukErrorSummary({ titleText: "There is a problem", errorList: [{ text: error, href: "#decision" }] }) }}
+    {% endif %}
+    <p class="govuk-body-l govuk-!-margin-bottom-1">Application reference:</p>
+    <p class="govuk-heading-l govuk-!-margin-bottom-4">{{ reference }}</p>
+    <h1 class="govuk-heading-xl govuk-!-margin-bottom-2">Make a decision</h1>
+    <p class="govuk-body govuk-!-margin-bottom-8">Use this section to make a decision about the request. This decision will be shared with the provider and recorded in application history.</p>
+    <form action="/v6-v3/application/{{ reference }}/redetermination/{{ index }}/decision" method="post">
+      {{ govukRadios({ name: "decision", idPrefix: "decision", fieldset: { legend: { text: "What is your overall decision?", classes: "govuk-fieldset__legend--m" } }, errorMessage: error and { text: error } or null, items: [{ value: "grant", text: "Grant", checked: selectedDecision == 'grant' }, { value: "refuse", text: "Refuse", checked: selectedDecision == 'refuse' }] }) }}
+      {{ govukButton({ text: "Continue" }) }}
+    </form>
+  </div></div>
+{% endblock %}
+
+{% block bodyEnd %}
+  <script src="/plugin-assets/govuk-prototype-kit/lib/assets/javascripts/kit.js"></script>
+  <script src="/plugin-assets/govuk-prototype-kit/lib/assets/javascripts/auto-store-data.js"></script>
+  <script type="module" src="/plugin-assets/govuk-frontend/dist/govuk/govuk-frontend.min.js"></script>
+  <script type="module" src="/plugin-assets/govuk-frontend/dist/govuk-prototype-kit/init.js"></script>
+{% endblock %}

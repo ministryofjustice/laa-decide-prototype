@@ -76,24 +76,29 @@ Check your answers
     <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
     
-    <h1 class="govuk-heading-xl govuk-!-margin-bottom-2">Check your answers</h1>
-    <p class="govuk-heading-l govuk-!-margin-bottom-4" style="font-weight: normal;">{{ decisionReference or 'L-12Z-13P' }}</p>
+    <p class="govuk-caption-l">Application reference</p>
+    <p class="govuk-body-l govuk-!-margin-bottom-6">{{ decisionReference or 'L-12Z-13P' }}</p>
+    <h1 class="govuk-heading-xl govuk-!-margin-bottom-6">Check your answers</h1>
 
     {% if data['overall-decision'] === 'refuse' %}
       {# REFUSE DECISION SUMMARY #}
       {% set summaryRows = [
         {
+          key: { text: "Decision" },
+          value: { text: "Refuse" },
+          actions: {
+            items: [{ href: "/v6/overall-decision", text: "Change", visuallyHiddenText: "decision" }]
+          }
+        },
+        {
+          key: { text: "Application type" },
+          value: { text: "Initial application" }
+        },
+        {
           key: { text: "Certificate type" },
           value: { text: "Substantive certificate" },
           actions: {
             items: [{ href: "/v6/overall-decision", text: "Change", visuallyHiddenText: "certificate type" }]
-          }
-        },
-        {
-          key: { text: "Merits assessment" },
-          value: { text: "Refuse" },
-          actions: {
-            items: [{ href: "/v6/overall-decision", text: "Change", visuallyHiddenText: "merit assessment" }]
           }
         },
         {
@@ -116,6 +121,17 @@ Check your answers
       {# GRANT DECISION SUMMARY #}
       {% set summaryRows = [
         {
+          key: { text: "Decision" },
+          value: { text: "Grant" },
+          actions: {
+            items: [{ href: "/v6/overall-decision", text: "Change", visuallyHiddenText: "decision" }]
+          }
+        },
+        {
+          key: { text: "Application type" },
+          value: { text: "Initial application" }
+        },
+        {
           key: { text: "Certificate type" },
           value: { text: "Substantive certificate" },
           actions: {
@@ -127,13 +143,6 @@ Check your answers
           value: { text: data['cert-date-display'] or "12 June 2026" },
           actions: {
             items: [{ href: "/v6/grant-certificate-date", text: "Change", visuallyHiddenText: "date granted" }]
-          }
-        },
-        {
-          key: { text: "Merit assessment" },
-          value: { text: "Grant" },
-          actions: {
-            items: [{ href: "/v6/overall-decision", text: "Change", visuallyHiddenText: "merit assessment" }]
           }
         }
       ] %}

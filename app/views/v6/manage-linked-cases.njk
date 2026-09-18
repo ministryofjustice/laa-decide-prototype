@@ -1,0 +1,112 @@
+{% extends "govuk/template.njk" %}
+
+{% from "govuk/components/header/macro.njk" import govukHeader %}
+{% from "govuk/components/phase-banner/macro.njk" import govukPhaseBanner %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+{% from "moj/components/primary-navigation/macro.njk" import mojPrimaryNavigation %}
+
+{% block pageTitle %}
+Manage linked cases
+{% endblock %}
+
+{% block head %}
+  <link href="/public/stylesheets/application.css" rel="stylesheet">
+  <style>
+    .manage-linked-card { border: 1px solid #b1b4b6; margin-bottom: 25px; }
+    .manage-linked-card__header { padding: 15px 20px; background: #f3f2f1; }
+    .manage-linked-card__header h2 { margin: 0; }
+    .manage-linked-card__content { padding: 0 12px; }
+    .manage-linked-table { width: 100%; table-layout: fixed; margin-bottom: 0; }
+    .manage-linked-table th, .manage-linked-table td { padding-left: 8px; padding-right: 8px; }
+    .manage-linked-table td:nth-child(2) { white-space: nowrap; }
+    .manage-linked-table th:nth-child(1), .manage-linked-table td:nth-child(1) { width: 15%; }
+    .manage-linked-table th:nth-child(2), .manage-linked-table td:nth-child(2) { width: 14%; }
+    .manage-linked-table th:nth-child(3), .manage-linked-table td:nth-child(3) { width: 16%; }
+    .manage-linked-table th:nth-child(4), .manage-linked-table td:nth-child(4) { width: 14%; }
+    .manage-linked-table th:nth-child(5), .manage-linked-table td:nth-child(5) { width: 20%; }
+    .manage-linked-table th:nth-child(6), .manage-linked-table td:nth-child(6) { width: 21%; }
+    .manage-linked-actions { white-space: nowrap; }
+    .manage-linked-actions .govuk-link + .govuk-link { margin-left: 12px; }
+  </style>
+{% endblock %}
+
+{% block header %}
+  {{ govukHeader({
+    homepageUrl: "#",
+    productName: "Legal Aid Agency",
+    navigationClasses: "govuk-header__navigation--end",
+    navigation: [
+      { href: "#", text: "joann.barton@law.com" },
+      { href: "/v6/sign-out", text: "Sign out" }
+    ]
+  }) }}
+
+  {{ mojPrimaryNavigation({
+    label: "Primary navigation",
+    items: [
+      { text: "Decide if an applicant can get legal aid", href: "#" },
+      { text: "Open applications", href: "/v6/open-applications" },
+      { text: "Your list", href: "/v6/yourlist" },
+      { text: "Search", href: "/v6/search" }
+    ]
+  }) }}
+{% endblock %}
+
+{% block beforeContent %}
+  {{ govukPhaseBanner({
+    tag: { text: "Beta" },
+    html: "This is a new service - your <a class=\"govuk-link\" href=\"#\">feedback</a> will help us to improve it."
+  }) }}
+  {{ govukBackLink({
+    text: "Back",
+    href: "/v6/application/" ~ reference
+  }) }}
+{% endblock %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="{{ 'govuk-grid-column-full' if hasLinkedCases else 'govuk-grid-column-two-thirds' }}">
+      <h1 class="govuk-heading-xl">Manage linked cases</h1>
+
+      {% if not hasLinkedCases %}
+        <p class="govuk-body">There are currently no linked cases to this application</p>
+        {{ govukButton({
+          text: "Link to this case",
+          href: "/v6/search?linkToReference=" ~ reference
+        }) }}
+      {% else %}
+        {{ govukButton({ text: "Link to this case", href: "/v6/search?linkToReference=" ~ reference }) }}
+
+        <div class="manage-linked-card">
+          <div class="manage-linked-card__header"><h2 class="govuk-heading-s">Lead</h2></div>
+          <div class="manage-linked-card__content">
+            <table class="govuk-table manage-linked-table">
+              <thead class="govuk-table__head"><tr class="govuk-table__row"><th class="govuk-table__header">Reference</th><th class="govuk-table__header">Submitted</th><th class="govuk-table__header">Type</th><th class="govuk-table__header">Delegated Functions</th><th class="govuk-table__header">Matter type</th><th class="govuk-table__header">Actions</th></tr></thead>
+              <tbody class="govuk-table__body"><tr class="govuk-table__row">
+                <td class="govuk-table__cell"><a class="govuk-link" href="/v6/application/{{ leadApplication.ref }}">{{ leadApplication.ref }}</a></td>
+                <td class="govuk-table__cell">{{ leadApplication.submitted }}</td><td class="govuk-table__cell">{{ leadApplication.type }}</td><td class="govuk-table__cell">{{ leadApplication.delegatedFunctions }}</td><td class="govuk-table__cell"><strong>{{ leadApplication.matterType.title }}</strong><br>{{ leadApplication.matterType.subtext }}</td>
+                <td class="govuk-table__cell manage-linked-actions"><a class="govuk-link" href="/v6/change-linked-lead/{{ leadApplication.ref }}">Change lead</a><a class="govuk-link" href="/v6/unlink-linked-case/{{ leadApplication.ref }}">Unlink</a></td>
+              </tr></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="manage-linked-card">
+          <div class="manage-linked-card__header"><h2 class="govuk-heading-s">Associated</h2></div>
+          <div class="manage-linked-card__content">
+            <table class="govuk-table manage-linked-table">
+              <thead class="govuk-table__head"><tr class="govuk-table__row"><th class="govuk-table__header">Reference</th><th class="govuk-table__header">Submitted</th><th class="govuk-table__header">Type</th><th class="govuk-table__header">Delegated Functions</th><th class="govuk-table__header">Matter type</th><th class="govuk-table__header">Actions</th></tr></thead>
+              <tbody class="govuk-table__body">
+                {% for application in associatedApplications %}
+                  <tr class="govuk-table__row"><td class="govuk-table__cell"><a class="govuk-link" href="/v6/application/{{ application.ref }}">{{ application.ref }}</a></td><td class="govuk-table__cell">{{ application.submitted }}</td><td class="govuk-table__cell">{{ application.type }}</td><td class="govuk-table__cell">{{ application.delegatedFunctions }}</td><td class="govuk-table__cell"><strong>{{ application.matterType.title }}</strong><br>{{ application.matterType.subtext }}</td><td class="govuk-table__cell manage-linked-actions"><a class="govuk-link" href="/v6/unlink-linked-case/{{ application.ref }}">Unlink</a></td></tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+{% endblock %}

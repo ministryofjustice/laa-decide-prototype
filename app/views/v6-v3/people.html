@@ -1,0 +1,229 @@
+
+{% extends "layouts/open.html" %}
+
+
+{% block pageTitle %}
+People
+{% endblock %}
+
+{% block beforeContent %}
+<a class="govuk-back-link" href="my-applications">Back to your list</a>
+{% endblock %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    <h2 class="govuk-heading-xl govuk-!-margin-bottom-2" ><span class="govuk-!-margin-right-2" id="reference-number">L-12Z-13P</span></h2>
+  </div>
+</div>
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-one-half">
+    <p class="govuk-body-m">
+      <strong>Date submitted: </strong>{{ date | date }}<br>
+      <strong>Assigned to: </strong>Mo Bradshaw
+    </p>
+  </div>
+</div>
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      <nav class="moj-sub-navigation" aria-label="Sub navigation">
+        <ul class="moj-sub-navigation__list">
+          <li class="moj-sub-navigation__item">
+            <a class="moj-sub-navigation__link" href="application-details-added">Application details</a>
+          </li>
+          <li class="moj-sub-navigation__item">
+            <a class="moj-sub-navigation__link" aria-current="page" href="people">People</a>
+          </li>
+          <li class="moj-sub-navigation__item">
+            <a class="moj-sub-navigation__link" href="application-history">Application history</a>
+          </li>
+        </ul>
+      </nav>
+
+      <div class="govuk-summary-card">
+        <div class="govuk-summary-card__title-wrapper">
+          <h2 class="govuk-summary-card__title">Provider</h2>
+        </div>
+        <div class="govuk-summary-card__content">
+          <dl class="govuk-summary-list">
+
+            <div class="govuk-summary-list__row">
+              <dt class="govuk-summary-list__key">
+                Name
+              </dt>
+              <dd class="govuk-summary-list__value"> David Gray LLP
+              </dd>   
+            </div>
+
+            <div class="govuk-summary-list__row">
+              <dt class="govuk-summary-list__key">
+                Firm
+              </dt>
+              <dd class="govuk-summary-list__value">Gray and Associates at Law
+              </dd>   
+            </div>
+            <div class="govuk-summary-list__row">
+              <dt class="govuk-summary-list__key">
+                Account number
+              </dt>
+              <dd class="govuk-summary-list__value">0K514R
+              </dd>   
+            </div>
+            <div class="govuk-summary-list__row">
+              <dt class="govuk-summary-list__key">
+                Address
+              </dt>
+              <dd class="govuk-summary-list__value">Armitage House<br>108 Petty France<br>London<br>SW2 8QT
+              </dd>   
+            </div>
+            <div class="govuk-summary-list__row">
+              <dt class="govuk-summary-list__key">
+                Phone
+              </dt>
+              <dd class="govuk-summary-list__value">07123456789
+              </dd>   
+            </div>
+
+          </dl>
+        </div>
+      </div>
+
+      <div class="govuk-summary-card">
+        <div class="govuk-summary-card__title-wrapper">
+          <h2 class="govuk-summary-card__title">Applicant</h2>
+        </div>
+        <div class="govuk-summary-card__content">
+          <dl class="govuk-summary-list">
+            
+            <div class="govuk-summary-list__row">
+              <dt class="govuk-summary-list__key">
+                Name
+              </dt>
+              <dd class="govuk-summary-list__value">
+                David George Barr
+              </dd>   
+            </div>
+
+            <div class="govuk-summary-list__row">
+              <dt class="govuk-summary-list__key">
+                Date of birth
+              </dt>
+              <dd class="govuk-summary-list__value">
+                  04 May 1980
+              </dd>   
+            </div>
+            <div class="govuk-summary-list__row">
+              <dt class="govuk-summary-list__key">
+                National insurance number
+              </dt>
+              <dd class="govuk-summary-list__value">
+                JT351585B
+              </dd>   
+            </div>
+            <div class="govuk-summary-list__row">
+              <dt class="govuk-summary-list__key">
+                Address
+              </dt>
+              <dd class="govuk-summary-list__value">
+               Buckingham Palace<br>London<br>SW1A 1AA
+              </dd>   
+            </div>
+
+          </dl>
+        </div>
+      </div>
+
+      <div class="govuk-summary-card">
+        <div class="govuk-summary-card__title-wrapper">
+          <h2 class="govuk-summary-card__title">Opponent</h2>
+        </div>
+        <div class="govuk-summary-card__content">
+          <dl class="govuk-summary-list">
+            
+            <div class="govuk-summary-list__row">
+              <dt class="govuk-summary-list__key">
+                Name
+              </dt>
+              <dd class="govuk-summary-list__value">
+                  Ellie Ann Barr
+              </dd>   
+            </div>
+
+            <div class="govuk-summary-list__row">
+              <dt class="govuk-summary-list__key">
+                Date of birth
+              </dt>
+              <dd class="govuk-summary-list__value">
+                23 Nov 1987
+              </dd>   
+            </div>
+            <div class="govuk-summary-list__row">
+              <dt class="govuk-summary-list__key">
+                Address
+              </dt>
+              <dd class="govuk-summary-list__value">
+               1 London Road<br>London<br>SW1A 1AA
+              </dd>   
+            </div>
+            <div class="govuk-summary-list__row">
+              <dt class="govuk-summary-list__key">
+                Relationship
+              </dt>
+              <dd class="govuk-summary-list__value">
+               Spouse
+              </dd>   
+            </div>
+
+          </dl>
+        </div>
+      </div>
+
+      <div class="govuk-summary-card">
+        <div class="govuk-summary-card__title-wrapper">
+          <h2 class="govuk-summary-card__title">Child</h2>
+        </div>
+        <div class="govuk-summary-card__content">
+          <dl class="govuk-summary-list">
+            
+            <div class="govuk-summary-list__row">
+              <dt class="govuk-summary-list__key">
+                Name
+              </dt>
+              <dd class="govuk-summary-list__value">
+                Somerset Michael Morris Barr
+              </dd>   
+            </div>
+
+            <div class="govuk-summary-list__row">
+              <dt class="govuk-summary-list__key">
+                Date of birth
+              </dt>
+              <dd class="govuk-summary-list__value">
+                20 Dec 2020
+              </dd>   
+            </div>
+            <div class="govuk-summary-list__row">
+              <dt class="govuk-summary-list__key">
+                Address
+              </dt>
+              <dd class="govuk-summary-list__value">
+               Buckingham Palace<br>London<br>SW1A 1AA
+              </dd>   
+            </div>
+            <div class="govuk-summary-list__row">
+              <dt class="govuk-summary-list__key">
+                Relationship
+              </dt>
+              <dd class="govuk-summary-list__value">
+               Child
+              </dd>   
+            </div>
+
+          </dl>
+        </div>
+      </div>   
+  </div>
+</div>
+{% endblock %}

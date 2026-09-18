@@ -38,6 +38,11 @@
       background-color: #d6ede5;
       color: #0b4b3e;
     }
+
+    .version-status-tag--in-progress {
+      background-color: #d2e2f1;
+      color: #0b0c0c;
+    }
   </style>
 {% endblock %}
 
@@ -151,6 +156,26 @@
           {{ govukButton({
             text: "Start version 2",
             href: "/v6-v2/open-applications"
+          }) }}
+        </div>
+      </div>
+
+      <div class="govuk-summary-card govuk-!-margin-bottom-2">
+        <div class="govuk-summary-card__title-wrapper version-header">
+          <div>
+            <h3 class="govuk-summary-card__title govuk-!-margin-bottom-2">Version 3</h3>
+            <p class="govuk-body govuk-!-margin-bottom-0">August 2026</p>
+          </div>
+          <div class="version-status-stack">
+            <span class="version-status-tag version-status-tag--in-progress">In progress</span>
+          </div>
+        </div>
+        <div class="govuk-summary-card__content">
+          <p class="govuk-body govuk-!-margin-bottom-6">Work in progress.</p>
+
+          {{ govukButton({
+            text: "Start version 3",
+            href: "/v6-v3/open-applications"
           }) }}
         </div>
       </div>

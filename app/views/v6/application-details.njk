@@ -88,6 +88,9 @@
           </div>
           <div class="govuk-notification-banner__content">
             <p class="govuk-body">{{ sessionData.toast.message }}</p>
+            {% if sessionData.toast.detail %}
+              <p class="govuk-body govuk-!-margin-bottom-0">{{ sessionData.toast.detail }}</p>
+            {% endif %}
           </div>
         </div>
         <script>
@@ -149,6 +152,9 @@
         {% endif %}
       </div>
 
+      {% if sessionData['consolidated-v6'] === true %}
+        <p class="govuk-caption-l">Application reference</p>
+      {% endif %}
       <h1 class="govuk-heading-xl govuk-!-margin-bottom-4">{{ application.ref or application.reference }}</h1>
 
       <p class="govuk-body govuk-!-margin-bottom-1">
@@ -158,11 +164,22 @@
         <strong>Date received:</strong> 19 May 2023
       </p>
 
+      {% if isAssociatedLinkedCase %}
+        <div class="govuk-inset-text govuk-!-margin-bottom-6">
+          This is an associated case linked to lead application
+          {% if linkedLeadReference %}
+            <a class="govuk-link" href="{{ applicationRoutePrefix }}/application/{{ linkedLeadReference }}">{{ linkedLeadReference }}</a>.
+          {% else %}
+            in this linked case group.
+          {% endif %}
+        </div>
+      {% endif %}
+
       {% set hasDecision = application.decisionType or application.status === "Granted" or application.status === "Refused" %}
 
       {% if sessionData['decision-reference'] !== reference %}
         {% if isAssigned %}
-          <a href="/v6/reassign?reference={{ reference }}" class="govuk-button govuk-button--secondary govuk-!-margin-bottom-8" data-module="govuk-button" style="background-color: #00703c; color: white;">Reassign</a>
+          <a href="/v6/reassign?reference={{ reference }}&isPriorAuthority={{ application.isPriorAuthority and 'true' or 'false' }}" class="govuk-button govuk-button--secondary govuk-!-margin-bottom-8" data-module="govuk-button" style="background-color: #00703c; color: white;">Reassign</a>
         {% elif not hasDecision %}
           <form id="addToListForm" style="display: inline;">
             <input type="hidden" name="reference" value="{{ reference }}">
@@ -187,9 +204,23 @@
                   'X-Requested-With': 'XMLHttpRequest'
                 }
               })
-                .then(response => {
+                .then(response => response.json())
+                .then(data => {
                   // Show toast notification using GOV.UK toast component
                   const toastContainer = document.getElementById('toast-notification');
+                  const addedCount = data && Number.isFinite(Number(data.addedCount)) ? Number(data.addedCount) : 1;
+                  const linkedAddedCount = data && Number.isFinite(Number(data.linkedAddedCount)) ? Number(data.linkedAddedCount) : Math.max(0, addedCount - 1);
+                  const referenceHref = '/v6/application/' + reference + (isPriorAuthority === 'true' ? '?isPriorAuthority=true#prior-authority' : '');
+                  const referenceLink = '<a class="govuk-link" href="' + referenceHref + '">' + reference + '</a>';
+                  const linkedLabel = linkedAddedCount === 1 ? 'linked case' : 'linked cases';
+                  let toastMessage = linkedAddedCount > 0
+                    ? 'You assigned this application ' + referenceLink + ' and ' + linkedAddedCount + ' ' + linkedLabel + ' to your list'
+                    : 'You assigned this application ' + referenceLink + ' to your list';
+
+                  if (addedCount === 0) {
+                    toastMessage = referenceLink + ' is already in your list';
+                  }
+
                   toastContainer.innerHTML = '';
                   const toast = document.createElement('div');
                   toast.setAttribute('data-module', 'govuk-notification-banner');
@@ -197,14 +228,14 @@
                   toast.setAttribute('aria-labelledby', 'govuk-notification-banner-title');
                   toast.className = 'govuk-notification-banner govuk-notification-banner--success';
                   toast.style.cssText = 'margin-bottom: 20px;';
-                  toast.innerHTML = '<div class="govuk-notification-banner__header"><h2 id="govuk-notification-banner-title" class="govuk-notification-banner__title">Success</h2></div><div class="govuk-notification-banner__content"><p class="govuk-notification-banner__heading">You added this application to your list</p></div>';
+                  toast.innerHTML = '<div class="govuk-notification-banner__header"><h2 id="govuk-notification-banner-title" class="govuk-notification-banner__title">Success</h2></div><div class="govuk-notification-banner__content"><p class="govuk-notification-banner__heading">' + toastMessage + '</p></div>';
                   
                   toastContainer.appendChild(toast);
 
                   // Stay on this page and switch CTA to Reassign once added.
                   const form = document.getElementById('addToListForm');
                   if (form) {
-                    form.outerHTML = '<a href="/v6/reassign?reference=' + encodeURIComponent(reference) + '" class="govuk-button govuk-button--secondary govuk-!-margin-bottom-8" data-module="govuk-button" style="background-color: #00703c; color: white;">Reassign</a>';
+                    form.outerHTML = '<a href="/v6/reassign?reference=' + encodeURIComponent(reference) + '&isPriorAuthority=' + encodeURIComponent(isPriorAuthority) + '" class="govuk-button govuk-button--secondary govuk-!-margin-bottom-8" data-module="govuk-button" style="background-color: #00703c; color: white;">Reassign</a>';
                   }
                 })
               .catch(error => console.error('Error:', error));
@@ -403,7 +434,7 @@
         <div class="govuk-!-margin-bottom-6" style="border: 1px solid #b1b4b6;">
           <div style="background-color: #f3f2f1; padding: 15px; border-bottom: 1px solid #b1b4b6; display: flex; justify-content: space-between; align-items: center;">
             <h2 class="govuk-heading-s govuk-!-margin-bottom-0">Cases linked to this application</h2>
-            <a href="#" class="govuk-link govuk-heading-s govuk-!-margin-bottom-0">Manage cases</a>
+            <a href="/v6/manage-linked-cases/{{ reference }}" class="govuk-link govuk-heading-s govuk-!-margin-bottom-0">Manage cases</a>
           </div>
           <div style="padding: 15px;">
             {% if hasLinkedCases %}
@@ -439,7 +470,7 @@
             <dl class="govuk-summary-list">
               <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">Substantive certificate</dt>
-                <dd class="govuk-summary-list__value">£25,000</dd>
+                <dd class="govuk-summary-list__value">{{ "£0" if isAssociatedLinkedCase else "£25,000" }}</dd>
               </div>
             </dl>
           </div>
@@ -468,7 +499,7 @@
                   </td>
                 </tr>
                 <tr class="govuk-table__row">
-                  <td class="govuk-table__cell">PR Evidence</td>
+                  <td class="govuk-table__cell">Parental evidence</td>
                   <td class="govuk-table__cell">
                     <a href="#" class="govuk-link">parental_responsibility.pdf</a><br>
                     14 July 2024
@@ -738,8 +769,11 @@
                 <dl class="govuk-summary-list">
                   <div class="govuk-summary-list__row">
                     <dt class="govuk-summary-list__key">Apportioned</dt>
-                    <dd class="govuk-summary-list__value">No</dd>
+                    <dd class="govuk-summary-list__value">{{ priorAuthorityApplication.apportioned and 'Yes' or 'No' }}</dd>
                   </div>
+                  {% if priorAuthorityApplication.apportioned %}
+                    <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">Number of parties</dt><dd class="govuk-summary-list__value">{{ priorAuthorityApplication.numberOfParties }}</dd></div>
+                  {% endif %}
                   <div class="govuk-summary-list__row">
                     <dt class="govuk-summary-list__key">Hours requested</dt>
                     <dd class="govuk-summary-list__value">
@@ -753,9 +787,9 @@
                     </dd>
                   </div>
                   <div class="govuk-summary-list__row">
-                    <dt class="govuk-summary-list__key">Total amount requested</dt>
+                    <dt class="govuk-summary-list__key">{{ priorAuthorityApplication.apportioned and 'Amount claimed for this prior authority' or 'Total amount requested' }}</dt>
                     <dd class="govuk-summary-list__value">
-                      £{{ priorAuthorityApplication.expertRequestedAmount or ('6,048.00' if 'Psychiatrist' in priorAuthorityType else ('3,420.00' if 'Physiotherapist' in priorAuthorityType else '4,750.00')) }}
+                      £{{ priorAuthorityApplication.apportioned and priorAuthorityApplication.amountClaimedForPriorAuthority or (priorAuthorityApplication.expertRequestedAmount or ('6,048.00' if 'Psychiatrist' in priorAuthorityType else ('3,420.00' if 'Physiotherapist' in priorAuthorityType else '4,750.00'))) }}
                     </dd>
                   </div>
                   <div class="govuk-summary-list__row">
@@ -767,7 +801,20 @@
                 </dl>
               </div>
             </div>
-          {% else %}
+          {% elif priorAuthorityType and 'Disbursement' in priorAuthorityType %}
+            <div class="govuk-summary-card">
+              <div class="govuk-summary-card__title-wrapper">
+                <h3 class="govuk-summary-card__title">Disbursement</h3>
+              </div>
+              <div class="govuk-summary-card__content">
+                <dl class="govuk-summary-list">
+                  <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">Disbursement type</dt><dd class="govuk-summary-list__value">{{ priorAuthorityApplication.disbursementType or 'Travel' }}</dd></div>
+                  <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">Amount to be disbursed</dt><dd class="govuk-summary-list__value">£{{ priorAuthorityApplication.disbursementAmount or '680' }}</dd></div>
+                  <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">Justification of request</dt><dd class="govuk-summary-list__value">{{ priorAuthorityApplication.disbursementJustification or 'The client resides in a remote rural location with no access to public transport. The travel is essential to obtain detailed instructions and review sensitive case documents that cannot be shared electronically.' }}</dd></div>
+                </dl>
+              </div>
+            </div>
+          {% elif not sessionData['consolidated-v6'] %}
             <div class="govuk-summary-card">
               <div class="govuk-summary-card__title-wrapper">
                 <h3 class="govuk-summary-card__title">Counsel</h3>
@@ -888,7 +935,7 @@
                       <td class="govuk-table__cell"><strong class="govuk-tag govuk-tag--green">Granted</strong></td>
                       <td class="govuk-table__cell"><a href="#" class="govuk-link">View</a></td>
                     </tr>
-                  {% else %}
+                  {% elif not sessionData['consolidated-v6'] %}
                     <tr class="govuk-table__row">
                       <td class="govuk-table__cell">Prior authority<br><span class="govuk-body-s">Junior counsel</span></td>
                       <td class="govuk-table__cell">Aspen Dorwart</td>
@@ -923,10 +970,12 @@
             </div>
           </div>
 
-          {% if not priorAuthorityHasDecision %}
+          {% if not priorAuthorityHasDecision and not (sessionData['consolidated-v6'] and priorAuthorityType and 'Counsel' in priorAuthorityType) %}
             {% set priorAuthorityAssessmentHref = "/v6/counsel-assessment/decision?reference=" + reference %}
             {% if priorAuthorityType and 'Expert' in priorAuthorityType %}
               {% set priorAuthorityAssessmentHref = "/v6/expert-assessment/decision?reference=" + reference %}
+            {% elif priorAuthorityType and 'Disbursement' in priorAuthorityType %}
+              {% set priorAuthorityAssessmentHref = "/v6/disbursement-assessment/decision?reference=" + reference %}
             {% endif %}
             <div class="govuk-!-margin-top-8">
               {{ govukButton({

@@ -1,0 +1,182 @@
+{% extends "govuk/template.njk" %}
+
+{% from "govuk/components/header/macro.njk" import govukHeader %}
+{% from "govuk/components/phase-banner/macro.njk" import govukPhaseBanner %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "moj/components/primary-navigation/macro.njk" import mojPrimaryNavigation %}
+
+{% block pageTitle %}Confirm linked cases{% endblock %}
+
+{% block head %}
+  <link href="/public/stylesheets/application.css" rel="stylesheet">
+  <style>
+    .confirm-link-panel {
+      border: 1px solid #b1b4b6;
+    }
+    .confirm-link-section + .confirm-link-section {
+      border-top: 1px solid #b1b4b6;
+    }
+    .confirm-link-section__header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 15px 20px;
+      background: #f3f2f1;
+    }
+    .confirm-link-section__header h2 {
+      margin: 0;
+    }
+    .confirm-link-section__content {
+      padding: 0 10px;
+    }
+    .confirm-link-table {
+      width: 100%;
+      table-layout: fixed;
+      margin-bottom: 0;
+    }
+    .confirm-link-table th,
+    .confirm-link-table td {
+      padding-left: 10px;
+      padding-right: 10px;
+    }
+    .confirm-link-table th:nth-child(1),
+    .confirm-link-table td:nth-child(1) { width: 18%; }
+    .confirm-link-table th:nth-child(2),
+    .confirm-link-table td:nth-child(2) { width: 14%; }
+    .confirm-link-table th:nth-child(3),
+    .confirm-link-table td:nth-child(3) { width: 17%; }
+    .confirm-link-table th:nth-child(4),
+    .confirm-link-table td:nth-child(4) { width: 17%; }
+    .confirm-link-table th:nth-child(5),
+    .confirm-link-table td:nth-child(5) { width: 22%; }
+    .confirm-link-table th:nth-child(6),
+    .confirm-link-table td:nth-child(6) { width: 12%; }
+    .confirm-link-table td:nth-child(2),
+    .confirm-link-table td:nth-child(6) { white-space: nowrap; }
+    .confirm-link-justification {
+      width: 100%;
+      max-width: 610px;
+    }
+  </style>
+{% endblock %}
+
+{% block header %}
+  {{ govukHeader({
+    homepageUrl: "#",
+    productName: "Legal Aid Agency",
+    navigationClasses: "govuk-header__navigation--end",
+    navigation: [
+      { href: '#', text: "jonaan.barton@law.com" },
+      { href: '/v6/sign-out', text: "Sign out" }
+    ]
+  }) }}
+  {{ mojPrimaryNavigation({
+    label: 'Primary navigation',
+    items: [
+      { text: 'Decide if an applicant can get legal aid', href: '#' },
+      { text: 'Open applications', href: '/v6/open-applications' },
+      { text: 'Your list', href: '/v6/yourlist' },
+      { text: 'Search', href: '/v6/search' }
+    ]
+  }) }}
+{% endblock %}
+
+{% block beforeContent %}
+  {{ govukPhaseBanner({ tag: { text: "Beta" }, html: 'This is a new service - your <a class="govuk-link" href="#">feedback</a> will help us to improve it.' }) }}
+  {{ govukBackLink({ text: "Back", href: "/v6/select-lead-case?reference=" ~ reference ~ "&linkedReference=" ~ linkedReference }) }}
+{% endblock %}
+
+{% macro caseTable(title, application) %}
+  <div class="confirm-link-section">
+    <div class="confirm-link-section__header">
+      <h2 class="govuk-heading-s">{{ title }}</h2>
+      <a class="govuk-link" href="/v6/select-lead-case?reference={{ reference }}&linkedReference={{ linkedReference }}&leadReference={{ leadReference }}">Change<span class="govuk-visually-hidden"> {{ title|lower }} case</span></a>
+    </div>
+    <div class="confirm-link-section__content">
+      <table class="govuk-table confirm-link-table">
+        <thead class="govuk-table__head">
+          <tr class="govuk-table__row">
+            <th scope="col" class="govuk-table__header">Reference</th>
+            <th scope="col" class="govuk-table__header">Submitted</th>
+            <th scope="col" class="govuk-table__header">Type</th>
+            <th scope="col" class="govuk-table__header">Delegated Functions</th>
+            <th scope="col" class="govuk-table__header">Matter type</th>
+            <th scope="col" class="govuk-table__header">Status</th>
+          </tr>
+        </thead>
+        <tbody class="govuk-table__body">
+          <tr class="govuk-table__row">
+            <td class="govuk-table__cell"><a href="/v6/application/{{ application.ref }}" class="govuk-link">{{ application.ref }}</a></td>
+            <td class="govuk-table__cell">{{ application.submitted or 'Not available' }}</td>
+            <td class="govuk-table__cell">{{ application.type or 'Initial application' }}</td>
+            <td class="govuk-table__cell">{{ application.delegatedFunctions or 'Used' }}</td>
+            <td class="govuk-table__cell"><strong>{{ application.matterType.title if application.matterType else 'Family' }}</strong><br>{{ application.matterType.subtext if application.matterType else "Special Children's Act" }}</td>
+            <td class="govuk-table__cell"><span class="govuk-tag govuk-tag--light-blue">In progress</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+{% endmacro %}
+
+{% macro associatedTable(applications) %}
+  <div class="confirm-link-section">
+    <div class="confirm-link-section__header">
+      <h2 class="govuk-heading-s">Associated</h2>
+      <a class="govuk-link" href="/v6/select-lead-case?reference={{ reference }}&linkedReference={{ linkedReference }}&leadReference={{ leadReference }}">Change<span class="govuk-visually-hidden"> associated cases</span></a>
+    </div>
+    <div class="confirm-link-section__content">
+      <table class="govuk-table confirm-link-table">
+        <thead class="govuk-table__head">
+          <tr class="govuk-table__row">
+            <th scope="col" class="govuk-table__header">Reference</th>
+            <th scope="col" class="govuk-table__header">Submitted</th>
+            <th scope="col" class="govuk-table__header">Type</th>
+            <th scope="col" class="govuk-table__header">Delegated Functions</th>
+            <th scope="col" class="govuk-table__header">Matter type</th>
+            <th scope="col" class="govuk-table__header">Status</th>
+          </tr>
+        </thead>
+        <tbody class="govuk-table__body">
+          {% for application in applications %}
+            <tr class="govuk-table__row">
+              <td class="govuk-table__cell"><a href="/v6/application/{{ application.ref }}" class="govuk-link">{{ application.ref }}</a></td>
+              <td class="govuk-table__cell">{{ application.submitted or 'Not available' }}</td>
+              <td class="govuk-table__cell">{{ application.type or 'Initial application' }}</td>
+              <td class="govuk-table__cell">{{ application.delegatedFunctions or 'Used' }}</td>
+              <td class="govuk-table__cell"><strong>{{ application.matterType.title if application.matterType else 'Family' }}</strong><br>{{ application.matterType.subtext if application.matterType else "Special Children's Act" }}</td>
+              <td class="govuk-table__cell"><span class="govuk-tag govuk-tag--light-blue">In progress</span></td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+{% endmacro %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+      <h1 class="govuk-heading-xl">Are you sure you want to link these cases together?</h1>
+      <p class="govuk-body">We will assign the full cost limit to the lead case. All other associated cases will be assigned a £0.00 cost limit.</p>
+
+      <div class="confirm-link-panel">
+        {{ caseTable('Lead', leadApplication) }}
+        {{ associatedTable(associatedApplications) }}
+      </div>
+
+      <h2 class="govuk-heading-s govuk-!-margin-top-6">Explain your decision</h2>
+      <p class="govuk-body">This information is for internal use only and will not be shared with the provider.</p>
+      <textarea class="govuk-textarea confirm-link-justification" name="link-justification" rows="5" form="confirm-link-form"></textarea>
+
+      <form id="confirm-link-form" action="/v6/confirm-link-cases" method="post" class="govuk-button-group govuk-!-margin-top-4">
+        <input type="hidden" name="reference" value="{{ reference }}">
+        <input type="hidden" name="linkedReference" value="{{ linkedReference }}">
+        <input type="hidden" name="leadReference" value="{{ leadReference }}">
+        {{ govukButton({ text: "Link case" }) }}
+        <a href="/v6/select-lead-case?reference={{ reference }}&linkedReference={{ linkedReference }}&leadReference={{ leadReference }}" class="govuk-link">Cancel</a>
+      </form>
+    </div>
+  </div>
+{% endblock %}

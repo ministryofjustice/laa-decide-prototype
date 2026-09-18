@@ -97,7 +97,6 @@
             <tr class="govuk-table__row">
               <th scope="col" class="govuk-table__header">Reference</th>
               <th scope="col" class="govuk-table__header">Submitted</th>
-              <th scope="col" class="govuk-table__header">Last updated</th>
               <th scope="col" class="govuk-table__header">Type</th>
               <th scope="col" class="govuk-table__header">Delegated Functions</th>
               <th scope="col" class="govuk-table__header">Matter type</th>
@@ -114,9 +113,6 @@
                 </td>
                 <td class="govuk-table__cell">
                   {{ app.submitted }}
-                </td>
-                <td class="govuk-table__cell">
-                  {{ app.lastUpdated }}
                 </td>
                 <td class="govuk-table__cell">
                   {% if app.isPriorAuthority %}

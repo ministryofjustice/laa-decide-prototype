@@ -153,15 +153,25 @@
       }) }}
     {% endif %}
 
-    <h1 class="govuk-heading-l govuk-!-margin-bottom-1">Make a decision</h1>
-    <p class="govuk-heading-m govuk-!-margin-top-0 govuk-!-margin-bottom-6">{{ reference or 'L-12Z-13P' }}</p>
+    {% if consolidated %}
+      <p class="govuk-caption-l">Application reference</p>
+      <p class="govuk-body-l govuk-!-margin-bottom-6">{{ reference or 'L-12Z-13P' }}</p>
+      <h1 class="govuk-heading-l govuk-!-margin-bottom-6">Review details of request</h1>
+    {% else %}
+      <h1 class="govuk-heading-l govuk-!-margin-bottom-1">Make a decision</h1>
+      <p class="govuk-heading-m govuk-!-margin-top-0 govuk-!-margin-bottom-6">{{ reference or 'L-12Z-13P' }}</p>
+    {% endif %}
 
-    <p class="govuk-body">
+    {% if not consolidated %}
+      <p class="govuk-body">
       Use this section to make a decision about the request.
       This decision will be shared with the provider and recorded in application history.
-    </p>
+      </p>
+    {% endif %}
 
-    <h2 class="govuk-heading-m govuk-!-margin-bottom-4">How much should be granted for this application?</h2>
+    {% if not consolidated %}
+      <h2 class="govuk-heading-m govuk-!-margin-bottom-4">How much should be granted for this application?</h2>
+    {% endif %}
 
     <form action="/v6/expert-assessment/amount-handler" method="post" novalidate>
       <div class="govuk-form-group{% if amountDecisionErrorMessage %} govuk-form-group--error{% endif %}">
@@ -183,46 +193,52 @@
               {% if data['expert-amount-decision'] == 'requested' or not data['expert-amount-decision'] %}checked{% endif %}
             >
             <label class="govuk-label govuk-radios__label" for="expert-amount-decision">
-              Requested amount
+              {{ 'Details of request' if consolidated else 'Requested amount' }}
             </label>
           </div>
 
           <div class="govuk-radios__conditional{% if data['expert-amount-decision'] == 'new' %} govuk-radios__conditional--hidden{% endif %}" id="conditional-expert-amount-decision">
-          <div class="expert-requested-block">
-            <div class="expert-detail-row">
-              <div class="expert-detail-label govuk-body-s">Expert name</div>
-              <input class="govuk-input expert-detail-input expert-readonly" type="text" value="{{ data['expert-default-name'] or 'Not provided' }}" readonly>
-            </div>
-            <div class="expert-detail-row">
-              <div class="expert-detail-label govuk-body-s">Expert type</div>
-              <input class="govuk-input expert-detail-input expert-readonly" type="text" value="{{ data['expert-default-type'] or 'Not provided' }}" readonly>
-            </div>
-            <div class="expert-detail-row">
-              <div class="expert-detail-label govuk-body-s">Expert postcode</div>
-              <input class="govuk-input expert-detail-input expert-readonly" type="text" value="{{ data['expert-default-location'] or 'Not provided' }}" readonly>
-            </div>
-            <div class="expert-detail-row">
-              <div class="expert-detail-label govuk-body-s">Expert fee hourly rate</div>
-              <input class="govuk-input expert-detail-input expert-readonly" type="text" value="£{{ data['expert-default-rate'] or 'Not provided' }}" readonly>
-            </div>
-            <div class="expert-detail-row">
-              <div class="expert-detail-label govuk-body-s">Hours requested</div>
-              <div class="expert-time-wrap">
-                <div class="govuk-input__wrapper">
-                  <input class="govuk-input govuk-input--width-3 expert-readonly" type="text" value="{{ data['expert-default-hours'] or '00' }}" inputmode="numeric" spellcheck="false" aria-label="Hours" readonly>
-                  <div class="govuk-input__suffix" aria-hidden="true">hours</div>
-                </div>
-                <div class="govuk-input__wrapper">
-                  <input class="govuk-input govuk-input--width-3 expert-readonly" type="text" value="{{ data['expert-default-minutes'] or '00' }}" inputmode="numeric" spellcheck="false" aria-label="Minutes" readonly>
-                  <div class="govuk-input__suffix" aria-hidden="true">minutes</div>
+          {% if consolidated %}
+            <dl class="govuk-summary-list expert-requested-summary">
+              <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">Expert name</dt><dd class="govuk-summary-list__value">{{ data['expert-default-name'] or 'Not provided' }}</dd></div>
+              <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">Expert type</dt><dd class="govuk-summary-list__value">{{ data['expert-default-type'] or 'Not provided' }}</dd></div>
+              <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">Post code</dt><dd class="govuk-summary-list__value">{{ data['expert-default-location'] or 'Not provided' }}</dd></div>
+              <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">Expert fee hourly rate</dt><dd class="govuk-summary-list__value">£{{ data['expert-default-rate'] or 'Not provided' }}</dd></div>
+              <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">Apportioned</dt><dd class="govuk-summary-list__value">{{ data['expert-apportioned'] and 'Yes' or 'No' }}</dd></div>
+              {% if data['expert-apportioned'] %}
+                <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">Number of parties</dt><dd class="govuk-summary-list__value">{{ data['expert-number-of-parties'] }}</dd></div>
+              {% endif %}
+              <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">Hours requested</dt><dd class="govuk-summary-list__value">{{ data['expert-default-hours'] or '00' }} hours {{ data['expert-default-minutes'] or '00' }} mins</dd></div>
+              <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">{{ data['expert-apportioned'] and 'Amount claimed for this prior authority' or 'Total amount' }}</dt><dd class="govuk-summary-list__value">£{{ data['expert-apportioned'] and data['expert-amount-claimed'] or requestedAmount or 'Not provided' }}</dd></div>
+            </dl>
+          {% else %}
+            <div class="expert-requested-block">
+              <div class="expert-detail-row">
+                <div class="expert-detail-label govuk-body-s">Expert name</div>
+                <input class="govuk-input expert-detail-input expert-readonly" type="text" value="{{ data['expert-default-name'] or 'Not provided' }}" readonly>
+              </div>
+              <div class="expert-detail-row">
+                <div class="expert-detail-label govuk-body-s">Expert type</div>
+                <input class="govuk-input expert-detail-input expert-readonly" type="text" value="{{ data['expert-default-type'] or 'Not provided' }}" readonly>
+              </div>
+              <div class="expert-detail-row">
+                <div class="expert-detail-label govuk-body-s">Expert postcode</div>
+                <input class="govuk-input expert-detail-input expert-readonly" type="text" value="{{ data['expert-default-location'] or 'Not provided' }}" readonly>
+              </div>
+              <div class="expert-detail-row">
+                <div class="expert-detail-label govuk-body-s">Expert fee hourly rate</div>
+                <input class="govuk-input expert-detail-input expert-readonly" type="text" value="£{{ data['expert-default-rate'] or 'Not provided' }}" readonly>
+              </div>
+              <div class="expert-detail-row">
+                <div class="expert-detail-label govuk-body-s">Hours requested</div>
+                <div class="expert-time-wrap">
+                  <div class="govuk-input__wrapper"><input class="govuk-input govuk-input--width-3 expert-readonly" type="text" value="{{ data['expert-default-hours'] or '00' }}" inputmode="numeric" spellcheck="false" aria-label="Hours" readonly><div class="govuk-input__suffix" aria-hidden="true">hours</div></div>
+                  <div class="govuk-input__wrapper"><input class="govuk-input govuk-input--width-3 expert-readonly" type="text" value="{{ data['expert-default-minutes'] or '00' }}" inputmode="numeric" spellcheck="false" aria-label="Minutes" readonly><div class="govuk-input__suffix" aria-hidden="true">minutes</div></div>
                 </div>
               </div>
+              <div class="expert-detail-row govuk-!-margin-bottom-0"><div class="expert-detail-label govuk-body-s">Total amount</div><input class="govuk-input expert-detail-input expert-readonly" type="text" value="{{ requestedAmount or 'Not provided' }}" readonly></div>
             </div>
-            <div class="expert-detail-row govuk-!-margin-bottom-0">
-              <div class="expert-detail-label govuk-body-s">Total amount</div>
-              <input class="govuk-input expert-detail-input expert-readonly" type="text" value="{{ requestedAmount or 'Not provided' }}" readonly>
-            </div>
-          </div>
+          {% endif %}
           </div>
 
           <div class="govuk-radios__item govuk-!-margin-bottom-6">
@@ -236,7 +252,7 @@
               {% if data['expert-amount-decision'] == 'new' %}checked{% endif %}
             >
             <label class="govuk-label govuk-radios__label" for="expert-amount-decision-2">
-              New amount
+              {{ 'New details' if consolidated else 'New amount' }}
             </label>
           </div>
 
@@ -271,6 +287,15 @@
                   </div>
                 </div>
               </div>
+              {% if consolidated and data['expert-apportioned'] %}
+                <div class="expert-detail-row">
+                  <div class="expert-detail-label govuk-body-s">Amount claimed for this prior authority</div>
+                  <div class="govuk-input__wrapper">
+                    <div class="govuk-input__prefix" aria-hidden="true">£</div>
+                    <input class="govuk-input expert-detail-input" type="text" name="expert-new-apportioned-amount" value="{{ data['expert-new-apportioned-amount'] or data['expert-amount-claimed'] or '' }}">
+                  </div>
+                </div>
+              {% endif %}
               <div class="expert-detail-row govuk-!-margin-bottom-0">
                 <div class="expert-detail-label govuk-body-s">Total amount</div>
                 <input class="govuk-input expert-detail-input" type="text" id="expert-new-total-amount" name="expert-new-total-amount" value="{{ data['expert-new-total-amount'] or '' }}">
@@ -280,9 +305,9 @@
         </div>
       </div>
 
-      <h2 class="govuk-heading-m govuk-!-margin-top-6 govuk-!-margin-bottom-2">Justification</h2>
+      <h2 class="govuk-heading-m govuk-!-margin-top-6 govuk-!-margin-bottom-2">{{ 'Explain your decision' if consolidated else 'Justification' }}</h2>
       <p class="govuk-body govuk-!-margin-bottom-4">
-        We will share this justification with the provider in the grant notification email. You will also find this saved in the application history.
+        {% if consolidated %}We will share this justification with the provider in the grant notification email. You will also find this saved in the application history.{% else %}We will share this justification with the provider in the grant notification email. You will also find this saved in the application history.{% endif %}
       </p>
 
       {{ govukTextarea({

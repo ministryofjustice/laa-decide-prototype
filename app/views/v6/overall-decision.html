@@ -94,12 +94,10 @@ Make a decision
       }) }}
     {% endif %}
     
-    <h1 class="govuk-heading-xl govuk-!-margin-bottom-2">Make a decision</h1>
-    <p class="govuk-heading-l govuk-!-margin-bottom-4" style="font-weight: normal;">{{ decisionReference or 'L-12Z-13P' }}</p>
-    
-    <p class="govuk-body govuk-!-margin-bottom-8" style="color: #505a5f;">
-      Use this section to provide more details about your decision. This will be shared with the provider and recorded in application history.
-    </p>
+    <p class="govuk-caption-l">Application reference</p>
+    <p class="govuk-body-l govuk-!-margin-bottom-6">{{ decisionReference or 'L-12Z-13P' }}</p>
+
+    <h1 class="govuk-heading-xl govuk-!-margin-bottom-6">Make a decision</h1>
 
     <div class="govuk-summary-card govuk-!-margin-bottom-8">
       <div class="govuk-summary-card__title-wrapper" style="background-color: #f3f2f1;">
@@ -127,7 +125,7 @@ Make a decision
         idPrefix: "overall-decision",
         fieldset: {
           legend: {
-            text: "What is your overall decision?",
+            text: "What is your decision?",
             classes: "govuk-fieldset__legend--l"
           }
         },
