@@ -1,0 +1,21 @@
+{% extends "layouts/main.html" %}
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% block pageTitle %}Check your answers{% endblock %}
+{% block beforeContent %}{{ govukBackLink({ text: "Back", href: "/v6/disbursement-assessment/review" }) }}{% endblock %}
+{% block content %}
+<div class="govuk-grid-row"><div class="govuk-grid-column-two-thirds">
+  <p class="govuk-caption-l">Application reference</p><p class="govuk-body-l govuk-!-margin-bottom-6">{{ reference }}</p>
+  <h1 class="govuk-heading-l">Check your answers</h1>
+  {% set selectedDisbursementType = data['disbursement-new-type'] if data['disbursement-amount-decision'] == 'new' and data['disbursement-new-type'] else application.disbursementType %}
+  {% set selectedDisbursementAmount = data['disbursement-new-amount'] if data['disbursement-amount-decision'] == 'new' and data['disbursement-new-amount'] else application.disbursementAmount %}
+  {{ govukSummaryList({ card: { title: { text: "Overview" } }, rows: [
+    { key: { text: "Decision" }, value: { text: data['disbursement-decision'] }, actions: { items: [{ href: "/v6/disbursement-assessment/decision", text: "Change", visuallyHiddenText: "decision" }] } },
+    { key: { text: "Application type" }, value: { text: "Prior authority" } },
+    { key: { text: "Disbursement type" }, value: { text: selectedDisbursementType } },
+    { key: { text: "Amount" }, value: { text: '£' ~ selectedDisbursementAmount }, actions: { items: [{ href: "/v6/disbursement-assessment/review", text: "Change", visuallyHiddenText: "amount" }] } },
+    { key: { text: "Decision reason" }, value: { text: data['disbursement-justification'] }, actions: { items: [{ href: "/v6/disbursement-assessment/review", text: "Change", visuallyHiddenText: "decision reason" }] } }
+  ] }) }}
+  <form action="/v6/disbursement-assessment/submit" method="post">{{ govukButton({ text: "Submit decision" }) }}</form>
+</div></div>
+{% endblock %}

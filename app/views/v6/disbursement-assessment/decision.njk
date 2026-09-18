@@ -1,0 +1,15 @@
+{% extends "layouts/main.html" %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% block pageTitle %}Make a decision - Disbursement{% endblock %}
+{% block beforeContent %}{{ govukBackLink({ text: "Back", href: "javascript:history.back()" }) }}{% endblock %}
+{% block content %}
+<div class="govuk-grid-row"><div class="govuk-grid-column-two-thirds">
+  {% if errors and errors.decision %}{{ govukErrorSummary({ titleText: "There is a problem", errorList: [{ text: errors.decision, href: "#disbursement-decision" }] }) }}{% endif %}
+  <p class="govuk-caption-l">Application reference</p><p class="govuk-body-l govuk-!-margin-bottom-6">{{ reference }}</p>
+  <form action="/v6/disbursement-assessment/decision" method="post">
+    {{ govukRadios({ name: "disbursement-decision", idPrefix: "disbursement-decision", fieldset: { legend: { text: "Make a decision", isPageHeading: true, classes: "govuk-fieldset__legend--l" } }, items: [{ value: "Grant", text: "Grant" }, { value: "Refuse", text: "Refuse" }] }) }}
+    {{ govukButton({ text: "Continue" }) }}
+  </form>
+</div></div>
+{% endblock %}

@@ -769,8 +769,11 @@
                 <dl class="govuk-summary-list">
                   <div class="govuk-summary-list__row">
                     <dt class="govuk-summary-list__key">Apportioned</dt>
-                    <dd class="govuk-summary-list__value">No</dd>
+                    <dd class="govuk-summary-list__value">{{ priorAuthorityApplication.apportioned and 'Yes' or 'No' }}</dd>
                   </div>
+                  {% if priorAuthorityApplication.apportioned %}
+                    <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">Number of parties</dt><dd class="govuk-summary-list__value">{{ priorAuthorityApplication.numberOfParties }}</dd></div>
+                  {% endif %}
                   <div class="govuk-summary-list__row">
                     <dt class="govuk-summary-list__key">Hours requested</dt>
                     <dd class="govuk-summary-list__value">
@@ -784,9 +787,9 @@
                     </dd>
                   </div>
                   <div class="govuk-summary-list__row">
-                    <dt class="govuk-summary-list__key">Total amount requested</dt>
+                    <dt class="govuk-summary-list__key">{{ priorAuthorityApplication.apportioned and 'Amount claimed for this prior authority' or 'Total amount requested' }}</dt>
                     <dd class="govuk-summary-list__value">
-                      £{{ priorAuthorityApplication.expertRequestedAmount or ('6,048.00' if 'Psychiatrist' in priorAuthorityType else ('3,420.00' if 'Physiotherapist' in priorAuthorityType else '4,750.00')) }}
+                      £{{ priorAuthorityApplication.apportioned and priorAuthorityApplication.amountClaimedForPriorAuthority or (priorAuthorityApplication.expertRequestedAmount or ('6,048.00' if 'Psychiatrist' in priorAuthorityType else ('3,420.00' if 'Physiotherapist' in priorAuthorityType else '4,750.00'))) }}
                     </dd>
                   </div>
                   <div class="govuk-summary-list__row">
@@ -798,7 +801,20 @@
                 </dl>
               </div>
             </div>
-          {% else %}
+          {% elif priorAuthorityType and 'Disbursement' in priorAuthorityType %}
+            <div class="govuk-summary-card">
+              <div class="govuk-summary-card__title-wrapper">
+                <h3 class="govuk-summary-card__title">Disbursement</h3>
+              </div>
+              <div class="govuk-summary-card__content">
+                <dl class="govuk-summary-list">
+                  <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">Disbursement type</dt><dd class="govuk-summary-list__value">{{ priorAuthorityApplication.disbursementType or 'Travel' }}</dd></div>
+                  <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">Amount to be disbursed</dt><dd class="govuk-summary-list__value">£{{ priorAuthorityApplication.disbursementAmount or '680' }}</dd></div>
+                  <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">Justification of request</dt><dd class="govuk-summary-list__value">{{ priorAuthorityApplication.disbursementJustification or 'The client resides in a remote rural location with no access to public transport. The travel is essential to obtain detailed instructions and review sensitive case documents that cannot be shared electronically.' }}</dd></div>
+                </dl>
+              </div>
+            </div>
+          {% elif not sessionData['consolidated-v6'] %}
             <div class="govuk-summary-card">
               <div class="govuk-summary-card__title-wrapper">
                 <h3 class="govuk-summary-card__title">Counsel</h3>
@@ -919,7 +935,7 @@
                       <td class="govuk-table__cell"><strong class="govuk-tag govuk-tag--green">Granted</strong></td>
                       <td class="govuk-table__cell"><a href="#" class="govuk-link">View</a></td>
                     </tr>
-                  {% else %}
+                  {% elif not sessionData['consolidated-v6'] %}
                     <tr class="govuk-table__row">
                       <td class="govuk-table__cell">Prior authority<br><span class="govuk-body-s">Junior counsel</span></td>
                       <td class="govuk-table__cell">Aspen Dorwart</td>
@@ -954,10 +970,12 @@
             </div>
           </div>
 
-          {% if not priorAuthorityHasDecision %}
+          {% if not priorAuthorityHasDecision and not (sessionData['consolidated-v6'] and priorAuthorityType and 'Counsel' in priorAuthorityType) %}
             {% set priorAuthorityAssessmentHref = "/v6/counsel-assessment/decision?reference=" + reference %}
             {% if priorAuthorityType and 'Expert' in priorAuthorityType %}
               {% set priorAuthorityAssessmentHref = "/v6/expert-assessment/decision?reference=" + reference %}
+            {% elif priorAuthorityType and 'Disbursement' in priorAuthorityType %}
+              {% set priorAuthorityAssessmentHref = "/v6/disbursement-assessment/decision?reference=" + reference %}
             {% endif %}
             <div class="govuk-!-margin-top-8">
               {{ govukButton({

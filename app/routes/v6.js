@@ -819,7 +819,7 @@ function generateMockApplications(count = 8) {
   const openApplications = [];
   const completedApplications = [];
   const generatedRefs = new Set();
-  const priorAuthorityTypes = ['Expert - Psychiatrist', 'Expert - Physiotherapist', 'Expert - Medical examiner', 'Counsel', "King's Counsel"];
+  const priorAuthorityTypes = ['Expert - Psychiatrist', 'Expert - Physiotherapist', 'Expert - Medical examiner', 'Disbursement', 'Counsel', "King's Counsel"];
 
   function uniqueRef() {
     let ref = generateRandomRef();
@@ -905,6 +905,12 @@ function generateMockApplications(count = 8) {
         isPriorAuthority: true
         // No status — awaiting PA assessment
       };
+
+      if (paType === 'Disbursement') {
+        paApp.disbursementType = 'Travel';
+        paApp.disbursementAmount = '680';
+        paApp.disbursementJustification = 'The client resides in a remote rural location with no access to public transport. The travel is essential to obtain detailed instructions and review sensitive case documents that cannot be shared electronically.';
+      }
 
       if (expertProfile) {
         paApp.expertName            = expertProfile.name;
@@ -1137,6 +1143,10 @@ function applicationVariantKey(app) {
   return `${app.ref}|${Boolean(app.isPriorAuthority)}`;
 }
 
+function isCounselPriorAuthority(application) {
+  return Boolean(application && application.isPriorAuthority && application.priorAuthorityType && application.priorAuthorityType.includes('Counsel'));
+}
+
 function generateReplacementOpenApplication(preferredType, existingVariantKeys = new Set(), scenario = 'linked-initial') {
   const maxAttempts = 8;
 
@@ -1216,6 +1226,10 @@ router.get('/open-applications', function(req, res) {
     .filter(app => !app.isRedetermination);
 
   if (consolidated) {
+    req.session.data['open-applications-all'] = req.session.data['open-applications-all'].filter(app => !isCounselPriorAuthority(app));
+    req.session.data['assigned-applications'] = req.session.data['assigned-applications'].filter(app => !isCounselPriorAuthority(app));
+    applications = applications.filter(app => !isCounselPriorAuthority(app));
+
     if (!req.session.data['consolidated-extra-initial-applications-v6']) {
       const existingRefs = new Set(applications.map(app => app.ref));
       req.session.data['consolidated-extra-initial-applications-v6'] = generateMockApplications(8).open
@@ -1223,7 +1237,48 @@ router.get('/open-applications', function(req, res) {
         .slice(0, 4);
     }
     applications = applications.concat(req.session.data['consolidated-extra-initial-applications-v6']);
-    applications = applications.filter(app => !app.priorAuthorityType || !app.priorAuthorityType.includes('Counsel'));
+    if (!req.session.data['consolidated-disbursement-application-v6']) {
+      const existingReferences = new Set(applications.map(app => app.ref));
+      let reference = generateRandomRef();
+      while (existingReferences.has(reference)) reference = generateRandomRef();
+      req.session.data['consolidated-disbursement-application-v6'] = {
+        ref: reference,
+        reference: reference,
+        firstName: 'Angel',
+        lastName: 'Philips',
+        dob: '12 Jan 1980',
+        submitted: '15 Feb 2026',
+        firm: 'WATKINS SOLICITORS INC<br>OK514R',
+        type: 'Prior authority',
+        priorAuthorityType: 'Disbursement',
+        delegatedFunctions: 'N/A',
+        matterType: { title: 'Family', subtext: "Special Children's Act" },
+        isPriorAuthority: true,
+        disbursementType: 'Travel',
+        disbursementAmount: '680',
+        disbursementJustification: 'The client resides in a remote rural location with no access to public transport. The travel is essential to obtain detailed instructions and review sensitive case documents that cannot be shared electronically.'
+      };
+    }
+    const disbursement = req.session.data['consolidated-disbursement-application-v6'];
+    if (!req.session.data['open-applications-all'].some(app => app.ref === disbursement.ref && app.isPriorAuthority)) {
+      req.session.data['open-applications-all'].push(disbursement);
+    }
+    if (!applications.some(app => app.ref === disbursement.ref && app.isPriorAuthority)) {
+      applications.push(disbursement);
+    }
+
+    const expertApplications = applications.filter(app => app.isPriorAuthority && app.priorAuthorityType && app.priorAuthorityType.includes('Expert'));
+    const apportionedCount = Math.floor(expertApplications.length / 2);
+    expertApplications.forEach((app, index) => {
+      app.apportioned = index < apportionedCount;
+      if (app.apportioned) {
+        app.numberOfParties = String(2 + (index % 3));
+        app.amountClaimedForPriorAuthority = (Number(app.expertRequestedAmount) / Number(app.numberOfParties)).toFixed(2);
+      } else {
+        delete app.numberOfParties;
+        delete app.amountClaimedForPriorAuthority;
+      }
+    });
   }
 
   // Remove applications already in a caseworker's list from open applications.
@@ -2928,6 +2983,82 @@ function removePriorAuthorityFromAssignedList(req, reference) {
   req.session.data['assigned-applications'] = assigned.filter(app => !(app.ref === reference && app.isPriorAuthority));
 }
 
+router.get('/disbursement-assessment/decision', function(req, res) {
+  const reference = req.query.reference || req.session.data['disbursement-assessment-reference'] || '';
+  const application = findApplicationByReference(req, reference, true);
+  if (!application || !String(application.priorAuthorityType).includes('Disbursement')) {
+    res.redirect('/v6/open-applications');
+    return;
+  }
+  req.session.data['disbursement-assessment-reference'] = reference;
+  const errors = req.session.data['disbursement-decision-errors'] || null;
+  delete req.session.data['disbursement-decision-errors'];
+  res.render('v6/disbursement-assessment/decision.njk', { reference, errors, consolidated: req.session.data['consolidated-v6'] === true });
+});
+
+router.post('/disbursement-assessment/decision', function(req, res) {
+  const decision = req.body['disbursement-decision'];
+  if (!decision) {
+    req.session.data['disbursement-decision-errors'] = { decision: 'Select grant or refuse to continue' };
+    res.redirect('/v6/disbursement-assessment/decision');
+    return;
+  }
+  req.session.data['disbursement-decision'] = decision;
+  res.redirect(decision === 'Refuse' ? '/v6/disbursement-assessment/review' : '/v6/disbursement-assessment/review');
+});
+
+router.get('/disbursement-assessment/review', function(req, res) {
+  const reference = req.session.data['disbursement-assessment-reference'] || '';
+  const application = findApplicationByReference(req, reference, true);
+  const errors = req.session.data['disbursement-review-errors'] || null;
+  delete req.session.data['disbursement-review-errors'];
+  res.render('v6/disbursement-assessment/review.njk', { reference, application, errors, data: req.session.data });
+});
+
+router.post('/disbursement-assessment/review', function(req, res) {
+  const amountDecision = req.body['disbursement-amount-decision'];
+  const justification = (req.body['disbursement-justification'] || '').trim();
+  const newType = (req.body['disbursement-new-type'] || '').trim();
+  const newAmount = (req.body['disbursement-new-amount'] || '').trim();
+  if (!amountDecision || !justification || (amountDecision === 'new' && (!newType || !newAmount))) {
+    req.session.data['disbursement-review-errors'] = {
+      amount: !amountDecision ? 'Select the amount to grant' : null,
+      justification: !justification ? 'Enter justification' : null,
+      newAmount: amountDecision === 'new' && (!newType || !newAmount) ? 'Enter the new disbursement type and amount' : null
+    };
+    res.redirect('/v6/disbursement-assessment/review');
+    return;
+  }
+  req.session.data['disbursement-amount-decision'] = amountDecision;
+  req.session.data['disbursement-justification'] = justification;
+  req.session.data['disbursement-new-type'] = newType;
+  req.session.data['disbursement-new-amount'] = newAmount;
+  res.redirect('/v6/disbursement-assessment/check-your-answers');
+});
+
+router.get('/disbursement-assessment/check-your-answers', function(req, res) {
+  const reference = req.session.data['disbursement-assessment-reference'] || '';
+  const application = findApplicationByReference(req, reference, true);
+  res.render('v6/disbursement-assessment/check-your-answers.njk', { reference, application, data: req.session.data });
+});
+
+router.post('/disbursement-assessment/submit', function(req, res) {
+  const reference = req.session.data['disbursement-assessment-reference'] || '';
+  const decision = req.session.data['disbursement-decision'];
+  if (!reference || !decision) {
+    res.redirect('/v6/disbursement-assessment/decision');
+    return;
+  }
+  updatePriorAuthorityStatusForReference(req, reference, decision);
+  removePriorAuthorityFromAssignedList(req, reference);
+  res.redirect('/v6/disbursement-assessment/confirmation');
+});
+
+router.get('/disbursement-assessment/confirmation', function(req, res) {
+  const reference = req.session.data['disbursement-assessment-reference'] || '';
+  res.render(req.session.data['consolidated-v6'] === true ? 'v6/consolidated-confirmation.njk' : 'v6/expert-assessment/confirmation.njk', { reference });
+});
+
 router.get('/counsel-assessment/decision', function (req, res) {
   const reference = req.query.reference || req.session.data['counsel-assessment-reference'] || '';
   const currentReference = req.session.data['counsel-assessment-reference'];
@@ -3181,6 +3312,7 @@ router.get('/expert-assessment/decision', function (req, res) {
     delete req.session.data['expert-new-hours'];
     delete req.session.data['expert-new-minutes'];
     delete req.session.data['expert-new-total-amount'];
+    delete req.session.data['expert-new-apportioned-amount'];
     delete req.session.data['expert-assessment-errors'];
     delete req.session.data['expert-refuse-justification-errors'];
     delete req.session.data['expert-assessment-amount-errors'];
@@ -3213,6 +3345,9 @@ router.get('/expert-assessment/decision', function (req, res) {
   req.session.data['expert-default-hours'] = expertDetails.hours;
   req.session.data['expert-default-minutes'] = expertDetails.minutes;
   req.session.data['expert-requested-amount'] = expertDetails.requestedAmount;
+  req.session.data['expert-apportioned'] = Boolean(priorAuthorityApplication && priorAuthorityApplication.apportioned);
+  req.session.data['expert-number-of-parties'] = priorAuthorityApplication && priorAuthorityApplication.numberOfParties;
+  req.session.data['expert-amount-claimed'] = priorAuthorityApplication && priorAuthorityApplication.amountClaimedForPriorAuthority;
 
   const errors = req.session.data['expert-assessment-errors'] || null;
   delete req.session.data['expert-assessment-errors'];
@@ -3319,6 +3454,7 @@ router.post('/expert-assessment/amount-handler', function (req, res) {
     req.session.data['expert-new-amount'] = Number.isFinite(parsed) && parsed > 0
       ? parsed.toFixed(2)
       : req.session.data['expert-requested-amount'];
+    req.session.data['expert-new-apportioned-amount'] = (req.body['expert-new-apportioned-amount'] || '').trim();
   } else {
     delete req.session.data['expert-new-name'];
     delete req.session.data['expert-new-type'];
@@ -3328,6 +3464,7 @@ router.post('/expert-assessment/amount-handler', function (req, res) {
     delete req.session.data['expert-new-minutes'];
     delete req.session.data['expert-new-total-amount'];
     delete req.session.data['expert-new-amount'];
+    delete req.session.data['expert-new-apportioned-amount'];
   }
 
   res.redirect('/v6/expert-assessment/check-your-answers');

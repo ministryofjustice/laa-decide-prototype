@@ -175,6 +175,18 @@
           ]
         }) }}
 
+        {% set categoryItems = [
+          { value: "expert", text: "Expert", checked: query.categories and ("expert" in query.categories) },
+          { value: "expenses", text: "Expenses", checked: query.categories and ("expenses" in query.categories) }
+        ] %}
+        {% if not consolidated %}
+          {% set categoryItems = [
+            { value: "expert", text: "Expert", checked: query.categories and ("expert" in query.categories) },
+            { value: "junior-counsel", text: "Junior counsel", checked: query.categories and ("junior-counsel" in query.categories) },
+            { value: "expenses", text: "Expenses", checked: query.categories and ("expenses" in query.categories) }
+          ] %}
+        {% endif %}
+
         {{ govukCheckboxes({
           idPrefix: "categories",
           name: "categories",
@@ -182,11 +194,7 @@
           fieldset: {
             legend: { text: "Categories", classes: "govuk-fieldset__legend--s govuk-!-font-weight-bold" }
           },
-          items: [
-            { value: "expert", text: "Expert", checked: query.categories and ("expert" in query.categories) },
-            { value: "junior-counsel", text: "Junior counsel", checked: query.categories and ("junior-counsel" in query.categories) },
-            { value: "expenses", text: "Expenses", checked: query.categories and ("expenses" in query.categories) }
-          ]
+          items: categoryItems
         }) }}
       {% endset %}
 

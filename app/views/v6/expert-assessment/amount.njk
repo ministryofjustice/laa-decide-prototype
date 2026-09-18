@@ -204,8 +204,12 @@
               <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">Expert type</dt><dd class="govuk-summary-list__value">{{ data['expert-default-type'] or 'Not provided' }}</dd></div>
               <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">Post code</dt><dd class="govuk-summary-list__value">{{ data['expert-default-location'] or 'Not provided' }}</dd></div>
               <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">Expert fee hourly rate</dt><dd class="govuk-summary-list__value">£{{ data['expert-default-rate'] or 'Not provided' }}</dd></div>
+              <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">Apportioned</dt><dd class="govuk-summary-list__value">{{ data['expert-apportioned'] and 'Yes' or 'No' }}</dd></div>
+              {% if data['expert-apportioned'] %}
+                <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">Number of parties</dt><dd class="govuk-summary-list__value">{{ data['expert-number-of-parties'] }}</dd></div>
+              {% endif %}
               <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">Hours requested</dt><dd class="govuk-summary-list__value">{{ data['expert-default-hours'] or '00' }} hours {{ data['expert-default-minutes'] or '00' }} mins</dd></div>
-              <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">Total amount</dt><dd class="govuk-summary-list__value">{{ requestedAmount or 'Not provided' }}</dd></div>
+              <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">{{ data['expert-apportioned'] and 'Amount claimed for this prior authority' or 'Total amount' }}</dt><dd class="govuk-summary-list__value">£{{ data['expert-apportioned'] and data['expert-amount-claimed'] or requestedAmount or 'Not provided' }}</dd></div>
             </dl>
           {% else %}
             <div class="expert-requested-block">
@@ -283,6 +287,15 @@
                   </div>
                 </div>
               </div>
+              {% if consolidated and data['expert-apportioned'] %}
+                <div class="expert-detail-row">
+                  <div class="expert-detail-label govuk-body-s">Amount claimed for this prior authority</div>
+                  <div class="govuk-input__wrapper">
+                    <div class="govuk-input__prefix" aria-hidden="true">£</div>
+                    <input class="govuk-input expert-detail-input" type="text" name="expert-new-apportioned-amount" value="{{ data['expert-new-apportioned-amount'] or data['expert-amount-claimed'] or '' }}">
+                  </div>
+                </div>
+              {% endif %}
               <div class="expert-detail-row govuk-!-margin-bottom-0">
                 <div class="expert-detail-label govuk-body-s">Total amount</div>
                 <input class="govuk-input expert-detail-input" type="text" id="expert-new-total-amount" name="expert-new-total-amount" value="{{ data['expert-new-total-amount'] or '' }}">

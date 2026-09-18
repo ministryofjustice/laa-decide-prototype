@@ -1,0 +1,21 @@
+{% extends "layouts/main.html" %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+{% from "govuk/components/textarea/macro.njk" import govukTextarea %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% block pageTitle %}Review details of request{% endblock %}
+{% block beforeContent %}{{ govukBackLink({ text: "Back", href: "javascript:history.back()" }) }}{% endblock %}
+{% block content %}
+<div class="govuk-grid-row"><div class="govuk-grid-column-two-thirds">
+  {% if errors and (errors.amount or errors.justification) %}{{ govukErrorSummary({ titleText: "There is a problem", errorList: [{ text: errors.amount or errors.justification, href: "#disbursement-amount-decision" }] }) }}{% endif %}
+  <p class="govuk-caption-l">Application reference</p><p class="govuk-body-l govuk-!-margin-bottom-6">{{ reference }}</p>
+  <h1 class="govuk-heading-l">Review details of request</h1>
+  <form action="/v6/disbursement-assessment/review" method="post">
+    {{ govukRadios({ name: "disbursement-amount-decision", idPrefix: "disbursement-amount-decision", items: [
+      { value: "requested", text: "Requested amount", checked: data['disbursement-amount-decision'] != 'new', conditional: { html: '<dl class="govuk-summary-list"><div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">Disbursement type</dt><dd class="govuk-summary-list__value">' ~ (application.disbursementType or 'Travel') ~ '</dd></div><div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">Amount</dt><dd class="govuk-summary-list__value">£' ~ (application.disbursementAmount or '680') ~ '</dd></div></dl>' } },
+      { value: "new", text: "New amount", checked: data['disbursement-amount-decision'] == 'new', conditional: { html: '<div class="govuk-form-group"><label class="govuk-label" for="disbursement-new-type">Disbursement type</label><input class="govuk-input" id="disbursement-new-type" name="disbursement-new-type" value="' ~ (data['disbursement-new-type'] or '') ~ '"></div><div class="govuk-form-group"><label class="govuk-label" for="disbursement-new-amount">Amount</label><div class="govuk-input__wrapper"><div class="govuk-input__prefix">£</div><input class="govuk-input govuk-input--width-10" id="disbursement-new-amount" name="disbursement-new-amount" value="' ~ (data['disbursement-new-amount'] or '') ~ '"></div></div>' } }
+    ] }) }}
+    {{ govukTextarea({ name: "disbursement-justification", id: "disbursement-justification", label: { text: "Explain your decision", classes: "govuk-label--m" }, hint: { text: "We will share this justification with the provider in the grant notification email. You will also find this saved in the application history." }, value: data['disbursement-justification'] }) }}
+    <p class="govuk-hint">You can enter up to 350 words</p>{{ govukButton({ text: "Continue" }) }}
+  </form>
+</div></div>
+{% endblock %}
