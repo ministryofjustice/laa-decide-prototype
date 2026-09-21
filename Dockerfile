@@ -7,10 +7,6 @@ RUN addgroup --gid 1017 --system appgroup \
 
 WORKDIR /app
 
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends make python3 && \
-    rm -rf /var/lib/apt/lists/*
-
 COPY . .
 
 RUN npm install
