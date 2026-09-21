@@ -8,8 +8,8 @@ RUN addgroup --gid 1017 --system appgroup \
 WORKDIR /app
 
 RUN apt-get update && \
-    apt-get upgrade -y && \
-    apt-get install -y make python3
+    apt-get install -y --no-install-recommends make python3 && \
+    rm -rf /var/lib/apt/lists/*
 
 COPY . .
 
