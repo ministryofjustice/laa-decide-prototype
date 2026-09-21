@@ -158,7 +158,7 @@
       <h1 class="govuk-heading-xl govuk-!-margin-bottom-4">{{ application.ref or application.reference }}</h1>
 
       <p class="govuk-body govuk-!-margin-bottom-1">
-        <strong>Assigned to:</strong> Caseworker name
+        <strong>Assigned to:</strong> <span id="assigned-caseworker">{{ assignedCaseworker }}</span>
       </p>
       <p class="govuk-body govuk-!-margin-bottom-6">
         <strong>Date received:</strong> 19 May 2023
@@ -236,6 +236,29 @@
                   const form = document.getElementById('addToListForm');
                   if (form) {
                     form.outerHTML = '<a href="/v6/reassign?reference=' + encodeURIComponent(reference) + '&isPriorAuthority=' + encodeURIComponent(isPriorAuthority) + '" class="govuk-button govuk-button--secondary govuk-!-margin-bottom-8" data-module="govuk-button" style="background-color: #00703c; color: white;">Reassign</a>';
+                  }
+
+                  const assignedCaseworker = document.getElementById('assigned-caseworker');
+                  if (assignedCaseworker && data.assignedCaseworker) {
+                    assignedCaseworker.textContent = data.assignedCaseworker;
+                  }
+
+                  const statusHtml = '<strong class="govuk-tag govuk-tag--light-blue">In progress</strong>';
+                  const pageStatusTag = document.getElementById('page-status-tag');
+                  const statusTemplate = document.getElementById(
+                    isPriorAuthority === 'true'
+                      ? 'prior-authority-status-tag-template'
+                      : 'initial-status-tag-template'
+                  );
+                  if (statusTemplate) {
+                    statusTemplate.innerHTML = statusHtml;
+                  }
+                  const activeHash = window.location.hash || '#application-details';
+                  const assignedTabIsActive = isPriorAuthority === 'true'
+                    ? activeHash === '#prior-authority'
+                    : activeHash !== '#prior-authority';
+                  if (pageStatusTag && assignedTabIsActive) {
+                    pageStatusTag.innerHTML = statusHtml;
                   }
                 })
               .catch(error => console.error('Error:', error));
@@ -510,10 +533,10 @@
           </div>
         </div>
 
-        {% if not hasDecision %}
+        {% if isInitialApplicationAssigned and not hasDecision %}
           <div class="govuk-!-margin-top-8">
             {{ govukButton({
-              text: "Make assessment",
+              text: "Make a decision",
               href: "/v6/decision-start?ref=" ~ reference,
               style: "background-color: #00703c; color: white;"
             }) }}
@@ -576,10 +599,10 @@
           ]
         }) }}
 
-        {% if not hasDecision %}
+        {% if isInitialApplicationAssigned and not hasDecision %}
           <div class="govuk-!-margin-top-6">
             {{ govukButton({
-              text: "Make assessment",
+              text: "Make a decision",
               style: "background-color: #00703c; color: white;"
             }) }}
           </div>
@@ -970,7 +993,7 @@
             </div>
           </div>
 
-          {% if not priorAuthorityHasDecision and not (sessionData['consolidated-v6'] and priorAuthorityType and 'Counsel' in priorAuthorityType) %}
+          {% if isPriorAuthorityAssigned and not priorAuthorityHasDecision and not (sessionData['consolidated-v6'] and priorAuthorityType and 'Counsel' in priorAuthorityType) %}
             {% set priorAuthorityAssessmentHref = "/v6/counsel-assessment/decision?reference=" + reference %}
             {% if priorAuthorityType and 'Expert' in priorAuthorityType %}
               {% set priorAuthorityAssessmentHref = "/v6/expert-assessment/decision?reference=" + reference %}
@@ -979,7 +1002,7 @@
             {% endif %}
             <div class="govuk-!-margin-top-8">
               {{ govukButton({
-                text: "Make assessment",
+                text: "Make a decision",
                 href: priorAuthorityAssessmentHref,
                 style: "background-color: #00703c; color: white;"
               }) }}

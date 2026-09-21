@@ -28,6 +28,32 @@ function reconstructApplicationAtVersion(application, history, versionIndex) {
 
   // Clone the application to avoid mutating the original
   const reconstructed = JSON.parse(JSON.stringify(application));
+
+  function setHistoricalField(field, value) {
+    switch (field) {
+      case 'firstName': reconstructed.firstName = value; break;
+      case 'lastName': reconstructed.lastName = value; break;
+      case 'dob': reconstructed.dob = value; break;
+      case 'niNumber': reconstructed.niNumber = value; break;
+      case 'homeAddress': reconstructed.homeAddress = value; break;
+      case 'address': reconstructed.address = value; break;
+      case 'correspondenceAddress': reconstructed.correspondenceAddress = value; break;
+      case 'opponentName': reconstructed.opponentName = value; break;
+      case 'priorAuthorityType': reconstructed.priorAuthorityType = value; break;
+    }
+  }
+
+  // Reverse edits made after this version before replaying its event stream.
+  for (let i = history.length - 1; i > versionIndex; i--) {
+    const event = history[i];
+    if (event.fieldChanged && typeof event.oldValue !== 'undefined') {
+      setHistoricalField(event.fieldChanged, event.oldValue);
+    }
+  }
+
+  reconstructed.status = 'Submitted';
+  reconstructed.decisionType = null;
+  if (application.isPriorAuthority) reconstructed.priorAuthorityStatus = 'Submitted';
   
   // Apply all events up to and including the specified version
   for (let i = 0; i <= versionIndex && i < history.length; i++) {
@@ -36,8 +62,12 @@ function reconstructApplicationAtVersion(application, history, versionIndex) {
     // Handle status changes (for main application or PA decisions)
     if (event.statusAfter) {
       if (event.type === 'pa_decision') {
+        if (application.isPriorAuthority) {
+          reconstructed.status = event.statusAfter;
+          reconstructed.decisionType = event.statusAfter === 'Granted' ? 'Grant' : 'Refuse';
+        }
         reconstructed.priorAuthorityStatus = event.statusAfter;
-      } else {
+      } else if (!application.isPriorAuthority) {
         reconstructed.status = event.statusAfter;
         reconstructed.decisionType = event.statusAfter === 'Granted' ? 'Grant' : 
                                      event.statusAfter === 'Refused' ? 'Refuse' : null;
@@ -46,20 +76,7 @@ function reconstructApplicationAtVersion(application, history, versionIndex) {
     
     // Handle data changes (name, address, etc.)
     if (event.fieldChanged) {
-      switch (event.fieldChanged) {
-        case 'firstName':
-          reconstructed.firstName = event.newValue;
-          break;
-        case 'address':
-          reconstructed.address = event.newValue;
-          break;
-        case 'correspondenceAddress':
-          reconstructed.correspondenceAddress = event.newValue;
-          break;
-        case 'priorAuthorityType':
-          reconstructed.priorAuthorityType = event.newValue;
-          break;
-      }
+      setHistoricalField(event.fieldChanged, event.newValue);
     }
   }
   
@@ -290,11 +307,13 @@ router.post('/refuse-decision-submit', function(request, response) {
             timestamp: datetime,
             action: 'Initial application refused',
             caseworker: caseworker,
+            type: 'decision',
+            statusAfter: 'Refused',
             changes: {
               From: 'Submitted',
               To: 'Refused'
             },
-            details: justification || null,
+            justification: justification || null,
             versionLink: '/v6/application/' + decisionReference
         })
         
@@ -372,6 +391,8 @@ router.post('/check-answers-submit', function(request, response) {
               timestamp: datetime,
               action: 'Initial application granted',
               caseworker: caseworker,
+              type: 'decision',
+              statusAfter: 'Granted',
               changes: {
                 From: 'Submitted',
                 To: 'Granted'
@@ -577,6 +598,160 @@ function addHistoryEvent(ref, action, caseworker, details = null, changes = null
     caseworker: caseworker,
     details: details,
     changes: changes
+  });
+}
+
+function historyTimestamp(date, time = '09:00') {
+  const fallbackDate = new Date().toLocaleDateString('en-GB', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric'
+  });
+  return `${date || fallbackDate} ${time}`;
+}
+
+function currentHistoryTimestamp() {
+  const now = new Date();
+  return now.toLocaleDateString('en-GB', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric'
+  }) + ' ' + now.toLocaleTimeString('en-GB', {
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+}
+
+function applicationsForReference(req, reference) {
+  const collections = [
+    req.session.data['assigned-applications'] || [],
+    req.session.data['completed-applications'] || [],
+    req.session.data['open-applications'] || [],
+    req.session.data['open-applications-all'] || [],
+    req.session.data['consolidated-extra-initial-applications-v6'] || []
+  ];
+  return collections.flat().filter(application => application && application.ref === reference);
+}
+
+function stableConsolidatedCaseworker(req, reference, variant = 'initial') {
+  if (!req.session.data['consolidated-caseworkers-v6']) {
+    req.session.data['consolidated-caseworkers-v6'] = {};
+  }
+  const key = `${reference}|${variant}`;
+  if (!req.session.data['consolidated-caseworkers-v6'][key]) {
+    req.session.data['consolidated-caseworkers-v6'][key] = caseworkers[Math.floor(Math.random() * caseworkers.length)];
+  }
+  return req.session.data['consolidated-caseworkers-v6'][key];
+}
+
+function ensureConsolidatedHistory(req, reference, currentApplication = null) {
+  if (req.session.data['consolidated-v6'] !== true || !reference) return;
+
+  if (!req.session.data['app-history']) req.session.data['app-history'] = {};
+  const existingHistory = req.session.data['app-history'][reference] || [];
+  const applications = applicationsForReference(req, reference);
+  const initialApplication = applications.find(application => !application.isPriorAuthority && !application.isRedetermination) || null;
+  const assignedInitialApplication = (req.session.data['assigned-applications'] || [])
+    .find(application => application.ref === reference && !application.isPriorAuthority && !application.isRedetermination) || null;
+  const laterApplication = currentApplication && (currentApplication.isPriorAuthority || currentApplication.isRedetermination)
+    ? currentApplication
+    : applications.find(application => application.isPriorAuthority || application.isRedetermination) || null;
+  const requiresGrantedInitial = Boolean(laterApplication);
+  const initialDate = (initialApplication && initialApplication.submitted) || (laterApplication && laterApplication.initialApplicationSubmitted) || null;
+  const existingInitialAssignment = existingHistory.find(event => /initial application assigned|^application assigned/i.test(event.action || ''));
+  const initialCaseworker = (assignedInitialApplication && assignedInitialApplication.caseworker)
+    || (initialApplication && initialApplication.caseworker)
+    || (existingInitialAssignment && existingInitialAssignment.caseworker !== 'Caseworker name' && existingInitialAssignment.caseworker)
+    || stableConsolidatedCaseworker(req, reference);
+  const remainingEvents = [...existingHistory];
+
+  function takeExisting(predicate, fallback) {
+    const index = remainingEvents.findIndex(predicate);
+    return index >= 0 ? remainingEvents.splice(index, 1)[0] : fallback;
+  }
+
+  const requiredEvents = [
+    takeExisting(
+      event => /^(initial )?application received$/i.test(event.action || ''),
+      {
+        timestamp: historyTimestamp(initialDate, '09:00'),
+        action: 'Initial application received',
+        caseworker: 'N/A',
+        type: 'status_change',
+        statusAfter: 'Submitted',
+        justification: 'Initial application submitted by provider.'
+      }
+    )
+  ];
+  requiredEvents[0].action = 'Initial application received';
+
+  const isInitialAssignment = event => /initial application assigned|^application assigned/i.test(event.action || '');
+  const hasInitialAssignment = Boolean(assignedInitialApplication) || remainingEvents.some(isInitialAssignment);
+
+  if (requiresGrantedInitial || hasInitialAssignment) {
+    requiredEvents.push(takeExisting(
+      event => isInitialAssignment(event) && (event.caseworker === initialCaseworker || initialCaseworker === 'Caseworker name'),
+      {
+        timestamp: historyTimestamp(initialDate, '10:00'),
+        action: `Initial application assigned to ${initialCaseworker}`,
+        caseworker: initialCaseworker,
+        type: 'assignment'
+      }
+    ));
+    requiredEvents[1].action = `Initial application assigned to ${requiredEvents[1].caseworker || initialCaseworker}`;
+    requiredEvents[1].type = 'assignment';
+    for (let index = remainingEvents.length - 1; index >= 0; index--) {
+      if (isInitialAssignment(remainingEvents[index])) remainingEvents.splice(index, 1);
+    }
+  }
+
+  if (requiresGrantedInitial) {
+    requiredEvents.push(takeExisting(
+      event => /initial application granted|decision to grant application/i.test(event.action || ''),
+      {
+        timestamp: historyTimestamp(initialDate, '11:00'),
+        action: 'Initial application granted',
+        caseworker: initialCaseworker,
+        type: 'decision',
+        statusAfter: 'Granted',
+        changes: { From: 'Submitted', To: 'Granted' }
+      }
+    ));
+    const grantedEvent = requiredEvents[requiredEvents.length - 1];
+    grantedEvent.action = 'Initial application granted';
+    grantedEvent.type = 'decision';
+    grantedEvent.statusAfter = 'Granted';
+
+    const isRedetermination = Boolean(laterApplication.isRedetermination);
+    const receivedLabel = isRedetermination ? 'Redetermination received' : 'Prior authority received';
+    requiredEvents.push(takeExisting(
+      event => isRedetermination
+        ? /redetermination received/i.test(event.action || '')
+        : /prior authority( request)? received/i.test(event.action || ''),
+      {
+        timestamp: historyTimestamp(laterApplication.submitted, '09:00'),
+        action: receivedLabel,
+        caseworker: 'N/A',
+        type: isRedetermination ? 'redetermination_status_change' : 'pa_status_change',
+        statusAfter: 'Submitted',
+        justification: isRedetermination
+          ? 'Redetermination request submitted by provider.'
+          : 'Prior authority request submitted by provider.'
+      }
+    ));
+    requiredEvents[requiredEvents.length - 1].action = receivedLabel;
+  }
+
+  req.session.data['app-history'][reference] = [...requiredEvents, ...remainingEvents];
+}
+
+function appendConsolidatedHistory(req, reference, event, currentApplication = null) {
+  if (req.session.data['consolidated-v6'] !== true || !reference) return;
+  ensureConsolidatedHistory(req, reference, currentApplication);
+  req.session.data['app-history'][reference].push({
+    timestamp: currentHistoryTimestamp(),
+    caseworker: 'Caseworker name',
+    ...event
   });
 }
 
@@ -788,6 +963,17 @@ function generateRandomDate() {
   return formatted;
 }
 
+function generateDateAfter(dateText, daysAfter) {
+  const date = new Date(dateText);
+  if (Number.isNaN(date.getTime())) return generateRandomDate();
+  date.setDate(date.getDate() + daysAfter);
+  return date.toLocaleDateString('en-GB', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric'
+  });
+}
+
 const expertProfiles = {
   Psychiatrist: [
     { name: 'Dr Morley Calzoni',    type: 'Psychiatrist',    location: 'London',     hours: '60', minutes: '00', rate: '100.80', requestedAmount: '6048.00', justification: 'Expert required to undertake psychiatric assessment on client, ordered by the court' },
@@ -888,7 +1074,7 @@ function generateMockApplications(count = 8) {
       const paType = shuffled[j];
       const isExpert = paType.includes('Expert');
       const expertProfile = isExpert ? pickExpertProfile(paType) : null;
-      const paSubmitted = generateRandomDate();
+      const paSubmitted = generateDateAfter(initialSubmitted, 7 + (j * 7));
 
       const paApp = {
         ref,
@@ -1260,6 +1446,18 @@ router.get('/open-applications', function(req, res) {
       };
     }
     const disbursement = req.session.data['consolidated-disbursement-application-v6'];
+    if (!req.session.data['completed-applications'].some(app => app.ref === disbursement.ref && !app.isPriorAuthority)) {
+      req.session.data['completed-applications'].push({
+        ...disbursement,
+        submitted: generateDateAfter(disbursement.submitted, -12),
+        type: 'Initial application',
+        priorAuthorityType: null,
+        isPriorAuthority: false,
+        status: 'Granted',
+        decisionType: 'Grant',
+        caseworker: 'Caseworker name'
+      });
+    }
     if (!req.session.data['open-applications-all'].some(app => app.ref === disbursement.ref && app.isPriorAuthority)) {
       req.session.data['open-applications-all'].push(disbursement);
     }
@@ -1497,6 +1695,7 @@ router.post('/your-list', function(req, res) {
 
   const assignedApplications = req.session.data['assigned-applications'] || [];
   const beforeCount = assignedApplications.length;
+  const reassignedApplications = [];
 
   if (ref && assignedApplications.length > 0) {
     const linkedGroupRows = req.session.data['linked-cases-by-reference-v6'] && req.session.data['linked-cases-by-reference-v6'][ref]
@@ -1505,19 +1704,14 @@ router.post('/your-list', function(req, res) {
     const linkedGroupRefs = [...new Set(linkedGroupRows.map(row => row.reference).filter(Boolean))];
 
     req.session.data['assigned-applications'] = assignedApplications.filter(app => {
+      let shouldRemove = false;
       if (isPriorAuthority) {
-        return !(app.ref === ref && Boolean(app.isPriorAuthority));
+        shouldRemove = app.ref === ref && Boolean(app.isPriorAuthority);
+      } else if (!Boolean(app.isPriorAuthority)) {
+        shouldRemove = linkedGroupRefs.length > 0 ? linkedGroupRefs.includes(app.ref) : app.ref === ref;
       }
-
-      if (Boolean(app.isPriorAuthority)) {
-        return true;
-      }
-
-      if (linkedGroupRefs.length > 0) {
-        return !linkedGroupRefs.includes(app.ref);
-      }
-
-      return app.ref !== ref;
+      if (shouldRemove) reassignedApplications.push(app);
+      return !shouldRemove;
     });
   }
 
@@ -1529,6 +1723,18 @@ router.post('/your-list', function(req, res) {
   }
   if (req.body['reassign-to']) {
     req.session.data['reassign-to'] = req.body['reassign-to'];
+  }
+
+  if (req.session.data['consolidated-v6'] === true) {
+    const newCaseworker = req.body['reassign-to'] || 'another caseworker';
+    reassignedApplications.forEach(application => {
+      appendConsolidatedHistory(req, application.ref, {
+        action: `${application.isPriorAuthority ? 'Prior authority' : 'Initial application'} reassigned to ${newCaseworker}`,
+        caseworker: application.caseworker || 'Caseworker name',
+        type: application.isPriorAuthority ? 'pa_assignment' : 'assignment',
+        justification: `Reassigned to ${newCaseworker}.`
+      }, application);
+    });
   }
 
   req.session.data['reassign-reference'] = null;
@@ -1581,6 +1787,10 @@ router.get('/add-application/:reference', function(req, res) {
   const isPriorAuthorityRequested = req.query.isPriorAuthority === 'true';
   const hasPriorAuthorityParam = typeof req.query.isPriorAuthority !== 'undefined';
   const assignedCaseworker = caseworkers[Math.floor(Math.random() * caseworkers.length)];
+  if (!req.session.data['consolidated-caseworkers-v6']) {
+    req.session.data['consolidated-caseworkers-v6'] = {};
+  }
+  req.session.data['consolidated-caseworkers-v6'][`${ref}|${isPriorAuthorityRequested ? 'prior-authority' : 'initial'}`] = assignedCaseworker;
 
   // Regenerate open applications to ensure we have current data
   if (!req.session.data['open-applications']) {
@@ -1642,6 +1852,7 @@ router.get('/add-application/:reference', function(req, res) {
       : (linkedRow ? linkedRow.lastName : 'Unknown');
 
     return {
+      ...(isPrimaryRef && openApp ? openApp : {}),
       ref: targetRef,
       reference: targetRef,
       firstName: firstName,
@@ -1738,6 +1949,18 @@ router.get('/add-application/:reference', function(req, res) {
   });
 
   // Log assignment to caseworker history when they add it to their list
+  if (req.session.data['consolidated-v6'] === true) {
+    addedRefs.forEach(addedRef => {
+      const assignedApplication = req.session.data['assigned-applications'].find(app => app.ref === addedRef && Boolean(app.isPriorAuthority) === Boolean(addedRef === ref && isPriorAuthorityRequested));
+      appendConsolidatedHistory(req, addedRef, {
+        action: assignedApplication && assignedApplication.isPriorAuthority
+          ? `Prior authority assigned to ${assignedCaseworker}`
+          : `Initial application assigned to ${assignedCaseworker}`,
+        caseworker: assignedCaseworker,
+        type: assignedApplication && assignedApplication.isPriorAuthority ? 'pa_assignment' : 'assignment'
+      }, assignedApplication);
+    });
+  } else {
   if (!req.session.data['app-history']) {
     req.session.data['app-history'] = {};
   }
@@ -1771,6 +1994,7 @@ router.get('/add-application/:reference', function(req, res) {
     caseworker: assignedCaseworker,
     details: null
   });
+  }
 
   req.session.data.toast = {
     show: true,
@@ -1782,11 +2006,15 @@ router.get('/add-application/:reference', function(req, res) {
 
   // Check if AJAX request (from fetch)
   if (req.headers['x-requested-with'] === 'XMLHttpRequest' || req.xhr) {
+    const assignedApplication = req.session.data['assigned-applications'].find(app =>
+      app.ref === ref && Boolean(app.isPriorAuthority) === isPriorAuthorityRequested
+    );
     res.status(200).json({
       success: true,
       ref: ref,
       addedCount: addedRefs.length,
-      linkedAddedCount: Math.max(0, addedRefs.length - 1)
+      linkedAddedCount: Math.max(0, addedRefs.length - 1),
+      assignedCaseworker: assignedApplication ? assignedApplication.caseworker : null
     });
   } else {
     res.redirect('/v6/open-applications');
@@ -1795,9 +2023,17 @@ router.get('/add-application/:reference', function(req, res) {
 
 router.get('/remove-application/:reference', function(req, res) {
   const ref = req.params.reference;
+  const removedApplications = (req.session.data['assigned-applications'] || []).filter(app => app.ref === ref);
   if (req.session.data['assigned-applications']) {
     req.session.data['assigned-applications'] = req.session.data['assigned-applications'].filter(app => app.ref !== ref);
   }
+  removedApplications.forEach(application => {
+    appendConsolidatedHistory(req, ref, {
+      action: `${application.isPriorAuthority ? 'Prior authority' : 'Initial application'} removed from your list`,
+      caseworker: application.caseworker || 'Caseworker name',
+      type: application.isPriorAuthority ? 'pa_assignment' : 'assignment'
+    }, application);
+  });
   
   res.redirect('/v6/yourlist');
 });
@@ -1947,6 +2183,14 @@ router.post('/confirm-link-cases', function(req, res) {
   });
   req.session.data['linked-cases-by-reference-v6'] = linkedCasesByReference;
 
+  linkedCases.forEach(linkedCase => {
+    appendConsolidatedHistory(req, linkedCase.reference, {
+      action: linkedCase.role === 'Lead' ? 'Application selected as lead case' : 'Application linked as an associated case',
+      type: 'linked_case',
+      justification: `Linked case group: ${linkedCases.map(row => row.reference).join(', ')}. Lead application: ${leadReference}.`
+    }, groupApplications.find(application => application.ref === linkedCase.reference));
+  });
+
   req.session.data.toast = {
     show: true,
     message: `You have linked this application ${linkedReference} to ${leadReference}`,
@@ -2030,6 +2274,20 @@ router.post('/change-linked-lead/:reference', function(req, res) {
   }
 
   replaceLinkedGroup(req, linkedCases, nextRows);
+  nextRows.forEach(row => {
+    appendConsolidatedHistory(req, row.reference, {
+      action: row.reference === selectedLeadReference ? 'Application selected as new lead case' : 'Linked case lead changed',
+      type: 'linked_case',
+      justification: `The lead application was changed from ${currentLead.reference} to ${selectedLeadReference}.`
+    }, findInitialApplication(req, row.reference));
+  });
+  if (mode === 'unlink' && currentLead) {
+    appendConsolidatedHistory(req, currentLead.reference, {
+      action: 'Application unlinked',
+      type: 'linked_case',
+      justification: 'The application is now standalone and has its own cost limit.'
+    }, findInitialApplication(req, currentLead.reference));
+  }
   req.session.data.toast = {
     show: true,
     message: mode === 'unlink'
@@ -2090,6 +2348,13 @@ router.post('/confirm-unlink-case/:reference', function(req, res) {
 
   if (linkedCases.length === 2) {
     replaceLinkedGroup(req, linkedCases, []);
+    linkedCases.forEach(row => {
+      appendConsolidatedHistory(req, row.reference, {
+        action: 'Application unlinked',
+        type: 'linked_case',
+        justification: 'The application is now standalone and has its own cost limit.'
+      }, findInitialApplication(req, row.reference));
+    });
     req.session.data.toast = {
       show: true,
       message: `You have unlinked ${caseReference}`,
@@ -2101,6 +2366,18 @@ router.post('/confirm-unlink-case/:reference', function(req, res) {
 
   const nextRows = linkedCases.filter(row => row.reference !== caseReference);
   replaceLinkedGroup(req, linkedCases, nextRows);
+  appendConsolidatedHistory(req, caseReference, {
+    action: 'Application unlinked',
+    type: 'linked_case',
+    justification: 'The application is now standalone and has its own cost limit.'
+  }, findInitialApplication(req, caseReference));
+  nextRows.forEach(row => {
+    appendConsolidatedHistory(req, row.reference, {
+      action: `Associated application ${caseReference} unlinked`,
+      type: 'linked_case',
+      justification: `Application ${caseReference} was removed from this linked case group.`
+    }, findInitialApplication(req, row.reference));
+  });
   req.session.data.toast = {
     show: true,
     message: `You have unlinked ${caseReference}`,
@@ -2150,6 +2427,13 @@ router.get('/manage-linked-cases/:reference', function(req, res) {
         linkedCasesByReference[linkedCase.reference] = linkedCases;
       });
       req.session.data['linked-cases-by-reference-v6'] = linkedCasesByReference;
+      linkedCases.forEach(linkedCase => {
+        appendConsolidatedHistory(req, linkedCase.reference, {
+          action: linkedCase.role === 'Lead' ? 'Application selected as lead case' : 'Application linked as an associated case',
+          type: 'linked_case',
+          justification: `Linked case group: ${linkedCases.map(row => row.reference).join(', ')}. Lead application: ${reference}.`
+        }, findInitialApplication(req, linkedCase.reference));
+      });
     }
   }
 
@@ -2229,6 +2513,16 @@ router.post('/manage-linked-cases/:reference', function(req, res) {
   req.session.data['open-applications'] = (req.session.data['open-applications'] || [])
     .filter(application => application.ref !== newLinkedReference);
 
+  linkedCases.forEach(linkedCase => {
+    appendConsolidatedHistory(req, linkedCase.reference, {
+      action: linkedCase.reference === newLinkedReference
+        ? 'Application linked as an associated case'
+        : `Application ${newLinkedReference} linked to case group`,
+      type: 'linked_case',
+      justification: `Linked case group: ${linkedCases.map(row => row.reference).join(', ')}.`
+    }, findInitialApplication(req, linkedCase.reference));
+  });
+
   res.redirect('/v6/application/' + encodeURIComponent(reference));
 });
 
@@ -2256,6 +2550,11 @@ router.get('/application/:reference/history', function(req, res) {
       req.session.data['app-history'][r] = SEEDED_HISTORY[r];
     }
   });
+  const referenceApplications = applicationsForReference(req, ref);
+  const currentReferenceApplication = referenceApplications.find(application => application.isPriorAuthority || application.isRedetermination)
+    || referenceApplications[0]
+    || null;
+  ensureConsolidatedHistory(req, ref, currentReferenceApplication);
   if (!req.session.data['app-history'][ref] || req.session.data['app-history'][ref].length === 0 ||
       (req.session.data['app-history'][ref].length > 0 && !req.session.data['app-history'][ref][0].action)) {
     
@@ -2302,7 +2601,7 @@ router.get('/application/:reference/history', function(req, res) {
 router.post('/application/:reference/add-note', function(req, res) {
   const ref = req.params.reference;
   const note = req.body.historyNote; // Form field is named "historyNote"
-  const caseworkerName = 'Caseworker'; // In real scenario, get from session/auth
+  const caseworkerName = 'Joann Barton';
   
   if (!req.session.data['app-history']) {
     req.session.data['app-history'] = {};
@@ -2322,13 +2621,22 @@ router.post('/application/:reference/add-note', function(req, res) {
   });
   
   // Add note using new versioned event structure (append to end maintains version indices)
-  req.session.data['app-history'][ref].push({
-    timestamp: timestamp,
-    action: 'Note Added',
-    caseworker: caseworkerName,
-    type: 'note',
-    details: note
-  });
+  if (req.session.data['consolidated-v6'] === true) {
+    appendConsolidatedHistory(req, ref, {
+      action: 'Note added',
+      caseworker: caseworkerName,
+      type: 'note',
+      details: note
+    });
+  } else {
+    req.session.data['app-history'][ref].push({
+      timestamp: timestamp,
+      action: 'Note Added',
+      caseworker: caseworkerName,
+      type: 'note',
+      details: note
+    });
+  }
   
   // Set toast message for success notification
   req.session.data.toast = {
@@ -2618,6 +2926,8 @@ router.get('/application/:reference', function(req, res) {
     providerAddress: `${nameLen} Liverpool Road<br>Manchester<br>MW2 5WT`,
     providerPhone: `0712345678${nameLen % 9}`
   };
+
+  ensureConsolidatedHistory(req, reference, applicationData);
   
   // Initialize history with initial application received entry if it doesn't exist
   if (!req.session.data['app-history']) {
@@ -2739,14 +3049,36 @@ router.get('/application/:reference', function(req, res) {
       versionedTitle = historyArray[viewVersion].action || 'Unknown event';
     }
   }
+
+  const renderedInitialApplication = isViewingPreviousVersion
+    ? reconstructApplicationAtVersion(initialApplicationData, historyArray, viewVersion)
+    : initialApplicationData;
+  const renderedPriorAuthorityApplication = isViewingPreviousVersion
+    ? reconstructApplicationAtVersion(priorAuthorityApplicationData, historyArray, viewVersion)
+    : priorAuthorityApplicationData;
+  const renderedStatusApplication = requestedPriorAuthority && renderedInitialApplication
+    ? renderedInitialApplication
+    : versionedApplication;
+  const selectedAssignedApplication = assignedApplications.find(app => app.ref === reference && Boolean(app.isPriorAuthority) === requestedPriorAuthority) || null;
+  const selectedCompletedApplication = (req.session.data['completed-applications'] || [])
+    .find(app => app.ref === reference && Boolean(app.isPriorAuthority) === requestedPriorAuthority) || null;
+  const relevantCaseworkerEvent = [...historyArray].reverse().find(event => {
+    if (!event.caseworker || event.caseworker === 'N/A' || event.caseworker === 'Caseworker name') return false;
+    if (requestedPriorAuthority) return event.type === 'pa_assignment' || event.type === 'pa_decision';
+    return (event.type === 'assignment' || event.type === 'decision') && !/prior authority/i.test(event.action || '');
+  });
+  const assignedCaseworker = (selectedAssignedApplication && selectedAssignedApplication.caseworker)
+    || (selectedCompletedApplication && selectedCompletedApplication.caseworker)
+    || (relevantCaseworkerEvent && relevantCaseworkerEvent.caseworker)
+    || 'Unassigned';
   
   res.render('v6/application-details.njk', {
     pageTitle: reference,
     reference: reference,
     application: isViewingPreviousVersion ? versionedApplication : application,
-    initialApplication: initialApplicationData,
-    priorAuthorityApplication: priorAuthorityApplicationData,
-    statusApplication: statusApplication,
+    initialApplication: renderedInitialApplication,
+    priorAuthorityApplication: renderedPriorAuthorityApplication,
+    statusApplication: renderedStatusApplication,
     hasLinkedCases: hasLinkedCases,
     linkedCases: linkedCasesForView,
     isAssociatedLinkedCase: isAssociatedLinkedCase,
@@ -2759,6 +3091,7 @@ router.get('/application/:reference', function(req, res) {
     isInitialApplicationAssigned: isInitialApplicationAssigned,
     isPriorAuthorityAssigned: isPriorAuthorityAssigned,
     isStatusApplicationAssigned: isStatusApplicationAssigned,
+    assignedCaseworker: assignedCaseworker,
     requestedPriorAuthority: requestedPriorAuthority,
     historyEvents: historyEvents,
     isViewingPreviousVersion: isViewingPreviousVersion,
@@ -2915,7 +3248,18 @@ router.post('/change/:reference/:field/confirm', function(req, res) {
     timestamp: datetime,
     action: `${displayField} updated`,
     caseworker: caseworker,
-    details: justification || null
+    type: 'data_change',
+    fieldChanged: {
+      'first-name': 'firstName',
+      'last-name': 'lastName',
+      'date-of-birth': 'dob',
+      'home-address': 'homeAddress',
+      'correspondence-address': 'correspondenceAddress',
+      'opponent-name': 'opponentName'
+    }[field] || field,
+    oldValue: oldValue,
+    newValue: newValue,
+    justification: justification || null
   });
   
   // Clear change session data
@@ -2981,6 +3325,23 @@ function updatePriorAuthorityStatusForReference(req, reference, decision) {
 function removePriorAuthorityFromAssignedList(req, reference) {
   const assigned = req.session.data['assigned-applications'] || [];
   req.session.data['assigned-applications'] = assigned.filter(app => !(app.ref === reference && app.isPriorAuthority));
+}
+
+function recordPriorAuthorityDecision(req, reference, decision, justification, decisionDetails = null) {
+  const application = findApplicationByReference(req, reference, true);
+  const status = decision === 'Refuse' ? 'Refused' : 'Granted';
+  const detailLines = [];
+  if (justification) detailLines.push(justification);
+  if (decisionDetails) detailLines.push(decisionDetails);
+
+  appendConsolidatedHistory(req, reference, {
+    action: `Prior authority ${status.toLowerCase()}`,
+    caseworker: (application && application.caseworker) || 'Caseworker name',
+    type: 'pa_decision',
+    statusAfter: status,
+    changes: { From: 'In progress', To: status },
+    justification: detailLines.join(' ') || null
+  }, application);
 }
 
 router.get('/disbursement-assessment/decision', function(req, res) {
@@ -3049,7 +3410,15 @@ router.post('/disbursement-assessment/submit', function(req, res) {
     res.redirect('/v6/disbursement-assessment/decision');
     return;
   }
+  const application = findApplicationByReference(req, reference, true);
+  const grantedAmount = req.session.data['disbursement-amount-decision'] === 'new'
+    ? req.session.data['disbursement-new-amount']
+    : application && application.disbursementAmount;
+  const decisionDetails = decision === 'Grant' && grantedAmount
+    ? `Amount granted: £${grantedAmount}.`
+    : null;
   updatePriorAuthorityStatusForReference(req, reference, decision);
+  recordPriorAuthorityDecision(req, reference, decision, req.session.data['disbursement-justification'], decisionDetails);
   removePriorAuthorityFromAssignedList(req, reference);
   res.redirect('/v6/disbursement-assessment/confirmation');
 });
@@ -3195,6 +3564,15 @@ router.post('/counsel-assessment/submit-assessment', function (req, res) {
 
   if (reference) {
     updatePriorAuthorityStatusForReference(req, reference, decision);
+    recordPriorAuthorityDecision(
+      req,
+      reference,
+      decision,
+      decision === 'Refuse' ? req.session.data['counsel-refuse-justification'] : req.session.data['counsel-justification'],
+      decision === 'Grant' && req.session.data['counsel-type-granted']
+        ? `Counsel granted: ${req.session.data['counsel-type-granted']}.`
+        : null
+    );
     removePriorAuthorityFromAssignedList(req, reference);
   }
   res.redirect('/v6/counsel-assessment/confirmation');
@@ -3528,6 +3906,16 @@ router.post('/expert-assessment/submit-assessment', function (req, res) {
 
   if (reference) {
     updatePriorAuthorityStatusForReference(req, reference, decision);
+    const grantedAmount = req.session.data['expert-amount-decision'] === 'new'
+      ? (req.session.data['expert-new-apportioned-amount'] || req.session.data['expert-new-amount'])
+      : (req.session.data['expert-amount-claimed'] || req.session.data['expert-requested-amount']);
+    recordPriorAuthorityDecision(
+      req,
+      reference,
+      decision,
+      decision === 'Refuse' ? req.session.data['expert-refuse-justification'] : req.session.data['expert-justification'],
+      decision === 'Grant' && grantedAmount ? `Amount granted: £${grantedAmount}.` : null
+    );
     removePriorAuthorityFromAssignedList(req, reference);
   }
 
