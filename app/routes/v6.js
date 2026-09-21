@@ -2600,8 +2600,25 @@ router.get('/application/:reference/history', function(req, res) {
 
 router.post('/application/:reference/add-note', function(req, res) {
   const ref = req.params.reference;
-  const note = req.body.historyNote; // Form field is named "historyNote"
+  const note = req.body.historyNote || '';
   const caseworkerName = 'Joann Barton';
+
+  if (req.session.data['consolidated-v6'] === true) {
+    const trimmedNote = note.trim();
+    let error = null;
+    if (!trimmedNote) {
+      error = 'Enter a note';
+    } else if (note.length > 10000) {
+      error = 'Note must be 10,000 characters or less';
+    }
+
+    if (error) {
+      req.session.data['history-note-error-v6'] = error;
+      req.session.data['history-note-value-v6'] = note;
+      res.redirect('/v6/application/' + encodeURIComponent(ref) + '#application-history');
+      return;
+    }
+  }
   
   if (!req.session.data['app-history']) {
     req.session.data['app-history'] = {};
@@ -2772,6 +2789,10 @@ router.get('/application-details', function(req, res) {
 router.get('/application/:reference', function(req, res) {
   const reference = req.params.reference;
   const requestedPriorAuthority = req.query.isPriorAuthority === 'true';
+  const historyNoteError = req.session.data['history-note-error-v6'] || null;
+  const historyNoteValue = req.session.data['history-note-value-v6'] || '';
+  delete req.session.data['history-note-error-v6'];
+  delete req.session.data['history-note-value-v6'];
   const defaultLinkedCasesByReference = {
     'L-12Z-13P': [
       { role: 'Lead', firstName: 'Haylie', middleName: '', lastName: 'Septimus', reference: 'L-12Z-13P', status: 'In progress', statusClass: 'govuk-tag--light-blue' },
@@ -3092,6 +3113,8 @@ router.get('/application/:reference', function(req, res) {
     isPriorAuthorityAssigned: isPriorAuthorityAssigned,
     isStatusApplicationAssigned: isStatusApplicationAssigned,
     assignedCaseworker: assignedCaseworker,
+    historyNoteError: historyNoteError,
+    historyNoteValue: historyNoteValue,
     requestedPriorAuthority: requestedPriorAuthority,
     historyEvents: historyEvents,
     isViewingPreviousVersion: isViewingPreviousVersion,

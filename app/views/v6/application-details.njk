@@ -615,7 +615,7 @@
             <tr class="govuk-table__row">
               <th scope="col" class="govuk-table__header">Date and time</th>
               <th scope="col" class="govuk-table__header">Caseworker</th>
-              <th scope="col" class="govuk-table__header">Update</th>
+              <th scope="col" class="govuk-table__header">{{ "Event" if sessionData['consolidated-v6'] === true else "Update" }}</th>
             </tr>
           </thead>
           <tbody class="govuk-table__body">
@@ -687,20 +687,49 @@
         }) }}
 
         <!-- Add note form -->
-        <h2 class="govuk-heading-s govuk-!-margin-top-6">Add a note to the application history</h2>
-        <form action="/v6/application/{{ reference }}/add-note" method="post">
-          {{ govukTextarea({
-            name: "historyNote",
-            id: "historyNote",
-            hint: { text: "This information is for internal use only" }
-          }) }}
+        {% if sessionData['consolidated-v6'] === true %}
+          {% set historyNoteCountClass = "govuk-error-message" if historyNoteError else "govuk-hint" %}
+          <form action="/v6/application/{{ reference }}/add-note" method="post" class="govuk-!-margin-top-6">
+            {{ govukTextarea({
+              name: "historyNote",
+              id: "historyNote",
+              label: {
+                text: "Add a note",
+                classes: "govuk-label--s"
+              },
+              hint: { text: "This information is for internal use only" },
+              errorMessage: { text: historyNoteError } if historyNoteError else null,
+              value: historyNoteValue,
+              rows: 5,
+              formGroup: {
+                afterInput: {
+                  html: '<div class="' ~ historyNoteCountClass ~ ' govuk-!-margin-top-1">You can enter up to 10,000 characters</div>'
+                }
+              }
+            }) }}
 
-          {{ govukButton({
-            text: "Add to application history",
-            classes: "govuk-button--secondary",
-            style: "background-color: #00703c; color: white;"
-          }) }}
-        </form>
+            {{ govukButton({
+              text: "Add a note",
+              classes: "govuk-button--secondary",
+              style: "background-color: #00703c; color: white;"
+            }) }}
+          </form>
+        {% else %}
+          <h2 class="govuk-heading-s govuk-!-margin-top-6">Add a note to the application history</h2>
+          <form action="/v6/application/{{ reference }}/add-note" method="post">
+            {{ govukTextarea({
+              name: "historyNote",
+              id: "historyNote",
+              hint: { text: "This information is for internal use only" }
+            }) }}
+
+            {{ govukButton({
+              text: "Add to application history",
+              classes: "govuk-button--secondary",
+              style: "background-color: #00703c; color: white;"
+            }) }}
+          </form>
+        {% endif %}
       {% endset -%}
 
       {% set priorAuthorityHtml %}
