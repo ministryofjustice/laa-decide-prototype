@@ -15,8 +15,9 @@
 {% block head %}
   <link href="/public/stylesheets/application.css" rel="stylesheet">
   <style>
-    .moj-primary-navigation__item:first-child .moj-primary-navigation__link { color: #0b0c0c; }
-    .moj-primary-navigation__item:first-child .moj-primary-navigation__link:hover { color: #0b0c0c; }
+    .moj-primary-navigation__item:first-child .moj-primary-navigation__link { color: #0b0c0c; pointer-events: none; cursor: default; text-decoration: none; }
+    .moj-primary-navigation__item:first-child .moj-primary-navigation__link:hover,
+    .moj-primary-navigation__item:first-child .moj-primary-navigation__link:focus { color: #0b0c0c; text-decoration: none; }
   </style>
 {% endblock %}
 
@@ -241,6 +242,13 @@
                   const assignedCaseworker = document.getElementById('assigned-caseworker');
                   if (assignedCaseworker && data.assignedCaseworker) {
                     assignedCaseworker.textContent = data.assignedCaseworker;
+                  }
+
+                  if (isPriorAuthority !== 'true') {
+                    const makeDecisionContainer = document.getElementById('make-decision-container');
+                    if (makeDecisionContainer) {
+                      makeDecisionContainer.hidden = false;
+                    }
                   }
 
                   const statusHtml = '<strong class="govuk-tag govuk-tag--light-blue">In progress</strong>';
@@ -533,8 +541,8 @@
           </div>
         </div>
 
-        {% if isInitialApplicationAssigned and not hasDecision %}
-          <div class="govuk-!-margin-top-8">
+        {% if not hasDecision %}
+          <div class="govuk-!-margin-top-8" id="make-decision-container"{% if not isInitialApplicationAssigned %} hidden{% endif %}>
             {{ govukButton({
               text: "Make a decision",
               href: "/v6/decision-start?ref=" ~ reference,

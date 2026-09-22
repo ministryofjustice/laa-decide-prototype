@@ -2,6 +2,15 @@
 
 {% set pageName="Select who you want to reassign this case to" %}
 
+{% block head %}
+  {{ super() }}
+  <style>
+    .moj-primary-navigation__item:first-child .moj-primary-navigation__link { color: #0b0c0c; pointer-events: none; cursor: default; text-decoration: none; }
+    .moj-primary-navigation__item:first-child .moj-primary-navigation__link:hover,
+    .moj-primary-navigation__item:first-child .moj-primary-navigation__link:focus { color: #0b0c0c; text-decoration: none; }
+  </style>
+{% endblock %}
+
 {# Navigation header #}
 {% block header %}
   {{ govukHeader({

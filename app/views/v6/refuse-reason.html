@@ -12,8 +12,9 @@
 {% block head %}
   <link href="/public/stylesheets/application.css" rel="stylesheet">
   <style>
-    .moj-primary-navigation__item:first-child .moj-primary-navigation__link { color: #0b0c0c; }
-    .moj-primary-navigation__item:first-child .moj-primary-navigation__link:hover { color: #0b0c0c; }
+    .moj-primary-navigation__item:first-child .moj-primary-navigation__link { color: #0b0c0c; pointer-events: none; cursor: default; text-decoration: none; }
+    .moj-primary-navigation__item:first-child .moj-primary-navigation__link:hover,
+    .moj-primary-navigation__item:first-child .moj-primary-navigation__link:focus { color: #0b0c0c; text-decoration: none; }
   </style>
 {% endblock %}
 
