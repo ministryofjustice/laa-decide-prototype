@@ -1883,6 +1883,9 @@ router.get('/search', function(req, res) {
       } else if (app.status === 'Refused') {
         outcome = 'Refused';
         outcomeClass = 'red';
+      } else if (app.status === 'Under Review') {
+        outcome = 'Under Review';
+        outcomeClass = 'yellow';
       }
       
       return {
@@ -1943,12 +1946,18 @@ router.get('/application/:reference', function(req, res) {
     if (storedDecision && storedDecision.status === 'Refused') {
       return { text: 'Refused', className: 'govuk-tag--red' };
     }
+    if (storedDecision && storedDecision.status === 'Under Review') {
+      return { text: 'Under Review', className: 'govuk-tag--yellow' };
+    }
     const assignedMatch = assignedApplications.find(app => app.ref === targetRef && !app.isPriorAuthority);
     if (assignedMatch && assignedMatch.status === 'Granted') {
       return { text: 'Granted', className: 'govuk-tag--green' };
     }
     if (assignedMatch && assignedMatch.status === 'Refused') {
       return { text: 'Refused', className: 'govuk-tag--red' };
+    }
+    if (assignedMatch && assignedMatch.status === 'Under Review') {
+      return { text: 'Under Review', className: 'govuk-tag--yellow' };
     }
     if (assignedMatch) {
       return { text: 'In progress', className: 'govuk-tag--light-blue' };
@@ -1958,6 +1967,9 @@ router.get('/application/:reference', function(req, res) {
     }
     if (fallbackStatus === 'Refused') {
       return { text: 'Refused', className: 'govuk-tag--red' };
+    }
+    if (fallbackStatus === 'Under Review') {
+      return { text: 'Under Review', className: 'govuk-tag--yellow' };
     }
     return { text: 'Submitted', className: 'govuk-tag--pink' };
   }

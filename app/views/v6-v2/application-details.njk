@@ -118,6 +118,8 @@
           {{ govukTag({ text: "Granted", classes: "govuk-tag--green" }) }}
         {% elif statusApplication.status === "Refused" %}
           {{ govukTag({ text: "Refused", classes: "govuk-tag--red" }) }}
+        {% elif statusApplication.status === "Under Review" %}
+          {{ govukTag({ text: "Under Review", classes: "govuk-tag--yellow" }) }}
         {% elif isStatusApplicationAssigned %}
           {{ govukTag({ text: "In progress", classes: "govuk-tag--light-blue" }) }}
         {% else %}
@@ -130,6 +132,8 @@
           {{ govukTag({ text: "Granted", classes: "govuk-tag--green" }) }}
         {% elif statusApplication.status === "Refused" %}
           {{ govukTag({ text: "Refused", classes: "govuk-tag--red" }) }}
+        {% elif statusApplication.status === "Under Review" %}
+          {{ govukTag({ text: "Under Review", classes: "govuk-tag--yellow" }) }}
         {% elif isStatusApplicationAssigned %}
           {{ govukTag({ text: "In progress", classes: "govuk-tag--light-blue" }) }}
         {% else %}
@@ -142,6 +146,8 @@
           {{ govukTag({ text: "Granted", classes: "govuk-tag--green" }) }}
         {% elif priorAuthorityApplication and priorAuthorityApplication.status === "Refused" %}
           {{ govukTag({ text: "Refused", classes: "govuk-tag--red" }) }}
+        {% elif priorAuthorityApplication and priorAuthorityApplication.status === "Under Review" %}
+          {{ govukTag({ text: "Under Review", classes: "govuk-tag--yellow" }) }}
         {% elif isPriorAuthorityAssigned %}
           {{ govukTag({ text: "In progress", classes: "govuk-tag--light-blue" }) }}
         {% else %}
@@ -281,6 +287,8 @@
                     {{ govukTag({ text: "Granted", classes: "govuk-tag--green" }) }}
                   {% elif statusApplication.status === "Refused" %}
                     {{ govukTag({ text: "Refused", classes: "govuk-tag--red" }) }}
+                  {% elif statusApplication.status === "Under Review" %}
+                    {{ govukTag({ text: "Under Review", classes: "govuk-tag--yellow" }) }}
                   {% elif isStatusApplicationAssigned %}
                     {{ govukTag({ text: "In progress", classes: "govuk-tag--light-blue" }) }}
                   {% else %}
@@ -710,6 +718,8 @@
                       {{ govukTag({ text: "Granted", classes: "govuk-tag--green" }) }}
                     {% elif priorAuthorityApplication and priorAuthorityApplication.status === "Refused" %}
                       {{ govukTag({ text: "Refused", classes: "govuk-tag--red" }) }}
+                    {% elif priorAuthorityApplication and priorAuthorityApplication.status === "Under Review" %}
+                      {{ govukTag({ text: "Under Review", classes: "govuk-tag--yellow" }) }}
                     {% elif isPriorAuthorityAssigned %}
                       {{ govukTag({ text: "In progress", classes: "govuk-tag--light-blue" }) }}
                     {% else %}

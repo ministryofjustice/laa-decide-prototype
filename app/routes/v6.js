@@ -2693,24 +2693,25 @@ router.get('/search', function(req, res) {
   });
   
   if (showResults) {
-    // Create a map to track unique references (prefer assigned-applications, then completed, then open)
+    // Create a map to track unique application variants (prefer assigned-applications, then completed, then open)
     const uniqueApps = {};
+    const variantKey = app => `${app.ref}|${Boolean(app.isPriorAuthority)}`;
     if (req.session.data['assigned-applications']) {
       req.session.data['assigned-applications'].forEach(app => {
-        uniqueApps[app.ref] = app;
+        uniqueApps[variantKey(app)] = app;
       });
     }
     if (req.session.data['completed-applications']) {
       req.session.data['completed-applications'].forEach(app => {
-        if (!uniqueApps[app.ref]) {
-          uniqueApps[app.ref] = app;
+        if (!uniqueApps[variantKey(app)]) {
+          uniqueApps[variantKey(app)] = app;
         }
       });
     }
     if (req.session.data['open-applications']) {
       req.session.data['open-applications'].forEach(app => {
-        if (!uniqueApps[app.ref]) {
-          uniqueApps[app.ref] = app;
+        if (!uniqueApps[variantKey(app)]) {
+          uniqueApps[variantKey(app)] = app;
         }
       });
     }
@@ -2747,6 +2748,9 @@ router.get('/search', function(req, res) {
       } else if (app.status === 'Refused') {
         outcome = 'Refused';
         outcomeClass = 'red';
+      } else if (app.status === 'Under Review') {
+        outcome = 'Under Review';
+        outcomeClass = 'yellow';
       }
       
       const firm = app.firm || app.providerFirm
@@ -2756,6 +2760,7 @@ router.get('/search', function(req, res) {
 
       return {
         ref: app.ref,
+        isPriorAuthority: Boolean(app.isPriorAuthority),
         firstName: app.firstName,
         lastName: app.lastName,
         dob: app.dob,
@@ -2849,12 +2854,18 @@ router.get('/application/:reference', function(req, res) {
     if (storedDecision && storedDecision.status === 'Refused') {
       return { text: 'Refused', className: 'govuk-tag--red' };
     }
+    if (storedDecision && storedDecision.status === 'Under Review') {
+      return { text: 'Under Review', className: 'govuk-tag--yellow' };
+    }
     const assignedMatch = linkedStatusAssignedApplications.find(app => app.ref === targetRef && !app.isPriorAuthority);
     if (assignedMatch && assignedMatch.status === 'Granted') {
       return { text: 'Granted', className: 'govuk-tag--green' };
     }
     if (assignedMatch && assignedMatch.status === 'Refused') {
       return { text: 'Refused', className: 'govuk-tag--red' };
+    }
+    if (assignedMatch && assignedMatch.status === 'Under Review') {
+      return { text: 'Under Review', className: 'govuk-tag--yellow' };
     }
     if (assignedMatch) {
       return { text: 'In progress', className: 'govuk-tag--light-blue' };
@@ -2869,6 +2880,9 @@ router.get('/application/:reference', function(req, res) {
       }
       if (fallbackStatus === 'Refused') {
         return { text: 'Refused', className: 'govuk-tag--red' };
+      }
+      if (fallbackStatus === 'Under Review') {
+        return { text: 'Under Review', className: 'govuk-tag--yellow' };
       }
     }
     return { text: 'Submitted', className: 'govuk-tag--pink' };
@@ -2899,8 +2913,9 @@ router.get('/application/:reference', function(req, res) {
     return hydrated;
   }
 
+  const rawPriorAuthorityApplication = findApplicationVariant(true);
   const initialApplicationData = applyStoredDecision(findApplicationVariant(false));
-  const priorAuthorityApplicationData = applyStoredDecision(findApplicationVariant(true));
+  const priorAuthorityApplicationData = applyStoredDecision(rawPriorAuthorityApplication);
   if (initialApplicationData && priorAuthorityApplicationData && !initialApplicationData.status) {
     initialApplicationData.status = 'Granted';
     initialApplicationData.decisionType = 'Grant';
@@ -2909,6 +2924,41 @@ router.get('/application/:reference', function(req, res) {
     ? (priorAuthorityApplicationData || initialApplicationData || {})
     : (initialApplicationData || priorAuthorityApplicationData || {});
   const hasPriorAuthority = Boolean(priorAuthorityApplicationData);
+
+  // Other prior authority requests on this same reference (e.g. a second Expert
+  // or Disbursement request) so a caseworker can see sibling work in progress.
+  // Collections can hold separate object instances for the same conceptual PA
+  // request, so identify siblings by a stable signature rather than object identity.
+  const otherPriorAuthorityApplications = [];
+  if (req.session.data['consolidated-v6'] === true) {
+    const priorAuthoritySignature = app => `${app.priorAuthorityType || ''}|${app.submitted || ''}`;
+    const currentSignature = rawPriorAuthorityApplication ? priorAuthoritySignature(rawPriorAuthorityApplication) : null;
+    const seenSignatures = new Set(currentSignature ? [currentSignature] : []);
+    applicationCollections.forEach(collection => {
+      collection.forEach(app => {
+        if (app.ref !== reference || !app.isPriorAuthority) return;
+        const signature = priorAuthoritySignature(app);
+        if (seenSignatures.has(signature)) return;
+        seenSignatures.add(signature);
+        const statusInfo = app.status === 'Granted'
+          ? { text: 'Granted', className: 'govuk-tag--green' }
+          : app.status === 'Refused'
+            ? { text: 'Refused', className: 'govuk-tag--red' }
+            : app.status === 'Under Review'
+              ? { text: 'Under Review', className: 'govuk-tag--yellow' }
+              : app.caseworker
+                ? { text: 'In progress', className: 'govuk-tag--light-blue' }
+                : { text: 'Submitted', className: 'govuk-tag--pink' };
+        otherPriorAuthorityApplications.push({
+          priorAuthorityType: app.priorAuthorityType || 'Expert',
+          caseworker: app.caseworker || 'Unassigned',
+          submitted: app.submitted || 'N/A',
+          statusText: statusInfo.text,
+          statusClass: statusInfo.className
+        });
+      });
+    });
+  }
   
   // Get prior authority type from the actual data
   let priorAuthorityType = null;
@@ -3009,9 +3059,11 @@ router.get('/application/:reference', function(req, res) {
     ? { text: 'Granted', className: 'govuk-tag--green' }
     : statusApplication.status === 'Refused'
       ? { text: 'Refused', className: 'govuk-tag--red' }
-      : isStatusApplicationAssigned
-        ? { text: 'In progress', className: 'govuk-tag--light-blue' }
-        : { text: 'Submitted', className: 'govuk-tag--pink' };
+      : statusApplication.status === 'Under Review'
+        ? { text: 'Under Review', className: 'govuk-tag--yellow' }
+        : isStatusApplicationAssigned
+          ? { text: 'In progress', className: 'govuk-tag--light-blue' }
+          : { text: 'Submitted', className: 'govuk-tag--pink' };
 
   const linkedCasesForView = linkedCases.map(linkedCase => {
     const linkedStatus = linkedCase.reference === reference
@@ -3107,6 +3159,7 @@ router.get('/application/:reference', function(req, res) {
     applicationRoutePrefix: '/v6',
     hasPriorAuthority: hasPriorAuthority,
     priorAuthorityType: priorAuthorityType,
+    otherPriorAuthorityApplications: otherPriorAuthorityApplications,
     sessionData: req.session.data,
     isAssigned: isAssigned,
     isInitialApplicationAssigned: isInitialApplicationAssigned,
@@ -3347,7 +3400,18 @@ function updatePriorAuthorityStatusForReference(req, reference, decision) {
 
 function removePriorAuthorityFromAssignedList(req, reference) {
   const assigned = req.session.data['assigned-applications'] || [];
+  const decidedApp = assigned.find(app => app.ref === reference && app.isPriorAuthority);
   req.session.data['assigned-applications'] = assigned.filter(app => !(app.ref === reference && app.isPriorAuthority));
+
+  // Keep the decided PA request searchable and visible on application details.
+  if (decidedApp) {
+    if (!req.session.data['completed-applications']) {
+      req.session.data['completed-applications'] = [];
+    }
+    req.session.data['completed-applications'] = req.session.data['completed-applications']
+      .filter(app => !(app.ref === reference && app.isPriorAuthority));
+    req.session.data['completed-applications'].push(decidedApp);
+  }
 }
 
 function recordPriorAuthorityDecision(req, reference, decision, justification, decisionDetails = null) {
