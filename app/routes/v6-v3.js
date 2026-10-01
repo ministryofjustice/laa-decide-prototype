@@ -899,6 +899,7 @@ const REDETERMINATION_PROCEEDINGS = [
   'Special guardianship order'
 ];
 const REDETERMINATION_CLIENT_ROLES = ['Applicant', 'Respondent', 'Intervenor', 'Subject of proceeding (Child)', 'Joined party'];
+const REDETERMINATION_REFUSAL_REASONS = ['Not in scope', 'Insufficient Information', 'Duplicate Case'];
 
 // L-12Z-13P is the default/most commonly viewed demo application across the
 // prototype, so it must always have a redetermination example to view —
@@ -2591,33 +2592,75 @@ router.post('/application/:reference/redetermination/:index/decision', function(
   }
 
   if (decision === 'grant') {
+    delete req.session.data['redetermination-grant-answers'];
     addHistoryEvent(req, reference, 'Redetermination decision started', 'Caseworker');
     res.redirect('/v6-v3/application/' + encodeURIComponent(reference) + '/redetermination/' + index + '/grant');
     return;
   }
 
-  redetermination.status = 'Refused';
-  redetermination.decisionType = 'Refuse';
+  res.redirect('/v6-v3/application/' + encodeURIComponent(reference) + '/redetermination/' + index + '/refuse');
+});
 
-  if (!req.session.data['redetermination-decision-store']) {
-    req.session.data['redetermination-decision-store'] = {};
+router.get('/application/:reference/redetermination/:index/refuse', function(req, res) {
+  const reference = req.params.reference;
+  const index = Number(req.params.index);
+  const redetermination = getRedeterminationsForReference(req, reference)[index];
+  const answers = req.session.data['redetermination-grant-answers'] || {};
+  const errors = req.session.data['redetermination-refusal-errors'] || {};
+  delete req.session.data['redetermination-refusal-errors'];
+
+  if (!hasGrantedInitialApplication(req, reference) || !redetermination) {
+    res.redirect('/v6-v3/application/' + encodeURIComponent(reference));
+    return;
   }
-  req.session.data['redetermination-decision-store'][reference + '|' + index] = {
+
+  res.render('v6-v3/redetermination-refuse.njk', {
+    pageTitle: 'Make a decision',
     reference: reference,
     index: index,
-    status: 'Refused',
-    decisionType: 'Refuse',
-    redeterminationType: redetermination.redeterminationType || 'Add a proceeding',
-    firstName: redetermination.firstName,
-    lastName: redetermination.lastName,
-    dob: redetermination.dob,
-    submitted: redetermination.submitted,
-    firm: redetermination.firm
-  };
-  addHistoryEvent(req, reference, 'Redetermination refused', redetermination.caseworker || 'Caseworker', null, { From: 'Submitted', To: 'Refused' });
-  removeResolvedRedeterminationGroupFromList(req, reference);
+    refusalReason: answers.refusalReason,
+    decisionReason: answers.decisionReason,
+    errors: errors
+  });
+});
 
-  res.redirect(detailsUrl);
+router.post('/application/:reference/redetermination/:index/refuse', function(req, res) {
+  const reference = req.params.reference;
+  const index = Number(req.params.index);
+  const redetermination = getRedeterminationsForReference(req, reference)[index];
+  const refusalReason = (req.body['refusal-reason'] || '').trim();
+  const decisionReason = (req.body['decision-reason'] || '').trim();
+  const errors = {};
+
+  if (!hasGrantedInitialApplication(req, reference) || !redetermination) {
+    res.redirect('/v6-v3/application/' + encodeURIComponent(reference));
+    return;
+  }
+
+  if (!REDETERMINATION_REFUSAL_REASONS.includes(refusalReason)) {
+    errors.refusalReason = 'Select a reason for refusal';
+  }
+  if (!decisionReason) {
+    errors.decisionReason = 'Explain your decision';
+  }
+
+  if (Object.keys(errors).length > 0) {
+    req.session.data['redetermination-refusal-errors'] = errors;
+    req.session.data['redetermination-grant-answers'] = {
+      decision: 'refuse',
+      refusalReason: refusalReason,
+      decisionReason: decisionReason
+    };
+    res.redirect('/v6-v3/application/' + encodeURIComponent(reference) + '/redetermination/' + index + '/refuse');
+    return;
+  }
+
+  req.session.data['redetermination-grant-answers'] = {
+    decision: 'refuse',
+    refusalReason: refusalReason,
+    decisionReason: decisionReason
+  };
+  res.redirect('/v6-v3/application/' + encodeURIComponent(reference) + '/redetermination/' + index + '/check-answers');
 });
 
 router.get('/application/:reference/redetermination/:index/grant', function(req, res) {
@@ -2806,8 +2849,8 @@ router.get('/application/:reference/redetermination/:index/check-answers', funct
   const index = req.params.index;
   const answers = req.session.data['redetermination-grant-answers'];
 
-  if (!answers || !answers.certificateGrantDate) {
-    res.redirect('/v6-v3/application/' + encodeURIComponent(reference) + '/redetermination/' + index + '/grant-date');
+  if (!answers) {
+    res.redirect('/v6-v3/application/' + encodeURIComponent(reference) + '/redetermination/' + index + '/decision');
     return;
   }
 
@@ -2815,6 +2858,23 @@ router.get('/application/:reference/redetermination/:index/check-answers', funct
 
   if (!hasGrantedInitialApplication(req, reference)) {
     res.redirect('/v6-v3/application/' + encodeURIComponent(reference));
+    return;
+  }
+
+  if (answers.decision === 'refuse') {
+    res.render('v6-v3/redetermination-check-answers.njk', {
+      pageTitle: 'Check your answers',
+      reference: reference,
+      index: index,
+      decision: 'Refuse',
+      refusalReason: answers.refusalReason,
+      decisionReason: answers.decisionReason
+    });
+    return;
+  }
+
+  if (!answers.certificateGrantDate) {
+    res.redirect('/v6-v3/application/' + encodeURIComponent(reference) + '/redetermination/' + index + '/grant-date');
     return;
   }
 
@@ -2844,6 +2904,38 @@ router.post('/application/:reference/redetermination/:index/check-answers', func
   }
 
   const redetermination = getRedeterminationsForReference(req, reference)[index];
+
+  if (answers.decision === 'refuse') {
+    if (!redetermination || !REDETERMINATION_REFUSAL_REASONS.includes(answers.refusalReason) || !answers.decisionReason) {
+      res.redirect('/v6-v3/application/' + encodeURIComponent(reference) + '/redetermination/' + index + '/refuse');
+      return;
+    }
+
+    redetermination.status = 'Refused';
+    redetermination.decisionType = 'Refuse';
+    redetermination.refusalReason = answers.refusalReason;
+    redetermination.decisionReason = answers.decisionReason;
+    if (!req.session.data['redetermination-decision-store']) req.session.data['redetermination-decision-store'] = {};
+    req.session.data['redetermination-decision-store'][reference + '|' + index] = {
+      reference: reference,
+      index: index,
+      status: 'Refused',
+      decisionType: 'Refuse',
+      refusalReason: answers.refusalReason,
+      decisionReason: answers.decisionReason,
+      redeterminationType: redetermination.redeterminationType || 'Add a proceeding',
+      firstName: redetermination.firstName,
+      lastName: redetermination.lastName,
+      dob: redetermination.dob,
+      submitted: redetermination.submitted,
+      firm: redetermination.firm
+    };
+    addHistoryEvent(req, reference, 'Redetermination refused', redetermination.caseworker || 'Caseworker', answers.decisionReason, { From: 'Submitted', To: 'Refused' });
+    delete req.session.data['redetermination-grant-answers'];
+    removeResolvedRedeterminationGroupFromList(req, reference);
+    res.redirect('/v6-v3/application/' + encodeURIComponent(reference) + '?isRedetermination=true&redeterminationIndex=' + index);
+    return;
+  }
 
   if (redetermination) {
     redetermination.status = 'Granted';
