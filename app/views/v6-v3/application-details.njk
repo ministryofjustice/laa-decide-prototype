@@ -433,6 +433,15 @@
           </div>
         </div>
 
+        {% if redeterminations and redeterminations.length > 0 %}
+          <div class="govuk-!-margin-bottom-6">
+            <div style="display: flex; align-items: center; gap: 12px; background: #f3f2f1; border-left: 5px solid #1d70b8; padding: 12px 16px;">
+              <strong class="govuk-body govuk-!-margin-bottom-0">Redetermination request{{ 's' if redeterminations.length > 1 }}</strong>
+              <span class="govuk-tag govuk-tag--blue">{{ redeterminations.length }} request{{ 's' if redeterminations.length > 1 }}</span>
+            </div>
+          </div>
+        {% endif %}
+
         <h2 class="govuk-heading-m govuk-!-margin-top-8">Redeterminations</h2>
 
         {% if redeterminations and redeterminations.length > 0 %}
@@ -468,7 +477,7 @@
                   </div>
                   <div class="govuk-summary-list__row">
                     <dt class="govuk-summary-list__key">Substantive scope limitations</dt>
-                    <dd class="govuk-summary-list__value">Hearing<br><br>Limited to all steps up to and including final hearing and any action necessary to implement (but not enforce) the order.</dd>
+                    <dd class="govuk-summary-list__value">Final Hearing<br><br>To be represented on all steps up to and including a final hearing.</dd>
                   </div>
                   <div class="govuk-summary-list__row">
                     <dt class="govuk-summary-list__key">Justification of request</dt>

@@ -20,6 +20,7 @@
 {% endblock %}
 
 {% set changeHref = "/v6-v3/application/" ~ reference ~ "/redetermination/" ~ index ~ "/grant" %}
+{% set newDetailsChangeHref = changeHref ~ "?edit=new-details" %}
 {% set decisionChangeHref = "/v6-v3/application/" ~ reference ~ "/redetermination/" ~ index ~ "/decision" %}
 
 {% block content %}
@@ -40,17 +41,14 @@
             <dd class="govuk-summary-list__actions"><a class="govuk-link" href="{{ decisionChangeHref }}">Change</a></dd>
           </div>
           <div class="govuk-summary-list__row">
-            <dt class="govuk-summary-list__key">Certificate type</dt>
-            <dd class="govuk-summary-list__value">{{ certificateType }}</dd>
-          </div>
-          <div class="govuk-summary-list__row">
             <dt class="govuk-summary-list__key">Proceeding</dt>
             <dd class="govuk-summary-list__value">{{ proceedingName }}</dd>
-            <dd class="govuk-summary-list__actions"><a class="govuk-link" href="{{ changeHref }}">Change</a></dd>
+            <dd class="govuk-summary-list__actions"><a class="govuk-link" href="{{ newDetailsChangeHref }}">Change</a></dd>
           </div>
           <div class="govuk-summary-list__row">
             <dt class="govuk-summary-list__key">Client role</dt>
             <dd class="govuk-summary-list__value">{{ clientRole }}</dd>
+            <dd class="govuk-summary-list__actions"><a class="govuk-link" href="{{ newDetailsChangeHref }}">Change</a></dd>
           </div>
           <div class="govuk-summary-list__row">
             <dt class="govuk-summary-list__key">Scope limitations</dt>

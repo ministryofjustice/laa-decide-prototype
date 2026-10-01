@@ -6,9 +6,10 @@ const express = require('express');
 const govukPrototypeKit = require('govuk-prototype-kit')
 const router = govukPrototypeKit.requests.setupRouter()
 
-// Redirect root to static welcome page
+// Version 3 is the active target for all future work.
+// Older versions are intentionally frozen and left read-only.
 router.get('/', function(req, res) {
-  res.redirect('/static/');
+  res.redirect('/v6-v3/');
 });
 
 // Add your routes here

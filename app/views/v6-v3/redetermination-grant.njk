@@ -31,7 +31,7 @@
     }
   </style>
 {% endblock %}
-{% block pageTitle %}Proceeding you are granting{% endblock %}
+{% block pageTitle %}{% if selectedProceeding == 'new-proceeding' %}Proceeding you are granting{% else %}Review details of request{% endif %}{% endblock %}
 
 {% block header %}
   {{ govukHeader({ homepageUrl: "#", productName: "Legal Aid Agency", navigationClasses: "govuk-header__navigation--end", navigation: [{ href: "#", text: "joann.barton@justice.gov.uk" }, { href: "/v6-v3/sign-out", text: "Sign out" }] }) }}
@@ -48,13 +48,9 @@
     {% if error %}{{ govukErrorSummary({ titleText: "There is a problem", errorList: [{ text: error, href: "#justification" if errorField == "justification" else "#proceeding" }] }) }}{% endif %}
     <p class="govuk-body-l govuk-!-margin-bottom-1">Application reference:</p>
     <p class="govuk-heading-l govuk-!-margin-bottom-4">{{ reference }}</p>
-    <h1 class="govuk-heading-xl govuk-!-margin-bottom-6">Proceeding you are granting</h1>
+    <h1 class="govuk-heading-xl govuk-!-margin-bottom-6" id="grant-heading">{% if selectedProceeding == 'new-proceeding' %}Proceeding you are granting{% else %}Review details of request{% endif %}</h1>
     {% set newProceedingHtml %}
       <div class="govuk-form-group">
-        <div class="redetermination-field-row">
-          <label class="govuk-label" for="new-proceeding-certificate-type">Certificate type</label>
-          <input class="govuk-input" id="new-proceeding-certificate-type" name="new-proceeding-certificate-type" type="text" value="{{ newProceeding.certificateType or 'Substantive certificate' }}">
-        </div>
         <div class="redetermination-field-row">
           <label class="govuk-label" for="new-proceeding-name">Proceeding</label>
           <input class="govuk-input" id="new-proceeding-name" name="new-proceeding-name" type="text" value="{{ newProceeding.proceedingName }}">
@@ -65,7 +61,7 @@
         </div>
         <div class="redetermination-field-row">
           <label class="govuk-label" for="new-proceeding-scope-limitations">Scope limitations</label>
-          <textarea class="govuk-textarea" id="new-proceeding-scope-limitations" name="new-proceeding-scope-limitations" rows="5">{{ newProceeding.scopeLimitations or 'Hearing - Limited to all steps up to and including final hearing and any action necessary to implement (but not enforce) the order.' }}</textarea>
+          <textarea class="govuk-textarea" id="new-proceeding-scope-limitations" name="new-proceeding-scope-limitations" rows="5">{{ newProceeding.scopeLimitations or 'Final Hearing\n\nTo be represented on all steps up to and including a final hearing.' }}</textarea>
         </div>
         <div class="redetermination-field-row">
           <label class="govuk-label" for="new-proceeding-level-of-service">Level of service</label>
@@ -76,10 +72,6 @@
     {% set selectedProceedingHtml %}
       <dl class="govuk-summary-list govuk-!-margin-top-4">
         <div class="govuk-summary-list__row">
-          <dt class="govuk-summary-list__key">Certificate type</dt>
-          <dd class="govuk-summary-list__value">Substantive certificate</dd>
-        </div>
-        <div class="govuk-summary-list__row">
           <dt class="govuk-summary-list__key">Proceeding</dt>
           <dd class="govuk-summary-list__value">{{ proceedingName or 'Child assessment order' }}</dd>
         </div>
@@ -88,8 +80,8 @@
           <dd class="govuk-summary-list__value">{{ clientRole or 'Applicant' }}</dd>
         </div>
         <div class="govuk-summary-list__row">
-          <dt class="govuk-summary-list__key">Scope limitation</dt>
-          <dd class="govuk-summary-list__value">Hearing<br><br>Limited to all steps up to and including final hearing and any action necessary to implement (but not enforce) the order.</dd>
+          <dt class="govuk-summary-list__key">Scope limitations</dt>
+          <dd class="govuk-summary-list__value">Final Hearing<br><br>To be represented on all steps up to and including a final hearing.</dd>
         </div>
         <div class="govuk-summary-list__row">
           <dt class="govuk-summary-list__key">Level of service</dt>
@@ -98,7 +90,7 @@
       </dl>
     {% endset %}
     <form action="/v6-v3/application/{{ reference }}/redetermination/{{ index }}/grant" method="post">
-      {{ govukRadios({ name: "proceeding", idPrefix: "proceeding", errorMessage: (error and { text: error } or null) if errorField != "justification" else null, items: [{ value: "child-assessment-order", text: "Selected proceeding", checked: selectedProceeding != 'new-proceeding', conditional: { html: selectedProceedingHtml } }, { value: "new-proceeding", text: "New proceeding", checked: selectedProceeding == 'new-proceeding', conditional: { html: newProceedingHtml } }] }) }}
+      {{ govukRadios({ name: "proceeding", idPrefix: "proceeding", errorMessage: (error and { text: error } or null) if errorField != "justification" else null, items: [{ value: "child-assessment-order", text: "Details of request", checked: selectedProceeding != 'new-proceeding', conditional: { html: selectedProceedingHtml } }, { value: "new-proceeding", text: "New details", checked: selectedProceeding == 'new-proceeding', conditional: { html: newProceedingHtml } }] }) }}
       {{ govukTextarea({ name: "justification", id: "justification", value: justification, label: { text: "Explain your decision", classes: "govuk-label--m" }, hint: { text: "We will share this justification with the provider in the grant notification email. You will also find this saved in the application history." }, errorMessage: (error and { text: error } or null) if errorField == "justification" else null, attributes: { maxlength: 350 } }) }}
       <p class="govuk-hint">You can enter up to 350 words</p>
       {{ govukButton({ text: "Continue" }) }}
@@ -107,6 +99,18 @@
 {% endblock %}
 
 {% block bodyEnd %}
+  <script>
+    const grantHeading = document.getElementById('grant-heading');
+    const proceedingOptions = document.querySelectorAll('input[name="proceeding"]');
+
+    function updateGrantHeading() {
+      const newDetailsSelected = Array.from(proceedingOptions).some(option => option.checked && option.value === 'new-proceeding');
+      grantHeading.textContent = newDetailsSelected ? 'Proceeding you are granting' : 'Review details of request';
+    }
+
+    proceedingOptions.forEach(option => option.addEventListener('change', updateGrantHeading));
+    updateGrantHeading();
+  </script>
   <script src="/plugin-assets/govuk-prototype-kit/lib/assets/javascripts/kit.js"></script>
   <script src="/plugin-assets/govuk-prototype-kit/lib/assets/javascripts/auto-store-data.js"></script>
   <script type="module" src="/plugin-assets/govuk-frontend/dist/govuk/govuk-frontend.min.js"></script>

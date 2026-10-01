@@ -915,25 +915,31 @@ function ensureDefaultDemoRedetermination(sessionData) {
   const alreadyExists = sessionData['open-applications-all'].some(app => app.ref === 'L-12Z-13P' && app.isRedetermination);
   if (alreadyExists) return;
 
-  const proceeding = REDETERMINATION_PROCEEDINGS[Math.floor(Math.random() * REDETERMINATION_PROCEEDINGS.length)];
-  const submitted = generateRandomDate();
-  sessionData['open-applications-all'].push({
-    ref: 'L-12Z-13P',
-    reference: 'L-12Z-13P',
-    firstName: 'John',
-    lastName: 'Doe',
-    dob: '10 May 1980',
-    submitted: submitted,
-    firm: 'WATKINS SOLICITORS INC<br>OK514R',
-    type: 'Redetermination',
-    redeterminationType: 'Add a proceeding',
-    redeterminationProceeding: proceeding,
-    redeterminationClientRole: REDETERMINATION_CLIENT_ROLES[Math.floor(Math.random() * REDETERMINATION_CLIENT_ROLES.length)],
-    redeterminationJustification: generateRedeterminationJustification(proceeding, submitted),
-    delegatedFunctions: 'N/A',
-    matterType: { title: 'Family', subtext: "Special Children's Act" },
-    isPriorAuthority: false,
-    isRedetermination: true
+  const sampleProceedings = [
+    'Child arrangement order',
+    'Care order'
+  ];
+
+  sampleProceedings.forEach((proceeding, index) => {
+    const submitted = generateRandomDate();
+    sessionData['open-applications-all'].push({
+      ref: 'L-12Z-13P',
+      reference: 'L-12Z-13P',
+      firstName: 'John',
+      lastName: 'Doe',
+      dob: '10 May 1980',
+      submitted: submitted,
+      firm: 'WATKINS SOLICITORS INC<br>OK514R',
+      type: 'Redetermination',
+      redeterminationType: index % 2 === 0 ? 'Add a proceeding' : 'Amend the original application',
+      redeterminationProceeding: proceeding,
+      redeterminationClientRole: REDETERMINATION_CLIENT_ROLES[Math.floor(Math.random() * REDETERMINATION_CLIENT_ROLES.length)],
+      redeterminationJustification: generateRedeterminationJustification(proceeding, submitted),
+      delegatedFunctions: 'N/A',
+      matterType: { title: 'Family', subtext: "Special Children's Act" },
+      isPriorAuthority: false,
+      isRedetermination: true
+    });
   });
 }
 
@@ -1004,27 +1010,32 @@ function generateMockApplications(count = 8) {
       decisionType: 'Grant'
     });
 
-    const redeterminationSubmitted = generateRandomDate();
-    const redeterminationProceeding = redeterminationProceedings[Math.floor(Math.random() * redeterminationProceedings.length)];
+    const requestCount = (i % 3) + 1;
 
-    openApplications.push({
-      ref,
-      reference: ref,
-      firstName,
-      lastName,
-      dob: '12 Jan 1980',
-      submitted: redeterminationSubmitted,
-      firm: 'WATKINS SOLICITORS INC<br>OK514R',
-      type: 'Redetermination',
-      redeterminationType: i % 2 === 0 ? 'Add a proceeding' : 'Amend the original application',
-      redeterminationProceeding: redeterminationProceeding,
-      redeterminationClientRole: redeterminationClientRoles[Math.floor(Math.random() * redeterminationClientRoles.length)],
-      redeterminationJustification: generateRedeterminationJustification(redeterminationProceeding, redeterminationSubmitted),
-      delegatedFunctions: 'N/A',
-      matterType: { title: 'Family', subtext: "Special Children's Act" },
-      isPriorAuthority: false,
-      isRedetermination: true
-    });
+    for (let r = 0; r < requestCount; r++) {
+      const redeterminationSubmitted = generateRandomDate();
+      const redeterminationProceeding = redeterminationProceedings[(i + r) % redeterminationProceedings.length];
+      const redeterminationType = r % 2 === 0 ? 'Add a proceeding' : 'Amend the original application';
+
+      openApplications.push({
+        ref,
+        reference: ref,
+        firstName,
+        lastName,
+        dob: '12 Jan 1980',
+        submitted: redeterminationSubmitted,
+        firm: 'WATKINS SOLICITORS INC<br>OK514R',
+        type: 'Redetermination',
+        redeterminationType: redeterminationType,
+        redeterminationProceeding: redeterminationProceeding,
+        redeterminationClientRole: redeterminationClientRoles[Math.floor(Math.random() * redeterminationClientRoles.length)],
+        redeterminationJustification: generateRedeterminationJustification(redeterminationProceeding, redeterminationSubmitted),
+        delegatedFunctions: 'N/A',
+        matterType: { title: 'Family', subtext: "Special Children's Act" },
+        isPriorAuthority: false,
+        isRedetermination: true
+      });
+    }
 
     // 1 or 2 pending PA requests — same ref, different expert types
     const numPA = Math.random() > 0.5 ? 2 : 1;
@@ -2332,22 +2343,26 @@ router.get('/application/:reference/redetermination/:index/grant', function(req,
   }
 
   const defaultNewProceeding = {
-    certificateType: 'Substantive certificate',
-    scopeLimitations: 'Hearing\n\nLimited to all steps up to and including final hearing and any action necessary to implement (but not enforce) the order.',
+    proceedingName: redetermination ? redetermination.redeterminationProceeding : 'Child assessment order',
+    clientRole: redetermination ? redetermination.redeterminationClientRole : 'Applicant',
+    scopeLimitations: 'Final Hearing\n\nTo be represented on all steps up to and including a final hearing.',
     levelOfService: 'Full representation'
   };
   const populatedNewProceeding = {
     ...defaultNewProceeding,
     ...(formState.newProceeding || {})
   };
+  const selectedProceeding = req.query.edit === 'new-details'
+    ? 'new-proceeding'
+    : formState.proceeding;
 
   res.render('v6-v3/redetermination-grant.njk', {
-    pageTitle: 'Proceeding you are granting',
+    pageTitle: selectedProceeding === 'new-proceeding' ? 'Proceeding you are granting' : 'Review details of request',
     reference: reference,
     index: index,
     error: error,
     errorField: errorField,
-    selectedProceeding: formState.proceeding,
+    selectedProceeding: selectedProceeding,
     justification: formState.justification,
     newProceeding: populatedNewProceeding,
     proceedingName: redetermination ? redetermination.redeterminationProceeding : 'Child assessment order',
@@ -2361,10 +2376,9 @@ router.post('/application/:reference/redetermination/:index/grant', function(req
   const proceeding = req.body.proceeding;
   const justification = (req.body.justification || '').trim();
   const newProceeding = {
-    certificateType: (req.body['new-proceeding-certificate-type'] || 'Substantive certificate').trim(),
     proceedingName: (req.body['new-proceeding-name'] || '').trim(),
     clientRole: (req.body['new-proceeding-client-role'] || '').trim(),
-    scopeLimitations: (req.body['new-proceeding-scope-limitations'] || 'Hearing\n\nLimited to all steps up to and including final hearing and any action necessary to implement (but not enforce) the order.').trim(),
+    scopeLimitations: (req.body['new-proceeding-scope-limitations'] || 'Final Hearing\n\nTo be represented on all steps up to and including a final hearing.').trim(),
     levelOfService: (req.body['new-proceeding-level-of-service'] || 'Full representation').trim()
   };
   const newProceedingIncomplete = proceeding === 'new-proceeding' && Object.values(newProceeding).some(value => !value);
@@ -2430,10 +2444,9 @@ router.get('/application/:reference/redetermination/:index/check-answers', funct
     reference: reference,
     index: index,
     decision: answers.decision === 'refuse' ? 'Refuse' : 'Grant',
-    certificateType: isNewProceeding ? answers.newProceeding.certificateType : 'Substantive certificate',
     proceedingName: isNewProceeding ? answers.newProceeding.proceedingName : (redetermination ? redetermination.redeterminationProceeding : 'Child assessment order'),
     clientRole: isNewProceeding ? answers.newProceeding.clientRole : (redetermination ? redetermination.redeterminationClientRole : 'Applicant'),
-    scopeLimitations: isNewProceeding ? answers.newProceeding.scopeLimitations : 'Hearing<br><br>Limited to all steps up to and including final hearing and any action necessary to implement (but not enforce) the order.',
+    scopeLimitations: isNewProceeding ? answers.newProceeding.scopeLimitations : 'Final Hearing<br><br>To be represented on all steps up to and including a final hearing.',
     levelOfService: isNewProceeding ? answers.newProceeding.levelOfService : 'Full representation',
     justification: answers.justification
   });
