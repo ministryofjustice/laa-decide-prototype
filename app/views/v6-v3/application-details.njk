@@ -165,6 +165,15 @@
         <strong>Date received:</strong> 19 May 2023
       </p>
 
+      {% if pendingRedeterminationCount > 0 %}
+        <div class="govuk-!-margin-bottom-6">
+          <div style="display: flex; align-items: center; gap: 12px; background: #f3f2f1; border-left: 5px solid #1d70b8; padding: 12px 16px;">
+            <strong class="govuk-body govuk-!-margin-bottom-0">Redetermination request{{ 's' if pendingRedeterminationCount > 1 }}</strong>
+            <span class="govuk-tag govuk-tag--blue">{{ pendingRedeterminationCount }} request{{ 's' if pendingRedeterminationCount > 1 }}</span>
+          </div>
+        </div>
+      {% endif %}
+
       {% if isAssociatedLinkedCase %}
         <div class="govuk-inset-text govuk-!-margin-bottom-6">
           This is an associated case linked to lead application
@@ -433,15 +442,6 @@
           </div>
         </div>
 
-        {% if redeterminations and redeterminations.length > 0 %}
-          <div class="govuk-!-margin-bottom-6">
-            <div style="display: flex; align-items: center; gap: 12px; background: #f3f2f1; border-left: 5px solid #1d70b8; padding: 12px 16px;">
-              <strong class="govuk-body govuk-!-margin-bottom-0">Redetermination request{{ 's' if redeterminations.length > 1 }}</strong>
-              <span class="govuk-tag govuk-tag--blue">{{ redeterminations.length }} request{{ 's' if redeterminations.length > 1 }}</span>
-            </div>
-          </div>
-        {% endif %}
-
         <h2 class="govuk-heading-m govuk-!-margin-top-8">Redeterminations</h2>
 
         {% if redeterminations and redeterminations.length > 0 %}
@@ -461,15 +461,11 @@
                 <dl class="govuk-summary-list">
                   <div class="govuk-summary-list__row">
                     <dt class="govuk-summary-list__key">Type</dt>
-                    <dd class="govuk-summary-list__value">{{ redetermination.redeterminationType }}</dd>
+                    <dd class="govuk-summary-list__value">{{ redetermination.redeterminationProceeding }}</dd>
                   </div>
                   <div class="govuk-summary-list__row">
                     <dt class="govuk-summary-list__key">Client role</dt>
                     <dd class="govuk-summary-list__value">{{ redetermination.redeterminationClientRole or 'Applicant' }}</dd>
-                  </div>
-                  <div class="govuk-summary-list__row">
-                    <dt class="govuk-summary-list__key">Delegated functions</dt>
-                    <dd class="govuk-summary-list__value">N/A</dd>
                   </div>
                   <div class="govuk-summary-list__row">
                     <dt class="govuk-summary-list__key">Substantive level of service</dt>
@@ -495,6 +491,7 @@
           <p class="govuk-body">There are currently no redetermination requests linked to this application.</p>
         {% endif %}
 
+        {% if not viewingRedetermination %}
         <h2 class="govuk-heading-m govuk-!-margin-top-8">Linked cases</h2>
 
         <div class="govuk-!-margin-bottom-6" style="border: 1px solid #b1b4b6;">
@@ -525,6 +522,7 @@
             {% endif %}
           </div>
         </div>
+        {% endif %}
 
         <h2 class="govuk-heading-m govuk-!-margin-top-8">Request cost limits</h2>
 

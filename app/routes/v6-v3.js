@@ -869,12 +869,35 @@ const redeterminationJustificationTemplates = {
 };
 
 function generateRedeterminationJustification(proceeding, submittedDate) {
-  const templates = redeterminationJustificationTemplates[proceeding] || redeterminationJustificationTemplates['Care order'];
+  const templates = redeterminationJustificationTemplates[proceeding];
+  if (!templates) {
+    return `On ${submittedDate}, a request was made in relation to the ${proceeding} under the Special Children's Act. Representation is required to prepare the client's response and represent them at the hearing.`;
+  }
   const template = templates[Math.floor(Math.random() * templates.length)];
   return template.replace('{submitted}', submittedDate);
 }
 
-const REDETERMINATION_PROCEEDINGS = ['Emergency protection order', 'Recovery of children order', 'Child arrangement order', 'Placement order', 'Care order', 'SCA supervision order'];
+const REDETERMINATION_PROCEEDINGS = [
+  'Child assessment order',
+  'Emergency protection order - extend',
+  'Emergency protection order - discharge',
+  'Secure accommodation order',
+  'Contact with a child in care',
+  'Recovery of children order',
+  'End contact with a child in care',
+  'Prohibited steps order',
+  'Specific issue order',
+  'Contact order - vary or discharge',
+  'Residence - vary or discharge',
+  'Prohibited steps order - vary or discharge',
+  'Specific issue order - vary or discharge',
+  'Emergency protection order',
+  'Parental responsibility',
+  'Child arrangements order - contact',
+  'Child arrangements order - residence',
+  'Placement order',
+  'Special guardianship order'
+];
 const REDETERMINATION_CLIENT_ROLES = ['Applicant', 'Respondent', 'Intervenor', 'Subject of proceeding (Child)', 'Joined party'];
 
 // L-12Z-13P is the default/most commonly viewed demo application across the
@@ -912,17 +935,26 @@ function ensureDefaultDemoRedetermination(sessionData) {
     });
   }
 
-  const alreadyExists = sessionData['open-applications-all'].some(app => app.ref === 'L-12Z-13P' && app.isRedetermination);
-  if (alreadyExists) return;
-
-  const sampleProceedings = [
-    'Child arrangement order',
-    'Care order'
-  ];
-
-  sampleProceedings.forEach((proceeding, index) => {
+  const existingRequestsById = new Map();
+  [
+    sessionData['open-applications-all'],
+    sessionData['open-applications'],
+    sessionData['assigned-applications'],
+    sessionData['completed-applications']
+  ].filter(Array.isArray).flat().forEach(app => {
+    if (app.ref !== 'L-12Z-13P' || !app.isRedetermination) return;
+    const key = app.redeterminationId || [app.redeterminationProceeding, app.redeterminationClientRole, app.submitted, app.redeterminationJustification].join('|');
+    if (!existingRequestsById.has(key)) existingRequestsById.set(key, app);
+  });
+  const existingRequests = Array.from(existingRequestsById.values())
+    .sort((left, right) => (left.redeterminationOrder ?? Number.MAX_SAFE_INTEGER) - (right.redeterminationOrder ?? Number.MAX_SAFE_INTEGER));
+  existingRequests.splice(2);
+  const sampleProceedings = ['Child assessment order', 'Emergency protection order - extend'];
+  while (existingRequests.length < 2) {
+    const proceeding = sampleProceedings.find(value => !existingRequests.some(app => app.redeterminationProceeding === value)) || REDETERMINATION_PROCEEDINGS[existingRequests.length];
+    const index = existingRequests.length;
     const submitted = generateRandomDate();
-    sessionData['open-applications-all'].push({
+    const request = {
       ref: 'L-12Z-13P',
       reference: 'L-12Z-13P',
       firstName: 'John',
@@ -931,7 +963,9 @@ function ensureDefaultDemoRedetermination(sessionData) {
       submitted: submitted,
       firm: 'WATKINS SOLICITORS INC<br>OK514R',
       type: 'Redetermination',
-      redeterminationType: index % 2 === 0 ? 'Add a proceeding' : 'Amend the original application',
+      redeterminationType: 'Add a proceeding',
+      redeterminationId: `L-12Z-13P-redetermination-${index + 1}`,
+      redeterminationOrder: index,
       redeterminationProceeding: proceeding,
       redeterminationClientRole: REDETERMINATION_CLIENT_ROLES[Math.floor(Math.random() * REDETERMINATION_CLIENT_ROLES.length)],
       redeterminationJustification: generateRedeterminationJustification(proceeding, submitted),
@@ -939,7 +973,103 @@ function ensureDefaultDemoRedetermination(sessionData) {
       matterType: { title: 'Family', subtext: "Special Children's Act" },
       isPriorAuthority: false,
       isRedetermination: true
+    };
+    sessionData['open-applications-all'].push(request);
+    existingRequests.push(request);
+  }
+
+  const retainedRequestKeys = new Set(existingRequests.map(app => app.redeterminationId || [app.redeterminationProceeding, app.redeterminationClientRole, app.submitted, app.redeterminationJustification].join('|')));
+  [
+    sessionData['open-applications-all'],
+    sessionData['open-applications'],
+    sessionData['assigned-applications'],
+    sessionData['completed-applications']
+  ].filter(Array.isArray).forEach(applications => {
+    for (let index = applications.length - 1; index >= 0; index -= 1) {
+      const app = applications[index];
+      if (app.ref !== 'L-12Z-13P' || !app.isRedetermination) continue;
+      const key = app.redeterminationId || [app.redeterminationProceeding, app.redeterminationClientRole, app.submitted, app.redeterminationJustification].join('|');
+      if (!retainedRequestKeys.has(key)) applications.splice(index, 1);
+    }
+  });
+}
+
+function ensureRedeterminationScenarioVariety(req) {
+  ensureRedeterminationRequestIds(req);
+  const openApplications = req.session.data['open-applications-all'] || [];
+  const assignedApplications = req.session.data['assigned-applications'] || [];
+  const completedApplications = req.session.data['completed-applications'] || (req.session.data['completed-applications'] = []);
+  const decisionStore = req.session.data['redetermination-decision-store'] || {};
+  const uniqueReferences = [...new Set(openApplications.filter(app => app.isRedetermination).map(app => app.ref))];
+
+  uniqueReferences.forEach((reference, scenarioIndex) => {
+    const requests = openApplications
+      .filter(app => app.ref === reference && app.isRedetermination)
+      .sort((left, right) => left.redeterminationOrder - right.redeterminationOrder);
+    const alreadyAssigned = assignedApplications.some(app => app.ref === reference && app.isRedetermination);
+    const hasDecision = requests.some(app => {
+      const stored = decisionStore[reference + '|' + app.redeterminationOrder];
+      return ['Granted', 'Refused'].includes((stored && stored.status) || app.status);
     });
+    if (alreadyAssigned || hasDecision || requests.length === 0) return;
+
+    if (requests.length > 3) {
+      const retainedIds = new Set(requests.slice(0, 3).map(request => request.redeterminationId));
+      for (let index = openApplications.length - 1; index >= 0; index -= 1) {
+        const application = openApplications[index];
+        if (application.ref === reference && application.isRedetermination && !retainedIds.has(application.redeterminationId)) {
+          openApplications.splice(index, 1);
+        }
+      }
+      requests.splice(3);
+    }
+
+    const initialApplicationExists = completedApplications.some(app => app.ref === reference && !app.isPriorAuthority && !app.isRedetermination);
+    if (!initialApplicationExists) {
+      const parent = requests[0];
+      completedApplications.push({
+        ref: reference,
+        reference: reference,
+        firstName: parent.firstName,
+        lastName: parent.lastName,
+        dob: parent.dob,
+        submitted: parent.submitted,
+        firm: parent.firm,
+        type: 'Initial application',
+        delegatedFunctions: 'Used',
+        matterType: parent.matterType,
+        isPriorAuthority: false,
+        status: 'Granted',
+        decisionType: 'Grant'
+      });
+    }
+
+    const targetCount = (scenarioIndex % 3) + 1;
+    const usedProceedings = new Set(requests.map(app => app.redeterminationProceeding));
+    while (requests.length < targetCount) {
+      const source = requests[0];
+      const proceeding = REDETERMINATION_PROCEEDINGS.find(value => !usedProceedings.has(value))
+        || REDETERMINATION_PROCEEDINGS[requests.length % REDETERMINATION_PROCEEDINGS.length];
+      const order = Math.max(...requests.map(app => app.redeterminationOrder)) + 1;
+      const submitted = generateRandomDate();
+      const additionalRequest = {
+        ...source,
+        submitted: submitted,
+        redeterminationId: `${reference}-redetermination-${order + 1}`,
+        redeterminationOrder: order,
+        redeterminationProceeding: proceeding,
+        redeterminationClientRole: REDETERMINATION_CLIENT_ROLES[Math.floor(Math.random() * REDETERMINATION_CLIENT_ROLES.length)],
+        redeterminationJustification: generateRedeterminationJustification(proceeding, submitted),
+        status: undefined
+      };
+      delete additionalRequest.grantedProceeding;
+      delete additionalRequest.grantJustification;
+      delete additionalRequest.newProceedingDetails;
+      delete additionalRequest.certificateGrantDate;
+      openApplications.push(additionalRequest);
+      requests.push(additionalRequest);
+      usedProceedings.add(proceeding);
+    }
   });
 }
 
@@ -958,35 +1088,9 @@ function generateMockApplications(count = 8) {
     return ref;
   }
 
-  // Version 3 focuses on redeterminations, so the majority of scenarios must
-  // generate a granted initial application with a redetermination request.
-  const initialPendingCount = Math.max(1, Math.floor(count / 4));
-  const paScenarioCount = count - initialPendingCount;
+  // Open rows are redeterminations; their granted initial applications stay completed.
+  const paScenarioCount = count;
 
-  // --- Pending initial applications (no status — awaiting decision) ---
-  for (let i = 0; i < initialPendingCount; i++) {
-    const ref = uniqueRef();
-    const firstName = firstNames[Math.floor(Math.random() * firstNames.length)];
-    const lastName  = lastNames[Math.floor(Math.random() * lastNames.length)];
-    const submittedDate = generateRandomDate();
-
-    openApplications.push({
-      ref,
-      reference: ref,
-      firstName,
-      lastName,
-      dob: '12 Jan 1980',
-      submitted: submittedDate,
-      firm: 'WATKINS SOLICITORS INC<br>OK514R',
-      type: 'Initial application',
-      delegatedFunctions: 'Used',
-      matterType: { title: 'Family', subtext: "Special Children's Act" },
-      isPriorAuthority: false
-      // No status — awaiting assessment
-    });
-  }
-
-  // --- PA scenarios: Granted initial app (completed) + 1-2 pending PA requests (open) ---
   for (let i = 0; i < paScenarioCount; i++) {
     const ref = uniqueRef();
     const firstName = firstNames[Math.floor(Math.random() * firstNames.length)];
@@ -1015,7 +1119,7 @@ function generateMockApplications(count = 8) {
     for (let r = 0; r < requestCount; r++) {
       const redeterminationSubmitted = generateRandomDate();
       const redeterminationProceeding = redeterminationProceedings[(i + r) % redeterminationProceedings.length];
-      const redeterminationType = r % 2 === 0 ? 'Add a proceeding' : 'Amend the original application';
+      const redeterminationType = 'Add a proceeding';
 
       openApplications.push({
         ref,
@@ -1027,6 +1131,8 @@ function generateMockApplications(count = 8) {
         firm: 'WATKINS SOLICITORS INC<br>OK514R',
         type: 'Redetermination',
         redeterminationType: redeterminationType,
+        redeterminationId: `${ref}-redetermination-${r + 1}`,
+        redeterminationOrder: r,
         redeterminationProceeding: redeterminationProceeding,
         redeterminationClientRole: redeterminationClientRoles[Math.floor(Math.random() * redeterminationClientRoles.length)],
         redeterminationJustification: generateRedeterminationJustification(redeterminationProceeding, redeterminationSubmitted),
@@ -1037,44 +1143,43 @@ function generateMockApplications(count = 8) {
       });
     }
 
-    // 1 or 2 pending PA requests — same ref, different expert types
-    const numPA = Math.random() > 0.5 ? 2 : 1;
-    // Pick distinct PA types for this scenario
-    const shuffled = [...priorAuthorityTypes].sort(() => Math.random() - 0.5);
-    for (let j = 0; j < numPA; j++) {
-      const paType = shuffled[j];
-      const isExpert = paType.includes('Expert');
-      const expertProfile = isExpert ? pickExpertProfile(paType) : null;
-      const paSubmitted = generateRandomDate();
+    if (i < Math.max(1, Math.floor(count / 4))) {
+      const numPA = Math.random() > 0.5 ? 2 : 1;
+      const shuffled = [...priorAuthorityTypes].sort(() => Math.random() - 0.5);
+      for (let j = 0; j < numPA; j++) {
+        const paType = shuffled[j];
+        const isExpert = paType.includes('Expert');
+        const expertProfile = isExpert ? pickExpertProfile(paType) : null;
+        const paSubmitted = generateRandomDate();
 
-      const paApp = {
-        ref,
-        reference: ref,
-        firstName,
-        lastName,
-        dob: '12 Jan 1980',
-        submitted: paSubmitted,
-        firm: 'WATKINS SOLICITORS INC<br>OK514R',
-        type: 'Prior authority',
-        priorAuthorityType: paType,
-        delegatedFunctions: 'N/A',
-        matterType: { title: 'Family', subtext: "Special Children's Act" },
-        isPriorAuthority: true
-        // No status — awaiting PA assessment
-      };
+        const paApp = {
+          ref,
+          reference: ref,
+          firstName,
+          lastName,
+          dob: '12 Jan 1980',
+          submitted: paSubmitted,
+          firm: 'WATKINS SOLICITORS INC<br>OK514R',
+          type: 'Prior authority',
+          priorAuthorityType: paType,
+          delegatedFunctions: 'N/A',
+          matterType: { title: 'Family', subtext: "Special Children's Act" },
+          isPriorAuthority: true
+        };
 
-      if (expertProfile) {
-        paApp.expertName            = expertProfile.name;
-        paApp.expertType            = expertProfile.type;
-        paApp.expertLocation        = expertProfile.location;
-        paApp.expertHours           = expertProfile.hours;
-        paApp.expertMinutes         = expertProfile.minutes;
-        paApp.expertRate            = expertProfile.rate;
-        paApp.expertRequestedAmount = expertProfile.requestedAmount;
-        paApp.expertJustification   = expertProfile.justification;
+        if (expertProfile) {
+          paApp.expertName            = expertProfile.name;
+          paApp.expertType            = expertProfile.type;
+          paApp.expertLocation        = expertProfile.location;
+          paApp.expertHours           = expertProfile.hours;
+          paApp.expertMinutes         = expertProfile.minutes;
+          paApp.expertRate            = expertProfile.rate;
+          paApp.expertRequestedAmount = expertProfile.requestedAmount;
+          paApp.expertJustification   = expertProfile.justification;
+        }
+
+        openApplications.push(paApp);
       }
-
-      openApplications.push(paApp);
     }
   }
 
@@ -1107,6 +1212,14 @@ function assignLinkedCaseMetadata(openApplications) {
   for (let i = 0; i < linkedRows; i++) {
     const app = openApplications[i];
     if (!app || !app.ref) continue;
+
+    if (app.isRedetermination) {
+      delete app.linkedCaseGroupId;
+      delete app.linkedCaseCount;
+      delete app.linkedCaseRole;
+      delete app.linkedCaseRefs;
+      continue;
+    }
 
     if (typeof app.isStandaloneLinkedCase === 'undefined') {
       app.isStandaloneLinkedCase = !app.isPriorAuthority && !app.isRedetermination && (i + 1) % STANDALONE_CASE_INTERVAL === 0;
@@ -1176,6 +1289,13 @@ function assignLinkedCaseMetadata(openApplications) {
   }
 
   openApplications.forEach(app => {
+    if (app && app.isRedetermination) {
+      delete app.linkedCaseGroupId;
+      delete app.linkedCaseCount;
+      delete app.linkedCaseRole;
+      delete app.linkedCaseRefs;
+      return;
+    }
     const metadata = app && app.ref ? metadataByRef[app.ref] : null;
 
     if (!metadata) {
@@ -1230,8 +1350,160 @@ function assignLinkedCaseMetadata(openApplications) {
 
 function applicationVariantKey(app) {
   if (app.isPriorAuthority) return `${app.ref}|prior-authority`;
-  if (app.isRedetermination) return `${app.ref}|redetermination`;
+  if (app.isRedetermination) return `${app.ref}|redetermination|${app.redeterminationId || app.redeterminationOrder || 0}`;
   return `${app.ref}|initial`;
+}
+
+function ensureRedeterminationRequestIds(req) {
+  const collections = [
+    req.session.data['open-applications-all'] || [],
+    req.session.data['open-applications'] || [],
+    req.session.data['assigned-applications'] || [],
+    req.session.data['completed-applications'] || []
+  ];
+  const requestBySignature = new Map();
+  const nextOrderByReference = new Map();
+  const usedOrdersByReference = new Map();
+
+  collections.flat().forEach(application => {
+    if (!application.isRedetermination || !Number.isInteger(application.redeterminationOrder)) return;
+    if (!usedOrdersByReference.has(application.ref)) usedOrdersByReference.set(application.ref, new Set());
+    usedOrdersByReference.get(application.ref).add(application.redeterminationOrder);
+  });
+
+  collections.forEach(collection => {
+    collection.forEach(application => {
+      if (!application.isRedetermination) return;
+      application.redeterminationType = 'Add a proceeding';
+      const signature = [
+        application.ref,
+        application.redeterminationProceeding,
+        application.redeterminationClientRole,
+        application.submitted,
+        application.redeterminationJustification
+      ].join('|');
+      const existing = requestBySignature.get(signature);
+      let order = Number.isInteger(application.redeterminationOrder)
+        ? application.redeterminationOrder
+        : existing && existing.order;
+      if (!Number.isInteger(order)) {
+        order = nextOrderByReference.get(application.ref) || 0;
+        const usedOrders = usedOrdersByReference.get(application.ref) || new Set();
+        while (usedOrders.has(order)) order += 1;
+        usedOrders.add(order);
+        usedOrdersByReference.set(application.ref, usedOrders);
+        nextOrderByReference.set(application.ref, order + 1);
+      }
+      const id = application.redeterminationId || (existing && existing.id) || `${application.ref}-redetermination-${order + 1}`;
+
+      application.redeterminationId = id;
+      application.redeterminationOrder = order;
+      requestBySignature.set(signature, { id, order });
+    });
+  });
+}
+
+function getRedeterminationsForReference(req, reference) {
+  ensureRedeterminationRequestIds(req);
+  const collections = [
+    req.session.data['open-applications-all'] || [],
+    req.session.data['open-applications'] || [],
+    req.session.data['assigned-applications'] || [],
+    req.session.data['completed-applications'] || []
+  ];
+  const requestsById = new Map();
+  collections.flat().forEach(application => {
+    if (application.ref === reference && application.isRedetermination) {
+      requestsById.set(application.redeterminationId, application);
+    }
+  });
+
+  const assignedRequestIds = new Set((req.session.data['assigned-applications'] || [])
+    .filter(application => application.ref === reference && application.isRedetermination)
+    .map(application => application.redeterminationId));
+  const decisionStore = req.session.data['redetermination-decision-store'] || {};
+
+  return Array.from(requestsById.values())
+    .sort((left, right) => left.redeterminationOrder - right.redeterminationOrder)
+    .map(application => {
+      const index = application.redeterminationOrder;
+      const storedDecision = decisionStore[reference + '|' + index];
+      const status = (storedDecision && storedDecision.status)
+        || (['Granted', 'Refused'].includes(application.status) ? application.status : null)
+        || (assignedRequestIds.has(application.redeterminationId) ? 'In progress' : 'Submitted');
+      return {
+        ...application,
+        index,
+        status,
+        statusClass: status === 'Granted'
+          ? 'govuk-tag--green'
+          : status === 'Refused'
+            ? 'govuk-tag--red'
+            : status === 'In progress'
+              ? 'govuk-tag--light-blue'
+              : 'govuk-tag--pink'
+      };
+    });
+}
+
+function removeResolvedRedeterminationGroupFromList(req, reference) {
+  const redeterminations = getRedeterminationsForReference(req, reference);
+  if (redeterminations.length === 0 || redeterminations.some(request => !['Granted', 'Refused'].includes(request.status))) return;
+
+  const assignedApplications = req.session.data['assigned-applications'] || [];
+  const resolvedAssignedRequests = assignedApplications.filter(application => application.ref === reference && application.isRedetermination);
+  if (resolvedAssignedRequests.length === 0) return;
+
+  if (!req.session.data['completed-applications']) req.session.data['completed-applications'] = [];
+  const completedRequestIds = new Set(req.session.data['completed-applications']
+    .filter(application => application.isRedetermination)
+    .map(application => application.redeterminationId));
+  resolvedAssignedRequests.forEach(application => {
+    if (!completedRequestIds.has(application.redeterminationId)) {
+      req.session.data['completed-applications'].push({ ...application });
+    }
+  });
+  req.session.data['assigned-applications'] = assignedApplications.filter(application => !(application.ref === reference && application.isRedetermination));
+}
+
+function groupRedeterminationApplications(applications) {
+  const rows = [];
+  const groupsByReference = new Map();
+
+  applications.forEach(application => {
+    if (!application.isRedetermination) {
+      rows.push(application);
+      return;
+    }
+
+    let group = groupsByReference.get(application.ref);
+    if (!group) {
+      group = { ...application, redeterminations: [], redeterminationRequestCount: 0 };
+      groupsByReference.set(application.ref, group);
+      rows.push(group);
+    }
+    group.redeterminations.push(application);
+    group.redeterminationRequestCount += 1;
+    group.redeterminationOrder = Math.min(group.redeterminationOrder, application.redeterminationOrder);
+  });
+
+  groupsByReference.forEach(group => {
+    group.redeterminations.sort((left, right) => left.redeterminationOrder - right.redeterminationOrder);
+    const pendingRequest = group.redeterminations.find(request => !['Granted', 'Refused'].includes(request.status));
+    if (pendingRequest) group.redeterminationOrder = pendingRequest.redeterminationOrder;
+  });
+
+  return rows;
+}
+
+function groupAssignedRedeterminations(req, applications) {
+  const decisionStore = req.session.data['redetermination-decision-store'] || {};
+  applications.forEach(application => {
+    if (!application.isRedetermination) return;
+    const storedDecision = decisionStore[application.ref + '|' + application.redeterminationOrder];
+    if (storedDecision && storedDecision.status) application.status = storedDecision.status;
+  });
+  return groupRedeterminationApplications(applications);
 }
 
 function generateReplacementOpenApplication(preferredType, existingVariantKeys = new Set(), scenario = 'linked-initial') {
@@ -1303,12 +1575,35 @@ router.get('/open-applications', function(req, res) {
     });
   }
   ensureDefaultDemoRedetermination(req.session.data);
+  ensureRedeterminationScenarioVariety(req);
+  ensureRedeterminationRequestIds(req);
   [...(req.session.data['open-applications-all'] || []), ...(req.session.data['completed-applications'] || [])]
     .forEach(application => {
       recordApplicationReceived(req, application);
       recordRedeterminationSubmitted(req, application);
     });
+  const priorAuthorityReferences = [...new Set((req.session.data['open-applications-all'] || [])
+    .filter(application => application.isPriorAuthority)
+    .map(application => application.ref))];
+  const retainedPriorAuthorityReferences = new Set(priorAuthorityReferences.slice(0, 2));
+  req.session.data['open-applications-all'] = (req.session.data['open-applications-all'] || [])
+    .filter(application => !application.isPriorAuthority || retainedPriorAuthorityReferences.has(application.ref));
   let applications = [...req.session.data['open-applications-all']];
+
+  const decisionStore = req.session.data['decision-store'] || {};
+  const redeterminationDecisionStore = req.session.data['redetermination-decision-store'] || {};
+  applications = applications.filter(app => {
+    if (!app.isRedetermination && !app.isPriorAuthority) return false;
+    if (app.isRedetermination) {
+      const storedDecision = redeterminationDecisionStore[app.ref + '|' + app.redeterminationOrder];
+      const status = (storedDecision && storedDecision.status) || app.status;
+      return !['Granted', 'Refused'].includes(status);
+    }
+    if (app.isPriorAuthority) return true;
+    const storedDecision = decisionStore[app.ref];
+    const status = (storedDecision && storedDecision.status) || app.status;
+    return !['Granted', 'Refused'].includes(status);
+  });
 
   // Remove applications already in a caseworker's list from open applications.
   const assignedKeys = new Set((req.session.data['assigned-applications'] || []).map(applicationVariantKey));
@@ -1397,6 +1692,8 @@ router.get('/open-applications', function(req, res) {
   }
   
   console.log('Final filtered apps:', filteredApps.length);
+
+  filteredApps = groupRedeterminationApplications(filteredApps);
   
   // Keep full, unfiltered open applications in session for routes like search and add-by-reference.
   req.session.data['open-applications'] = applications;
@@ -1556,6 +1853,7 @@ router.get('/yourlist', function(req, res) {
   if (!req.session.data['assigned-applications']) {
     req.session.data['assigned-applications'] = [];
   }
+  ensureRedeterminationRequestIds(req);
 
   const reassigned = req.session.data['reassigned'];
   const reassignedTo = req.session.data['reassign-to'];
@@ -1570,10 +1868,12 @@ router.get('/yourlist', function(req, res) {
       restoreDecisionData(app, req.session.data['decision-store']);
     });
   }
+
+  const applications = groupAssignedRedeterminations(req, req.session.data['assigned-applications']);
   
   res.render('v6-v3/my-applications.html', { 
     pageTitle: 'Your list',
-    applications: req.session.data['assigned-applications'],
+    applications: applications,
     reassigned: reassigned,
     reassignedTo: reassignedTo,
     reassignedCaseCount: reassignedCaseCount
@@ -1600,16 +1900,20 @@ router.get('/add-application/:reference', function(req, res) {
   if (!req.session.data['open-applications-all']) {
     req.session.data['open-applications-all'] = [];
   }
+  ensureRedeterminationRequestIds(req);
 
   // Get the full application data from open applications, matching requested variant when provided.
   let openApp = null;
   if (req.session.data['open-applications']) {
     if (hasRedeterminationParam) {
-      openApp = req.session.data['open-applications'].find(app => app.ref === ref && Boolean(app.isRedetermination) === isRedeterminationRequested) || null;
+      const requestedOrder = Number(req.query.redeterminationIndex);
+      openApp = req.session.data['open-applications'].find(app => app.ref === ref
+        && Boolean(app.isRedetermination) === isRedeterminationRequested
+        && (!isRedeterminationRequested || app.redeterminationOrder === requestedOrder)) || null;
     } else if (hasPriorAuthorityParam) {
       openApp = req.session.data['open-applications'].find(app => app.ref === ref && app.isPriorAuthority === isPriorAuthorityRequested) || null;
     }
-    if (!openApp) {
+    if (!openApp && !hasRedeterminationParam) {
       openApp = req.session.data['open-applications'].find(app => app.ref === ref) || null;
     }
   }
@@ -1639,22 +1943,19 @@ router.get('/add-application/:reference', function(req, res) {
   const addedRefs = [];
 
   function isAlreadyAssigned(targetRef, application) {
-    return req.session.data['assigned-applications'].some(app => applicationVariantKey(app) === applicationVariantKey({
-      ref: targetRef,
-      isPriorAuthority: application && application.isPriorAuthority,
-      isRedetermination: application && application.isRedetermination
-    }));
+    const targetApplication = application ? { ...application, ref: targetRef } : { ref: targetRef };
+    return req.session.data['assigned-applications'].some(app => applicationVariantKey(app) === applicationVariantKey(targetApplication));
   }
 
-  function buildAssignedApp(targetRef) {
+  function buildAssignedApp(targetRef, sourceApplication) {
     const isPrimaryRef = targetRef === ref;
     const linkedRow = linkedRowByRef[targetRef] || null;
 
     const firstName = isPrimaryRef
-      ? (openApp ? openApp.firstName : 'Unknown')
+      ? (sourceApplication ? sourceApplication.firstName : 'Unknown')
       : (linkedRow ? linkedRow.firstName : 'Unknown');
     const lastName = isPrimaryRef
-      ? (openApp ? openApp.lastName : 'Unknown')
+      ? (sourceApplication ? sourceApplication.lastName : 'Unknown')
       : (linkedRow ? linkedRow.lastName : 'Unknown');
 
     return {
@@ -1662,35 +1963,40 @@ router.get('/add-application/:reference', function(req, res) {
       reference: targetRef,
       firstName: firstName,
       lastName: lastName,
-      dob: openApp ? openApp.dob : 'N/A',
-      submitted: openApp ? openApp.submitted : 'N/A',
-      firm: openApp ? openApp.firm : 'WATKINS SOLICITORS INC<br>OK514R',
-      type: isPrimaryRef && openApp ? openApp.type : 'Initial application',
-      delegatedFunctions: isPrimaryRef && openApp ? openApp.delegatedFunctions : 'Used',
-      matterType: openApp ? openApp.matterType : { title: 'Family', subtext: "Special Children's Act" },
-      isPriorAuthority: isPrimaryRef && openApp ? Boolean(openApp.isPriorAuthority) : false,
-      isRedetermination: isPrimaryRef && openApp ? Boolean(openApp.isRedetermination) : false,
-      priorAuthorityType: isPrimaryRef && openApp ? openApp.priorAuthorityType : null,
-      redeterminationType: isPrimaryRef && openApp ? openApp.redeterminationType : null,
-      redeterminationProceeding: isPrimaryRef && openApp ? openApp.redeterminationProceeding : null,
-      redeterminationClientRole: isPrimaryRef && openApp ? openApp.redeterminationClientRole : null,
-      redeterminationJustification: isPrimaryRef && openApp ? openApp.redeterminationJustification : null,
-      linkedCaseGroupId: openApp && openApp.linkedCaseGroupId ? openApp.linkedCaseGroupId : null,
+      dob: sourceApplication ? sourceApplication.dob : 'N/A',
+      submitted: sourceApplication ? sourceApplication.submitted : 'N/A',
+      firm: sourceApplication ? sourceApplication.firm : 'WATKINS SOLICITORS INC<br>OK514R',
+      type: isPrimaryRef && sourceApplication ? sourceApplication.type : 'Initial application',
+      delegatedFunctions: isPrimaryRef && sourceApplication ? sourceApplication.delegatedFunctions : 'Used',
+      matterType: sourceApplication ? sourceApplication.matterType : { title: 'Family', subtext: "Special Children's Act" },
+      isPriorAuthority: isPrimaryRef && sourceApplication ? Boolean(sourceApplication.isPriorAuthority) : false,
+      isRedetermination: isPrimaryRef && sourceApplication ? Boolean(sourceApplication.isRedetermination) : false,
+      priorAuthorityType: isPrimaryRef && sourceApplication ? sourceApplication.priorAuthorityType : null,
+      redeterminationType: isPrimaryRef && sourceApplication ? sourceApplication.redeterminationType : null,
+      redeterminationId: isPrimaryRef && sourceApplication ? sourceApplication.redeterminationId : null,
+      redeterminationOrder: isPrimaryRef && sourceApplication ? sourceApplication.redeterminationOrder : null,
+      redeterminationProceeding: isPrimaryRef && sourceApplication ? sourceApplication.redeterminationProceeding : null,
+      redeterminationClientRole: isPrimaryRef && sourceApplication ? sourceApplication.redeterminationClientRole : null,
+      redeterminationJustification: isPrimaryRef && sourceApplication ? sourceApplication.redeterminationJustification : null,
+      linkedCaseGroupId: sourceApplication && sourceApplication.linkedCaseGroupId ? sourceApplication.linkedCaseGroupId : null,
       caseworker: assignedCaseworker,
       addedDate: addedDate,
       lastUpdated: addedDate
     };
   }
 
-  targetRefs.forEach(targetRef => {
-    const isPrimaryRef = targetRef === ref;
-    const targetApplication = isPrimaryRef ? openApp : null;
+  const applicationsToAssign = openApp && openApp.isRedetermination
+    ? req.session.data['open-applications'].filter(application => application.ref === ref && application.isRedetermination)
+      .map(application => ({ reference: ref, application }))
+    : targetRefs.map(targetRef => ({ reference: targetRef, application: targetRef === ref ? openApp : null }));
+
+  applicationsToAssign.forEach(({ reference: targetRef, application: targetApplication }) => {
 
     if (isAlreadyAssigned(targetRef, targetApplication)) {
       return;
     }
 
-    const assignedApp = buildAssignedApp(targetRef);
+    const assignedApp = buildAssignedApp(targetRef, targetApplication);
 
     if (req.session.data['decision-store'] && req.session.data['decision-store'][targetRef]) {
       const stored = req.session.data['decision-store'][targetRef];
@@ -1702,12 +2008,16 @@ router.get('/add-application/:reference', function(req, res) {
     }
 
     req.session.data['assigned-applications'].push(assignedApp);
-    addedRefs.push(targetRef);
+    if (!addedRefs.includes(targetRef)) addedRefs.push(targetRef);
   });
 
   req.session.data['open-applications-all'] = req.session.data['open-applications-all'].filter(app => {
     if (app.ref !== ref) return true;
-    if (hasRedeterminationParam) return Boolean(app.isRedetermination) !== isRedeterminationRequested;
+    if (hasRedeterminationParam) {
+      if (Boolean(app.isRedetermination) !== isRedeterminationRequested) return true;
+      if (isRedeterminationRequested) return false;
+      return false;
+    }
     if (hasPriorAuthorityParam) return app.isPriorAuthority !== isPriorAuthorityRequested;
     return false;
   });
@@ -2231,10 +2541,7 @@ router.get('/application-details', function(req, res) {
 router.get('/application/:reference/redetermination/:index/decision', function(req, res) {
   const reference = req.params.reference;
   const index = Number(req.params.index);
-  const redeterminations = [
-    ...(req.session.data['open-applications-all'] || []),
-    ...(req.session.data['assigned-applications'] || [])
-  ].filter(application => application.ref === reference && application.isRedetermination);
+  const redeterminations = getRedeterminationsForReference(req, reference);
   const redetermination = redeterminations[index];
 
   if (!hasGrantedInitialApplication(req, reference)) {
@@ -2263,15 +2570,9 @@ router.post('/application/:reference/redetermination/:index/decision', function(
   const reference = req.params.reference;
   const index = Number(req.params.index);
   const decision = req.body.decision;
-  const collections = [
-    req.session.data['open-applications-all'] || [],
-    req.session.data['open-applications'] || [],
-    req.session.data['assigned-applications'] || []
-  ];
-  const redeterminations = collections
-    .flat()
-    .filter(application => application.ref === reference && application.isRedetermination);
+  const redeterminations = getRedeterminationsForReference(req, reference);
   const redetermination = redeterminations[index];
+  const detailsUrl = '/v6-v3/application/' + encodeURIComponent(reference) + '?isRedetermination=true&redeterminationIndex=' + index;
 
   if (!hasGrantedInitialApplication(req, reference)) {
     res.redirect('/v6-v3/application/' + encodeURIComponent(reference));
@@ -2314,8 +2615,9 @@ router.post('/application/:reference/redetermination/:index/decision', function(
     firm: redetermination.firm
   };
   addHistoryEvent(req, reference, 'Redetermination refused', redetermination.caseworker || 'Caseworker', null, { From: 'Submitted', To: 'Refused' });
+  removeResolvedRedeterminationGroupFromList(req, reference);
 
-  res.redirect('/v6-v3/application/' + encodeURIComponent(reference) + '/redetermination/' + index + '/confirmation');
+  res.redirect(detailsUrl);
 });
 
 router.get('/application/:reference/redetermination/:index/grant', function(req, res) {
@@ -2328,14 +2630,7 @@ router.get('/application/:reference/redetermination/:index/grant', function(req,
   delete req.session.data['redetermination-grant-error-field'];
   delete req.session.data['redetermination-grant-form'];
 
-  const collections = [
-    req.session.data['open-applications-all'] || [],
-    req.session.data['open-applications'] || [],
-    req.session.data['assigned-applications'] || []
-  ];
-  const redetermination = collections
-    .flat()
-    .filter(application => application.ref === reference && application.isRedetermination)[index];
+  const redetermination = getRedeterminationsForReference(req, reference)[index];
 
   if (!hasGrantedInitialApplication(req, reference)) {
     res.redirect('/v6-v3/application/' + encodeURIComponent(reference));
@@ -2410,7 +2705,99 @@ router.post('/application/:reference/redetermination/:index/grant', function(req
     return;
   }
 
-  req.session.data['redetermination-grant-answers'] = { decision: 'grant', proceeding, justification, newProceeding };
+  req.session.data['redetermination-grant-answers'] = {
+    ...(req.session.data['redetermination-grant-answers'] || {}),
+    decision: 'grant',
+    proceeding,
+    justification,
+    newProceeding
+  };
+  delete req.session.data['redetermination-grant-date-errors'];
+  res.redirect('/v6-v3/application/' + encodeURIComponent(reference) + '/redetermination/' + index + '/grant-date');
+});
+
+router.get('/application/:reference/redetermination/:index/grant-date', function(req, res) {
+  const reference = req.params.reference;
+  const index = Number(req.params.index);
+  const answers = req.session.data['redetermination-grant-answers'];
+  if (!answers) {
+    res.redirect('/v6-v3/application/' + encodeURIComponent(reference) + '/redetermination/' + index + '/grant');
+    return;
+  }
+
+  const errors = req.session.data['redetermination-grant-date-errors'] || {};
+  delete req.session.data['redetermination-grant-date-errors'];
+  res.render('v6-v3/redetermination-grant-date.njk', {
+    pageTitle: 'When should the certificate be granted from?',
+    reference: reference,
+    index: index,
+    selectedDateType: answers.certificateGrantDateType || 'today',
+    dateDay: answers.certificateGrantDateDay,
+    dateMonth: answers.certificateGrantDateMonth,
+    dateYear: answers.certificateGrantDateYear,
+    errors: errors
+  });
+});
+
+router.post('/application/:reference/redetermination/:index/grant-date', function(req, res) {
+  const reference = req.params.reference;
+  const index = Number(req.params.index);
+  const answers = req.session.data['redetermination-grant-answers'];
+  if (!answers) {
+    res.redirect('/v6-v3/application/' + encodeURIComponent(reference) + '/redetermination/' + index + '/grant');
+    return;
+  }
+
+  const dateType = req.body['certificate-date-type'];
+  const day = (req.body['certificate-date-day'] || '').trim();
+  const month = (req.body['certificate-date-month'] || '').trim();
+  const year = (req.body['certificate-date-year'] || '').trim();
+  const errors = {};
+  let certificateGrantDate;
+
+  if (!['today', 'another-date'].includes(dateType)) {
+    errors.dateType = 'Select when the certificate should be granted from';
+  } else if (dateType === 'today') {
+    certificateGrantDate = new Date().toLocaleDateString('en-GB', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric'
+    });
+  } else {
+    const date = new Date(Number(year), Number(month) - 1, Number(day));
+    const isValidDate = /^\d{1,2}$/.test(day)
+      && /^\d{1,2}$/.test(month)
+      && /^\d{4}$/.test(year)
+      && Number(year) >= 1000
+      && date.getFullYear() === Number(year)
+      && date.getMonth() === Number(month) - 1
+      && date.getDate() === Number(day);
+    if (!isValidDate) {
+      errors.date = 'Enter a real date for when the certificate should be granted from';
+    } else {
+      certificateGrantDate = date.toLocaleDateString('en-GB', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric'
+      });
+    }
+  }
+
+  if (Object.keys(errors).length > 0) {
+    req.session.data['redetermination-grant-date-errors'] = errors;
+    answers.certificateGrantDateType = dateType;
+    answers.certificateGrantDateDay = day;
+    answers.certificateGrantDateMonth = month;
+    answers.certificateGrantDateYear = year;
+    res.redirect('/v6-v3/application/' + encodeURIComponent(reference) + '/redetermination/' + index + '/grant-date');
+    return;
+  }
+
+  answers.certificateGrantDateType = dateType;
+  answers.certificateGrantDateDay = day;
+  answers.certificateGrantDateMonth = month;
+  answers.certificateGrantDateYear = year;
+  answers.certificateGrantDate = certificateGrantDate;
   res.redirect('/v6-v3/application/' + encodeURIComponent(reference) + '/redetermination/' + index + '/check-answers');
 });
 
@@ -2419,19 +2806,12 @@ router.get('/application/:reference/redetermination/:index/check-answers', funct
   const index = req.params.index;
   const answers = req.session.data['redetermination-grant-answers'];
 
-  if (!answers) {
-    res.redirect('/v6-v3/application/' + encodeURIComponent(reference) + '/redetermination/' + index + '/grant');
+  if (!answers || !answers.certificateGrantDate) {
+    res.redirect('/v6-v3/application/' + encodeURIComponent(reference) + '/redetermination/' + index + '/grant-date');
     return;
   }
 
-  const collections = [
-    req.session.data['open-applications-all'] || [],
-    req.session.data['open-applications'] || [],
-    req.session.data['assigned-applications'] || []
-  ];
-  const redetermination = collections
-    .flat()
-    .filter(application => application.ref === reference && application.isRedetermination)[Number(index)];
+  const redetermination = getRedeterminationsForReference(req, reference)[Number(index)];
 
   if (!hasGrantedInitialApplication(req, reference)) {
     res.redirect('/v6-v3/application/' + encodeURIComponent(reference));
@@ -2448,7 +2828,8 @@ router.get('/application/:reference/redetermination/:index/check-answers', funct
     clientRole: isNewProceeding ? answers.newProceeding.clientRole : (redetermination ? redetermination.redeterminationClientRole : 'Applicant'),
     scopeLimitations: isNewProceeding ? answers.newProceeding.scopeLimitations : 'Final Hearing<br><br>To be represented on all steps up to and including a final hearing.',
     levelOfService: isNewProceeding ? answers.newProceeding.levelOfService : 'Full representation',
-    justification: answers.justification
+    justification: answers.justification,
+    certificateGrantDate: answers.certificateGrantDate
   });
 });
 
@@ -2462,20 +2843,14 @@ router.post('/application/:reference/redetermination/:index/check-answers', func
     return;
   }
 
-  const collections = [
-    req.session.data['open-applications-all'] || [],
-    req.session.data['open-applications'] || [],
-    req.session.data['assigned-applications'] || []
-  ];
-  const redetermination = collections
-    .flat()
-    .filter(application => application.ref === reference && application.isRedetermination)[index];
+  const redetermination = getRedeterminationsForReference(req, reference)[index];
 
   if (redetermination) {
     redetermination.status = 'Granted';
     redetermination.decisionType = 'Grant';
     redetermination.grantedProceeding = answers.proceeding;
     redetermination.grantJustification = answers.justification;
+    redetermination.certificateGrantDate = answers.certificateGrantDate;
     if (answers.proceeding === 'new-proceeding') {
       redetermination.newProceedingDetails = answers.newProceeding;
     }
@@ -2496,10 +2871,11 @@ router.post('/application/:reference/redetermination/:index/check-answers', func
       firm: redetermination.firm
     };
     addHistoryEvent(req, reference, 'Redetermination granted', redetermination.caseworker || 'Caseworker', answers.justification, { From: 'Submitted', To: 'Granted' });
+    removeResolvedRedeterminationGroupFromList(req, reference);
   }
 
   delete req.session.data['redetermination-grant-answers'];
-  res.redirect('/v6-v3/application/' + encodeURIComponent(reference) + '/redetermination/' + index + '/confirmation');
+  res.redirect('/v6-v3/application/' + encodeURIComponent(reference) + '?isRedetermination=true&redeterminationIndex=' + index);
 });
 
 router.get('/application/:reference/redetermination/:index/confirmation', function(req, res) {
@@ -2512,6 +2888,7 @@ router.get('/application/:reference/redetermination/:index/confirmation', functi
 router.get('/application/:reference', function(req, res) {
   const reference = req.params.reference;
   const requestedPriorAuthority = req.query.isPriorAuthority === 'true';
+  const requestedRedetermination = req.query.isRedetermination === 'true';
   const defaultLinkedCasesByReference = {
     'L-12Z-13P': [
       { role: 'Lead', firstName: 'Haylie', middleName: '', lastName: 'Septimus', reference: 'L-12Z-13P', status: 'In progress', statusClass: 'govuk-tag--light-blue' },
@@ -2524,7 +2901,7 @@ router.get('/application/:reference', function(req, res) {
     ...defaultLinkedCasesByReference,
     ...(req.session.data['linked-cases-by-reference-v3'] || {})
   };
-  const linkedCases = linkedCasesByReference[reference] || [];
+  const linkedCases = requestedRedetermination ? [] : (linkedCasesByReference[reference] || []);
   const hasLinkedCases = linkedCases.length > 0;
   const currentLinkedCase = linkedCases.find(linkedCase => linkedCase.reference === reference) || null;
   const isAssociatedLinkedCase = Boolean(currentLinkedCase && currentLinkedCase.role === 'Associated');
@@ -2613,6 +2990,7 @@ router.get('/application/:reference', function(req, res) {
     });
   }
   ensureDefaultDemoRedetermination(req.session.data);
+  ensureRedeterminationScenarioVariety(req);
 
   const applicationCollections = [
     req.session.data['assigned-applications'] || [],
@@ -2648,36 +3026,8 @@ router.get('/application/:reference', function(req, res) {
 
   const initialApplicationData = applyStoredDecision(findApplicationVariant(false));
   const priorAuthorityApplicationData = applyStoredDecision(findApplicationVariant(true));
-  const redeterminationDecisionStore = req.session.data['redetermination-decision-store'] || {};
-  const seenRedeterminationSignatures = new Set();
-  const redeterminations = applicationCollections
-    .flat()
-    .filter(application => application.ref === reference && application.isRedetermination)
-    .filter(application => {
-      // Different session collections can independently hold the same underlying
-      // redetermination request — de-duplicate so it isn't shown/counted twice.
-      const signature = [application.redeterminationProceeding, application.redeterminationClientRole, application.submitted].join('|');
-      if (seenRedeterminationSignatures.has(signature)) return false;
-      seenRedeterminationSignatures.add(signature);
-      return true;
-    })
-    .map((application, index) => {
-      // Session collections can hold independently-deserialized copies of the
-      // same record, so the decision must be re-hydrated from the authoritative
-      // store rather than trusted from whichever object instance was found here.
-      const storedDecision = redeterminationDecisionStore[reference + '|' + index];
-      const status = (storedDecision && storedDecision.status) || application.status || 'In progress';
-      return {
-        ...application,
-        index: index,
-        status: status,
-        statusClass: status === 'Granted'
-          ? 'govuk-tag--green'
-          : status === 'Refused'
-            ? 'govuk-tag--red'
-            : 'govuk-tag--light-blue'
-      };
-    });
+  const redeterminations = getRedeterminationsForReference(req, reference);
+  const pendingRedeterminationCount = redeterminations.filter(redetermination => !['Granted', 'Refused'].includes(redetermination.status)).length;
   if (initialApplicationData && priorAuthorityApplicationData && !initialApplicationData.status) {
     initialApplicationData.status = 'Granted';
     initialApplicationData.decisionType = 'Grant';
@@ -2790,12 +3140,24 @@ router.get('/application/:reference', function(req, res) {
   }
   
   // Check if application is already assigned (in your list)
-  const isAssigned = assignedApplications.some(app => app.ref === reference && Boolean(app.isPriorAuthority) === requestedPriorAuthority);
+  const requestedRedeterminationIndex = Number(req.query.redeterminationIndex);
+  const selectedRedetermination = requestedRedetermination
+    ? redeterminations.find(redetermination => redetermination.index === requestedRedeterminationIndex)
+      || redeterminations.find(redetermination => !['Granted', 'Refused'].includes(redetermination.status))
+      || redeterminations[0]
+    : null;
+  const selectedRedeterminationIndex = selectedRedetermination ? selectedRedetermination.index : requestedRedeterminationIndex;
+  const isAssigned = requestedRedetermination
+    ? assignedApplications.some(app => app.ref === reference && app.isRedetermination && app.redeterminationOrder === selectedRedeterminationIndex)
+    : assignedApplications.some(app => app.ref === reference && Boolean(app.isPriorAuthority) === requestedPriorAuthority);
   const isInitialApplicationAssigned = assignedApplications.some(app => app.ref === reference && !app.isPriorAuthority);
   const isPriorAuthorityAssigned = assignedApplications.some(app => app.ref === reference && app.isPriorAuthority);
   const isLateLinkedCase = Boolean(applicationData && applicationData.isStandaloneLinkedCase);
-  const statusApplication = requestedPriorAuthority && resolvedInitialApplicationData && !isLateLinkedCase ? resolvedInitialApplicationData : application;
-  const isStatusApplicationAssigned = requestedPriorAuthority && resolvedInitialApplicationData && !isLateLinkedCase ? isInitialApplicationAssigned : isAssigned;
+  const statusApplication = selectedRedetermination
+    || (requestedPriorAuthority && resolvedInitialApplicationData && !isLateLinkedCase ? resolvedInitialApplicationData : application);
+  const isStatusApplicationAssigned = selectedRedetermination
+    ? selectedRedetermination.status === 'In progress'
+    : requestedPriorAuthority && resolvedInitialApplicationData && !isLateLinkedCase ? isInitialApplicationAssigned : isAssigned;
   
   // Convert app-history to historyEvents format for template
   let historyEvents = [];
@@ -2854,11 +3216,13 @@ router.get('/application/:reference', function(req, res) {
     hasLinkedCases: hasLinkedCases,
     linkedCases: linkedCasesForView,
     isAssociatedLinkedCase: isAssociatedLinkedCase,
+    viewingRedetermination: requestedRedetermination,
     linkedLeadReference: linkedLeadReference,
     applicationRoutePrefix: '/v6-v3',
     hasPriorAuthority: hasPriorAuthority,
     priorAuthorityType: priorAuthorityType,
     redeterminations: redeterminations,
+    pendingRedeterminationCount: pendingRedeterminationCount,
     sessionData: req.session.data,
     isAssigned: isAssigned,
     isInitialApplicationAssigned: isInitialApplicationAssigned,

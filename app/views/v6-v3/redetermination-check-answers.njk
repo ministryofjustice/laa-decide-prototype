@@ -21,6 +21,7 @@
 
 {% set changeHref = "/v6-v3/application/" ~ reference ~ "/redetermination/" ~ index ~ "/grant" %}
 {% set newDetailsChangeHref = changeHref ~ "?edit=new-details" %}
+{% set dateChangeHref = "/v6-v3/application/" ~ reference ~ "/redetermination/" ~ index ~ "/grant-date" %}
 {% set decisionChangeHref = "/v6-v3/application/" ~ reference ~ "/redetermination/" ~ index ~ "/decision" %}
 
 {% block content %}
@@ -46,6 +47,11 @@
             <dd class="govuk-summary-list__actions"><a class="govuk-link" href="{{ newDetailsChangeHref }}">Change</a></dd>
           </div>
           <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">Date certificate granted from</dt>
+            <dd class="govuk-summary-list__value">{{ certificateGrantDate }}</dd>
+            <dd class="govuk-summary-list__actions"><a class="govuk-link" href="{{ dateChangeHref }}">Change</a></dd>
+          </div>
+          <div class="govuk-summary-list__row">
             <dt class="govuk-summary-list__key">Client role</dt>
             <dd class="govuk-summary-list__value">{{ clientRole }}</dd>
             <dd class="govuk-summary-list__actions"><a class="govuk-link" href="{{ newDetailsChangeHref }}">Change</a></dd>
@@ -53,12 +59,10 @@
           <div class="govuk-summary-list__row">
             <dt class="govuk-summary-list__key">Scope limitations</dt>
             <dd class="govuk-summary-list__value">{{ scopeLimitations | safe }}</dd>
-            <dd class="govuk-summary-list__actions"><a class="govuk-link" href="{{ changeHref }}">Change</a></dd>
           </div>
           <div class="govuk-summary-list__row">
             <dt class="govuk-summary-list__key">Level of service</dt>
             <dd class="govuk-summary-list__value">{{ levelOfService }}</dd>
-            <dd class="govuk-summary-list__actions"><a class="govuk-link" href="{{ changeHref }}">Change</a></dd>
           </div>
           <div class="govuk-summary-list__row">
             <dt class="govuk-summary-list__key">Justification of request</dt>

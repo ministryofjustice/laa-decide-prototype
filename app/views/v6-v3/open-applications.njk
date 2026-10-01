@@ -40,10 +40,22 @@
       font-size: 19px;
       margin-top: 15px;
     }
-    /* The MOJ sort icon is a 22px SVG with built-in padding, which reads as a
-       large gap once the header text wraps onto two lines. */
-    [aria-sort] button svg {
-      margin-left: -6px;
+    .open-applications-table {
+      width: 100%;
+      min-width: 900px;
+      table-layout: fixed;
+    }
+    .open-applications-table th:nth-child(4) button {
+      display: inline;
+      white-space: normal;
+    }
+    .open-applications-table th:nth-child(4) button svg {
+      width: 16px;
+      margin-left: 0;
+      vertical-align: middle;
+    }
+    .open-applications-table td:last-child {
+      white-space: nowrap;
     }
   </style>
 {% endblock %}
@@ -182,12 +194,19 @@
           </div>
 
           {% if applications and applications.length > 0 %}
-            <table class="govuk-table moj-sortable-table" data-module="moj-sortable-table">
+            <table class="govuk-table moj-sortable-table open-applications-table" data-module="moj-sortable-table">
+              <colgroup>
+                <col style="width: 14%;">
+                <col style="width: 13%;">
+                <col style="width: 17%;">
+                <col style="width: 19%;">
+                <col style="width: 19%;">
+                <col style="width: 18%;">
+              </colgroup>
               <thead class="govuk-table__head">
                 <tr class="govuk-table__row">
                   <th scope="col" class="govuk-table__header">Reference</th>
                   <th scope="col" class="govuk-table__header" aria-sort="none" data-sort-type="date">Submitted</th>
-                  <th scope="col" class="govuk-table__header" aria-sort="none" data-sort-type="date">Last updated</th>
                   <th scope="col" class="govuk-table__header">Type</th>
                   <th scope="col" class="govuk-table__header" aria-sort="none">Delegated Functions</th>
                   <th scope="col" class="govuk-table__header" aria-sort="none">Matter type</th>
@@ -198,12 +217,9 @@
                 {% for app in applications %}
                   <tr class="govuk-table__row">
                     <td class="govuk-table__cell">
-                      <a href="/v6-v3/application/{{ app.ref }}{% if app.isPriorAuthority %}?isPriorAuthority=true#prior-authority{% elif app.isRedetermination %}?isRedetermination=true{% endif %}" class="govuk-link">
+                      <a href="/v6-v3/application/{{ app.ref }}{% if app.isPriorAuthority %}?isPriorAuthority=true#prior-authority{% elif app.isRedetermination %}?isRedetermination=true&amp;redeterminationIndex={{ app.redeterminationOrder }}{% endif %}" class="govuk-link">
                         {{ app.ref }}
                       </a>
-                    </td>
-                    <td class="govuk-table__cell" data-sort-value="{{ app.submitted | replace(' ', '') }}">
-                      {{ app.submitted }}
                     </td>
                     <td class="govuk-table__cell" data-sort-value="{{ app.submitted | replace(' ', '') }}">
                       {{ app.submitted }}
@@ -224,7 +240,7 @@
                       <strong>{{ app.matterType.title }}</strong><br>{{ app.matterType.subtext }}
                     </td>
                     <td class="govuk-table__cell">
-                      <a href="#" class="govuk-link add-to-list" data-ref="{{ app.ref }}" data-is-prior-authority="{{ app.isPriorAuthority and 'true' or 'false' }}" data-is-redetermination="{{ app.isRedetermination and 'true' or 'false' }}">Add</a>
+                      <a href="#" class="govuk-link add-to-list" data-ref="{{ app.ref }}" data-is-prior-authority="{{ app.isPriorAuthority and 'true' or 'false' }}" data-is-redetermination="{{ app.isRedetermination and 'true' or 'false' }}" data-redetermination-index="{{ app.redeterminationOrder }}">Assign to your list</a>
                     </td>
                   </tr>
                 {% endfor %}
@@ -342,9 +358,10 @@
         const reference = this.getAttribute('data-ref');
         const isPriorAuthority = this.getAttribute('data-is-prior-authority') === 'true';
         const isRedetermination = this.getAttribute('data-is-redetermination') === 'true';
+        const redeterminationIndex = this.getAttribute('data-redetermination-index');
         
         // Add application to list via fetch
-        fetch('/v6-v3/add-application/' + reference + '?isPriorAuthority=' + isPriorAuthority + '&isRedetermination=' + isRedetermination, {
+        fetch('/v6-v3/add-application/' + reference + '?isPriorAuthority=' + isPriorAuthority + '&isRedetermination=' + isRedetermination + (isRedetermination ? '&redeterminationIndex=' + encodeURIComponent(redeterminationIndex) : ''), {
           method: 'GET',
           headers: {
             'X-Requested-With': 'XMLHttpRequest'
@@ -356,7 +373,7 @@
             const toastContainer = document.getElementById('toast-notification');
             const addedCount = data && Number.isFinite(Number(data.addedCount)) ? Number(data.addedCount) : 1;
             const linkedAddedCount = data && Number.isFinite(Number(data.linkedAddedCount)) ? Number(data.linkedAddedCount) : Math.max(0, addedCount - 1);
-            const referenceHref = '/v6-v3/application/' + reference + (isPriorAuthority ? '?isPriorAuthority=true#prior-authority' : isRedetermination ? '?isRedetermination=true' : '');
+            const referenceHref = '/v6-v3/application/' + reference + (isPriorAuthority ? '?isPriorAuthority=true#prior-authority' : isRedetermination ? '?isRedetermination=true&redeterminationIndex=' + encodeURIComponent(redeterminationIndex) : '');
             const referenceLink = '<a class="govuk-link" href="' + referenceHref + '">' + reference + '</a>';
             const linkedLabel = linkedAddedCount === 1 ? 'linked case' : 'linked cases';
             let toastMessage = linkedAddedCount > 0

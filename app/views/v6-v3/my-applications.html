@@ -98,7 +98,6 @@
             <tr class="govuk-table__row">
               <th scope="col" class="govuk-table__header">Reference</th>
               <th scope="col" class="govuk-table__header">Submitted</th>
-              <th scope="col" class="govuk-table__header">Last updated</th>
               <th scope="col" class="govuk-table__header">Type</th>
               <th scope="col" class="govuk-table__header">Delegated Functions</th>
               <th scope="col" class="govuk-table__header">Matter type</th>
@@ -109,15 +108,12 @@
             {% for app in applications %}
               <tr class="govuk-table__row">
                 <td class="govuk-table__cell">
-                  <a href="/v6-v3/application/{{ app.ref }}{% if app.isPriorAuthority %}?isPriorAuthority=true#prior-authority{% endif %}" class="govuk-link">
+                  <a href="/v6-v3/application/{{ app.ref }}{% if app.isPriorAuthority %}?isPriorAuthority=true#prior-authority{% elif app.isRedetermination %}?isRedetermination=true&amp;redeterminationIndex={{ app.redeterminationOrder }}{% endif %}" class="govuk-link">
                     {{ app.ref }}
                   </a>
                 </td>
                 <td class="govuk-table__cell">
                   {{ app.submitted }}
-                </td>
-                <td class="govuk-table__cell">
-                  {{ app.lastUpdated }}
                 </td>
                 <td class="govuk-table__cell">
                   {% if app.isRedetermination %}
