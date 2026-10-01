@@ -2868,7 +2868,11 @@ router.get('/application/:reference/redetermination/:index/check-answers', funct
       index: index,
       decision: 'Refuse',
       refusalReason: answers.refusalReason,
-      decisionReason: answers.decisionReason
+      decisionReason: answers.decisionReason,
+      proceedingName: redetermination ? redetermination.redeterminationProceeding : 'Child assessment order',
+      clientRole: redetermination ? redetermination.redeterminationClientRole : 'Applicant',
+      scopeLimitations: 'Final Hearing<br><br>To be represented on all steps up to and including a final hearing.',
+      levelOfService: 'Full representation'
     });
     return;
   }
@@ -3245,11 +3249,12 @@ router.get('/application/:reference', function(req, res) {
   const isInitialApplicationAssigned = assignedApplications.some(app => app.ref === reference && !app.isPriorAuthority);
   const isPriorAuthorityAssigned = assignedApplications.some(app => app.ref === reference && app.isPriorAuthority);
   const isLateLinkedCase = Boolean(applicationData && applicationData.isStandaloneLinkedCase);
-  const statusApplication = selectedRedetermination
-    || (requestedPriorAuthority && resolvedInitialApplicationData && !isLateLinkedCase ? resolvedInitialApplicationData : application);
-  const isStatusApplicationAssigned = selectedRedetermination
-    ? selectedRedetermination.status === 'In progress'
-    : requestedPriorAuthority && resolvedInitialApplicationData && !isLateLinkedCase ? isInitialApplicationAssigned : isAssigned;
+  const statusApplication = requestedRedetermination
+    ? resolvedInitialApplicationData
+    : requestedPriorAuthority && resolvedInitialApplicationData && !isLateLinkedCase ? resolvedInitialApplicationData : application;
+  const isStatusApplicationAssigned = requestedRedetermination || (requestedPriorAuthority && resolvedInitialApplicationData && !isLateLinkedCase)
+    ? isInitialApplicationAssigned
+    : isAssigned;
   
   // Convert app-history to historyEvents format for template
   let historyEvents = [];
