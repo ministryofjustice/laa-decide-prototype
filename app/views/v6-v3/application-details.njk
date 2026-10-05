@@ -191,10 +191,12 @@
       {% if sessionData['decision-reference'] !== reference %}
         {% if isAssigned %}
           <a href="/v6-v3/reassign?reference={{ reference }}&isPriorAuthority={{ application.isPriorAuthority and 'true' or 'false' }}" class="govuk-button govuk-button--secondary govuk-!-margin-bottom-8" data-module="govuk-button" style="background-color: #00703c; color: white;">Reassign</a>
-        {% elif not hasDecision %}
+        {% elif not hasDecision or (viewingRedetermination and pendingRedeterminationCount > 0) %}
           <form id="addToListForm" style="display: inline;">
             <input type="hidden" name="reference" value="{{ reference }}">
             <input type="hidden" name="isPriorAuthority" value="{{ application.isPriorAuthority and 'true' or 'false' }}">
+            <input type="hidden" name="isRedetermination" value="{{ viewingRedetermination and 'true' or 'false' }}">
+            <input type="hidden" name="redeterminationIndex" value="{{ redeterminationAssignmentIndex }}">
             {{ govukButton({
               text: "Add to your list",
               classes: "govuk-button--secondary govuk-!-margin-bottom-8",
@@ -207,9 +209,11 @@
               e.preventDefault();
               const reference = this.querySelector('input[name="reference"]').value;
               const isPriorAuthority = this.querySelector('input[name="isPriorAuthority"]').value;
+              const isRedetermination = this.querySelector('input[name="isRedetermination"]').value === 'true';
+              const redeterminationIndex = this.querySelector('input[name="redeterminationIndex"]').value;
               
               // Add application to list via fetch
-              fetch('/v6-v3/add-application/' + reference + '?isPriorAuthority=' + isPriorAuthority, { 
+              fetch('/v6-v3/add-application/' + reference + '?isPriorAuthority=' + isPriorAuthority + (isRedetermination ? '&isRedetermination=true&redeterminationIndex=' + encodeURIComponent(redeterminationIndex) : ''), {
                 method: 'GET',
                 headers: {
                   'X-Requested-With': 'XMLHttpRequest'
@@ -221,7 +225,7 @@
                   const toastContainer = document.getElementById('toast-notification');
                   const addedCount = data && Number.isFinite(Number(data.addedCount)) ? Number(data.addedCount) : 1;
                   const linkedAddedCount = data && Number.isFinite(Number(data.linkedAddedCount)) ? Number(data.linkedAddedCount) : Math.max(0, addedCount - 1);
-                  const referenceHref = '/v6-v3/application/' + reference + (isPriorAuthority === 'true' ? '?isPriorAuthority=true#prior-authority' : '');
+                  const referenceHref = '/v6-v3/application/' + reference + (isRedetermination ? '?isRedetermination=true&redeterminationIndex=' + encodeURIComponent(redeterminationIndex) : isPriorAuthority === 'true' ? '?isPriorAuthority=true#prior-authority' : '');
                   const referenceLink = '<a class="govuk-link" href="' + referenceHref + '">' + reference + '</a>';
                   const linkedLabel = linkedAddedCount === 1 ? 'linked case' : 'linked cases';
                   let toastMessage = linkedAddedCount > 0
@@ -442,14 +446,23 @@
           </div>
         </div>
 
-        <h2 class="govuk-heading-m govuk-!-margin-top-8">Redeterminations</h2>
+        {% if groupedRedeterminationFlow %}
+          <div class="govuk-!-margin-top-8 govuk-!-margin-bottom-6" style="display: flex; justify-content: space-between; align-items: baseline; gap: 20px; flex-wrap: wrap;">
+            <h2 class="govuk-heading-m govuk-!-margin-bottom-0">Redetermination request</h2>
+            {% if pendingRedeterminationCount > 0 %}
+              <a href="/v6-v3/application/{{ reference }}/redeterminations/decision" class="govuk-link">Make a decision</a>
+            {% endif %}
+          </div>
+        {% else %}
+          <h2 class="govuk-heading-m govuk-!-margin-top-8">Redeterminations</h2>
+        {% endif %}
 
         {% if redeterminations and redeterminations.length > 0 %}
           {% for redetermination in redeterminations %}
             <div class="govuk-summary-card govuk-!-margin-bottom-6">
               <div class="govuk-summary-card__title-wrapper" style="background-color: #f3f2f1; padding: 15px; display: flex; justify-content: space-between; align-items: center;">
                 <h3 class="govuk-summary-card__title govuk-heading-s govuk-!-margin-bottom-0">{{ loop.index }}. {{ redetermination.redeterminationProceeding or 'Child assessment order' }}</h3>
-                {% if redetermination.status == 'In progress' %}
+                {% if redetermination.status == 'In progress' and not groupedRedeterminationFlow %}
                   <div style="display: flex; gap: 6px; align-items: center;">
                     <a href="/v6-v3/application/{{ reference }}/redetermination/{{ redetermination.index }}/decision" class="govuk-link">Grant</a>
                     <span>|</span>
@@ -459,21 +472,27 @@
               </div>
               <div class="govuk-summary-card__content">
                 <dl class="govuk-summary-list">
+                  {% if not groupedRedeterminationFlow %}
                   <div class="govuk-summary-list__row">
                     <dt class="govuk-summary-list__key">Type</dt>
                     <dd class="govuk-summary-list__value">{{ redetermination.redeterminationProceeding }}</dd>
                   </div>
+                  {% endif %}
                   <div class="govuk-summary-list__row">
                     <dt class="govuk-summary-list__key">Client role</dt>
                     <dd class="govuk-summary-list__value">{{ redetermination.redeterminationClientRole or 'Applicant' }}</dd>
                   </div>
                   <div class="govuk-summary-list__row">
                     <dt class="govuk-summary-list__key">Substantive level of service</dt>
-                    <dd class="govuk-summary-list__value">Full representation</dd>
+                    <dd class="govuk-summary-list__value">{{ redetermination.newProceedingDetails.levelOfService if groupedRedeterminationFlow and redetermination.newProceedingDetails else 'Full representation' }}</dd>
                   </div>
                   <div class="govuk-summary-list__row">
                     <dt class="govuk-summary-list__key">Substantive scope limitations</dt>
+                    {% if groupedRedeterminationFlow and redetermination.newProceedingDetails %}
+                      <dd class="govuk-summary-list__value" style="white-space: pre-line;">{{ redetermination.newProceedingDetails.scopeLimitations }}</dd>
+                    {% else %}
                     <dd class="govuk-summary-list__value">Final Hearing<br><br>To be represented on all steps up to and including a final hearing.</dd>
+                    {% endif %}
                   </div>
                   <div class="govuk-summary-list__row">
                     <dt class="govuk-summary-list__key">Justification of request</dt>

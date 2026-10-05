@@ -1012,7 +1012,7 @@ function ensureRedeterminationScenarioVariety(req) {
       const stored = decisionStore[reference + '|' + app.redeterminationOrder];
       return ['Granted', 'Refused'].includes((stored && stored.status) || app.status);
     });
-    if (alreadyAssigned || hasDecision || requests.length === 0) return;
+    if (alreadyAssigned || hasDecision || requests.length === 0 || requests[0].groupedRedeterminationFlow) return;
 
     if (requests.length > 3) {
       const retainedIds = new Set(requests.slice(0, 3).map(request => request.redeterminationId));
@@ -1072,6 +1072,39 @@ function ensureRedeterminationScenarioVariety(req) {
       usedProceedings.add(proceeding);
     }
   });
+}
+
+function ensureGroupedRedeterminationExamples(req) {
+  const data = req.session.data;
+  const collections = ['open-applications-all', 'open-applications', 'assigned-applications', 'completed-applications'];
+  const applications = collections.flatMap(key => data[key] || []);
+  const activeReferences = new Set(applications.filter(app => app.groupedRedeterminationFlow
+    && !data['grouped-redetermination-completed']?.[app.ref]).map(app => app.ref));
+  const usedReferences = new Set(applications.map(app => app.ref));
+  data['open-applications-all'] = data['open-applications-all'] || [];
+  data['completed-applications'] = data['completed-applications'] || [];
+
+  while (activeReferences.size < 2) {
+    const mock = generateMockApplications(3);
+    const sourceReference = mock.completed[activeReferences.size + 1].ref;
+    let reference;
+    do {
+      reference = 'L-1' + generateRandomRef().slice(2);
+    } while (usedReferences.has(reference));
+    const parent = mock.completed.find(app => app.ref === sourceReference);
+    data['completed-applications'].push({ ...parent, ref: reference, reference });
+    mock.open.filter(app => app.ref === sourceReference && app.isRedetermination).forEach(app => {
+      data['open-applications-all'].push({
+        ...app,
+        ref: reference,
+        reference,
+        redeterminationId: `${reference}-redetermination-${app.redeterminationOrder + 1}`,
+        groupedRedeterminationFlow: true
+      });
+    });
+    activeReferences.add(reference);
+    usedReferences.add(reference);
+  }
 }
 
 function generateMockApplications(count = 8) {
@@ -1425,6 +1458,7 @@ function getRedeterminationsForReference(req, reference) {
   const decisionStore = req.session.data['redetermination-decision-store'] || {};
 
   return Array.from(requestsById.values())
+    .filter(application => !decisionStore[reference + '|' + application.redeterminationOrder]?.replacedByNewProceedings)
     .sort((left, right) => left.redeterminationOrder - right.redeterminationOrder)
     .map(application => {
       const index = application.redeterminationOrder;
@@ -1434,6 +1468,11 @@ function getRedeterminationsForReference(req, reference) {
         || (assignedRequestIds.has(application.redeterminationId) ? 'In progress' : 'Submitted');
       return {
         ...application,
+        ...(application.groupedRedeterminationFlow && storedDecision ? {
+          redeterminationProceeding: storedDecision.redeterminationProceeding,
+          redeterminationClientRole: storedDecision.redeterminationClientRole,
+          newProceedingDetails: storedDecision.newProceedingDetails
+        } : {}),
         index,
         status,
         statusClass: status === 'Granted'
@@ -1577,6 +1616,7 @@ router.get('/open-applications', function(req, res) {
   }
   ensureDefaultDemoRedetermination(req.session.data);
   ensureRedeterminationScenarioVariety(req);
+  ensureGroupedRedeterminationExamples(req);
   ensureRedeterminationRequestIds(req);
   [...(req.session.data['open-applications-all'] || []), ...(req.session.data['completed-applications'] || [])]
     .forEach(application => {
@@ -1979,6 +2019,7 @@ router.get('/add-application/:reference', function(req, res) {
       redeterminationProceeding: isPrimaryRef && sourceApplication ? sourceApplication.redeterminationProceeding : null,
       redeterminationClientRole: isPrimaryRef && sourceApplication ? sourceApplication.redeterminationClientRole : null,
       redeterminationJustification: isPrimaryRef && sourceApplication ? sourceApplication.redeterminationJustification : null,
+      groupedRedeterminationFlow: isPrimaryRef && sourceApplication ? Boolean(sourceApplication.groupedRedeterminationFlow) : false,
       linkedCaseGroupId: sourceApplication && sourceApplication.linkedCaseGroupId ? sourceApplication.linkedCaseGroupId : null,
       caseworker: assignedCaseworker,
       addedDate: addedDate,
@@ -2486,13 +2527,29 @@ router.get('/search', function(req, res) {
     // with their own status even when a same-reference application already exists.
     const redeterminationStore = req.session.data['redetermination-decision-store'] || {};
     const referencesWithInitialRow = new Set(results.map(row => row.ref));
+    const referencesWithRedeterminationRow = new Set();
     Object.values(redeterminationStore).filter(entry => {
+      if (entry.replacedByNewProceedings) return false;
       let match = true;
       if (req.query.reference && !entry.reference.toLowerCase().includes(req.query.reference.toLowerCase())) match = false;
       if (req.query.firstName && !(entry.firstName || '').toLowerCase().includes(req.query.firstName.toLowerCase())) match = false;
       if (req.query.lastName && !(entry.lastName || '').toLowerCase().includes(req.query.lastName.toLowerCase())) match = false;
       return match;
     }).forEach(entry => {
+      if (referencesWithRedeterminationRow.has(entry.reference)) return;
+      referencesWithRedeterminationRow.add(entry.reference);
+      const requests = getRedeterminationsForReference(req, entry.reference);
+      const requestStatuses = requests.length
+        ? requests.map(request => request.status)
+        : Object.values(redeterminationStore)
+          .filter(request => request.reference === entry.reference && !request.replacedByNewProceedings)
+          .map(request => request.status);
+      const hasPendingRequests = requestStatuses.some(status => !['Granted', 'Refused'].includes(status));
+      const outcome = hasPendingRequests
+        ? requestStatuses.includes('In progress') ? 'In progress' : 'Submitted'
+        : new Set(requestStatuses).size === 1 ? requestStatuses[0] : 'Completed';
+      const outcomeClasses = { Granted: 'green', Refused: 'red', 'In progress': 'light-blue', Submitted: 'pink', Completed: 'blue' };
+      const linkedRequest = requests.find(request => !['Granted', 'Refused'].includes(request.status)) || requests[0];
       // A redetermination can only be submitted against an initial application that
       // has already been granted, so guarantee that companion row appears in results
       // even if the original mock record is no longer present in session data.
@@ -2519,8 +2576,10 @@ router.get('/search', function(req, res) {
         submitted: entry.submitted,
         firm: entry.firm || 'Not available',
         type: 'Redetermination<br><strong>' + (entry.redeterminationType || 'Add a proceeding') + '</strong>',
-        outcome: entry.status,
-        outcomeClass: entry.status === 'Granted' ? 'green' : 'red'
+        isRedetermination: true,
+        redeterminationIndex: linkedRequest ? linkedRequest.index : entry.index,
+        outcome: outcome,
+        outcomeClass: outcomeClasses[outcome]
       });
     });
   }
@@ -2537,6 +2596,137 @@ router.get('/search', function(req, res) {
 router.get('/application-details', function(req, res) {
   const reference = req.query.reference || req.query.ref || req.session.data['decision-reference'] || 'L-12Z-13P';
   res.redirect('/v6-v3/application/' + encodeURIComponent(reference));
+});
+
+router.use('/application/:reference/redeterminations', function(req, res, next) {
+  const requests = getRedeterminationsForReference(req, req.params.reference);
+  if (!requests.some(request => request.groupedRedeterminationFlow) || !hasGrantedInitialApplication(req, req.params.reference)) {
+    res.redirect('/v6-v3/application/' + encodeURIComponent(req.params.reference));
+    return;
+  }
+  res.locals.groupedRequests = requests;
+  next();
+});
+
+router.get('/application/:reference/redeterminations/decision', function(req, res) {
+  const reference = req.params.reference;
+  const requests = res.locals.groupedRequests.filter(request => !['Granted', 'Refused'].includes(request.status));
+  if (!requests.length) {
+    res.redirect('/v6-v3/application/' + encodeURIComponent(reference) + '?isRedetermination=true');
+    return;
+  }
+  const draft = req.session.data['grouped-redetermination-drafts']?.[reference] || {};
+  const requestsWithAnswers = requests.map(request => ({ ...request, answer: draft.decisions?.find(answer => answer.index === request.index) || {}, editingDetails: req.query.edit === String(request.index) }));
+  res.render('v6-v3/grouped-redetermination-decision.njk', { reference, requests: requestsWithAnswers, draft });
+});
+
+router.post('/application/:reference/redeterminations/decision', function(req, res) {
+  const reference = req.params.reference;
+  const requests = res.locals.groupedRequests.filter(request => !['Granted', 'Refused'].includes(request.status));
+  if (!requests.length) {
+    res.redirect('/v6-v3/application/' + encodeURIComponent(reference) + '?isRedetermination=true');
+    return;
+  }
+  const errors = [];
+  const proceedingMode = req.body['proceeding-mode'];
+  if (!['existing', 'new'].includes(proceedingMode)) errors.push({ text: 'Select Details of request or New proceeding', href: '#proceeding-mode' });
+  const decisions = proceedingMode === 'new' ? [] : requests.map(request => {
+    const decision = req.body['decision-' + request.index];
+    const refusalReason = req.body['refusal-' + request.index];
+    const previousAnswer = req.session.data['grouped-redetermination-drafts']?.[reference]?.decisions?.find(answer => answer.index === request.index);
+    const proceedingName = (req.body['proceeding-' + request.index] ?? previousAnswer?.proceedingName ?? request.redeterminationProceeding).trim();
+    const clientRole = (req.body['role-' + request.index] ?? previousAnswer?.clientRole ?? request.redeterminationClientRole).trim();
+    if (!proceedingName || !clientRole) errors.push({ text: 'Enter the proceeding and client role', href: '#request-heading-' + request.index });
+    if (!['grant', 'refuse'].includes(decision)) errors.push({ text: 'Select a decision for ' + request.redeterminationProceeding, href: '#decision-' + request.index });
+    if (decision === 'refuse' && !REDETERMINATION_REFUSAL_REASONS.includes(refusalReason)) errors.push({ text: 'Select a refusal reason for ' + request.redeterminationProceeding, href: '#refusal-' + request.index });
+    return { index: request.index, decision, proceedingName, clientRole, refusalReason: decision === 'refuse' ? refusalReason : '' };
+  });
+  const explanation = (req.body['grouped-explanation'] || '').trim();
+  if (!explanation || explanation.length > 10000) errors.push({ text: 'Explain your decision using up to 10,000 characters', href: '#grouped-explanation' });
+  const replaceProceedings = proceedingMode === 'new';
+  const asArray = value => Array.isArray(value) ? value : value === undefined ? [] : [value];
+  const names = asArray(req.body['additional-name']);
+  const roles = asArray(req.body['additional-role']);
+  const scopes = asArray(req.body['additional-scope']);
+  const services = asArray(req.body['additional-service']);
+  const additions = replaceProceedings ? names.map((name, position) => ({
+    proceedingName: String(name || '').trim(),
+    clientRole: String(roles[position] || '').trim(),
+    scopeLimitations: String(scopes[position] || '').trim(),
+    levelOfService: String(services[position] || '').trim()
+  })) : [];
+  if (replaceProceedings && (!additions.length || additions.some(item => Object.values(item).some(value => !value)))) errors.push({ text: 'Complete all fields for each new proceeding', href: '#additional-proceedings' });
+  const draft = { decisions, explanation, proceedingMode, additions, errors };
+  req.session.data['grouped-redetermination-drafts'] = req.session.data['grouped-redetermination-drafts'] || {};
+  req.session.data['grouped-redetermination-drafts'][reference] = draft;
+  res.redirect('/v6-v3/application/' + encodeURIComponent(reference) + '/redeterminations/' + (errors.length ? 'decision' : 'check-answers'));
+});
+
+router.get('/application/:reference/redeterminations/check-answers', function(req, res) {
+  const reference = req.params.reference;
+  const draft = req.session.data['grouped-redetermination-drafts']?.[reference];
+  if (!draft || draft.errors.length) {
+    res.redirect('/v6-v3/application/' + encodeURIComponent(reference) + '/redeterminations/decision');
+    return;
+  }
+  const decisions = draft.decisions.map(answer => ({ ...res.locals.groupedRequests.find(request => request.index === answer.index), ...answer }));
+  res.render('v6-v3/grouped-redetermination-check-answers.njk', { reference, draft, decisions });
+});
+
+router.post('/application/:reference/redeterminations/check-answers', function(req, res) {
+  const reference = req.params.reference;
+  const draft = req.session.data['grouped-redetermination-drafts']?.[reference];
+  const requests = res.locals.groupedRequests;
+  const pending = requests.filter(request => !['Granted', 'Refused'].includes(request.status));
+  if (!draft || draft.errors.length || !pending.length || (draft.proceedingMode !== 'new' && pending.some(request => !draft.decisions.some(answer => answer.index === request.index)))) {
+    res.redirect('/v6-v3/application/' + encodeURIComponent(reference) + '/redeterminations/decision');
+    return;
+  }
+  const store = req.session.data['redetermination-decision-store'] || (req.session.data['redetermination-decision-store'] = {});
+  if (draft.proceedingMode === 'new') {
+    pending.forEach(request => {
+      store[reference + '|' + request.index] = { ...request, reference, status: 'Granted', decisionType: 'Grant', replacedByNewProceedings: true, decisionReason: draft.explanation };
+      addHistoryEvent(req, reference, request.redeterminationProceeding + ': replaced by new proceedings', request.caseworker || 'Caseworker', draft.explanation);
+    });
+  }
+  draft.decisions.forEach(answer => {
+    const request = requests.find(item => item.index === answer.index);
+    const status = answer.decision === 'grant' ? 'Granted' : 'Refused';
+    store[reference + '|' + answer.index] = { ...request, reference, redeterminationProceeding: answer.proceedingName, redeterminationClientRole: answer.clientRole, status, decisionType: answer.decision === 'grant' ? 'Grant' : 'Refuse', refusalReason: answer.refusalReason, decisionReason: draft.explanation };
+    addHistoryEvent(req, reference, request.redeterminationProceeding + ': ' + status, request.caseworker || 'Caseworker', draft.explanation, { From: request.status, To: status });
+  });
+  let nextIndex = Math.max(...requests.map(request => request.index)) + 1;
+  draft.additions.forEach(addition => {
+    const index = nextIndex++;
+    const request = {
+      ...requests[0],
+      redeterminationId: `${reference}-redetermination-${index + 1}`,
+      redeterminationOrder: index,
+      redeterminationProceeding: addition.proceedingName,
+      redeterminationClientRole: addition.clientRole,
+      redeterminationJustification: draft.explanation,
+      newProceedingDetails: addition,
+      status: 'Granted',
+      decisionType: 'Grant'
+    };
+    req.session.data['completed-applications'].push(request);
+    store[reference + '|' + index] = { ...request, reference, index, decisionReason: draft.explanation };
+    addHistoryEvent(req, reference, addition.proceedingName + ': Granted', request.caseworker || 'Caseworker', draft.explanation);
+  });
+  removeResolvedRedeterminationGroupFromList(req, reference);
+  req.session.data['grouped-redetermination-completed'] = req.session.data['grouped-redetermination-completed'] || {};
+  req.session.data['grouped-redetermination-completed'][reference] = true;
+  delete req.session.data['grouped-redetermination-drafts'][reference];
+  ensureGroupedRedeterminationExamples(req);
+  res.redirect('/v6-v3/application/' + encodeURIComponent(reference) + '/redeterminations/confirmation');
+});
+
+router.get('/application/:reference/redeterminations/confirmation', function(req, res) {
+  if (!req.session.data['grouped-redetermination-completed']?.[req.params.reference]) {
+    res.redirect('/v6-v3/application/' + encodeURIComponent(req.params.reference) + '/redeterminations/decision');
+    return;
+  }
+  res.render('v6-v3/grouped-redetermination-confirmation.njk', { reference: req.params.reference });
 });
 
 router.get('/application/:reference/redetermination/:index/decision', function(req, res) {
@@ -3314,6 +3504,8 @@ router.get('/application/:reference', function(req, res) {
     linkedCases: linkedCasesForView,
     isAssociatedLinkedCase: isAssociatedLinkedCase,
     viewingRedetermination: requestedRedetermination,
+    redeterminationAssignmentIndex: selectedRedeterminationIndex,
+    groupedRedeterminationFlow: redeterminations.some(request => request.groupedRedeterminationFlow),
     linkedLeadReference: linkedLeadReference,
     applicationRoutePrefix: '/v6-v3',
     hasPriorAuthority: hasPriorAuthority,

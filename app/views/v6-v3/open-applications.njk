@@ -355,6 +355,9 @@
     document.querySelectorAll('.add-to-list').forEach(link => {
       link.addEventListener('click', function(e) {
         e.preventDefault();
+        if (this.getAttribute('aria-disabled') === 'true') return;
+        this.setAttribute('aria-disabled', 'true');
+        this.textContent = 'Assigning to your list...';
         const reference = this.getAttribute('data-ref');
         const isPriorAuthority = this.getAttribute('data-is-prior-authority') === 'true';
         const isRedetermination = this.getAttribute('data-is-redetermination') === 'true';
@@ -367,7 +370,10 @@
             'X-Requested-With': 'XMLHttpRequest'
           }
         })
-          .then(response => response.json())
+          .then(response => {
+            if (!response.ok) throw new Error('Assignment failed');
+            return response.json();
+          })
           .then(data => {
             // Show toast notification using GOV.UK toast component
             const toastContainer = document.getElementById('toast-notification');
@@ -396,6 +402,10 @@
             toast.innerHTML = '<div class="govuk-notification-banner__header"><h2 id="govuk-notification-banner-title" class="govuk-notification-banner__title">Success</h2></div><div class="govuk-notification-banner__content"><p class="govuk-notification-banner__heading">' + toastMessage + '</p></div>';
             
             toastContainer.appendChild(toast);
+            this.closest('tr').remove();
+            toastContainer.setAttribute('tabindex', '-1');
+            toastContainer.focus();
+            toastContainer.scrollIntoView({ block: 'start' });
             
             // Cancel any pending reload from a previous add so it doesn't cut off this message
             if (addToListReloadTimeout) {
@@ -405,7 +415,15 @@
               window.location.reload();
             }, 10000);
           })
-          .catch(error => console.error('Error:', error));
+          .catch(error => {
+            this.removeAttribute('aria-disabled');
+            this.textContent = 'Assign to your list';
+            const toastContainer = document.getElementById('toast-notification');
+            toastContainer.textContent = 'The application could not be assigned. Please try again.';
+            toastContainer.setAttribute('role', 'alert');
+            toastContainer.scrollIntoView({ block: 'start' });
+            console.error('Error:', error);
+          });
       });
     });
   </script>

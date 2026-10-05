@@ -1,0 +1,15 @@
+{% extends "v6-v3/redetermination-decision.njk" %}
+{% from "govuk/components/panel/macro.njk" import govukPanel %}
+{% block pageTitle %}Assessment complete{% endblock %}
+{% block beforeContent %}
+  {{ govukPhaseBanner({ tag: { text: "Beta" }, html: 'This is a new service - your <a class="govuk-link" href="#">feedback</a> will help us to improve it.' }) }}
+  {{ govukBackLink({ text: "Back to open applications", href: "/v6-v3/open-applications" }) }}
+{% endblock %}
+{% block content %}
+  <div class="govuk-grid-row"><div class="govuk-grid-column-two-thirds">
+    {{ govukPanel({ titleText: "Assessment complete", html: "Reference number:<br><strong>" ~ reference ~ "</strong>" }) }}
+    <h2 class="govuk-heading-m">What happens next</h2>
+    <p class="govuk-body">We've saved your decision and it has been sent to the provider.</p>
+    {{ govukButton({ text: "View your list", href: "/v6-v3/yourlist" }) }}
+  </div></div>
+{% endblock %}
