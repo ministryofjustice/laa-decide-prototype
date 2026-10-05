@@ -20,7 +20,7 @@
 
 {% block beforeContent %}
   {{ govukPhaseBanner({ tag: { text: "Beta" }, html: 'This is a new service - your <a class="govuk-link" href="#">feedback</a> will help us to improve it.' }) }}
-  {{ govukBackLink({ text: "Back to application", href: "/v6-v4/application/" ~ reference ~ "?isRedetermination=true" }) }}
+  {{ govukBackLink({ text: "Back" if assessmentOfNewProceedings else "Back to application", href: "/v6-v4/application/" ~ reference ~ "/redeterminations/decision" if assessmentOfNewProceedings else "/v6-v4/application/" ~ reference ~ "?isRedetermination=true" }) }}
 {% endblock %}
 
 {% macro additionalFields(position, item) %}
@@ -43,7 +43,7 @@
     <p class="govuk-heading-l">{{ reference }}</p>
     <h1 class="govuk-heading-xl">Make a decision</h1>
     <p class="govuk-body">Use this section to make decisions on one or more proceedings. Each decision will be recorded in application history and will be shared with the provider.</p>
-    <form method="post" action="/v6-v4/application/{{ reference }}/redeterminations/decision">
+    <form method="post" action="/v6-v4/application/{{ reference }}/redeterminations/{% if assessmentOfNewProceedings %}new-proceedings/{% endif %}decision">
       {% set appliedProceedingsHtml %}
       {% for request in requests %}
         <section class="govuk-!-margin-top-6 govuk-!-margin-bottom-8" aria-labelledby="request-heading-{{ request.index }}">
@@ -52,8 +52,8 @@
           <dl class="govuk-summary-list">
             <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">Proceeding</dt><dd class="govuk-summary-list__value">{{ request.answer.proceedingName or request.redeterminationProceeding }}</dd></div>
             <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">Client role</dt><dd class="govuk-summary-list__value">{{ request.answer.clientRole or request.redeterminationClientRole }}</dd></div>
-            <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">Scope limitations</dt><dd class="govuk-summary-list__value">Final Hearing<br><br>To be represented on all steps up to and including a final hearing.</dd></div>
-            <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">Level of service</dt><dd class="govuk-summary-list__value">Full representation</dd></div>
+            <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">Scope limitations</dt>{% if assessmentOfNewProceedings %}<dd class="govuk-summary-list__value" style="white-space: pre-line;">{{ request.scopeLimitations }}</dd>{% else %}<dd class="govuk-summary-list__value">Final Hearing<br><br>To be represented on all steps up to and including a final hearing.</dd>{% endif %}</div>
+            <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">Level of service</dt><dd class="govuk-summary-list__value">{{ request.levelOfService or 'Full representation' }}</dd></div>
           </dl>
           {% if request.editingDetails %}
             {{ govukInput({ id: "proceeding-" ~ request.index, name: "proceeding-" ~ request.index, value: request.answer.proceedingName or request.redeterminationProceeding, label: { text: "Proceeding" } }) }}
@@ -77,6 +77,9 @@
         </section>
       {% endfor %}
       {% endset %}
+      {% if assessmentOfNewProceedings %}
+        {{ appliedProceedingsHtml | safe }}
+      {% else %}
       {% set additionsHtml %}
         <div id="additional-proceedings">
           {% if draft.additions.length %}
@@ -92,6 +95,7 @@
         { value: "existing", text: "Details of request", checked: draft.proceedingMode != "new", conditional: { html: appliedProceedingsHtml } },
         { value: "new", text: "New proceeding", checked: draft.proceedingMode == "new", conditional: { html: additionsHtml } }
       ] }) }}
+      {% endif %}
       {{ govukTextarea({ name: "grouped-explanation", id: "grouped-explanation", value: draft.explanation,
         label: { text: "Explain your decision", classes: "govuk-label--m" },
         hint: { text: "We will share this decision with the provider in the notification email. You will also find this saved in the application history." },
@@ -99,12 +103,13 @@
       <p class="govuk-hint">You can enter up to 10,000 characters</p>
       {{ govukButton({ text: "Continue" }) }}
     </form>
-    <template id="additional-proceeding-template">{{ additionalFields("template", {}) }}</template>
+    {% if not assessmentOfNewProceedings %}<template id="additional-proceeding-template">{{ additionalFields("template", {}) }}</template>{% endif %}
   </div></div>
 {% endblock %}
 
 {% block bodyEnd %}
   {{ super() }}
+  {% if not assessmentOfNewProceedings %}
   <script>
     const additionalContainer = document.getElementById('additional-proceedings');
     const addButton = document.getElementById('add-another-proceeding');
@@ -138,4 +143,5 @@
     });
     updateRemoveButtons();
   </script>
+  {% endif %}
 {% endblock %}

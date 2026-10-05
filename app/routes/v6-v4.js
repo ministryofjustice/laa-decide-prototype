@@ -2684,17 +2684,80 @@ router.post('/application/:reference/redeterminations/decision', function(req, r
   const roles = asArray(req.body['additional-role']);
   const scopes = asArray(req.body['additional-scope']);
   const services = asArray(req.body['additional-service']);
-  const additions = replaceProceedings ? names.map((name, position) => ({
-    proceedingName: String(name || '').trim(),
-    clientRole: String(roles[position] || '').trim(),
-    scopeLimitations: String(scopes[position] || '').trim(),
-    levelOfService: String(services[position] || '').trim()
-  })) : [];
-  if (replaceProceedings && (!additions.length || additions.some(item => Object.values(item).some(value => !value)))) errors.push({ text: 'Complete all fields for each new proceeding', href: '#additional-proceedings' });
+  const previousDraft = req.session.data['v6-v4']['grouped-redetermination-drafts']?.[reference];
+  const additions = replaceProceedings ? names.map((name, position) => {
+    const addition = {
+      proceedingName: String(name || '').trim(),
+      clientRole: String(roles[position] || '').trim(),
+      scopeLimitations: String(scopes[position] || '').trim(),
+      levelOfService: String(services[position] || '').trim()
+    };
+    const previous = previousDraft?.additions?.[position];
+    if (previous && Object.keys(addition).every(key => addition[key] === previous[key])) {
+      addition.decision = previous.decision;
+      addition.refusalReason = previous.refusalReason;
+    }
+    return addition;
+  }) : [];
+  if (replaceProceedings && (!additions.length || additions.some(item => !item.proceedingName || !item.clientRole || !item.scopeLimitations || !item.levelOfService))) errors.push({ text: 'Complete all fields for each new proceeding', href: '#additional-proceedings' });
   const draft = { decisions, explanation, proceedingMode, additions, errors };
   req.session.data['v6-v4']['grouped-redetermination-drafts'] = req.session.data['v6-v4']['grouped-redetermination-drafts'] || {};
   req.session.data['v6-v4']['grouped-redetermination-drafts'][reference] = draft;
-  res.redirect('/v6-v4/application/' + encodeURIComponent(reference) + '/redeterminations/' + (errors.length ? 'decision' : 'check-answers'));
+  const nextStep = errors.length ? 'decision' : replaceProceedings ? 'new-proceedings/decision' : 'check-answers';
+  res.redirect('/v6-v4/application/' + encodeURIComponent(reference) + '/redeterminations/' + nextStep);
+});
+
+function hasValidNewProceedingDecisions(draft) {
+  return draft.additions?.length > 0 && draft.additions.every(addition => ['grant', 'refuse'].includes(addition.decision)
+    && (addition.decision !== 'refuse' || REDETERMINATION_REFUSAL_REASONS.includes(addition.refusalReason)));
+}
+
+router.get('/application/:reference/redeterminations/new-proceedings/decision', function(req, res) {
+  const reference = req.params.reference;
+  const draft = req.session.data['v6-v4']['grouped-redetermination-drafts']?.[reference];
+  if (!draft || draft.proceedingMode !== 'new' || draft.errors.length || !draft.additions.length) {
+    res.redirect('/v6-v4/application/' + encodeURIComponent(reference) + '/redeterminations/decision');
+    return;
+  }
+  const pendingRequests = res.locals.groupedRequests.filter(request => !['Granted', 'Refused'].includes(request.status));
+  if (!pendingRequests.length) {
+    res.redirect('/v6-v4/application/' + encodeURIComponent(reference) + '?isRedetermination=true');
+    return;
+  }
+  const requests = draft.additions.map((addition, position) => ({
+    index: 'new-' + position,
+    redeterminationProceeding: addition.proceedingName,
+    redeterminationClientRole: addition.clientRole,
+    scopeLimitations: addition.scopeLimitations,
+    levelOfService: addition.levelOfService,
+    answer: { decision: addition.decision, refusalReason: addition.refusalReason }
+  }));
+  res.render('v6-v4/grouped-redetermination-decision.njk', {
+    reference,
+    requests,
+    draft: { ...draft, errors: draft.newProceedingErrors || [] },
+    assessmentOfNewProceedings: true
+  });
+});
+
+router.post('/application/:reference/redeterminations/new-proceedings/decision', function(req, res) {
+  const reference = req.params.reference;
+  const draft = req.session.data['v6-v4']['grouped-redetermination-drafts']?.[reference];
+  if (!draft || draft.proceedingMode !== 'new' || draft.errors.length || !draft.additions.length) {
+    res.redirect('/v6-v4/application/' + encodeURIComponent(reference) + '/redeterminations/decision');
+    return;
+  }
+  const errors = [];
+  draft.additions.forEach((addition, position) => {
+    addition.decision = req.body['decision-new-' + position];
+    addition.refusalReason = addition.decision === 'refuse' ? req.body['refusal-new-' + position] : '';
+    if (!['grant', 'refuse'].includes(addition.decision)) errors.push({ text: 'Select a decision for ' + addition.proceedingName, href: '#decision-new-' + position });
+    if (addition.decision === 'refuse' && !REDETERMINATION_REFUSAL_REASONS.includes(addition.refusalReason)) errors.push({ text: 'Select a refusal reason for ' + addition.proceedingName, href: '#refusal-new-' + position });
+  });
+  draft.explanation = (req.body['grouped-explanation'] || '').trim();
+  if (!draft.explanation || draft.explanation.length > 10000) errors.push({ text: 'Explain your decision using up to 10,000 characters', href: '#grouped-explanation' });
+  draft.newProceedingErrors = errors;
+  res.redirect('/v6-v4/application/' + encodeURIComponent(reference) + '/redeterminations/' + (errors.length ? 'new-proceedings/decision' : 'check-answers'));
 });
 
 router.get('/application/:reference/redeterminations/check-answers', function(req, res) {
@@ -2702,6 +2765,10 @@ router.get('/application/:reference/redeterminations/check-answers', function(re
   const draft = req.session.data['v6-v4']['grouped-redetermination-drafts']?.[reference];
   if (!draft || draft.errors.length) {
     res.redirect('/v6-v4/application/' + encodeURIComponent(reference) + '/redeterminations/decision');
+    return;
+  }
+  if (draft.proceedingMode === 'new' && (!hasValidNewProceedingDecisions(draft) || draft.newProceedingErrors?.length)) {
+    res.redirect('/v6-v4/application/' + encodeURIComponent(reference) + '/redeterminations/new-proceedings/decision');
     return;
   }
   const decisions = draft.decisions.map(answer => ({ ...res.locals.groupedRequests.find(request => request.index === answer.index), ...answer }));
@@ -2715,6 +2782,10 @@ router.post('/application/:reference/redeterminations/check-answers', function(r
   const pending = requests.filter(request => !['Granted', 'Refused'].includes(request.status));
   if (!draft || draft.errors.length || !pending.length || (draft.proceedingMode !== 'new' && pending.some(request => !draft.decisions.some(answer => answer.index === request.index)))) {
     res.redirect('/v6-v4/application/' + encodeURIComponent(reference) + '/redeterminations/decision');
+    return;
+  }
+  if (draft.proceedingMode === 'new' && (!hasValidNewProceedingDecisions(draft) || draft.newProceedingErrors?.length)) {
+    res.redirect('/v6-v4/application/' + encodeURIComponent(reference) + '/redeterminations/new-proceedings/decision');
     return;
   }
   const store = req.session.data['v6-v4']['redetermination-decision-store'] || (req.session.data['v6-v4']['redetermination-decision-store'] = {});
@@ -2733,6 +2804,7 @@ router.post('/application/:reference/redeterminations/check-answers', function(r
   let nextIndex = Math.max(...requests.map(request => request.index)) + 1;
   draft.additions.forEach(addition => {
     const index = nextIndex++;
+    const status = addition.decision === 'grant' ? 'Granted' : 'Refused';
     const request = {
       ...requests[0],
       redeterminationId: `${reference}-redetermination-${index + 1}`,
@@ -2741,12 +2813,13 @@ router.post('/application/:reference/redeterminations/check-answers', function(r
       redeterminationClientRole: addition.clientRole,
       redeterminationJustification: draft.explanation,
       newProceedingDetails: addition,
-      status: 'Granted',
-      decisionType: 'Grant'
+      status,
+      decisionType: addition.decision === 'grant' ? 'Grant' : 'Refuse',
+      refusalReason: addition.refusalReason
     };
     req.session.data['v6-v4']['completed-applications'].push(request);
     store[reference + '|' + index] = { ...request, reference, index, decisionReason: draft.explanation };
-    addHistoryEvent(req, reference, addition.proceedingName + ': Granted', request.caseworker || 'Caseworker', draft.explanation);
+    addHistoryEvent(req, reference, addition.proceedingName + ': ' + status, request.caseworker || 'Caseworker', draft.explanation);
   });
   removeResolvedRedeterminationGroupFromList(req, reference);
   req.session.data['v6-v4']['grouped-redetermination-completed'] = req.session.data['v6-v4']['grouped-redetermination-completed'] || {};
