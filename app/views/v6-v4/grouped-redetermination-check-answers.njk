@@ -1,0 +1,64 @@
+{% extends "v6-v4/redetermination-decision.njk" %}
+{% block pageTitle %}Check your answers{% endblock %}
+{% block beforeContent %}
+  {{ govukPhaseBanner({ tag: { text: "Beta" }, html: 'This is a new service - your <a class="govuk-link" href="#">feedback</a> will help us to improve it.' }) }}
+  {{ govukBackLink({ text: "Back to application", href: "/v6-v4/application/" ~ reference ~ "?isRedetermination=true" }) }}
+{% endblock %}
+
+{% macro summaryCard(title, decision, role, scope, service, refusal, changeHref, anchor) %}
+  {% set detailsHref = changeHref ~ anchor if anchor == "#additional-proceedings" else changeHref ~ "?edit=" ~ (anchor | replace('#request-heading-', '')) ~ anchor %}
+  <div class="govuk-summary-card govuk-!-margin-bottom-6">
+    <div class="govuk-summary-card__title-wrapper"><h2 class="govuk-summary-card__title">{{ title }}</h2></div>
+    <div class="govuk-summary-card__content">
+      <dl class="govuk-summary-list">
+        <div class="govuk-summary-list__row">
+          <dt class="govuk-summary-list__key">Decision</dt><dd class="govuk-summary-list__value">{{ decision }}</dd>
+          <dd class="govuk-summary-list__actions"><a href="{{ changeHref }}{{ anchor }}" class="govuk-link">Change<span class="govuk-visually-hidden"> decision for {{ title }}</span></a></dd>
+        </div>
+        {% if decision == 'Refuse' %}
+          <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">Refusal reason</dt><dd class="govuk-summary-list__value">{{ refusal }}</dd>
+            <dd class="govuk-summary-list__actions"><a href="{{ changeHref }}{{ anchor }}" class="govuk-link">Change<span class="govuk-visually-hidden"> refusal reason for {{ title }}</span></a></dd>
+          </div>
+        {% endif %}
+        <div class="govuk-summary-list__row">
+          <dt class="govuk-summary-list__key">Proceeding</dt><dd class="govuk-summary-list__value">{{ title }}</dd>
+          <dd class="govuk-summary-list__actions"><a href="{{ detailsHref }}" class="govuk-link">Change<span class="govuk-visually-hidden"> proceeding {{ title }}</span></a></dd>
+        </div>
+        <div class="govuk-summary-list__row">
+          <dt class="govuk-summary-list__key">Client role</dt><dd class="govuk-summary-list__value">{{ role }}</dd>
+          <dd class="govuk-summary-list__actions"><a href="{{ detailsHref }}" class="govuk-link">Change<span class="govuk-visually-hidden"> client role for {{ title }}</span></a></dd>
+        </div>
+        <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">Scope limitations</dt><dd class="govuk-summary-list__value" style="white-space: pre-line;">{{ scope }}</dd></div>
+        <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">Level of service</dt><dd class="govuk-summary-list__value">{{ service }}</dd></div>
+      </dl>
+    </div>
+  </div>
+{% endmacro %}
+
+{% block content %}
+  {% set changeHref = "/v6-v4/application/" ~ reference ~ "/redeterminations/decision" %}
+  <div class="govuk-grid-row"><div class="govuk-grid-column-two-thirds">
+    <p class="govuk-body-l govuk-!-margin-bottom-1">Application reference</p>
+    <p class="govuk-heading-l">{{ reference }}</p>
+    <h1 class="govuk-heading-xl">Check your answers</h1>
+    {% for item in decisions %}
+      {{ summaryCard(item.proceedingName, "Grant" if item.decision == "grant" else "Refuse", item.clientRole,
+        "Final Hearing\n\nTo be represented on all steps up to and including a final hearing.", "Full representation", item.refusalReason, changeHref, "#request-heading-" ~ item.index) }}
+    {% endfor %}
+    {% for item in draft.additions %}
+      {{ summaryCard(item.proceedingName, "Grant", item.clientRole, item.scopeLimitations, item.levelOfService, "", changeHref, "#additional-proceedings") }}
+    {% endfor %}
+    <div class="govuk-summary-card govuk-!-margin-bottom-6">
+      <div class="govuk-summary-card__title-wrapper"><h2 class="govuk-summary-card__title">Decision reason</h2></div>
+      <div class="govuk-summary-card__content">
+        <dl class="govuk-summary-list"><div class="govuk-summary-list__row">
+          <dt class="govuk-summary-list__key govuk-visually-hidden">Decision reason</dt>
+          <dd class="govuk-summary-list__value" style="white-space: pre-line;">{{ draft.explanation }}</dd>
+          <dd class="govuk-summary-list__actions"><a class="govuk-link" href="{{ changeHref }}#grouped-explanation">Change<span class="govuk-visually-hidden"> decision reason</span></a></dd>
+        </div></dl>
+      </div>
+    </div>
+    <form method="post" action="/v6-v4/application/{{ reference }}/redeterminations/check-answers">{{ govukButton({ text: "Submit decision" }) }}</form>
+  </div></div>
+{% endblock %}

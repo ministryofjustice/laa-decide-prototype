@@ -1,0 +1,72 @@
+{% extends "govuk/template.njk" %}
+
+{% from "govuk/components/header/macro.njk" import govukHeader %}
+{% from "govuk/components/phase-banner/macro.njk" import govukPhaseBanner %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+{% from "govuk/components/date-input/macro.njk" import govukDateInput %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "moj/components/primary-navigation/macro.njk" import mojPrimaryNavigation %}
+
+{% block head %}<link href="/public/stylesheets/application.css" rel="stylesheet">{% endblock %}
+{% block pageTitle %}{{ pageTitle }}{% endblock %}
+
+{% block header %}
+  {{ govukHeader({ homepageUrl: "#", productName: "Legal Aid Agency", navigationClasses: "govuk-header__navigation--end", navigation: [{ href: "#", text: "joann.barton@justice.gov.uk" }, { href: "/v6-v4/sign-out", text: "Sign out" }] }) }}
+  {{ mojPrimaryNavigation({ label: "Primary navigation", items: [{ text: "Decide if an applicant can get legal aid", href: "#" }, { text: "Open applications", href: "/v6-v4/open-applications" }, { text: "Your list", href: "/v6-v4/yourlist" }, { text: "Search", href: "/v6-v4/search" }] }) }}
+{% endblock %}
+
+{% block beforeContent %}
+  {{ govukPhaseBanner({ tag: { text: "Beta" }, html: "This is a new service - your <a class=\"govuk-link\" href=\"#\">feedback</a> will help us to improve it." }) }}
+  {{ govukBackLink({ text: "Back", href: "/v6-v4/application/" ~ reference ~ "/redetermination/" ~ index ~ "/grant" }) }}
+{% endblock %}
+
+{% block content %}
+  <div class="govuk-grid-row"><div class="govuk-grid-column-two-thirds">
+    {% if errors.dateType or errors.date %}
+      {% set dateErrors = [] %}
+      {% if errors.dateType %}{% set dateErrors = (dateErrors.push({ text: errors.dateType, href: "#certificate-date-type" }), dateErrors) %}{% endif %}
+      {% if errors.date %}{% set dateErrors = (dateErrors.push({ text: errors.date, href: "#certificate-date-day" }), dateErrors) %}{% endif %}
+      {{ govukErrorSummary({ titleText: "There is a problem", errorList: dateErrors }) }}
+    {% endif %}
+    <p class="govuk-body-l govuk-!-margin-bottom-1">Application reference:</p>
+    <p class="govuk-heading-l govuk-!-margin-bottom-4">{{ reference }}</p>
+    <h1 class="govuk-heading-xl">When should the certificate be granted from?</h1>
+
+    {% set anotherDateHtml %}
+      {{ govukDateInput({
+        id: "certificate-date",
+        namePrefix: "certificate-date",
+        fieldset: { legend: { text: "Enter date", classes: "govuk-fieldset__legend--s" } },
+        hint: { text: "For example, 12 6 2026" },
+        errorMessage: errors.date and { text: errors.date } or null,
+        items: [
+          { name: "day", value: dateDay, classes: "govuk-input--width-2" },
+          { name: "month", value: dateMonth, classes: "govuk-input--width-2" },
+          { name: "year", value: dateYear, classes: "govuk-input--width-4" }
+        ]
+      }) }}
+    {% endset %}
+
+    <form action="/v6-v4/application/{{ reference }}/redetermination/{{ index }}/grant-date" method="post">
+      {{ govukRadios({
+        name: "certificate-date-type",
+        idPrefix: "certificate-date-type",
+        errorMessage: errors.dateType and { text: errors.dateType } or null,
+        items: [
+          { value: "today", text: "Today", checked: selectedDateType == "today" },
+          { value: "another-date", text: "Another date", checked: selectedDateType == "another-date", conditional: { html: anotherDateHtml } }
+        ]
+      }) }}
+      {{ govukButton({ text: "Continue" }) }}
+    </form>
+  </div></div>
+{% endblock %}
+
+{% block bodyEnd %}
+  <script src="/plugin-assets/govuk-prototype-kit/lib/assets/javascripts/kit.js"></script>
+  <script src="/plugin-assets/govuk-prototype-kit/lib/assets/javascripts/auto-store-data.js"></script>
+  <script type="module" src="/plugin-assets/govuk-frontend/dist/govuk/govuk-frontend.min.js"></script>
+  <script type="module" src="/plugin-assets/govuk-frontend/dist/govuk-prototype-kit/init.js"></script>
+{% endblock %}

@@ -71,7 +71,7 @@
         text: "joann.barton@law.com"
       },
       {
-        href: '/v6-v3/sign-out',
+        href: '/v6-v4/sign-out',
         text: "Sign out"
       }
     ]
@@ -86,15 +86,15 @@
       },
       {
         text: 'Open applications',
-        href: '/v6-v3/open-applications'
+        href: '/v6-v4/open-applications'
       },
       {
         text: 'Your list',
-        href: '/v6-v3/yourlist'
+        href: '/v6-v4/yourlist'
       },
       {
         text: 'Search',
-        href: '/v6-v3/search'
+        href: '/v6-v4/search'
       }
     ]
   }) }}
@@ -114,9 +114,9 @@
 {% block content %}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
-      
+
       <div id="toast-notification"></div>
-      
+
       <h1 class="govuk-heading-xl govuk-!-margin-bottom-6">Open applications</h1>
 
       {% set filterOptionsHtml %}
@@ -173,12 +173,12 @@
 
       <div class="moj-filter-layout">
         <div class="moj-filter-layout__filter" id="filter-panel">
-          <form method="GET" action="/v6-v3/open-applications">
+          <form method="GET" action="/v6-v4/open-applications">
             {{ mojFilter({
               heading: { text: 'Filter' },
               selectedFilters: {
                 heading: { text: 'Selected filters' },
-                clearLink: { text: 'Clear filters', href: '/v6-v3/open-applications' },
+                clearLink: { text: 'Clear filters', href: '/v6-v4/open-applications' },
                 categories: []
               },
               optionsHtml: filterOptionsHtml
@@ -217,7 +217,7 @@
                 {% for app in applications %}
                   <tr class="govuk-table__row">
                     <td class="govuk-table__cell">
-                      <a href="/v6-v3/application/{{ app.ref }}{% if app.isPriorAuthority %}?isPriorAuthority=true#prior-authority{% elif app.isRedetermination %}?isRedetermination=true&amp;redeterminationIndex={{ app.redeterminationOrder }}{% endif %}" class="govuk-link">
+                      <a href="/v6-v4/application/{{ app.ref }}{% if app.isPriorAuthority %}?isPriorAuthority=true#prior-authority{% elif app.isRedetermination %}?isRedetermination=true&amp;redeterminationIndex={{ app.redeterminationOrder }}{% endif %}" class="govuk-link">
                         {{ app.ref }}
                       </a>
                     </td>
@@ -294,13 +294,13 @@
       // Populate chips from query parameters in the moj-filter__selected section
       const queryParams = new URLSearchParams(window.location.search);
       const selectedFiltersSection = filterPanel.querySelector('.moj-filter__selected');
-      
+
       if (selectedFiltersSection) {
         const chipsContainer = selectedFiltersSection.querySelector('.moj-filter-tags');
         if (chipsContainer) {
           // Clear existing chips
           chipsContainer.innerHTML = '';
-          
+
           queryParams.forEach((value, key) => {
             if (key === 'applicationType' || key === 'matterType' || key === 'categories') {
               const values = value.split(',').filter(v => v);
@@ -323,7 +323,7 @@
               e.preventDefault();
               const filterKey = this.getAttribute('data-filter');
               const filterValue = this.getAttribute('data-value');
-              
+
               // Uncheck the corresponding checkbox
               const checkbox = filterPanel.querySelector(`input[name="${filterKey}"][value="${filterValue}"]`);
               if (checkbox) {
@@ -335,7 +335,7 @@
       }
 
       // Handle "Clear filters" - keep panel open but clear selections
-      const clearLinks = filterPanel.querySelectorAll('a[href*="/v6-v3/open-applications"]');
+      const clearLinks = filterPanel.querySelectorAll('a[href*="/v6-v4/open-applications"]');
       clearLinks.forEach(link => {
         if (link.textContent.includes('Clear')) {
           link.addEventListener('click', function(e) {
@@ -344,7 +344,7 @@
             const checkboxes = filterPanel.querySelectorAll('input[type="checkbox"]');
             checkboxes.forEach(cb => cb.checked = false);
             // Navigate to clean URL
-            window.location.href = '/v6-v3/open-applications';
+            window.location.href = '/v6-v4/open-applications';
           });
         }
       });
@@ -361,9 +361,9 @@
         const isPriorAuthority = this.getAttribute('data-is-prior-authority') === 'true';
         const isRedetermination = this.getAttribute('data-is-redetermination') === 'true';
         const redeterminationIndex = this.getAttribute('data-redetermination-index');
-        
+
         // Add application to list via fetch
-        fetch('/v6-v3/add-application/' + reference + '?isPriorAuthority=' + isPriorAuthority + '&isRedetermination=' + isRedetermination + (isRedetermination ? '&redeterminationIndex=' + encodeURIComponent(redeterminationIndex) : ''), {
+        fetch('/v6-v4/add-application/' + reference + '?isPriorAuthority=' + isPriorAuthority + '&isRedetermination=' + isRedetermination + (isRedetermination ? '&redeterminationIndex=' + encodeURIComponent(redeterminationIndex) : ''), {
           method: 'GET',
           headers: {
             'X-Requested-With': 'XMLHttpRequest'
@@ -378,7 +378,7 @@
             const toastContainer = document.getElementById('toast-notification');
             const addedCount = data && Number.isFinite(Number(data.addedCount)) ? Number(data.addedCount) : 1;
             const linkedAddedCount = data && Number.isFinite(Number(data.linkedAddedCount)) ? Number(data.linkedAddedCount) : Math.max(0, addedCount - 1);
-            const referenceHref = '/v6-v3/application/' + reference + (isPriorAuthority ? '?isPriorAuthority=true#prior-authority' : isRedetermination ? '?isRedetermination=true&redeterminationIndex=' + encodeURIComponent(redeterminationIndex) : '');
+            const referenceHref = '/v6-v4/application/' + reference + (isPriorAuthority ? '?isPriorAuthority=true#prior-authority' : isRedetermination ? '?isRedetermination=true&redeterminationIndex=' + encodeURIComponent(redeterminationIndex) : '');
             const referenceLink = '<a class="govuk-link" href="' + referenceHref + '">' + reference + '</a>';
             const linkedLabel = linkedAddedCount === 1 ? 'linked case' : 'linked cases';
             let toastMessage = linkedAddedCount > 0
@@ -388,10 +388,10 @@
             if (addedCount === 0) {
               toastMessage = referenceLink + ' is already in your list';
             }
-            
+
             // Clear any existing toast so only the latest success message is shown
             toastContainer.innerHTML = '';
-            
+
             const toast = document.createElement('div');
             toast.setAttribute('data-module', 'govuk-notification-banner');
             toast.setAttribute('role', 'region');
@@ -399,13 +399,13 @@
             toast.className = 'govuk-notification-banner govuk-notification-banner--success';
             toast.style.cssText = 'margin-bottom: 20px;';
             toast.innerHTML = '<div class="govuk-notification-banner__header"><h2 id="govuk-notification-banner-title" class="govuk-notification-banner__title">Success</h2></div><div class="govuk-notification-banner__content"><p class="govuk-notification-banner__heading">' + toastMessage + '</p></div>';
-            
+
             toastContainer.appendChild(toast);
             this.closest('tr').remove();
             toastContainer.setAttribute('tabindex', '-1');
             toastContainer.focus();
             toastContainer.scrollIntoView({ block: 'start' });
-            
+
             // Cancel any pending reload from a previous add so it doesn't cut off this message
             if (addToListReloadTimeout) {
               clearTimeout(addToListReloadTimeout);

@@ -6,6 +6,14 @@
 const govukPrototypeKit = require('govuk-prototype-kit')
 const router = govukPrototypeKit.requests.setupRouter()
 
+router.use(function(req, res, next) {
+  req.session.data = req.session.data || {};
+  const versionData = req.session.data['v6-v4'] || (req.session.data['v6-v4'] = {});
+  Object.assign(versionData, req.body || {});
+  res.locals.data = versionData;
+  next();
+});
+
 // Helper function to restore decision data to an application
 function restoreDecisionData(application, decisionStore) {
   if (!application || !decisionStore) return;
@@ -28,22 +36,22 @@ function reconstructApplicationAtVersion(application, history, versionIndex) {
 
   // Clone the application to avoid mutating the original
   const reconstructed = JSON.parse(JSON.stringify(application));
-  
+
   // Apply all events up to and including the specified version
   for (let i = 0; i <= versionIndex && i < history.length; i++) {
     const event = history[i];
-    
+
     // Handle status changes (for main application or PA decisions)
     if (event.statusAfter) {
       if (event.type === 'pa_decision') {
         reconstructed.priorAuthorityStatus = event.statusAfter;
       } else {
         reconstructed.status = event.statusAfter;
-        reconstructed.decisionType = event.statusAfter === 'Granted' ? 'Grant' : 
+        reconstructed.decisionType = event.statusAfter === 'Granted' ? 'Grant' :
                                      event.statusAfter === 'Refused' ? 'Refuse' : null;
       }
     }
-    
+
     // Handle data changes (name, address, etc.)
     if (event.fieldChanged) {
       switch (event.fieldChanged) {
@@ -62,7 +70,7 @@ function reconstructApplicationAtVersion(application, history, versionIndex) {
       }
     }
   }
-  
+
   return reconstructed;
 }
 
@@ -70,65 +78,65 @@ function reconstructApplicationAtVersion(application, history, versionIndex) {
 
 router.post('/send-back-check', function(request, response) {
 
-    var sendbackCheck = request.session.data['rejection-reason']
+    var sendbackCheck = request.session.data['v6-v4']['rejection-reason']
     if (sendbackCheck == "rfi") {
-        response.redirect("/v6-v3/my-applications-rfi")
+        response.redirect("/v6-v4/my-applications-rfi")
     }  else if (sendbackCheck == "withdraw") {
-      response.redirect("/v6-v3/my-applications-withdraw")
+      response.redirect("/v6-v4/my-applications-withdraw")
     }  else {
-      response.redirect("/v6-v3/my-applications-rejected")
+      response.redirect("/v6-v4/my-applications-rejected")
     }
 });
 
 router.post('/merits-check', function(request, response) {
 
-    var meritsCheck = request.session.data['application_2_proceeding_1_certificate_1']
+    var meritsCheck = request.session.data['v6-v4']['application_2_proceeding_1_certificate_1']
     if (meritsCheck == "granted") {
-        response.redirect("/v6-v3/merits-assessment-emergency-costs")
+        response.redirect("/v6-v4/merits-assessment-emergency-costs")
     } else {
-      response.redirect("/v6-v3/merits-assessment-substantive")
+      response.redirect("/v6-v4/merits-assessment-substantive")
     }
 });
 
 router.post('/merits-check2', function(request, response) {
 
-    var meritsCheck2 = request.session.data['application_1_proceeding_1_certificate_2']
+    var meritsCheck2 = request.session.data['v6-v4']['application_1_proceeding_1_certificate_2']
     if (meritsCheck2 == "granted") {
-        response.redirect("/v6-v3/merits-assessment-substantive-costs")
+        response.redirect("/v6-v4/merits-assessment-substantive-costs")
     } else {
-      response.redirect("/v6-v3/decision-communication")
+      response.redirect("/v6-v4/decision-communication")
     }
 });
 
 router.get('/decision-start', function(req, res) {
   const reference = req.query.ref;
-  const isAssigned = reference && (req.session.data['assigned-applications'] || [])
+  const isAssigned = reference && (req.session.data['v6-v4']['assigned-applications'] || [])
     .some(application => application.ref === reference);
 
   if (!isAssigned) {
-    res.redirect('/v6-v3/application/' + encodeURIComponent(reference || ''));
+    res.redirect('/v6-v4/application/' + encodeURIComponent(reference || ''));
     return;
   }
 
-  const currentReference = req.session.data['decision-reference'];
+  const currentReference = req.session.data['v6-v4']['decision-reference'];
 
   if (reference && reference !== currentReference) {
-    delete req.session.data['overall-decision'];
-    delete req.session.data['overall-decision-errors'];
-    delete req.session.data['cert-date-type'];
-    delete req.session.data['cert-date-day'];
-    delete req.session.data['cert-date-month'];
-    delete req.session.data['cert-date-year'];
-    delete req.session.data['cert-date-display'];
-    delete req.session.data['refusal-reason'];
-    delete req.session.data['refuse-justification'];
-    delete req.session.data['refuse-reason-errors'];
+    delete req.session.data['v6-v4']['overall-decision'];
+    delete req.session.data['v6-v4']['overall-decision-errors'];
+    delete req.session.data['v6-v4']['cert-date-type'];
+    delete req.session.data['v6-v4']['cert-date-day'];
+    delete req.session.data['v6-v4']['cert-date-month'];
+    delete req.session.data['v6-v4']['cert-date-year'];
+    delete req.session.data['v6-v4']['cert-date-display'];
+    delete req.session.data['v6-v4']['refusal-reason'];
+    delete req.session.data['v6-v4']['refuse-justification'];
+    delete req.session.data['v6-v4']['refuse-reason-errors'];
   }
 
   if (reference) {
-    req.session.data['decision-reference'] = reference;
+    req.session.data['v6-v4']['decision-reference'] = reference;
   }
-  res.redirect('/v6-v3/overall-decision');
+  res.redirect('/v6-v4/overall-decision');
 });
 
 router.post('/decision-check', function(request, response) {
@@ -140,15 +148,15 @@ router.post('/decision-check', function(request, response) {
   }
 
   if (Object.keys(errors).length > 0) {
-    request.session.data['overall-decision-errors'] = errors
-    response.redirect('/v6-v3/overall-decision')
+    request.session.data['v6-v4']['overall-decision-errors'] = errors
+    response.redirect('/v6-v4/overall-decision')
     return
   }
 
   if (decisionCheck == "refuse") {
-    response.redirect("/v6-v3/refuse-reason")
+    response.redirect("/v6-v4/refuse-reason")
   } else {
-    response.redirect("/v6-v3/grant-certificate-date")
+    response.redirect("/v6-v4/grant-certificate-date")
   }
 });
 
@@ -170,31 +178,31 @@ router.post('/grant-date-submit', function(request, response) {
   }
 
   if (Object.keys(errors).length > 0) {
-    request.session.data['grant-certificate-date-errors'] = errors
-    response.redirect('/v6-v3/grant-certificate-date')
+    request.session.data['v6-v4']['grant-certificate-date-errors'] = errors
+    response.redirect('/v6-v4/grant-certificate-date')
     return
   }
 
     // Certificate date data stored in session from form
     var displayDate = "12 June 2026" // Default
-    
+
     // Get the application to find its submitted date
-    var decisionReference = request.session.data['decision-reference']
+    var decisionReference = request.session.data['v6-v4']['decision-reference']
     var application = null
-    
+
     // Search for application in assigned or open applications
-    if (request.session.data['assigned-applications']) {
-        application = request.session.data['assigned-applications'].find(app => app.ref === decisionReference)
+    if (request.session.data['v6-v4']['assigned-applications']) {
+        application = request.session.data['v6-v4']['assigned-applications'].find(app => app.ref === decisionReference)
     }
-    if (!application && request.session.data['open-applications']) {
-        application = request.session.data['open-applications'].find(app => app.ref === decisionReference)
+    if (!application && request.session.data['v6-v4']['open-applications']) {
+        application = request.session.data['v6-v4']['open-applications'].find(app => app.ref === decisionReference)
     }
-    
+
     if (certDateType === 'another-date') {
         // Format the entered date
-        var day = request.session.data['cert-date-day']
-        var month = request.session.data['cert-date-month']
-        var year = request.session.data['cert-date-year']
+        var day = request.session.data['v6-v4']['cert-date-day']
+        var month = request.session.data['v6-v4']['cert-date-month']
+        var year = request.session.data['v6-v4']['cert-date-year']
         if (day && month && year) {
             // Format as "DD Mon YYYY"
             var monthNames = ['', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
@@ -210,9 +218,9 @@ router.post('/grant-date-submit', function(request, response) {
             displayDate = "27 Jun 2026"
         }
     }
-    
-    request.session.data['cert-date-display'] = displayDate
-    response.redirect("/v6-v3/check-answers")
+
+    request.session.data['v6-v4']['cert-date-display'] = displayDate
+    response.redirect("/v6-v4/check-answers")
 });
 
 router.post('/refuse-submit', function(request, response) {
@@ -229,68 +237,68 @@ router.post('/refuse-submit', function(request, response) {
   }
 
   if (Object.keys(errors).length > 0) {
-    request.session.data['refuse-reason-errors'] = errors
-    response.redirect('/v6-v3/refuse-reason')
+    request.session.data['v6-v4']['refuse-reason-errors'] = errors
+    response.redirect('/v6-v4/refuse-reason')
     return
   }
 
-  request.session.data['refuse-justification'] = refuseJustification
+  request.session.data['v6-v4']['refuse-justification'] = refuseJustification
 
   // Refusal reason and justification stored in session from form
-  response.redirect("/v6-v3/check-answers")
+  response.redirect("/v6-v4/check-answers")
 });
 
 router.post('/refuse-decision-submit', function(request, response) {
     // Handle refuse decision from error page
-    var decisionReference = request.session.data['decision-reference']
+    var decisionReference = request.session.data['v6-v4']['decision-reference']
     var application = null
-    
+
     // Search for application in assigned or open applications
-    if (request.session.data['assigned-applications']) {
-        application = request.session.data['assigned-applications'].find(app => app.ref === decisionReference)
+    if (request.session.data['v6-v4']['assigned-applications']) {
+        application = request.session.data['v6-v4']['assigned-applications'].find(app => app.ref === decisionReference)
     }
-    if (!application && request.session.data['open-applications']) {
-        application = request.session.data['open-applications'].find(app => app.ref === decisionReference)
+    if (!application && request.session.data['v6-v4']['open-applications']) {
+        application = request.session.data['v6-v4']['open-applications'].find(app => app.ref === decisionReference)
     }
-    
+
     if (application) {
         // Initialize decision store if needed
-        if (!request.session.data['decision-store']) {
-            request.session.data['decision-store'] = {};
+        if (!request.session.data['v6-v4']['decision-store']) {
+            request.session.data['v6-v4']['decision-store'] = {};
         }
-        
+
         // Update application with refuse decision
         application.status = 'Refused'
         application.decisionDate = '27 Jun 2026'
         application.decisionType = 'Refuse'
-        application.refusalReason = request.session.data['refusal-reason'] || 'Applicant does not meet the merits test'
-        
+        application.refusalReason = request.session.data['v6-v4']['refusal-reason'] || 'Applicant does not meet the merits test'
+
         // Save decision to persistent store
-        request.session.data['decision-store'][decisionReference] = {
+        request.session.data['v6-v4']['decision-store'][decisionReference] = {
             status: 'Refused',
             decisionDate: '27 Jun 2026',
             decisionType: 'Refuse',
             refusalReason: application.refusalReason
         };
-        
+
         // Add to application history
-        if (!request.session.data['app-history']) {
-            request.session.data['app-history'] = {}
+        if (!request.session.data['v6-v4']['app-history']) {
+            request.session.data['v6-v4']['app-history'] = {}
         }
-        if (!request.session.data['app-history'][decisionReference]) {
-            request.session.data['app-history'][decisionReference] = []
+        if (!request.session.data['v6-v4']['app-history'][decisionReference]) {
+            request.session.data['v6-v4']['app-history'][decisionReference] = []
         }
-        
+
         // Generate current timestamp
         const now = new Date();
         const dateStr = now.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
         const timeStr = now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
         const datetime = dateStr + ' ' + timeStr;
         const caseworker = application.caseworker || 'Mo Bradshaw';
-        const refusalReason = request.session.data['refusal-reason'] || 'Not specified';
-        const justification = request.session.data['refuse-justification'] || '';
-        
-        request.session.data['app-history'][decisionReference].push({
+        const refusalReason = request.session.data['v6-v4']['refusal-reason'] || 'Not specified';
+        const justification = request.session.data['v6-v4']['refuse-justification'] || '';
+
+        request.session.data['v6-v4']['app-history'][decisionReference].push({
             timestamp: datetime,
             action: 'Initial application refused',
             caseworker: caseworker,
@@ -299,80 +307,80 @@ router.post('/refuse-decision-submit', function(request, response) {
               To: 'Refused'
             },
             details: justification || null,
-            versionLink: '/v6-v3/application/' + decisionReference
+            versionLink: '/v6-v4/application/' + decisionReference
         })
-        
+
         // Move application from assigned to completed (decided) list
-        if (request.session.data['assigned-applications']) {
-            const decidedApp = request.session.data['assigned-applications'].find(app => app.ref === decisionReference)
+        if (request.session.data['v6-v4']['assigned-applications']) {
+            const decidedApp = request.session.data['v6-v4']['assigned-applications'].find(app => app.ref === decisionReference)
             if (decidedApp) {
-                if (!request.session.data['completed-applications']) {
-                    request.session.data['completed-applications'] = []
+                if (!request.session.data['v6-v4']['completed-applications']) {
+                    request.session.data['v6-v4']['completed-applications'] = []
                 }
-                request.session.data['completed-applications'].push(decidedApp)
-                request.session.data['assigned-applications'] = request.session.data['assigned-applications'].filter(app => app.ref !== decisionReference)
+                request.session.data['v6-v4']['completed-applications'].push(decidedApp)
+                request.session.data['v6-v4']['assigned-applications'] = request.session.data['v6-v4']['assigned-applications'].filter(app => app.ref !== decisionReference)
             }
         }
     }
-    
-    response.redirect("/v6-v3/confirmation-screen")
+
+    response.redirect("/v6-v4/confirmation-screen")
 });
 
 router.post('/check-answers-submit', function(request, response) {
-    var overallDecision = request.session.data['overall-decision']
-    var decisionReference = request.session.data['decision-reference']
-    
+    var overallDecision = request.session.data['v6-v4']['overall-decision']
+    var decisionReference = request.session.data['v6-v4']['decision-reference']
+
     if (overallDecision == "refuse") {
-        response.redirect("/v6-v3/overall-decision-error")
+        response.redirect("/v6-v4/overall-decision-error")
     } else {
       // Store the decision on the application
       var application = null
-      
+
       // Search for application in assigned or open applications
-      if (request.session.data['assigned-applications']) {
-          application = request.session.data['assigned-applications'].find(app => app.ref === decisionReference)
+      if (request.session.data['v6-v4']['assigned-applications']) {
+          application = request.session.data['v6-v4']['assigned-applications'].find(app => app.ref === decisionReference)
       }
-      if (!application && request.session.data['open-applications']) {
-          application = request.session.data['open-applications'].find(app => app.ref === decisionReference)
+      if (!application && request.session.data['v6-v4']['open-applications']) {
+          application = request.session.data['v6-v4']['open-applications'].find(app => app.ref === decisionReference)
       }
-      
+
       if (application) {
           // Initialize decision store if needed
-          if (!request.session.data['decision-store']) {
-              request.session.data['decision-store'] = {};
+          if (!request.session.data['v6-v4']['decision-store']) {
+              request.session.data['v6-v4']['decision-store'] = {};
           }
-          
+
           // Update application with decision
           application.status = 'Granted'
           application.decisionDate = '27 Jun 2026'
           application.decisionType = 'Grant'
-          application.certDate = request.session.data['cert-date-display']
-          
+          application.certDate = request.session.data['v6-v4']['cert-date-display']
+
           // Save decision to persistent store
-          request.session.data['decision-store'][decisionReference] = {
+          request.session.data['v6-v4']['decision-store'][decisionReference] = {
               status: 'Granted',
               decisionDate: '27 Jun 2026',
               decisionType: 'Grant',
-              certDate: request.session.data['cert-date-display']
+              certDate: request.session.data['v6-v4']['cert-date-display']
           };
-          
+
           // Add to application history
-          if (!request.session.data['app-history']) {
-              request.session.data['app-history'] = {}
+          if (!request.session.data['v6-v4']['app-history']) {
+              request.session.data['v6-v4']['app-history'] = {}
           }
-          if (!request.session.data['app-history'][decisionReference]) {
-              request.session.data['app-history'][decisionReference] = []
+          if (!request.session.data['v6-v4']['app-history'][decisionReference]) {
+              request.session.data['v6-v4']['app-history'][decisionReference] = []
           }
-          
+
           // Generate current timestamp
           const now = new Date();
           const dateStr = now.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
           const timeStr = now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
           const datetime = dateStr + ' ' + timeStr;
           const caseworker = application.caseworker || 'Mo Bradshaw';
-          const certDate = request.session.data['cert-date-display'] || '';
-          
-          request.session.data['app-history'][decisionReference].push({
+          const certDate = request.session.data['v6-v4']['cert-date-display'] || '';
+
+          request.session.data['v6-v4']['app-history'][decisionReference].push({
               timestamp: datetime,
               action: 'Initial application granted',
               caseworker: caseworker,
@@ -380,23 +388,23 @@ router.post('/check-answers-submit', function(request, response) {
                 From: 'In progress',
                 To: 'Granted'
               },
-              versionLink: '/v6-v3/application/' + decisionReference
+              versionLink: '/v6-v4/application/' + decisionReference
           })
-          
+
           // Move application from assigned to completed (decided) list
-          if (request.session.data['assigned-applications']) {
-              const decidedApp = request.session.data['assigned-applications'].find(app => app.ref === decisionReference)
+          if (request.session.data['v6-v4']['assigned-applications']) {
+              const decidedApp = request.session.data['v6-v4']['assigned-applications'].find(app => app.ref === decisionReference)
               if (decidedApp) {
-                  if (!request.session.data['completed-applications']) {
-                      request.session.data['completed-applications'] = []
+                  if (!request.session.data['v6-v4']['completed-applications']) {
+                      request.session.data['v6-v4']['completed-applications'] = []
                   }
-                  request.session.data['completed-applications'].push(decidedApp)
-                  request.session.data['assigned-applications'] = request.session.data['assigned-applications'].filter(app => app.ref !== decisionReference)
+                  request.session.data['v6-v4']['completed-applications'].push(decidedApp)
+                  request.session.data['v6-v4']['assigned-applications'] = request.session.data['v6-v4']['assigned-applications'].filter(app => app.ref !== decisionReference)
               }
           }
       }
-      
-      response.redirect("/v6-v3/confirmation-screen")
+
+      response.redirect("/v6-v4/confirmation-screen")
     }
 });
 
@@ -418,11 +426,11 @@ const mockResults = [
 ];
 
 router.get('/grant-certificate-date', function(req, res) {
-  const decisionReference = req.session.data['decision-reference'] || 'L-12Z-13P';
-  const errors = req.session.data['grant-certificate-date-errors'] || null;
-  delete req.session.data['grant-certificate-date-errors'];
+  const decisionReference = req.session.data['v6-v4']['decision-reference'] || 'L-12Z-13P';
+  const errors = req.session.data['v6-v4']['grant-certificate-date-errors'] || null;
+  delete req.session.data['v6-v4']['grant-certificate-date-errors'];
 
-  res.render('v6-v3/grant-certificate-date.html', {
+  res.render('v6-v4/grant-certificate-date.html', {
     pageTitle: 'Make a decision',
     decisionReference: decisionReference,
     errors: errors
@@ -430,11 +438,11 @@ router.get('/grant-certificate-date', function(req, res) {
 });
 
 router.get('/refuse-reason', function(req, res) {
-  const decisionReference = req.session.data['decision-reference'] || 'L-12Z-13P';
-  const errors = req.session.data['refuse-reason-errors'] || null;
-  delete req.session.data['refuse-reason-errors'];
+  const decisionReference = req.session.data['v6-v4']['decision-reference'] || 'L-12Z-13P';
+  const errors = req.session.data['v6-v4']['refuse-reason-errors'] || null;
+  delete req.session.data['v6-v4']['refuse-reason-errors'];
 
-  res.render('v6-v3/refuse-reason.html', {
+  res.render('v6-v4/refuse-reason.html', {
     pageTitle: 'Make a decision',
     decisionReference: decisionReference,
     errors: errors
@@ -442,20 +450,20 @@ router.get('/refuse-reason', function(req, res) {
 });
 
 router.get('/check-answers', function(req, res) {
-  const decisionReference = req.session.data['decision-reference'] || 'L-12Z-13P';
-  res.render('v6-v3/check-answers.html', { 
-    pageTitle: 'Check your answers', 
+  const decisionReference = req.session.data['v6-v4']['decision-reference'] || 'L-12Z-13P';
+  res.render('v6-v4/check-answers.html', {
+    pageTitle: 'Check your answers',
     decisionReference: decisionReference,
-    data: req.session.data
+    data: req.session.data['v6-v4']
   });
 });
 
 router.get('/overall-decision', function(req, res) {
-  const decisionReference = req.session.data['decision-reference'] || 'L-12Z-13P';
-  const errors = req.session.data['overall-decision-errors'] || null;
-  delete req.session.data['overall-decision-errors'];
+  const decisionReference = req.session.data['v6-v4']['decision-reference'] || 'L-12Z-13P';
+  const errors = req.session.data['v6-v4']['overall-decision-errors'] || null;
+  delete req.session.data['v6-v4']['overall-decision-errors'];
 
-  res.render('v6-v3/overall-decision.html', {
+  res.render('v6-v4/overall-decision.html', {
     pageTitle: 'Make a decision',
     decisionReference: decisionReference,
     errors: errors
@@ -463,13 +471,13 @@ router.get('/overall-decision', function(req, res) {
 });
 
 router.get('/confirmation-screen', function(req, res) {
-  const decisionReference = req.session.data['decision-reference'] || 'L-12Z-13P';
-  res.render('v6-v3/confirmation-screen.html', { pageTitle: 'Confirmation', decisionReference: decisionReference });
+  const decisionReference = req.session.data['v6-v4']['decision-reference'] || 'L-12Z-13P';
+  res.render('v6-v4/confirmation-screen.html', { pageTitle: 'Confirmation', decisionReference: decisionReference });
 });
 
 router.get('/overall-decision-error', function(req, res) {
-  const decisionReference = req.session.data['decision-reference'] || 'L-12Z-13P';
-  res.render('v6-v3/overall-decision-error.html', { pageTitle: 'Error', decisionReference: decisionReference });
+  const decisionReference = req.session.data['v6-v4']['decision-reference'] || 'L-12Z-13P';
+  res.render('v6-v4/overall-decision-error.html', { pageTitle: 'Error', decisionReference: decisionReference });
 });
 
 // Password for accessing the prototype
@@ -477,93 +485,93 @@ const PROTOTYPE_PASSWORD = 'prototype';
 
 // Authentication middleware
 function requireAuth(req, res, next) {
-  if (req.session.data && req.session.data['v6-authenticated']) {
+  if (req.session.data['v6-v4'] && req.session.data['v6-v4']['v6-authenticated']) {
     next();
   } else {
-    res.redirect('/v6-v3/');
+    res.redirect('/v6-v4/');
   }
 }
 
 // Default root route - shows password form
 router.get('/', function(req, res) {
-  res.render('v6-v3/password.njk', { 
+  res.render('v6-v4/password.njk', {
     pageTitle: 'Enter password',
-    errorMessage: req.session.data && req.session.data['password-error'] ? req.session.data['password-error'] : null
+    errorMessage: req.session.data['v6-v4'] && req.session.data['v6-v4']['password-error'] ? req.session.data['v6-v4']['password-error'] : null
   });
   // Clear error after displaying
-  if (req.session.data) {
-    delete req.session.data['password-error'];
+  if (req.session.data['v6-v4']) {
+    delete req.session.data['v6-v4']['password-error'];
   }
 });
 
 // Password submission
 router.post('/password-submit', function(req, res) {
   const enteredPassword = req.body.password;
-  
+
   if (enteredPassword === PROTOTYPE_PASSWORD) {
     // Store auth in session
-    if (!req.session.data) {
-      req.session.data = {};
+    if (!req.session.data['v6-v4']) {
+      req.session.data['v6-v4'] = {};
     }
-    req.session.data['v6-authenticated'] = true;
-    res.redirect('/v6-v3/index');
+    req.session.data['v6-v4']['v6-authenticated'] = true;
+    res.redirect('/v6-v4/index');
   } else {
     // Store error and redirect back
-    if (!req.session.data) {
-      req.session.data = {};
+    if (!req.session.data['v6-v4']) {
+      req.session.data['v6-v4'] = {};
     }
-    req.session.data['password-error'] = 'Incorrect password';
-    res.redirect('/v6-v3/');
+    req.session.data['v6-v4']['password-error'] = 'Incorrect password';
+    res.redirect('/v6-v4/');
   }
 });
 
 router.get('/sign-out', function(req, res) {
-  if (req.session.data) {
-    delete req.session.data['v6-authenticated'];
+  if (req.session.data['v6-v4']) {
+    delete req.session.data['v6-v4']['v6-authenticated'];
   }
-  res.redirect('/v6-v3/');
+  res.redirect('/v6-v4/');
 });
 
 // Welcome/index page - requires auth
 router.get('/index', function(req, res) {
   // Check authentication
-  if (!req.session.data || !req.session.data['v6-authenticated']) {
-    res.redirect('/v6-v3/');
+  if (!req.session.data['v6-v4'] || !req.session.data['v6-v4']['v6-authenticated']) {
+    res.redirect('/v6-v4/');
     return;
   }
-  res.render('v6-v3/index.njk', { pageTitle: 'Civil Decide prototype' });
+  res.render('v6-v4/index.njk', { pageTitle: 'Civil Decide prototype' });
 });
 
 function initializeAppHistory(req, ref) {
-  if (!req.session.data['app-history']) {
-    req.session.data['app-history'] = {};
+  if (!req.session.data['v6-v4']['app-history']) {
+    req.session.data['v6-v4']['app-history'] = {};
   }
-  
-  if (!req.session.data['app-history'][ref]) {
-    req.session.data['app-history'][ref] = [];
+
+  if (!req.session.data['v6-v4']['app-history'][ref]) {
+    req.session.data['v6-v4']['app-history'][ref] = [];
   }
 }
 
 function addHistoryEvent(req, ref, action, caseworker, details = null, changes = null) {
-  if (!req.session.data['app-history']) {
-    req.session.data['app-history'] = {};
+  if (!req.session.data['v6-v4']['app-history']) {
+    req.session.data['v6-v4']['app-history'] = {};
   }
-  
-  if (!req.session.data['app-history'][ref]) {
-    req.session.data['app-history'][ref] = [];
+
+  if (!req.session.data['v6-v4']['app-history'][ref]) {
+    req.session.data['v6-v4']['app-history'][ref] = [];
   }
-  
+
   const now = new Date();
-  const timestamp = now.toLocaleDateString('en-GB', { 
-    day: '2-digit', 
-    month: 'short', 
+  const timestamp = now.toLocaleDateString('en-GB', {
+    day: '2-digit',
+    month: 'short',
     year: 'numeric'
-  }) + ' ' + now.toLocaleTimeString('en-GB', { 
-    hour: '2-digit', 
+  }) + ' ' + now.toLocaleTimeString('en-GB', {
+    hour: '2-digit',
     minute: '2-digit'
   });
-  
-  req.session.data['app-history'][ref].push({
+
+  req.session.data['v6-v4']['app-history'][ref].push({
     timestamp: timestamp,
     action: action,
     caseworker: caseworker,
@@ -575,7 +583,7 @@ function addHistoryEvent(req, ref, action, caseworker, details = null, changes =
 function recordApplicationReceived(req, application) {
   if (!application || application.isRedetermination) return;
   initializeAppHistory(req, application.ref);
-  const history = req.session.data['app-history'][application.ref];
+  const history = req.session.data['v6-v4']['app-history'][application.ref];
   if (!history.some(event => event.action === 'Initial application received')) {
     addHistoryEvent(req, application.ref, 'Initial application received', 'N/A');
   }
@@ -584,7 +592,7 @@ function recordApplicationReceived(req, application) {
 function recordRedeterminationSubmitted(req, application) {
   if (!application || !application.isRedetermination) return;
   initializeAppHistory(req, application.ref);
-  const history = req.session.data['app-history'][application.ref];
+  const history = req.session.data['v6-v4']['app-history'][application.ref];
   if (!history.some(event => event.action === 'Redetermination submitted' && event.redeterminationType === application.redeterminationType)) {
     addHistoryEvent(req, application.ref, 'Redetermination submitted', 'N/A', application.redeterminationJustification || null, null);
     history[history.length - 1].redeterminationType = application.redeterminationType || 'Add a proceeding';
@@ -593,16 +601,16 @@ function recordRedeterminationSubmitted(req, application) {
 
 function hasGrantedInitialApplication(req, reference) {
   const applications = [
-    ...(req.session.data['completed-applications'] || []),
-    ...(req.session.data['assigned-applications'] || []),
-    ...(req.session.data['open-applications-all'] || []),
-    ...(req.session.data['open-applications'] || [])
+    ...(req.session.data['v6-v4']['completed-applications'] || []),
+    ...(req.session.data['v6-v4']['assigned-applications'] || []),
+    ...(req.session.data['v6-v4']['open-applications-all'] || []),
+    ...(req.session.data['v6-v4']['open-applications'] || [])
   ];
   const initialApplication = applications.find(application =>
     application.ref === reference && !application.isPriorAuthority && !application.isRedetermination
   );
   if (!initialApplication) return false;
-  const storedDecision = req.session.data['decision-store'] && req.session.data['decision-store'][reference];
+  const storedDecision = req.session.data['v6-v4']['decision-store'] && req.session.data['v6-v4']['decision-store'][reference];
   return (storedDecision && storedDecision.status === 'Granted') || initialApplication.status === 'Granted' || initialApplication.decisionType === 'Grant';
 }
 
@@ -804,11 +812,11 @@ function generateRandomDate() {
   const year = 2026;
   const month = Math.floor(Math.random() * 6); // 0-5 for Jan-Jun
   const day = Math.floor(Math.random() * 28) + 1; // 1-28 to avoid month-specific issues
-  
+
   const date = new Date(year, month, day);
-  const formatted = date.toLocaleDateString('en-GB', { 
-    day: '2-digit', 
-    month: 'short', 
+  const formatted = date.toLocaleDateString('en-GB', {
+    day: '2-digit',
+    month: 'short',
     year: 'numeric'
   });
   return formatted;
@@ -997,10 +1005,10 @@ function ensureDefaultDemoRedetermination(sessionData) {
 
 function ensureRedeterminationScenarioVariety(req) {
   ensureRedeterminationRequestIds(req);
-  const openApplications = req.session.data['open-applications-all'] || [];
-  const assignedApplications = req.session.data['assigned-applications'] || [];
-  const completedApplications = req.session.data['completed-applications'] || (req.session.data['completed-applications'] = []);
-  const decisionStore = req.session.data['redetermination-decision-store'] || {};
+  const openApplications = req.session.data['v6-v4']['open-applications-all'] || [];
+  const assignedApplications = req.session.data['v6-v4']['assigned-applications'] || [];
+  const completedApplications = req.session.data['v6-v4']['completed-applications'] || (req.session.data['v6-v4']['completed-applications'] = []);
+  const decisionStore = req.session.data['v6-v4']['redetermination-decision-store'] || {};
   const uniqueReferences = [...new Set(openApplications.filter(app => app.isRedetermination).map(app => app.ref))];
 
   uniqueReferences.forEach((reference, scenarioIndex) => {
@@ -1075,7 +1083,7 @@ function ensureRedeterminationScenarioVariety(req) {
 }
 
 function ensureGroupedRedeterminationExamples(req) {
-  const data = req.session.data;
+  const data = req.session.data['v6-v4'];
   const collections = ['open-applications-all', 'open-applications', 'assigned-applications', 'completed-applications'];
   const applications = collections.flatMap(key => data[key] || []);
   const activeReferences = new Set(applications.filter(app => app.groupedRedeterminationFlow
@@ -1084,13 +1092,13 @@ function ensureGroupedRedeterminationExamples(req) {
   data['open-applications-all'] = data['open-applications-all'] || [];
   data['completed-applications'] = data['completed-applications'] || [];
 
-  while (activeReferences.size < 2) {
+  while (activeReferences.size < 8) {
     const mock = generateMockApplications(3);
-    const sourceReference = mock.completed[activeReferences.size + 1].ref;
-    let reference;
-    do {
-      reference = 'L-1' + generateRandomRef().slice(2);
-    } while (usedReferences.has(reference));
+    const scenarioIndex = data['redetermination-replacement-index'] || 0;
+    const reference = mock.completed[scenarioIndex % 3].ref;
+    if (usedReferences.has(reference)) continue;
+    data['redetermination-replacement-index'] = scenarioIndex + 1;
+    const sourceReference = reference;
     const parent = mock.completed.find(app => app.ref === sourceReference);
     data['completed-applications'].push({ ...parent, ref: reference, reference });
     mock.open.filter(app => app.ref === sourceReference && app.isRedetermination).forEach(app => {
@@ -1107,11 +1115,71 @@ function ensureGroupedRedeterminationExamples(req) {
   }
 }
 
+function ensureOtherApplicationExamples(req) {
+  const data = req.session.data['v6-v4'];
+  const applications = ['open-applications-all', 'assigned-applications', 'completed-applications']
+    .flatMap(key => data[key] || []);
+  const usedReferences = new Set(applications.map(application => application.ref));
+  const decisionStore = data['decision-store'] || {};
+
+  for (const exampleType of ['initial', 'prior-authority']) {
+    const activeReferences = new Set(applications.filter(application => application.comparisonExampleType === exampleType
+      && !['Granted', 'Refused'].includes(decisionStore[application.ref]?.status || application.status))
+      .map(application => application.ref));
+    while (activeReferences.size < 2) {
+      let reference;
+      do {
+        reference = generateRandomRef();
+      } while (usedReferences.has(reference));
+      const application = {
+        ref: reference,
+        reference,
+        firstName: firstNames[Math.floor(Math.random() * firstNames.length)],
+        lastName: lastNames[Math.floor(Math.random() * lastNames.length)],
+        dob: '12 Jan 1980',
+        submitted: generateRandomDate(),
+        firm: 'WATKINS SOLICITORS INC<br>OK514R',
+        type: exampleType === 'initial' ? 'Initial application' : 'Prior authority',
+        delegatedFunctions: exampleType === 'initial' ? 'Used' : 'N/A',
+        matterType: { title: 'Family', subtext: "Special Children's Act" },
+        isPriorAuthority: exampleType === 'prior-authority',
+        isRedetermination: false,
+        comparisonExampleType: exampleType
+      };
+      if (application.isPriorAuthority) {
+        const priorAuthorityType = activeReferences.size === 0 ? 'Expert - Psychiatrist' : 'Expert - Physiotherapist';
+        const profile = pickExpertProfile(priorAuthorityType);
+        Object.assign(application, {
+          priorAuthorityType,
+          expertName: profile.name,
+          expertType: profile.type,
+          expertLocation: profile.location,
+          expertHours: profile.hours,
+          expertMinutes: profile.minutes,
+          expertRate: profile.rate,
+          expertRequestedAmount: profile.requestedAmount,
+          expertJustification: profile.justification
+        });
+        data['completed-applications'].push({
+          ...application,
+          type: 'Initial application',
+          isPriorAuthority: false,
+          comparisonExampleType: undefined,
+          status: 'Granted',
+          decisionType: 'Grant'
+        });
+      }
+      data['open-applications-all'].push(application);
+      usedReferences.add(reference);
+      activeReferences.add(reference);
+    }
+  }
+}
+
 function generateMockApplications(count = 8) {
   const openApplications = [];
   const completedApplications = [];
   const generatedRefs = new Set();
-  const priorAuthorityTypes = ['Expert - Psychiatrist', 'Expert - Physiotherapist', 'Expert - Medical examiner', 'Counsel', "King's Counsel"];
   const redeterminationProceedings = REDETERMINATION_PROCEEDINGS;
   const redeterminationClientRoles = REDETERMINATION_CLIENT_ROLES;
 
@@ -1123,9 +1191,7 @@ function generateMockApplications(count = 8) {
   }
 
   // Open rows are redeterminations; their granted initial applications stay completed.
-  const paScenarioCount = count;
-
-  for (let i = 0; i < paScenarioCount; i++) {
+  for (let i = 0; i < count; i++) {
     const ref = uniqueRef();
     const firstName = firstNames[Math.floor(Math.random() * firstNames.length)];
     const lastName  = lastNames[Math.floor(Math.random() * lastNames.length)];
@@ -1173,48 +1239,11 @@ function generateMockApplications(count = 8) {
         delegatedFunctions: 'N/A',
         matterType: { title: 'Family', subtext: "Special Children's Act" },
         isPriorAuthority: false,
-        isRedetermination: true
+        isRedetermination: true,
+        groupedRedeterminationFlow: true
       });
     }
 
-    if (i < Math.max(1, Math.floor(count / 4))) {
-      const numPA = Math.random() > 0.5 ? 2 : 1;
-      const shuffled = [...priorAuthorityTypes].sort(() => Math.random() - 0.5);
-      for (let j = 0; j < numPA; j++) {
-        const paType = shuffled[j];
-        const isExpert = paType.includes('Expert');
-        const expertProfile = isExpert ? pickExpertProfile(paType) : null;
-        const paSubmitted = generateRandomDate();
-
-        const paApp = {
-          ref,
-          reference: ref,
-          firstName,
-          lastName,
-          dob: '12 Jan 1980',
-          submitted: paSubmitted,
-          firm: 'WATKINS SOLICITORS INC<br>OK514R',
-          type: 'Prior authority',
-          priorAuthorityType: paType,
-          delegatedFunctions: 'N/A',
-          matterType: { title: 'Family', subtext: "Special Children's Act" },
-          isPriorAuthority: true
-        };
-
-        if (expertProfile) {
-          paApp.expertName            = expertProfile.name;
-          paApp.expertType            = expertProfile.type;
-          paApp.expertLocation        = expertProfile.location;
-          paApp.expertHours           = expertProfile.hours;
-          paApp.expertMinutes         = expertProfile.minutes;
-          paApp.expertRate            = expertProfile.rate;
-          paApp.expertRequestedAmount = expertProfile.requestedAmount;
-          paApp.expertJustification   = expertProfile.justification;
-        }
-
-        openApplications.push(paApp);
-      }
-    }
   }
 
   return { open: openApplications, completed: completedApplications };
@@ -1390,10 +1419,10 @@ function applicationVariantKey(app) {
 
 function ensureRedeterminationRequestIds(req) {
   const collections = [
-    req.session.data['open-applications-all'] || [],
-    req.session.data['open-applications'] || [],
-    req.session.data['assigned-applications'] || [],
-    req.session.data['completed-applications'] || []
+    req.session.data['v6-v4']['open-applications-all'] || [],
+    req.session.data['v6-v4']['open-applications'] || [],
+    req.session.data['v6-v4']['assigned-applications'] || [],
+    req.session.data['v6-v4']['completed-applications'] || []
   ];
   const requestBySignature = new Map();
   const nextOrderByReference = new Map();
@@ -1440,10 +1469,10 @@ function ensureRedeterminationRequestIds(req) {
 function getRedeterminationsForReference(req, reference) {
   ensureRedeterminationRequestIds(req);
   const collections = [
-    req.session.data['open-applications-all'] || [],
-    req.session.data['open-applications'] || [],
-    req.session.data['assigned-applications'] || [],
-    req.session.data['completed-applications'] || []
+    req.session.data['v6-v4']['open-applications-all'] || [],
+    req.session.data['v6-v4']['open-applications'] || [],
+    req.session.data['v6-v4']['assigned-applications'] || [],
+    req.session.data['v6-v4']['completed-applications'] || []
   ];
   const requestsById = new Map();
   collections.flat().forEach(application => {
@@ -1452,10 +1481,10 @@ function getRedeterminationsForReference(req, reference) {
     }
   });
 
-  const assignedRequestIds = new Set((req.session.data['assigned-applications'] || [])
+  const assignedRequestIds = new Set((req.session.data['v6-v4']['assigned-applications'] || [])
     .filter(application => application.ref === reference && application.isRedetermination)
     .map(application => application.redeterminationId));
-  const decisionStore = req.session.data['redetermination-decision-store'] || {};
+  const decisionStore = req.session.data['v6-v4']['redetermination-decision-store'] || {};
 
   return Array.from(requestsById.values())
     .filter(application => !decisionStore[reference + '|' + application.redeterminationOrder]?.replacedByNewProceedings)
@@ -1490,20 +1519,20 @@ function removeResolvedRedeterminationGroupFromList(req, reference) {
   const redeterminations = getRedeterminationsForReference(req, reference);
   if (redeterminations.length === 0 || redeterminations.some(request => !['Granted', 'Refused'].includes(request.status))) return;
 
-  const assignedApplications = req.session.data['assigned-applications'] || [];
+  const assignedApplications = req.session.data['v6-v4']['assigned-applications'] || [];
   const resolvedAssignedRequests = assignedApplications.filter(application => application.ref === reference && application.isRedetermination);
   if (resolvedAssignedRequests.length === 0) return;
 
-  if (!req.session.data['completed-applications']) req.session.data['completed-applications'] = [];
-  const completedRequestIds = new Set(req.session.data['completed-applications']
+  if (!req.session.data['v6-v4']['completed-applications']) req.session.data['v6-v4']['completed-applications'] = [];
+  const completedRequestIds = new Set(req.session.data['v6-v4']['completed-applications']
     .filter(application => application.isRedetermination)
     .map(application => application.redeterminationId));
   resolvedAssignedRequests.forEach(application => {
     if (!completedRequestIds.has(application.redeterminationId)) {
-      req.session.data['completed-applications'].push({ ...application });
+      req.session.data['v6-v4']['completed-applications'].push({ ...application });
     }
   });
-  req.session.data['assigned-applications'] = assignedApplications.filter(application => !(application.ref === reference && application.isRedetermination));
+  req.session.data['v6-v4']['assigned-applications'] = assignedApplications.filter(application => !(application.ref === reference && application.isRedetermination));
 }
 
 function groupRedeterminationApplications(applications) {
@@ -1537,7 +1566,7 @@ function groupRedeterminationApplications(applications) {
 }
 
 function groupAssignedRedeterminations(req, applications) {
-  const decisionStore = req.session.data['redetermination-decision-store'] || {};
+  const decisionStore = req.session.data['v6-v4']['redetermination-decision-store'] || {};
   applications.forEach(application => {
     if (!application.isRedetermination) return;
     const storedDecision = decisionStore[application.ref + '|' + application.redeterminationOrder];
@@ -1588,53 +1617,52 @@ function generateReplacementOpenApplication(preferredType, existingVariantKeys =
 }
 
 router.get('/open-applications', function(req, res) {
-  if (!req.session.data['assigned-applications']) {
-    req.session.data['assigned-applications'] = [];
+  if (!req.session.data['v6-v4']['assigned-applications']) {
+    req.session.data['v6-v4']['assigned-applications'] = [];
   }
-  
+
   // Keep a stable open-applications source for the session so references remain searchable.
-  if (!req.session.data['open-applications-all'] || !req.session.data['open-applications-all'].some(app => app.isRedetermination)) {
+  if (!req.session.data['v6-v4']['open-applications-all'] || !req.session.data['v6-v4']['open-applications-all'].some(app => app.isRedetermination)) {
     const mockData = generateMockApplications(8);
-    req.session.data['open-applications-all'] = mockData.open;
-    const generatedLinkedCases = assignLinkedCaseMetadata(req.session.data['open-applications-all']);
-    req.session.data['linked-cases-by-reference-v3'] = {
-      ...(req.session.data['linked-cases-by-reference-v3'] || {}),
+    req.session.data['v6-v4']['open-applications-all'] = mockData.open;
+    const generatedLinkedCases = assignLinkedCaseMetadata(req.session.data['v6-v4']['open-applications-all']);
+    req.session.data['v6-v4']['linked-cases-by-reference-v4'] = {
+      ...(req.session.data['v6-v4']['linked-cases-by-reference-v4'] || {}),
       ...generatedLinkedCases
     };
-    req.session.data['open-applications'] = null; // reset derived copy
+    req.session.data['v6-v4']['open-applications'] = null; // reset derived copy
     // Seed completed-applications with the granted initial apps linked to PA requests
-    if (!req.session.data['completed-applications']) {
-      req.session.data['completed-applications'] = [];
+    if (!req.session.data['v6-v4']['completed-applications']) {
+      req.session.data['v6-v4']['completed-applications'] = [];
     }
     // Remove any previously seeded mock completed entries and re-add fresh ones
-    req.session.data['completed-applications'] = req.session.data['completed-applications']
+    req.session.data['v6-v4']['completed-applications'] = req.session.data['v6-v4']['completed-applications']
       .filter(a => a._mockGenerated !== true);
     mockData.completed.forEach(a => {
       a._mockGenerated = true;
-      req.session.data['completed-applications'].push(a);
+      req.session.data['v6-v4']['completed-applications'].push(a);
     });
   }
-  ensureDefaultDemoRedetermination(req.session.data);
   ensureRedeterminationScenarioVariety(req);
   ensureGroupedRedeterminationExamples(req);
+  ensureOtherApplicationExamples(req);
   ensureRedeterminationRequestIds(req);
-  [...(req.session.data['open-applications-all'] || []), ...(req.session.data['completed-applications'] || [])]
+  [...(req.session.data['v6-v4']['open-applications-all'] || []), ...(req.session.data['v6-v4']['completed-applications'] || [])]
     .forEach(application => {
       recordApplicationReceived(req, application);
       recordRedeterminationSubmitted(req, application);
     });
-  const priorAuthorityReferences = [...new Set((req.session.data['open-applications-all'] || [])
+  const priorAuthorityReferences = [...new Set((req.session.data['v6-v4']['open-applications-all'] || [])
     .filter(application => application.isPriorAuthority)
     .map(application => application.ref))];
   const retainedPriorAuthorityReferences = new Set(priorAuthorityReferences.slice(0, 2));
-  req.session.data['open-applications-all'] = (req.session.data['open-applications-all'] || [])
+  req.session.data['v6-v4']['open-applications-all'] = (req.session.data['v6-v4']['open-applications-all'] || [])
     .filter(application => !application.isPriorAuthority || retainedPriorAuthorityReferences.has(application.ref));
-  let applications = [...req.session.data['open-applications-all']];
+  let applications = [...req.session.data['v6-v4']['open-applications-all']];
 
-  const decisionStore = req.session.data['decision-store'] || {};
-  const redeterminationDecisionStore = req.session.data['redetermination-decision-store'] || {};
+  const decisionStore = req.session.data['v6-v4']['decision-store'] || {};
+  const redeterminationDecisionStore = req.session.data['v6-v4']['redetermination-decision-store'] || {};
   applications = applications.filter(app => {
-    if (!app.isRedetermination && !app.isPriorAuthority) return false;
     if (app.isRedetermination) {
       const storedDecision = redeterminationDecisionStore[app.ref + '|' + app.redeterminationOrder];
       const status = (storedDecision && storedDecision.status) || app.status;
@@ -1647,28 +1675,34 @@ router.get('/open-applications', function(req, res) {
   });
 
   // Remove applications already in a caseworker's list from open applications.
-  const assignedKeys = new Set((req.session.data['assigned-applications'] || []).map(applicationVariantKey));
+  const assignedKeys = new Set((req.session.data['v6-v4']['assigned-applications'] || []).map(applicationVariantKey));
   applications = applications.filter(app => !assignedKeys.has(applicationVariantKey(app)));
+  const displayOrder = req.session.data['v6-v4']['open-application-display-order']
+    || (req.session.data['v6-v4']['open-application-display-order'] = {});
+  applications.forEach(application => {
+    if (displayOrder[application.ref] === undefined) displayOrder[application.ref] = Math.random();
+  });
+  applications.sort((left, right) => displayOrder[left.ref] - displayOrder[right.ref]);
   const generatedLinkedCases = assignLinkedCaseMetadata(applications);
-  req.session.data['linked-cases-by-reference-v3'] = {
-    ...(req.session.data['linked-cases-by-reference-v3'] || {}),
+  req.session.data['v6-v4']['linked-cases-by-reference-v4'] = {
+    ...(req.session.data['v6-v4']['linked-cases-by-reference-v4'] || {}),
     ...generatedLinkedCases
   };
-  
+
   // Restore any stored decisions from decision-store
-  if (req.session.data['decision-store']) {
+  if (req.session.data['v6-v4']['decision-store']) {
     applications.forEach(app => {
-      restoreDecisionData(app, req.session.data['decision-store']);
+      restoreDecisionData(app, req.session.data['v6-v4']['decision-store']);
     });
   }
-  
+
   // Apply filters based on query parameters
   const { applicationType, matterType, categories } = req.query;
-  
+
   let filteredApps = applications;
-  
+
   console.log('Query params:', req.query);
-  
+
   // Filter by application type
   if (applicationType) {
     console.log('Filtering by applicationType');
@@ -1676,7 +1710,7 @@ router.get('/open-applications', function(req, res) {
     // Remove _unchecked values
     selectedTypes = selectedTypes.filter(t => t !== '_unchecked');
     console.log('selectedTypes after filter:', selectedTypes);
-    
+
     if (selectedTypes.length > 0) {
       filteredApps = filteredApps.filter(app => {
         for (let type of selectedTypes) {
@@ -1689,7 +1723,7 @@ router.get('/open-applications', function(req, res) {
       console.log('After applicationType filter:', filteredApps.length);
     }
   }
-  
+
   // Filter by matter type
   if (matterType) {
     console.log('Filtering by matterType');
@@ -1697,7 +1731,7 @@ router.get('/open-applications', function(req, res) {
     // Remove _unchecked values
     selectedMatters = selectedMatters.filter(m => m !== '_unchecked');
     console.log('selectedMatters after filter:', selectedMatters);
-    
+
     if (selectedMatters.length > 0) {
       filteredApps = filteredApps.filter(app => {
         for (let matter of selectedMatters) {
@@ -1708,7 +1742,7 @@ router.get('/open-applications', function(req, res) {
       console.log('After matterType filter:', filteredApps.length);
     }
   }
-  
+
   // Filter by categories (for prior authority applications only)
   if (categories) {
     console.log('Filtering by categories');
@@ -1716,11 +1750,11 @@ router.get('/open-applications', function(req, res) {
     // Remove _unchecked values
     selectedCategories = selectedCategories.filter(c => c !== '_unchecked');
     console.log('selectedCategories after filter:', selectedCategories);
-    
+
     if (selectedCategories.length > 0) {
       filteredApps = filteredApps.filter(app => {
         if (!app.isPriorAuthority) return true; // Pass through non-prior-authority apps
-        
+
         for (let cat of selectedCategories) {
           if (cat === 'expert' && app.priorAuthorityType && app.priorAuthorityType.includes('Expert')) return true;
           if (cat === 'junior-counsel' && app.priorAuthorityType && app.priorAuthorityType.includes('Counsel')) return true;
@@ -1731,15 +1765,15 @@ router.get('/open-applications', function(req, res) {
       console.log('After categories filter:', filteredApps.length);
     }
   }
-  
+
   console.log('Final filtered apps:', filteredApps.length);
 
   filteredApps = groupRedeterminationApplications(filteredApps);
-  
+
   // Keep full, unfiltered open applications in session for routes like search and add-by-reference.
-  req.session.data['open-applications'] = applications;
-  
-  res.render('v6-v3/open-applications.njk', { 
+  req.session.data['v6-v4']['open-applications'] = applications;
+
+  res.render('v6-v4/open-applications.njk', {
     pageTitle: 'Open applications',
     applications: filteredApps,
     query: req.query
@@ -1748,20 +1782,20 @@ router.get('/open-applications', function(req, res) {
 
 // Isolated reassignment prototype flow (uses auto-stored form data)
 router.get('/your-list', function(req, res) {
-  if (!req.session.data['assigned-applications']) {
-    req.session.data['assigned-applications'] = [];
+  if (!req.session.data['v6-v4']['assigned-applications']) {
+    req.session.data['v6-v4']['assigned-applications'] = [];
   }
 
-  const reassigned = req.session.data['reassigned'];
-  const reassignedTo = req.session.data['reassign-to'];
-  const reassignedCaseCount = Number(req.session.data['reassigned-case-count'] || 0);
-  req.session.data['reassigned'] = null;
-  req.session.data['reassign-to'] = null;
-  req.session.data['reassigned-case-count'] = null;
+  const reassigned = req.session.data['v6-v4']['reassigned'];
+  const reassignedTo = req.session.data['v6-v4']['reassign-to'];
+  const reassignedCaseCount = Number(req.session.data['v6-v4']['reassigned-case-count'] || 0);
+  req.session.data['v6-v4']['reassigned'] = null;
+  req.session.data['v6-v4']['reassign-to'] = null;
+  req.session.data['v6-v4']['reassigned-case-count'] = null;
 
-  res.render('v6-v3/your-list.html', {
+  res.render('v6-v4/your-list.html', {
     pageTitle: 'Your list',
-    applications: req.session.data['assigned-applications'],
+    applications: req.session.data['v6-v4']['assigned-applications'],
     reassigned: reassigned,
     reassignedTo: reassignedTo,
     reassignedCaseCount: reassignedCaseCount
@@ -1769,34 +1803,34 @@ router.get('/your-list', function(req, res) {
 });
 
 router.get('/reassign', function(req, res) {
-  const ref = req.query.reference || req.session.data['reassign-reference'] || null;
+  const ref = req.query.reference || req.session.data['v6-v4']['reassign-reference'] || null;
   const queryIsPriorAuthority = req.query.isPriorAuthority;
   const requestedIsPriorAuthority = queryIsPriorAuthority === 'true';
   const hasVariantQuery = typeof queryIsPriorAuthority !== 'undefined';
   if (req.query.reference) {
-    req.session.data['reassign-reference'] = req.query.reference;
+    req.session.data['v6-v4']['reassign-reference'] = req.query.reference;
   }
   if (hasVariantQuery) {
-    req.session.data['reassign-is-prior-authority'] = requestedIsPriorAuthority;
+    req.session.data['v6-v4']['reassign-is-prior-authority'] = requestedIsPriorAuthority;
   }
 
   let application = null;
-  if (ref && req.session.data['assigned-applications']) {
+  if (ref && req.session.data['v6-v4']['assigned-applications']) {
     if (hasVariantQuery) {
-      application = req.session.data['assigned-applications'].find(app => app.ref === ref && Boolean(app.isPriorAuthority) === requestedIsPriorAuthority) || null;
+      application = req.session.data['v6-v4']['assigned-applications'].find(app => app.ref === ref && Boolean(app.isPriorAuthority) === requestedIsPriorAuthority) || null;
     }
-    if (!application && typeof req.session.data['reassign-is-prior-authority'] !== 'undefined') {
-      application = req.session.data['assigned-applications'].find(app => app.ref === ref && Boolean(app.isPriorAuthority) === Boolean(req.session.data['reassign-is-prior-authority'])) || null;
+    if (!application && typeof req.session.data['v6-v4']['reassign-is-prior-authority'] !== 'undefined') {
+      application = req.session.data['v6-v4']['assigned-applications'].find(app => app.ref === ref && Boolean(app.isPriorAuthority) === Boolean(req.session.data['v6-v4']['reassign-is-prior-authority'])) || null;
     }
     if (!application) {
-      application = req.session.data['assigned-applications'].find(app => app.ref === ref) || null;
+      application = req.session.data['v6-v4']['assigned-applications'].find(app => app.ref === ref) || null;
     }
   }
 
   const isPriorAuthority = application ? Boolean(application.isPriorAuthority) : requestedIsPriorAuthority;
-  req.session.data['reassign-is-prior-authority'] = isPriorAuthority;
+  req.session.data['v6-v4']['reassign-is-prior-authority'] = isPriorAuthority;
 
-  res.render('v6-v3/reassign.html', {
+  res.render('v6-v4/reassign.html', {
     pageTitle: 'Select who you want to reassign this case to',
     reference: ref,
     application: application,
@@ -1806,27 +1840,27 @@ router.get('/reassign', function(req, res) {
 
 router.post('/confirm-reassign', function(req, res) {
   if (req.body.reference) {
-    req.session.data['reassign-reference'] = req.body.reference;
+    req.session.data['v6-v4']['reassign-reference'] = req.body.reference;
   }
   if (typeof req.body.isPriorAuthority !== 'undefined') {
-    req.session.data['reassign-is-prior-authority'] = req.body.isPriorAuthority === 'true';
+    req.session.data['v6-v4']['reassign-is-prior-authority'] = req.body.isPriorAuthority === 'true';
   }
-  res.redirect('/v6-v3/confirm-reassign');
+  res.redirect('/v6-v4/confirm-reassign');
 });
 
 router.get('/confirm-reassign', function(req, res) {
-  const ref = req.session.data['reassign-reference'] || null;
-  const isPriorAuthority = Boolean(req.session.data['reassign-is-prior-authority']);
+  const ref = req.session.data['v6-v4']['reassign-reference'] || null;
+  const isPriorAuthority = Boolean(req.session.data['v6-v4']['reassign-is-prior-authority']);
   let application = null;
 
-  if (ref && req.session.data['assigned-applications']) {
-    application = req.session.data['assigned-applications'].find(app => app.ref === ref && Boolean(app.isPriorAuthority) === isPriorAuthority) || null;
+  if (ref && req.session.data['v6-v4']['assigned-applications']) {
+    application = req.session.data['v6-v4']['assigned-applications'].find(app => app.ref === ref && Boolean(app.isPriorAuthority) === isPriorAuthority) || null;
     if (!application) {
-      application = req.session.data['assigned-applications'].find(app => app.ref === ref) || null;
+      application = req.session.data['v6-v4']['assigned-applications'].find(app => app.ref === ref) || null;
     }
   }
 
-  res.render('v6-v3/confirm-reassign.html', {
+  res.render('v6-v4/confirm-reassign.html', {
     pageTitle: 'Confirm you want to reassign this case?',
     reference: ref,
     application: application,
@@ -1835,21 +1869,21 @@ router.get('/confirm-reassign', function(req, res) {
 });
 
 router.post('/your-list', function(req, res) {
-  const ref = req.body.reference || req.session.data['reassign-reference'];
+  const ref = req.body.reference || req.session.data['v6-v4']['reassign-reference'];
   const isPriorAuthority = (typeof req.body.isPriorAuthority !== 'undefined')
     ? req.body.isPriorAuthority === 'true'
-    : Boolean(req.session.data['reassign-is-prior-authority']);
+    : Boolean(req.session.data['v6-v4']['reassign-is-prior-authority']);
 
-  const assignedApplications = req.session.data['assigned-applications'] || [];
+  const assignedApplications = req.session.data['v6-v4']['assigned-applications'] || [];
   const beforeCount = assignedApplications.length;
 
   if (ref && assignedApplications.length > 0) {
-    const linkedGroupRows = req.session.data['linked-cases-by-reference-v3'] && req.session.data['linked-cases-by-reference-v3'][ref]
-      ? req.session.data['linked-cases-by-reference-v3'][ref]
+    const linkedGroupRows = req.session.data['v6-v4']['linked-cases-by-reference-v4'] && req.session.data['v6-v4']['linked-cases-by-reference-v4'][ref]
+      ? req.session.data['v6-v4']['linked-cases-by-reference-v4'][ref]
       : [];
     const linkedGroupRefs = [...new Set(linkedGroupRows.map(row => row.reference).filter(Boolean))];
 
-    req.session.data['assigned-applications'] = assignedApplications.filter(app => {
+    req.session.data['v6-v4']['assigned-applications'] = assignedApplications.filter(app => {
       if (isPriorAuthority) {
         return !(app.ref === ref && Boolean(app.isPriorAuthority));
       }
@@ -1866,53 +1900,53 @@ router.post('/your-list', function(req, res) {
     });
   }
 
-  const afterCount = (req.session.data['assigned-applications'] || []).length;
-  req.session.data['reassigned-case-count'] = Math.max(beforeCount - afterCount, 0);
+  const afterCount = (req.session.data['v6-v4']['assigned-applications'] || []).length;
+  req.session.data['v6-v4']['reassigned-case-count'] = Math.max(beforeCount - afterCount, 0);
 
   if (req.body['reassigned']) {
-    req.session.data['reassigned'] = req.body['reassigned'];
+    req.session.data['v6-v4']['reassigned'] = req.body['reassigned'];
   }
   if (req.body['reassign-to']) {
-    req.session.data['reassign-to'] = req.body['reassign-to'];
+    req.session.data['v6-v4']['reassign-to'] = req.body['reassign-to'];
   }
 
-  req.session.data['reassign-reference'] = null;
-  req.session.data['reassign-is-prior-authority'] = null;
+  req.session.data['v6-v4']['reassign-reference'] = null;
+  req.session.data['v6-v4']['reassign-is-prior-authority'] = null;
 
   // If we came from the main v6 journey, return there with a success banner
   if (ref) {
     addHistoryEvent(req, ref, 'Application reassigned', req.body['reassign-to'] || 'Caseworker');
-    res.redirect('/v6-v3/yourlist');
+    res.redirect('/v6-v4/yourlist');
     return;
   }
 
   // Keep isolated example journey working
-  res.redirect('/v6-v3/your-list');
+  res.redirect('/v6-v4/your-list');
 });
 
 router.get('/yourlist', function(req, res) {
-  if (!req.session.data['assigned-applications']) {
-    req.session.data['assigned-applications'] = [];
+  if (!req.session.data['v6-v4']['assigned-applications']) {
+    req.session.data['v6-v4']['assigned-applications'] = [];
   }
   ensureRedeterminationRequestIds(req);
 
-  const reassigned = req.session.data['reassigned'];
-  const reassignedTo = req.session.data['reassign-to'];
-  const reassignedCaseCount = Number(req.session.data['reassigned-case-count'] || 0);
-  req.session.data['reassigned'] = null;
-  req.session.data['reassign-to'] = null;
-  req.session.data['reassigned-case-count'] = null;
-  
+  const reassigned = req.session.data['v6-v4']['reassigned'];
+  const reassignedTo = req.session.data['v6-v4']['reassign-to'];
+  const reassignedCaseCount = Number(req.session.data['v6-v4']['reassigned-case-count'] || 0);
+  req.session.data['v6-v4']['reassigned'] = null;
+  req.session.data['v6-v4']['reassign-to'] = null;
+  req.session.data['v6-v4']['reassigned-case-count'] = null;
+
   // Restore any stored decisions from decision-store
-  if (req.session.data['decision-store']) {
-    req.session.data['assigned-applications'].forEach(app => {
-      restoreDecisionData(app, req.session.data['decision-store']);
+  if (req.session.data['v6-v4']['decision-store']) {
+    req.session.data['v6-v4']['assigned-applications'].forEach(app => {
+      restoreDecisionData(app, req.session.data['v6-v4']['decision-store']);
     });
   }
 
-  const applications = groupAssignedRedeterminations(req, req.session.data['assigned-applications']);
-  
-  res.render('v6-v3/my-applications.html', { 
+  const applications = groupAssignedRedeterminations(req, req.session.data['v6-v4']['assigned-applications']);
+
+  res.render('v6-v4/my-applications.html', {
     pageTitle: 'Your list',
     applications: applications,
     reassigned: reassigned,
@@ -1922,10 +1956,10 @@ router.get('/yourlist', function(req, res) {
 });
 
 router.get('/add-application/:reference', function(req, res) {
-  if (!req.session.data['assigned-applications']) {
-    req.session.data['assigned-applications'] = [];
+  if (!req.session.data['v6-v4']['assigned-applications']) {
+    req.session.data['v6-v4']['assigned-applications'] = [];
   }
-  
+
   const ref = req.params.reference;
   const isPriorAuthorityRequested = req.query.isPriorAuthority === 'true';
   const hasPriorAuthorityParam = typeof req.query.isPriorAuthority !== 'undefined';
@@ -1934,35 +1968,35 @@ router.get('/add-application/:reference', function(req, res) {
   const assignedCaseworker = caseworkers[Math.floor(Math.random() * caseworkers.length)];
 
   // Regenerate open applications to ensure we have current data
-  if (!req.session.data['open-applications']) {
-    req.session.data['open-applications'] = req.session.data['open-applications-all'] || [];
+  if (!req.session.data['v6-v4']['open-applications']) {
+    req.session.data['v6-v4']['open-applications'] = req.session.data['v6-v4']['open-applications-all'] || [];
   }
 
-  if (!req.session.data['open-applications-all']) {
-    req.session.data['open-applications-all'] = [];
+  if (!req.session.data['v6-v4']['open-applications-all']) {
+    req.session.data['v6-v4']['open-applications-all'] = [];
   }
   ensureRedeterminationRequestIds(req);
 
   // Get the full application data from open applications, matching requested variant when provided.
   let openApp = null;
-  if (req.session.data['open-applications']) {
+  if (req.session.data['v6-v4']['open-applications']) {
     if (hasRedeterminationParam) {
       const requestedOrder = Number(req.query.redeterminationIndex);
-      openApp = req.session.data['open-applications'].find(app => app.ref === ref
+      openApp = req.session.data['v6-v4']['open-applications'].find(app => app.ref === ref
         && Boolean(app.isRedetermination) === isRedeterminationRequested
         && (!isRedeterminationRequested || app.redeterminationOrder === requestedOrder)) || null;
     } else if (hasPriorAuthorityParam) {
-      openApp = req.session.data['open-applications'].find(app => app.ref === ref && app.isPriorAuthority === isPriorAuthorityRequested) || null;
+      openApp = req.session.data['v6-v4']['open-applications'].find(app => app.ref === ref && app.isPriorAuthority === isPriorAuthorityRequested) || null;
     }
     if (!openApp && !hasRedeterminationParam) {
-      openApp = req.session.data['open-applications'].find(app => app.ref === ref) || null;
+      openApp = req.session.data['v6-v4']['open-applications'].find(app => app.ref === ref) || null;
     }
   }
 
-  const linkedGroupRows = req.session.data['linked-cases-by-reference-v3'] && req.session.data['linked-cases-by-reference-v3'][ref]
-    ? req.session.data['linked-cases-by-reference-v3'][ref]
+  const linkedGroupRows = req.session.data['v6-v4']['linked-cases-by-reference-v4'] && req.session.data['v6-v4']['linked-cases-by-reference-v4'][ref]
+    ? req.session.data['v6-v4']['linked-cases-by-reference-v4'][ref]
     : [];
-  const targetRefs = openApp && openApp.isRedetermination
+  const targetRefs = openApp && (openApp.isRedetermination || openApp.comparisonExampleType)
     ? [ref]
     : openApp && openApp.isStandaloneLinkedCase
     ? [ref]
@@ -1985,7 +2019,7 @@ router.get('/add-application/:reference', function(req, res) {
 
   function isAlreadyAssigned(targetRef, application) {
     const targetApplication = application ? { ...application, ref: targetRef } : { ref: targetRef };
-    return req.session.data['assigned-applications'].some(app => applicationVariantKey(app) === applicationVariantKey(targetApplication));
+    return req.session.data['v6-v4']['assigned-applications'].some(app => applicationVariantKey(app) === applicationVariantKey(targetApplication));
   }
 
   function buildAssignedApp(targetRef, sourceApplication) {
@@ -2000,6 +2034,7 @@ router.get('/add-application/:reference', function(req, res) {
       : (linkedRow ? linkedRow.lastName : 'Unknown');
 
     return {
+      ...(isPrimaryRef && sourceApplication ? sourceApplication : {}),
       ref: targetRef,
       reference: targetRef,
       firstName: firstName,
@@ -2020,6 +2055,7 @@ router.get('/add-application/:reference', function(req, res) {
       redeterminationClientRole: isPrimaryRef && sourceApplication ? sourceApplication.redeterminationClientRole : null,
       redeterminationJustification: isPrimaryRef && sourceApplication ? sourceApplication.redeterminationJustification : null,
       groupedRedeterminationFlow: isPrimaryRef && sourceApplication ? Boolean(sourceApplication.groupedRedeterminationFlow) : false,
+      comparisonExampleType: isPrimaryRef && sourceApplication ? sourceApplication.comparisonExampleType : undefined,
       linkedCaseGroupId: sourceApplication && sourceApplication.linkedCaseGroupId ? sourceApplication.linkedCaseGroupId : null,
       caseworker: assignedCaseworker,
       addedDate: addedDate,
@@ -2028,7 +2064,7 @@ router.get('/add-application/:reference', function(req, res) {
   }
 
   const applicationsToAssign = openApp && openApp.isRedetermination
-    ? req.session.data['open-applications'].filter(application => application.ref === ref && application.isRedetermination)
+    ? req.session.data['v6-v4']['open-applications'].filter(application => application.ref === ref && application.isRedetermination)
       .map(application => ({ reference: ref, application }))
     : targetRefs.map(targetRef => ({ reference: targetRef, application: targetRef === ref ? openApp : null }));
 
@@ -2040,8 +2076,8 @@ router.get('/add-application/:reference', function(req, res) {
 
     const assignedApp = buildAssignedApp(targetRef, targetApplication);
 
-    if (req.session.data['decision-store'] && req.session.data['decision-store'][targetRef]) {
-      const stored = req.session.data['decision-store'][targetRef];
+    if (req.session.data['v6-v4']['decision-store'] && req.session.data['v6-v4']['decision-store'][targetRef]) {
+      const stored = req.session.data['v6-v4']['decision-store'][targetRef];
       assignedApp.status = stored.status;
       assignedApp.decisionDate = stored.decisionDate;
       assignedApp.decisionType = stored.decisionType;
@@ -2049,11 +2085,11 @@ router.get('/add-application/:reference', function(req, res) {
       if (stored.refusalReason) assignedApp.refusalReason = stored.refusalReason;
     }
 
-    req.session.data['assigned-applications'].push(assignedApp);
+    req.session.data['v6-v4']['assigned-applications'].push(assignedApp);
     if (!addedRefs.includes(targetRef)) addedRefs.push(targetRef);
   });
 
-  req.session.data['open-applications-all'] = req.session.data['open-applications-all'].filter(app => {
+  req.session.data['v6-v4']['open-applications-all'] = req.session.data['v6-v4']['open-applications-all'].filter(app => {
     if (app.ref !== ref) return true;
     if (hasRedeterminationParam) {
       if (Boolean(app.isRedetermination) !== isRedeterminationRequested) return true;
@@ -2064,7 +2100,7 @@ router.get('/add-application/:reference', function(req, res) {
     return false;
   });
 
-  const remainingOpenApplications = req.session.data['open-applications-all'];
+  const remainingOpenApplications = req.session.data['v6-v4']['open-applications-all'];
   const initialCount = remainingOpenApplications.filter(app => !app.isPriorAuthority).length;
   const priorCount = remainingOpenApplications.filter(app => app.isPriorAuthority).length;
   const preferredReplacementType = initialCount > priorCount
@@ -2074,44 +2110,43 @@ router.get('/add-application/:reference', function(req, res) {
       : (Math.random() > 0.5 ? 'initial' : 'prior');
 
   const existingVariantKeys = new Set();
-  (req.session.data['open-applications-all'] || []).forEach(app => {
+  (req.session.data['v6-v4']['open-applications-all'] || []).forEach(app => {
     existingVariantKeys.add(applicationVariantKey(app));
   });
-  (req.session.data['assigned-applications'] || []).forEach(app => {
+  (req.session.data['v6-v4']['assigned-applications'] || []).forEach(app => {
     existingVariantKeys.add(applicationVariantKey(app));
   });
 
-  const replacementScenarioIndex = req.session.data['demo-replacement-scenario-index'] || 0;
+  const replacementScenarioIndex = req.session.data['v6-v4']['demo-replacement-scenario-index'] || 0;
   const replacementScenario = DEMO_REPLACEMENT_SCENARIOS[
     replacementScenarioIndex % DEMO_REPLACEMENT_SCENARIOS.length
   ];
-  req.session.data['demo-replacement-scenario-index'] = replacementScenarioIndex + 1;
-  const refillData = generateReplacementOpenApplication(preferredReplacementType, existingVariantKeys, replacementScenario);
-  req.session.data['open-applications-all'].push(refillData.replacement);
-  const refreshedLinkedCases = assignLinkedCaseMetadata(req.session.data['open-applications-all']);
-  req.session.data['linked-cases-by-reference-v3'] = {
-    ...(req.session.data['linked-cases-by-reference-v3'] || {}),
+  req.session.data['v6-v4']['demo-replacement-scenario-index'] = replacementScenarioIndex + 1;
+  const refillData = { completed: [] };
+  const refreshedLinkedCases = assignLinkedCaseMetadata(req.session.data['v6-v4']['open-applications-all']);
+  req.session.data['v6-v4']['linked-cases-by-reference-v4'] = {
+    ...(req.session.data['v6-v4']['linked-cases-by-reference-v4'] || {}),
     ...refreshedLinkedCases
   };
 
-  if (!req.session.data['completed-applications']) {
-    req.session.data['completed-applications'] = [];
+  if (!req.session.data['v6-v4']['completed-applications']) {
+    req.session.data['v6-v4']['completed-applications'] = [];
   }
 
   refillData.completed.forEach(app => {
     app._mockGenerated = true;
-    req.session.data['completed-applications'].push(app);
+    req.session.data['v6-v4']['completed-applications'].push(app);
   });
 
   // Log assignment to caseworker history when they add it to their list
-  if (!req.session.data['app-history']) {
-    req.session.data['app-history'] = {};
+  if (!req.session.data['v6-v4']['app-history']) {
+    req.session.data['v6-v4']['app-history'] = {};
   }
-  if (!req.session.data['app-history'][ref]) {
-    req.session.data['app-history'][ref] = [];
+  if (!req.session.data['v6-v4']['app-history'][ref]) {
+    req.session.data['v6-v4']['app-history'][ref] = [];
   }
 
-  const openAppForHistory = req.session.data['open-applications'] ? req.session.data['open-applications'].find(app => app.ref === ref) : null;
+  const openAppForHistory = req.session.data['v6-v4']['open-applications'] ? req.session.data['v6-v4']['open-applications'].find(app => app.ref === ref) : null;
   let datetime;
 
   if (openAppForHistory) {
@@ -2131,7 +2166,7 @@ router.get('/add-application/:reference', function(req, res) {
     });
   }
 
-  req.session.data['app-history'][ref].push({
+  req.session.data['v6-v4']['app-history'][ref].push({
     timestamp: datetime,
     action: openApp && openApp.isRedetermination ? 'Redetermination assigned to your list' : 'Application assigned to ' + assignedCaseworker,
     caseworker: assignedCaseworker,
@@ -2141,7 +2176,7 @@ router.get('/add-application/:reference', function(req, res) {
     recordApplicationReceived(req, openAppForHistory);
     recordRedeterminationSubmitted(req, openAppForHistory);
   }
-  
+
   // Check if AJAX request (from fetch)
   if (req.headers['x-requested-with'] === 'XMLHttpRequest' || req.xhr) {
     res.status(200).json({
@@ -2151,30 +2186,30 @@ router.get('/add-application/:reference', function(req, res) {
       linkedAddedCount: Math.max(0, addedRefs.length - 1)
     });
   } else {
-    res.redirect('/v6-v3/open-applications');
+    res.redirect('/v6-v4/open-applications');
   }
 });
 
 router.get('/remove-application/:reference', function(req, res) {
   const ref = req.params.reference;
-  const removedApplication = (req.session.data['assigned-applications'] || []).find(app => app.ref === ref);
-  if (req.session.data['assigned-applications']) {
-    req.session.data['assigned-applications'] = req.session.data['assigned-applications'].filter(app => app.ref !== ref);
+  const removedApplication = (req.session.data['v6-v4']['assigned-applications'] || []).find(app => app.ref === ref);
+  if (req.session.data['v6-v4']['assigned-applications']) {
+    req.session.data['v6-v4']['assigned-applications'] = req.session.data['v6-v4']['assigned-applications'].filter(app => app.ref !== ref);
   }
   if (removedApplication) {
     addHistoryEvent(req, ref, removedApplication.isRedetermination ? 'Redetermination removed from your list' : 'Application removed from your list', removedApplication.caseworker || 'Caseworker');
   }
-  
-  res.redirect('/v6-v3/yourlist');
+
+  res.redirect('/v6-v4/yourlist');
 });
 
 router.get('/manage-linked-cases/:reference', function(req, res) {
   const reference = req.params.reference;
-  const linkedCasesByReference = req.session.data['linked-cases-by-reference-v3'] || {};
+  const linkedCasesByReference = req.session.data['v6-v4']['linked-cases-by-reference-v4'] || {};
   const linkedCases = linkedCasesByReference[reference] || [];
   const applications = [
-    ...(req.session.data['open-applications-all'] || []),
-    ...(req.session.data['assigned-applications'] || [])
+    ...(req.session.data['v6-v4']['open-applications-all'] || []),
+    ...(req.session.data['v6-v4']['assigned-applications'] || [])
   ];
   const caseRows = linkedCases.map(linkedCase => {
     const application = applications.find(item => item.ref === linkedCase.reference);
@@ -2186,7 +2221,7 @@ router.get('/manage-linked-cases/:reference', function(req, res) {
       firm: application && application.firm ? application.firm : 'Not available'
     };
   });
-  const candidates = (req.session.data['open-applications-all'] || [])
+  const candidates = (req.session.data['v6-v4']['open-applications-all'] || [])
     .filter(application => application.isStandaloneLinkedCase && !application.isPriorAuthority)
     .map(application => ({
       reference: application.ref,
@@ -2195,7 +2230,7 @@ router.get('/manage-linked-cases/:reference', function(req, res) {
       submitted: application.submitted
     }));
 
-  res.render('v6-v3/manage-linked-cases.njk', {
+  res.render('v6-v4/manage-linked-cases.njk', {
     pageTitle: 'Manage linked cases',
     reference: reference,
     leadCase: caseRows.find(linkedCase => linkedCase.role === 'Lead'),
@@ -2208,21 +2243,21 @@ router.get('/manage-linked-cases/:reference', function(req, res) {
 router.get('/manage-linked-cases/:reference/unlink/:caseReference', function(req, res) {
   const reference = req.params.reference;
   const caseReference = req.params.caseReference;
-  const linkedCasesByReference = req.session.data['linked-cases-by-reference-v3'] || {};
+  const linkedCasesByReference = req.session.data['v6-v4']['linked-cases-by-reference-v4'] || {};
   const linkedCases = linkedCasesByReference[reference] || [];
   const applications = [
-    ...(req.session.data['open-applications-all'] || []),
-    ...(req.session.data['assigned-applications'] || [])
+    ...(req.session.data['v6-v4']['open-applications-all'] || []),
+    ...(req.session.data['v6-v4']['assigned-applications'] || [])
   ];
   const linkedCase = linkedCases.find(item => item.reference === caseReference && item.role !== 'Lead');
 
   if (!linkedCase) {
-    res.redirect('/v6-v3/manage-linked-cases/' + encodeURIComponent(reference));
+    res.redirect('/v6-v4/manage-linked-cases/' + encodeURIComponent(reference));
     return;
   }
 
   const application = applications.find(item => item.ref === caseReference);
-  res.render('v6-v3/unlink-case.njk', {
+  res.render('v6-v4/unlink-case.njk', {
     pageTitle: 'Unlink case',
     reference: reference,
     linkedCase: {
@@ -2237,7 +2272,7 @@ router.get('/manage-linked-cases/:reference/unlink/:caseReference', function(req
 router.post('/manage-linked-cases/:reference/unlink/:caseReference', function(req, res) {
   const reference = req.params.reference;
   const caseReference = req.params.caseReference;
-  const linkedCasesByReference = req.session.data['linked-cases-by-reference-v3'] || {};
+  const linkedCasesByReference = req.session.data['v6-v4']['linked-cases-by-reference-v4'] || {};
   const linkedCases = linkedCasesByReference[reference] || [];
   const remainingCases = linkedCases.filter(item => item.reference !== caseReference);
 
@@ -2246,23 +2281,23 @@ router.post('/manage-linked-cases/:reference/unlink/:caseReference', function(re
       linkedCasesByReference[item.reference] = remainingCases;
     });
     delete linkedCasesByReference[caseReference];
-    req.session.data['linked-cases-by-reference-v3'] = linkedCasesByReference;
+    req.session.data['v6-v4']['linked-cases-by-reference-v4'] = linkedCasesByReference;
     addHistoryEvent(req, reference, 'Linked case removed', 'Caseworker', 'Removed linked case ' + caseReference);
   }
 
-  res.redirect('/v6-v3/manage-linked-cases/' + encodeURIComponent(reference));
+  res.redirect('/v6-v4/manage-linked-cases/' + encodeURIComponent(reference));
 });
 
 router.post('/manage-linked-cases/:reference', function(req, res) {
   const reference = req.params.reference;
   const newLinkedReference = req.body['new-linked-reference'];
-  const linkedCasesByReference = req.session.data['linked-cases-by-reference-v3'] || {};
+  const linkedCasesByReference = req.session.data['v6-v4']['linked-cases-by-reference-v4'] || {};
   const linkedCases = linkedCasesByReference[reference] || [];
-  const newLinkedApplication = (req.session.data['open-applications-all'] || [])
+  const newLinkedApplication = (req.session.data['v6-v4']['open-applications-all'] || [])
     .find(application => application.ref === newLinkedReference && application.isStandaloneLinkedCase && !application.isPriorAuthority);
 
   if (!newLinkedApplication || linkedCases.length === 0) {
-    res.redirect('/v6-v3/manage-linked-cases/' + encodeURIComponent(reference));
+    res.redirect('/v6-v4/manage-linked-cases/' + encodeURIComponent(reference));
     return;
   }
 
@@ -2282,11 +2317,11 @@ router.post('/manage-linked-cases/:reference', function(req, res) {
   linkedCases.forEach(linkedCase => {
     linkedCasesByReference[linkedCase.reference] = linkedCases;
   });
-  req.session.data['linked-cases-by-reference-v3'] = linkedCasesByReference;
+  req.session.data['v6-v4']['linked-cases-by-reference-v4'] = linkedCasesByReference;
   addHistoryEvent(req, reference, 'Linked case added', 'Caseworker', 'Added linked case ' + newLinkedReference);
 
   const leadCase = linkedCases.find(linkedCase => linkedCase.role === 'Lead');
-  const leadApplication = (req.session.data['assigned-applications'] || [])
+  const leadApplication = (req.session.data['v6-v4']['assigned-applications'] || [])
     .find(application => application.ref === (leadCase && leadCase.reference));
   const assignedDate = new Date().toLocaleDateString('en-GB', {
     day: '2-digit',
@@ -2294,11 +2329,11 @@ router.post('/manage-linked-cases/:reference', function(req, res) {
     year: 'numeric'
   });
 
-  if (!req.session.data['assigned-applications']) {
-    req.session.data['assigned-applications'] = [];
+  if (!req.session.data['v6-v4']['assigned-applications']) {
+    req.session.data['v6-v4']['assigned-applications'] = [];
   }
-  if (!req.session.data['assigned-applications'].some(application => application.ref === newLinkedReference)) {
-    req.session.data['assigned-applications'].push({
+  if (!req.session.data['v6-v4']['assigned-applications'].some(application => application.ref === newLinkedReference)) {
+    req.session.data['v6-v4']['assigned-applications'].push({
       ...newLinkedApplication,
       linkedCaseGroupId: leadApplication && leadApplication.linkedCaseGroupId,
       linkedCaseRole: 'New link',
@@ -2309,75 +2344,75 @@ router.post('/manage-linked-cases/:reference', function(req, res) {
     });
   }
 
-  req.session.data['open-applications-all'] = req.session.data['open-applications-all']
+  req.session.data['v6-v4']['open-applications-all'] = req.session.data['v6-v4']['open-applications-all']
     .filter(application => application.ref !== newLinkedReference);
-  req.session.data['open-applications'] = (req.session.data['open-applications'] || [])
+  req.session.data['v6-v4']['open-applications'] = (req.session.data['v6-v4']['open-applications'] || [])
     .filter(application => application.ref !== newLinkedReference);
 
-  res.redirect('/v6-v3/application/' + encodeURIComponent(reference));
+  res.redirect('/v6-v4/application/' + encodeURIComponent(reference));
 });
 
 router.get('/application/:reference/history', function(req, res) {
   const ref = req.params.reference;
-  
+
   // Ensure seeded applications and history are always available
-  if (!req.session.data['completed-applications']) {
-    req.session.data['completed-applications'] = [];
+  if (!req.session.data['v6-v4']['completed-applications']) {
+    req.session.data['v6-v4']['completed-applications'] = [];
   }
   const seededRefsHistory = [...new Set(SEEDED_APPLICATIONS.map(a => a.ref))];
-  req.session.data['completed-applications'] = req.session.data['completed-applications'].filter(a => !seededRefsHistory.includes(a.ref));
+  req.session.data['v6-v4']['completed-applications'] = req.session.data['v6-v4']['completed-applications'].filter(a => !seededRefsHistory.includes(a.ref));
   SEEDED_APPLICATIONS.forEach(seeded => {
-    req.session.data['completed-applications'].push(seeded);
+    req.session.data['v6-v4']['completed-applications'].push(seeded);
   });
 
   // Always ensure seeded history is available
-  if (!req.session.data['app-history']) {
-    req.session.data['app-history'] = {};
+  if (!req.session.data['v6-v4']['app-history']) {
+    req.session.data['v6-v4']['app-history'] = {};
   }
 
   // Only initialize seeded history if not already set (preserve user-added notes)
   Object.keys(SEEDED_HISTORY).forEach(r => {
-    if (!req.session.data['app-history'][r]) {
-      req.session.data['app-history'][r] = SEEDED_HISTORY[r];
+    if (!req.session.data['v6-v4']['app-history'][r]) {
+      req.session.data['v6-v4']['app-history'][r] = SEEDED_HISTORY[r];
     }
   });
-  if (!req.session.data['app-history'][ref] || req.session.data['app-history'][ref].length === 0 ||
-      (req.session.data['app-history'][ref].length > 0 && !req.session.data['app-history'][ref][0].action)) {
-    
-    req.session.data['app-history'][ref] = [];
-    
+  if (!req.session.data['v6-v4']['app-history'][ref] || req.session.data['v6-v4']['app-history'][ref].length === 0 ||
+      (req.session.data['v6-v4']['app-history'][ref].length > 0 && !req.session.data['v6-v4']['app-history'][ref][0].action)) {
+
+    req.session.data['v6-v4']['app-history'][ref] = [];
+
     // Add initial application received entry
     let submittedDate = 'N/A';
-    
-    if (req.session.data['open-applications']) {
-      const openApp = req.session.data['open-applications'].find(app => app.ref === ref);
+
+    if (req.session.data['v6-v4']['open-applications']) {
+      const openApp = req.session.data['v6-v4']['open-applications'].find(app => app.ref === ref);
       if (openApp && openApp.submitted) {
         submittedDate = openApp.submitted;
       }
     }
-    
+
     if (submittedDate === 'N/A') {
       const now = new Date();
       submittedDate = now.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
     }
-    
+
     const randomHour = Math.floor(Math.random() * 24);
     const randomMin = Math.floor(Math.random() * 60);
     const timeStr = String(randomHour).padStart(2, '0') + ':' + String(randomMin).padStart(2, '0');
     const datetime = submittedDate + ' ' + timeStr;
-    
-    req.session.data['app-history'][ref].push({
+
+    req.session.data['v6-v4']['app-history'][ref].push({
       timestamp: datetime,
       action: 'Initial application received',
       caseworker: 'N/A',
       details: null
     });
   }
-  
-  const assignedApp = req.session.data['assigned-applications'] ? req.session.data['assigned-applications'].find(app => app.ref === ref) : null;
-  const history = req.session.data['app-history'][ref] || [];
-  
-  res.render('v6-v3/application-history-modern.html', {
+
+  const assignedApp = req.session.data['v6-v4']['assigned-applications'] ? req.session.data['v6-v4']['assigned-applications'].find(app => app.ref === ref) : null;
+  const history = req.session.data['v6-v4']['app-history'][ref] || [];
+
+  res.render('v6-v4/application-history-modern.html', {
     reference: ref,
     assignedCaseworker: assignedApp ? assignedApp.caseworker : 'Unassigned',
     history: history
@@ -2388,41 +2423,41 @@ router.post('/application/:reference/add-note', function(req, res) {
   const ref = req.params.reference;
   const note = req.body.historyNote; // Form field is named "historyNote"
   const caseworkerName = 'Caseworker'; // In real scenario, get from session/auth
-  
-  if (!req.session.data['app-history']) {
-    req.session.data['app-history'] = {};
+
+  if (!req.session.data['v6-v4']['app-history']) {
+    req.session.data['v6-v4']['app-history'] = {};
   }
-  if (!req.session.data['app-history'][ref]) {
-    req.session.data['app-history'][ref] = [];
+  if (!req.session.data['v6-v4']['app-history'][ref]) {
+    req.session.data['v6-v4']['app-history'][ref] = [];
   }
-  
+
   const now = new Date();
-  const timestamp = now.toLocaleDateString('en-GB', { 
-    day: '2-digit', 
-    month: 'short', 
+  const timestamp = now.toLocaleDateString('en-GB', {
+    day: '2-digit',
+    month: 'short',
     year: 'numeric'
-  }) + ' ' + now.toLocaleTimeString('en-GB', { 
-    hour: '2-digit', 
+  }) + ' ' + now.toLocaleTimeString('en-GB', {
+    hour: '2-digit',
     minute: '2-digit'
   });
-  
+
   // Add note using new versioned event structure (append to end maintains version indices)
-  req.session.data['app-history'][ref].push({
+  req.session.data['v6-v4']['app-history'][ref].push({
     timestamp: timestamp,
     action: 'Note Added',
     caseworker: caseworkerName,
     type: 'note',
     details: note
   });
-  
+
   // Set toast message for success notification
-  req.session.data.toast = {
+  req.session.data['v6-v4'].toast = {
     show: true,
     message: 'Your notes have been successfully added',
     type: 'success'
   };
-  
-  res.redirect('/v6-v3/application/' + ref + '#application-history');
+
+  res.redirect('/v6-v4/application/' + ref + '#application-history');
 });
 
 router.get('/search', function(req, res) {
@@ -2430,63 +2465,63 @@ router.get('/search', function(req, res) {
   let results = [];
 
   // Always ensure seeded applications are in completed-applications
-  if (!req.session.data['completed-applications']) {
-    req.session.data['completed-applications'] = [];
+  if (!req.session.data['v6-v4']['completed-applications']) {
+    req.session.data['v6-v4']['completed-applications'] = [];
   }
   // Remove stale seeded entries and re-inject fresh ones
   const seededRefs = [...new Set(SEEDED_APPLICATIONS.map(a => a.ref))];
-  req.session.data['completed-applications'] = req.session.data['completed-applications'].filter(a => !seededRefs.includes(a.ref));
+  req.session.data['v6-v4']['completed-applications'] = req.session.data['v6-v4']['completed-applications'].filter(a => !seededRefs.includes(a.ref));
   SEEDED_APPLICATIONS.forEach(seeded => {
-    req.session.data['completed-applications'].push(seeded);
+    req.session.data['v6-v4']['completed-applications'].push(seeded);
   });
 
   // Always ensure seeded history is available (but don't overwrite existing)
-  if (!req.session.data['app-history']) {
-    req.session.data['app-history'] = {};
+  if (!req.session.data['v6-v4']['app-history']) {
+    req.session.data['v6-v4']['app-history'] = {};
   }
   Object.keys(SEEDED_HISTORY).forEach(ref => {
     // Only initialize if not already set (preserves added notes)
-    if (!req.session.data['app-history'][ref]) {
-      req.session.data['app-history'][ref] = SEEDED_HISTORY[ref];
+    if (!req.session.data['v6-v4']['app-history'][ref]) {
+      req.session.data['v6-v4']['app-history'][ref] = SEEDED_HISTORY[ref];
     }
   });
-  
+
   if (showResults) {
     // Create a map to track unique references (prefer assigned-applications, then completed, then open).
     // Pending redetermination requests are excluded here: they must never mask the
     // status of the initial application that shares the same reference. Decided
     // redeterminations are surfaced separately via redetermination-decision-store below.
     const uniqueApps = {};
-    if (req.session.data['assigned-applications']) {
-      req.session.data['assigned-applications'].forEach(app => {
+    if (req.session.data['v6-v4']['assigned-applications']) {
+      req.session.data['v6-v4']['assigned-applications'].forEach(app => {
         if (app.isRedetermination) return;
         uniqueApps[app.ref] = app;
       });
     }
-    if (req.session.data['completed-applications']) {
-      req.session.data['completed-applications'].forEach(app => {
+    if (req.session.data['v6-v4']['completed-applications']) {
+      req.session.data['v6-v4']['completed-applications'].forEach(app => {
         if (app.isRedetermination) return;
         if (!uniqueApps[app.ref]) {
           uniqueApps[app.ref] = app;
         }
       });
     }
-    if (req.session.data['open-applications']) {
-      req.session.data['open-applications'].forEach(app => {
+    if (req.session.data['v6-v4']['open-applications']) {
+      req.session.data['v6-v4']['open-applications'].forEach(app => {
         if (app.isRedetermination) return;
         if (!uniqueApps[app.ref]) {
           uniqueApps[app.ref] = app;
         }
       });
     }
-    
+
     // Restore any stored decisions from decision-store
-    if (req.session.data['decision-store']) {
+    if (req.session.data['v6-v4']['decision-store']) {
       Object.values(uniqueApps).forEach(app => {
-        restoreDecisionData(app, req.session.data['decision-store']);
+        restoreDecisionData(app, req.session.data['v6-v4']['decision-store']);
       });
     }
-    
+
     // Filter applications based on search criteria
     results = Object.values(uniqueApps).filter(app => {
       let match = true;
@@ -2498,7 +2533,7 @@ router.get('/search', function(req, res) {
       // Determine outcome based on decision status
       let outcome = 'In progress';
       let outcomeClass = 'light-blue';
-      
+
       if (app.status === 'Granted') {
         outcome = 'Granted';
         outcomeClass = 'green';
@@ -2509,7 +2544,7 @@ router.get('/search', function(req, res) {
         outcome = 'Under Review';
         outcomeClass = 'yellow';
       }
-      
+
       return {
         ref: app.ref,
         firstName: app.firstName,
@@ -2525,7 +2560,7 @@ router.get('/search', function(req, res) {
 
     // Redetermination decisions are stored separately so they remain searchable
     // with their own status even when a same-reference application already exists.
-    const redeterminationStore = req.session.data['redetermination-decision-store'] || {};
+    const redeterminationStore = req.session.data['v6-v4']['redetermination-decision-store'] || {};
     const referencesWithInitialRow = new Set(results.map(row => row.ref));
     const referencesWithRedeterminationRow = new Set();
     Object.values(redeterminationStore).filter(entry => {
@@ -2583,8 +2618,8 @@ router.get('/search', function(req, res) {
       });
     });
   }
-  
-  res.render('v6-v3/search.njk', {
+
+  res.render('v6-v4/search.njk', {
     pageTitle: 'Search for a case',
     showResults: showResults,
     results: results,
@@ -2594,14 +2629,14 @@ router.get('/search', function(req, res) {
 });
 
 router.get('/application-details', function(req, res) {
-  const reference = req.query.reference || req.query.ref || req.session.data['decision-reference'] || 'L-12Z-13P';
-  res.redirect('/v6-v3/application/' + encodeURIComponent(reference));
+  const reference = req.query.reference || req.query.ref || req.session.data['v6-v4']['decision-reference'] || 'L-12Z-13P';
+  res.redirect('/v6-v4/application/' + encodeURIComponent(reference));
 });
 
 router.use('/application/:reference/redeterminations', function(req, res, next) {
   const requests = getRedeterminationsForReference(req, req.params.reference);
   if (!requests.some(request => request.groupedRedeterminationFlow) || !hasGrantedInitialApplication(req, req.params.reference)) {
-    res.redirect('/v6-v3/application/' + encodeURIComponent(req.params.reference));
+    res.redirect('/v6-v4/application/' + encodeURIComponent(req.params.reference));
     return;
   }
   res.locals.groupedRequests = requests;
@@ -2612,19 +2647,19 @@ router.get('/application/:reference/redeterminations/decision', function(req, re
   const reference = req.params.reference;
   const requests = res.locals.groupedRequests.filter(request => !['Granted', 'Refused'].includes(request.status));
   if (!requests.length) {
-    res.redirect('/v6-v3/application/' + encodeURIComponent(reference) + '?isRedetermination=true');
+    res.redirect('/v6-v4/application/' + encodeURIComponent(reference) + '?isRedetermination=true');
     return;
   }
-  const draft = req.session.data['grouped-redetermination-drafts']?.[reference] || {};
+  const draft = req.session.data['v6-v4']['grouped-redetermination-drafts']?.[reference] || {};
   const requestsWithAnswers = requests.map(request => ({ ...request, answer: draft.decisions?.find(answer => answer.index === request.index) || {}, editingDetails: req.query.edit === String(request.index) }));
-  res.render('v6-v3/grouped-redetermination-decision.njk', { reference, requests: requestsWithAnswers, draft });
+  res.render('v6-v4/grouped-redetermination-decision.njk', { reference, requests: requestsWithAnswers, draft });
 });
 
 router.post('/application/:reference/redeterminations/decision', function(req, res) {
   const reference = req.params.reference;
   const requests = res.locals.groupedRequests.filter(request => !['Granted', 'Refused'].includes(request.status));
   if (!requests.length) {
-    res.redirect('/v6-v3/application/' + encodeURIComponent(reference) + '?isRedetermination=true');
+    res.redirect('/v6-v4/application/' + encodeURIComponent(reference) + '?isRedetermination=true');
     return;
   }
   const errors = [];
@@ -2633,7 +2668,7 @@ router.post('/application/:reference/redeterminations/decision', function(req, r
   const decisions = proceedingMode === 'new' ? [] : requests.map(request => {
     const decision = req.body['decision-' + request.index];
     const refusalReason = req.body['refusal-' + request.index];
-    const previousAnswer = req.session.data['grouped-redetermination-drafts']?.[reference]?.decisions?.find(answer => answer.index === request.index);
+    const previousAnswer = req.session.data['v6-v4']['grouped-redetermination-drafts']?.[reference]?.decisions?.find(answer => answer.index === request.index);
     const proceedingName = (req.body['proceeding-' + request.index] ?? previousAnswer?.proceedingName ?? request.redeterminationProceeding).trim();
     const clientRole = (req.body['role-' + request.index] ?? previousAnswer?.clientRole ?? request.redeterminationClientRole).trim();
     if (!proceedingName || !clientRole) errors.push({ text: 'Enter the proceeding and client role', href: '#request-heading-' + request.index });
@@ -2657,32 +2692,32 @@ router.post('/application/:reference/redeterminations/decision', function(req, r
   })) : [];
   if (replaceProceedings && (!additions.length || additions.some(item => Object.values(item).some(value => !value)))) errors.push({ text: 'Complete all fields for each new proceeding', href: '#additional-proceedings' });
   const draft = { decisions, explanation, proceedingMode, additions, errors };
-  req.session.data['grouped-redetermination-drafts'] = req.session.data['grouped-redetermination-drafts'] || {};
-  req.session.data['grouped-redetermination-drafts'][reference] = draft;
-  res.redirect('/v6-v3/application/' + encodeURIComponent(reference) + '/redeterminations/' + (errors.length ? 'decision' : 'check-answers'));
+  req.session.data['v6-v4']['grouped-redetermination-drafts'] = req.session.data['v6-v4']['grouped-redetermination-drafts'] || {};
+  req.session.data['v6-v4']['grouped-redetermination-drafts'][reference] = draft;
+  res.redirect('/v6-v4/application/' + encodeURIComponent(reference) + '/redeterminations/' + (errors.length ? 'decision' : 'check-answers'));
 });
 
 router.get('/application/:reference/redeterminations/check-answers', function(req, res) {
   const reference = req.params.reference;
-  const draft = req.session.data['grouped-redetermination-drafts']?.[reference];
+  const draft = req.session.data['v6-v4']['grouped-redetermination-drafts']?.[reference];
   if (!draft || draft.errors.length) {
-    res.redirect('/v6-v3/application/' + encodeURIComponent(reference) + '/redeterminations/decision');
+    res.redirect('/v6-v4/application/' + encodeURIComponent(reference) + '/redeterminations/decision');
     return;
   }
   const decisions = draft.decisions.map(answer => ({ ...res.locals.groupedRequests.find(request => request.index === answer.index), ...answer }));
-  res.render('v6-v3/grouped-redetermination-check-answers.njk', { reference, draft, decisions });
+  res.render('v6-v4/grouped-redetermination-check-answers.njk', { reference, draft, decisions });
 });
 
 router.post('/application/:reference/redeterminations/check-answers', function(req, res) {
   const reference = req.params.reference;
-  const draft = req.session.data['grouped-redetermination-drafts']?.[reference];
+  const draft = req.session.data['v6-v4']['grouped-redetermination-drafts']?.[reference];
   const requests = res.locals.groupedRequests;
   const pending = requests.filter(request => !['Granted', 'Refused'].includes(request.status));
   if (!draft || draft.errors.length || !pending.length || (draft.proceedingMode !== 'new' && pending.some(request => !draft.decisions.some(answer => answer.index === request.index)))) {
-    res.redirect('/v6-v3/application/' + encodeURIComponent(reference) + '/redeterminations/decision');
+    res.redirect('/v6-v4/application/' + encodeURIComponent(reference) + '/redeterminations/decision');
     return;
   }
-  const store = req.session.data['redetermination-decision-store'] || (req.session.data['redetermination-decision-store'] = {});
+  const store = req.session.data['v6-v4']['redetermination-decision-store'] || (req.session.data['v6-v4']['redetermination-decision-store'] = {});
   if (draft.proceedingMode === 'new') {
     pending.forEach(request => {
       store[reference + '|' + request.index] = { ...request, reference, status: 'Granted', decisionType: 'Grant', replacedByNewProceedings: true, decisionReason: draft.explanation };
@@ -2709,24 +2744,24 @@ router.post('/application/:reference/redeterminations/check-answers', function(r
       status: 'Granted',
       decisionType: 'Grant'
     };
-    req.session.data['completed-applications'].push(request);
+    req.session.data['v6-v4']['completed-applications'].push(request);
     store[reference + '|' + index] = { ...request, reference, index, decisionReason: draft.explanation };
     addHistoryEvent(req, reference, addition.proceedingName + ': Granted', request.caseworker || 'Caseworker', draft.explanation);
   });
   removeResolvedRedeterminationGroupFromList(req, reference);
-  req.session.data['grouped-redetermination-completed'] = req.session.data['grouped-redetermination-completed'] || {};
-  req.session.data['grouped-redetermination-completed'][reference] = true;
-  delete req.session.data['grouped-redetermination-drafts'][reference];
+  req.session.data['v6-v4']['grouped-redetermination-completed'] = req.session.data['v6-v4']['grouped-redetermination-completed'] || {};
+  req.session.data['v6-v4']['grouped-redetermination-completed'][reference] = true;
+  delete req.session.data['v6-v4']['grouped-redetermination-drafts'][reference];
   ensureGroupedRedeterminationExamples(req);
-  res.redirect('/v6-v3/application/' + encodeURIComponent(reference) + '/redeterminations/confirmation');
+  res.redirect('/v6-v4/application/' + encodeURIComponent(reference) + '/redeterminations/confirmation');
 });
 
 router.get('/application/:reference/redeterminations/confirmation', function(req, res) {
-  if (!req.session.data['grouped-redetermination-completed']?.[req.params.reference]) {
-    res.redirect('/v6-v3/application/' + encodeURIComponent(req.params.reference) + '/redeterminations/decision');
+  if (!req.session.data['v6-v4']['grouped-redetermination-completed']?.[req.params.reference]) {
+    res.redirect('/v6-v4/application/' + encodeURIComponent(req.params.reference) + '/redeterminations/decision');
     return;
   }
-  res.render('v6-v3/grouped-redetermination-confirmation.njk', { reference: req.params.reference });
+  res.render('v6-v4/grouped-redetermination-confirmation.njk', { reference: req.params.reference });
 });
 
 router.get('/application/:reference/redetermination/:index/decision', function(req, res) {
@@ -2736,19 +2771,19 @@ router.get('/application/:reference/redetermination/:index/decision', function(r
   const redetermination = redeterminations[index];
 
   if (!hasGrantedInitialApplication(req, reference)) {
-    res.redirect('/v6-v3/application/' + encodeURIComponent(reference));
+    res.redirect('/v6-v4/application/' + encodeURIComponent(reference));
     return;
   }
 
   if (!redetermination) {
-    res.redirect('/v6-v3/application/' + encodeURIComponent(reference));
+    res.redirect('/v6-v4/application/' + encodeURIComponent(reference));
     return;
   }
 
-  const error = req.session.data['redetermination-decision-error'];
-  const storedAnswers = req.session.data['redetermination-grant-answers'];
-  delete req.session.data['redetermination-decision-error'];
-  res.render('v6-v3/redetermination-decision.njk', {
+  const error = req.session.data['v6-v4']['redetermination-decision-error'];
+  const storedAnswers = req.session.data['v6-v4']['redetermination-grant-answers'];
+  delete req.session.data['v6-v4']['redetermination-decision-error'];
+  res.render('v6-v4/redetermination-decision.njk', {
     pageTitle: 'Make a decision',
     reference: reference,
     index: index,
@@ -2763,48 +2798,48 @@ router.post('/application/:reference/redetermination/:index/decision', function(
   const decision = req.body.decision;
   const redeterminations = getRedeterminationsForReference(req, reference);
   const redetermination = redeterminations[index];
-  const detailsUrl = '/v6-v3/application/' + encodeURIComponent(reference) + '?isRedetermination=true&redeterminationIndex=' + index;
+  const detailsUrl = '/v6-v4/application/' + encodeURIComponent(reference) + '?isRedetermination=true&redeterminationIndex=' + index;
 
   if (!hasGrantedInitialApplication(req, reference)) {
-    res.redirect('/v6-v3/application/' + encodeURIComponent(reference));
+    res.redirect('/v6-v4/application/' + encodeURIComponent(reference));
     return;
   }
 
   if (!['grant', 'refuse'].includes(decision)) {
-    req.session.data['redetermination-decision-error'] = 'Select grant or refuse to continue';
-    res.redirect('/v6-v3/application/' + encodeURIComponent(reference) + '/redetermination/' + index + '/decision');
+    req.session.data['v6-v4']['redetermination-decision-error'] = 'Select grant or refuse to continue';
+    res.redirect('/v6-v4/application/' + encodeURIComponent(reference) + '/redetermination/' + index + '/decision');
     return;
   }
 
   if (!redetermination) {
-    res.redirect('/v6-v3/application/' + encodeURIComponent(reference));
+    res.redirect('/v6-v4/application/' + encodeURIComponent(reference));
     return;
   }
 
   if (decision === 'grant') {
-    delete req.session.data['redetermination-grant-answers'];
+    delete req.session.data['v6-v4']['redetermination-grant-answers'];
     addHistoryEvent(req, reference, 'Redetermination decision started', 'Caseworker');
-    res.redirect('/v6-v3/application/' + encodeURIComponent(reference) + '/redetermination/' + index + '/grant');
+    res.redirect('/v6-v4/application/' + encodeURIComponent(reference) + '/redetermination/' + index + '/grant');
     return;
   }
 
-  res.redirect('/v6-v3/application/' + encodeURIComponent(reference) + '/redetermination/' + index + '/refuse');
+  res.redirect('/v6-v4/application/' + encodeURIComponent(reference) + '/redetermination/' + index + '/refuse');
 });
 
 router.get('/application/:reference/redetermination/:index/refuse', function(req, res) {
   const reference = req.params.reference;
   const index = Number(req.params.index);
   const redetermination = getRedeterminationsForReference(req, reference)[index];
-  const answers = req.session.data['redetermination-grant-answers'] || {};
-  const errors = req.session.data['redetermination-refusal-errors'] || {};
-  delete req.session.data['redetermination-refusal-errors'];
+  const answers = req.session.data['v6-v4']['redetermination-grant-answers'] || {};
+  const errors = req.session.data['v6-v4']['redetermination-refusal-errors'] || {};
+  delete req.session.data['v6-v4']['redetermination-refusal-errors'];
 
   if (!hasGrantedInitialApplication(req, reference) || !redetermination) {
-    res.redirect('/v6-v3/application/' + encodeURIComponent(reference));
+    res.redirect('/v6-v4/application/' + encodeURIComponent(reference));
     return;
   }
 
-  res.render('v6-v3/redetermination-refuse.njk', {
+  res.render('v6-v4/redetermination-refuse.njk', {
     pageTitle: 'Make a decision',
     reference: reference,
     index: index,
@@ -2823,7 +2858,7 @@ router.post('/application/:reference/redetermination/:index/refuse', function(re
   const errors = {};
 
   if (!hasGrantedInitialApplication(req, reference) || !redetermination) {
-    res.redirect('/v6-v3/application/' + encodeURIComponent(reference));
+    res.redirect('/v6-v4/application/' + encodeURIComponent(reference));
     return;
   }
 
@@ -2835,38 +2870,38 @@ router.post('/application/:reference/redetermination/:index/refuse', function(re
   }
 
   if (Object.keys(errors).length > 0) {
-    req.session.data['redetermination-refusal-errors'] = errors;
-    req.session.data['redetermination-grant-answers'] = {
+    req.session.data['v6-v4']['redetermination-refusal-errors'] = errors;
+    req.session.data['v6-v4']['redetermination-grant-answers'] = {
       decision: 'refuse',
       refusalReason: refusalReason,
       decisionReason: decisionReason
     };
-    res.redirect('/v6-v3/application/' + encodeURIComponent(reference) + '/redetermination/' + index + '/refuse');
+    res.redirect('/v6-v4/application/' + encodeURIComponent(reference) + '/redetermination/' + index + '/refuse');
     return;
   }
 
-  req.session.data['redetermination-grant-answers'] = {
+  req.session.data['v6-v4']['redetermination-grant-answers'] = {
     decision: 'refuse',
     refusalReason: refusalReason,
     decisionReason: decisionReason
   };
-  res.redirect('/v6-v3/application/' + encodeURIComponent(reference) + '/redetermination/' + index + '/check-answers');
+  res.redirect('/v6-v4/application/' + encodeURIComponent(reference) + '/redetermination/' + index + '/check-answers');
 });
 
 router.get('/application/:reference/redetermination/:index/grant', function(req, res) {
   const reference = req.params.reference;
   const index = Number(req.params.index);
-  const error = req.session.data['redetermination-grant-error'];
-  const errorField = req.session.data['redetermination-grant-error-field'];
-  const formState = req.session.data['redetermination-grant-form'] || req.session.data['redetermination-grant-answers'] || {};
-  delete req.session.data['redetermination-grant-error'];
-  delete req.session.data['redetermination-grant-error-field'];
-  delete req.session.data['redetermination-grant-form'];
+  const error = req.session.data['v6-v4']['redetermination-grant-error'];
+  const errorField = req.session.data['v6-v4']['redetermination-grant-error-field'];
+  const formState = req.session.data['v6-v4']['redetermination-grant-form'] || req.session.data['v6-v4']['redetermination-grant-answers'] || {};
+  delete req.session.data['v6-v4']['redetermination-grant-error'];
+  delete req.session.data['v6-v4']['redetermination-grant-error-field'];
+  delete req.session.data['v6-v4']['redetermination-grant-form'];
 
   const redetermination = getRedeterminationsForReference(req, reference)[index];
 
   if (!hasGrantedInitialApplication(req, reference)) {
-    res.redirect('/v6-v3/application/' + encodeURIComponent(reference));
+    res.redirect('/v6-v4/application/' + encodeURIComponent(reference));
     return;
   }
 
@@ -2884,7 +2919,7 @@ router.get('/application/:reference/redetermination/:index/grant', function(req,
     ? 'new-proceeding'
     : formState.proceeding;
 
-  res.render('v6-v3/redetermination-grant.njk', {
+  res.render('v6-v4/redetermination-grant.njk', {
     pageTitle: selectedProceeding === 'new-proceeding' ? 'Proceeding you are granting' : 'Review details of request',
     reference: reference,
     index: index,
@@ -2926,41 +2961,41 @@ router.post('/application/:reference/redetermination/:index/grant', function(req
       errorMessage = 'Explain your decision';
       errorField = 'justification';
     }
-    req.session.data['redetermination-grant-error'] = errorMessage;
-    req.session.data['redetermination-grant-error-field'] = errorField;
-    req.session.data['redetermination-grant-form'] = { proceeding, justification, newProceeding };
-    res.redirect('/v6-v3/application/' + encodeURIComponent(reference) + '/redetermination/' + index + '/grant');
+    req.session.data['v6-v4']['redetermination-grant-error'] = errorMessage;
+    req.session.data['v6-v4']['redetermination-grant-error-field'] = errorField;
+    req.session.data['v6-v4']['redetermination-grant-form'] = { proceeding, justification, newProceeding };
+    res.redirect('/v6-v4/application/' + encodeURIComponent(reference) + '/redetermination/' + index + '/grant');
     return;
   }
 
   if (!hasGrantedInitialApplication(req, reference)) {
-    res.redirect('/v6-v3/application/' + encodeURIComponent(reference));
+    res.redirect('/v6-v4/application/' + encodeURIComponent(reference));
     return;
   }
 
-  req.session.data['redetermination-grant-answers'] = {
-    ...(req.session.data['redetermination-grant-answers'] || {}),
+  req.session.data['v6-v4']['redetermination-grant-answers'] = {
+    ...(req.session.data['v6-v4']['redetermination-grant-answers'] || {}),
     decision: 'grant',
     proceeding,
     justification,
     newProceeding
   };
-  delete req.session.data['redetermination-grant-date-errors'];
-  res.redirect('/v6-v3/application/' + encodeURIComponent(reference) + '/redetermination/' + index + '/grant-date');
+  delete req.session.data['v6-v4']['redetermination-grant-date-errors'];
+  res.redirect('/v6-v4/application/' + encodeURIComponent(reference) + '/redetermination/' + index + '/grant-date');
 });
 
 router.get('/application/:reference/redetermination/:index/grant-date', function(req, res) {
   const reference = req.params.reference;
   const index = Number(req.params.index);
-  const answers = req.session.data['redetermination-grant-answers'];
+  const answers = req.session.data['v6-v4']['redetermination-grant-answers'];
   if (!answers) {
-    res.redirect('/v6-v3/application/' + encodeURIComponent(reference) + '/redetermination/' + index + '/grant');
+    res.redirect('/v6-v4/application/' + encodeURIComponent(reference) + '/redetermination/' + index + '/grant');
     return;
   }
 
-  const errors = req.session.data['redetermination-grant-date-errors'] || {};
-  delete req.session.data['redetermination-grant-date-errors'];
-  res.render('v6-v3/redetermination-grant-date.njk', {
+  const errors = req.session.data['v6-v4']['redetermination-grant-date-errors'] || {};
+  delete req.session.data['v6-v4']['redetermination-grant-date-errors'];
+  res.render('v6-v4/redetermination-grant-date.njk', {
     pageTitle: 'When should the certificate be granted from?',
     reference: reference,
     index: index,
@@ -2975,9 +3010,9 @@ router.get('/application/:reference/redetermination/:index/grant-date', function
 router.post('/application/:reference/redetermination/:index/grant-date', function(req, res) {
   const reference = req.params.reference;
   const index = Number(req.params.index);
-  const answers = req.session.data['redetermination-grant-answers'];
+  const answers = req.session.data['v6-v4']['redetermination-grant-answers'];
   if (!answers) {
-    res.redirect('/v6-v3/application/' + encodeURIComponent(reference) + '/redetermination/' + index + '/grant');
+    res.redirect('/v6-v4/application/' + encodeURIComponent(reference) + '/redetermination/' + index + '/grant');
     return;
   }
 
@@ -3017,12 +3052,12 @@ router.post('/application/:reference/redetermination/:index/grant-date', functio
   }
 
   if (Object.keys(errors).length > 0) {
-    req.session.data['redetermination-grant-date-errors'] = errors;
+    req.session.data['v6-v4']['redetermination-grant-date-errors'] = errors;
     answers.certificateGrantDateType = dateType;
     answers.certificateGrantDateDay = day;
     answers.certificateGrantDateMonth = month;
     answers.certificateGrantDateYear = year;
-    res.redirect('/v6-v3/application/' + encodeURIComponent(reference) + '/redetermination/' + index + '/grant-date');
+    res.redirect('/v6-v4/application/' + encodeURIComponent(reference) + '/redetermination/' + index + '/grant-date');
     return;
   }
 
@@ -3031,28 +3066,28 @@ router.post('/application/:reference/redetermination/:index/grant-date', functio
   answers.certificateGrantDateMonth = month;
   answers.certificateGrantDateYear = year;
   answers.certificateGrantDate = certificateGrantDate;
-  res.redirect('/v6-v3/application/' + encodeURIComponent(reference) + '/redetermination/' + index + '/check-answers');
+  res.redirect('/v6-v4/application/' + encodeURIComponent(reference) + '/redetermination/' + index + '/check-answers');
 });
 
 router.get('/application/:reference/redetermination/:index/check-answers', function(req, res) {
   const reference = req.params.reference;
   const index = req.params.index;
-  const answers = req.session.data['redetermination-grant-answers'];
+  const answers = req.session.data['v6-v4']['redetermination-grant-answers'];
 
   if (!answers) {
-    res.redirect('/v6-v3/application/' + encodeURIComponent(reference) + '/redetermination/' + index + '/decision');
+    res.redirect('/v6-v4/application/' + encodeURIComponent(reference) + '/redetermination/' + index + '/decision');
     return;
   }
 
   const redetermination = getRedeterminationsForReference(req, reference)[Number(index)];
 
   if (!hasGrantedInitialApplication(req, reference)) {
-    res.redirect('/v6-v3/application/' + encodeURIComponent(reference));
+    res.redirect('/v6-v4/application/' + encodeURIComponent(reference));
     return;
   }
 
   if (answers.decision === 'refuse') {
-    res.render('v6-v3/redetermination-check-answers.njk', {
+    res.render('v6-v4/redetermination-check-answers.njk', {
       pageTitle: 'Check your answers',
       reference: reference,
       index: index,
@@ -3068,12 +3103,12 @@ router.get('/application/:reference/redetermination/:index/check-answers', funct
   }
 
   if (!answers.certificateGrantDate) {
-    res.redirect('/v6-v3/application/' + encodeURIComponent(reference) + '/redetermination/' + index + '/grant-date');
+    res.redirect('/v6-v4/application/' + encodeURIComponent(reference) + '/redetermination/' + index + '/grant-date');
     return;
   }
 
   const isNewProceeding = answers.proceeding === 'new-proceeding';
-  res.render('v6-v3/redetermination-check-answers.njk', {
+  res.render('v6-v4/redetermination-check-answers.njk', {
     pageTitle: 'Check your answers',
     reference: reference,
     index: index,
@@ -3090,10 +3125,10 @@ router.get('/application/:reference/redetermination/:index/check-answers', funct
 router.post('/application/:reference/redetermination/:index/check-answers', function(req, res) {
   const reference = req.params.reference;
   const index = Number(req.params.index);
-  const answers = req.session.data['redetermination-grant-answers'];
+  const answers = req.session.data['v6-v4']['redetermination-grant-answers'];
 
   if (!answers) {
-    res.redirect('/v6-v3/application/' + encodeURIComponent(reference));
+    res.redirect('/v6-v4/application/' + encodeURIComponent(reference));
     return;
   }
 
@@ -3101,7 +3136,7 @@ router.post('/application/:reference/redetermination/:index/check-answers', func
 
   if (answers.decision === 'refuse') {
     if (!redetermination || !REDETERMINATION_REFUSAL_REASONS.includes(answers.refusalReason) || !answers.decisionReason) {
-      res.redirect('/v6-v3/application/' + encodeURIComponent(reference) + '/redetermination/' + index + '/refuse');
+      res.redirect('/v6-v4/application/' + encodeURIComponent(reference) + '/redetermination/' + index + '/refuse');
       return;
     }
 
@@ -3109,8 +3144,8 @@ router.post('/application/:reference/redetermination/:index/check-answers', func
     redetermination.decisionType = 'Refuse';
     redetermination.refusalReason = answers.refusalReason;
     redetermination.decisionReason = answers.decisionReason;
-    if (!req.session.data['redetermination-decision-store']) req.session.data['redetermination-decision-store'] = {};
-    req.session.data['redetermination-decision-store'][reference + '|' + index] = {
+    if (!req.session.data['v6-v4']['redetermination-decision-store']) req.session.data['v6-v4']['redetermination-decision-store'] = {};
+    req.session.data['v6-v4']['redetermination-decision-store'][reference + '|' + index] = {
       reference: reference,
       index: index,
       status: 'Refused',
@@ -3125,9 +3160,9 @@ router.post('/application/:reference/redetermination/:index/check-answers', func
       firm: redetermination.firm
     };
     addHistoryEvent(req, reference, 'Redetermination refused', redetermination.caseworker || 'Caseworker', answers.decisionReason, { From: 'Submitted', To: 'Refused' });
-    delete req.session.data['redetermination-grant-answers'];
+    delete req.session.data['v6-v4']['redetermination-grant-answers'];
     removeResolvedRedeterminationGroupFromList(req, reference);
-    res.redirect('/v6-v3/application/' + encodeURIComponent(reference) + '?isRedetermination=true&redeterminationIndex=' + index);
+    res.redirect('/v6-v4/application/' + encodeURIComponent(reference) + '?isRedetermination=true&redeterminationIndex=' + index);
     return;
   }
 
@@ -3141,10 +3176,10 @@ router.post('/application/:reference/redetermination/:index/check-answers', func
       redetermination.newProceedingDetails = answers.newProceeding;
     }
 
-    if (!req.session.data['redetermination-decision-store']) {
-      req.session.data['redetermination-decision-store'] = {};
+    if (!req.session.data['v6-v4']['redetermination-decision-store']) {
+      req.session.data['v6-v4']['redetermination-decision-store'] = {};
     }
-    req.session.data['redetermination-decision-store'][reference + '|' + index] = {
+    req.session.data['v6-v4']['redetermination-decision-store'][reference + '|' + index] = {
       reference: reference,
       index: index,
       status: 'Granted',
@@ -3160,12 +3195,12 @@ router.post('/application/:reference/redetermination/:index/check-answers', func
     removeResolvedRedeterminationGroupFromList(req, reference);
   }
 
-  delete req.session.data['redetermination-grant-answers'];
-  res.redirect('/v6-v3/application/' + encodeURIComponent(reference) + '?isRedetermination=true&redeterminationIndex=' + index);
+  delete req.session.data['v6-v4']['redetermination-grant-answers'];
+  res.redirect('/v6-v4/application/' + encodeURIComponent(reference) + '?isRedetermination=true&redeterminationIndex=' + index);
 });
 
 router.get('/application/:reference/redetermination/:index/confirmation', function(req, res) {
-  res.render('v6-v3/redetermination-confirmation.njk', {
+  res.render('v6-v4/redetermination-confirmation.njk', {
     pageTitle: 'Confirmation',
     reference: req.params.reference
   });
@@ -3185,7 +3220,7 @@ router.get('/application/:reference', function(req, res) {
   };
   const linkedCasesByReference = {
     ...defaultLinkedCasesByReference,
-    ...(req.session.data['linked-cases-by-reference-v3'] || {})
+    ...(req.session.data['v6-v4']['linked-cases-by-reference-v4'] || {})
   };
   const linkedCases = requestedRedetermination ? [] : (linkedCasesByReference[reference] || []);
   const hasLinkedCases = linkedCases.length > 0;
@@ -3193,10 +3228,10 @@ router.get('/application/:reference', function(req, res) {
   const isAssociatedLinkedCase = Boolean(currentLinkedCase && currentLinkedCase.role === 'Associated');
   const leadLinkedCase = linkedCases.find(linkedCase => linkedCase.role === 'Lead') || null;
   const linkedLeadReference = leadLinkedCase ? leadLinkedCase.reference : null;
-  const assignedApplications = req.session.data['assigned-applications'] || [];
+  const assignedApplications = req.session.data['v6-v4']['assigned-applications'] || [];
 
   function getLinkedCaseStatus(targetRef, fallbackStatus) {
-    const storedDecision = req.session.data['decision-store'] && req.session.data['decision-store'][targetRef];
+    const storedDecision = req.session.data['v6-v4']['decision-store'] && req.session.data['v6-v4']['decision-store'][targetRef];
     if (storedDecision && storedDecision.status === 'Granted') {
       return { text: 'Granted', className: 'govuk-tag--green' };
     }
@@ -3241,48 +3276,47 @@ router.get('/application/:reference', function(req, res) {
   });
 
   // Ensure seeded applications are always available
-  if (!req.session.data['completed-applications']) {
-    req.session.data['completed-applications'] = [];
+  if (!req.session.data['v6-v4']['completed-applications']) {
+    req.session.data['v6-v4']['completed-applications'] = [];
   }
   const seededRefsApp = [...new Set(SEEDED_APPLICATIONS.map(a => a.ref))];
-  req.session.data['completed-applications'] = req.session.data['completed-applications'].filter(a => !seededRefsApp.includes(a.ref));
+  req.session.data['v6-v4']['completed-applications'] = req.session.data['v6-v4']['completed-applications'].filter(a => !seededRefsApp.includes(a.ref));
   SEEDED_APPLICATIONS.forEach(seeded => {
-    req.session.data['completed-applications'].push(seeded);
+    req.session.data['v6-v4']['completed-applications'].push(seeded);
   });
-  if (!req.session.data['app-history']) {
-    req.session.data['app-history'] = {};
+  if (!req.session.data['v6-v4']['app-history']) {
+    req.session.data['v6-v4']['app-history'] = {};
   }
   Object.keys(SEEDED_HISTORY).forEach(ref => {
     // Only initialize if not already set (preserves added notes)
-    if (!req.session.data['app-history'][ref]) {
-      req.session.data['app-history'][ref] = SEEDED_HISTORY[ref];
+    if (!req.session.data['v6-v4']['app-history'][ref]) {
+      req.session.data['v6-v4']['app-history'][ref] = SEEDED_HISTORY[ref];
     }
   });
 
   // Redeterminations only exist on generated mock data, so seed it here too —
   // otherwise an application reached without first visiting Open applications
   // would incorrectly appear to have no redetermination requests.
-  if (!req.session.data['open-applications-all'] || !req.session.data['open-applications-all'].some(app => app.isRedetermination)) {
+  if (!req.session.data['v6-v4']['open-applications-all'] || !req.session.data['v6-v4']['open-applications-all'].some(app => app.isRedetermination)) {
     const mockData = generateMockApplications(8);
-    req.session.data['open-applications-all'] = mockData.open;
-    if (!req.session.data['completed-applications']) {
-      req.session.data['completed-applications'] = [];
+    req.session.data['v6-v4']['open-applications-all'] = mockData.open;
+    if (!req.session.data['v6-v4']['completed-applications']) {
+      req.session.data['v6-v4']['completed-applications'] = [];
     }
-    req.session.data['completed-applications'] = req.session.data['completed-applications']
+    req.session.data['v6-v4']['completed-applications'] = req.session.data['v6-v4']['completed-applications']
       .filter(a => a._mockGenerated !== true);
     mockData.completed.forEach(a => {
       a._mockGenerated = true;
-      req.session.data['completed-applications'].push(a);
+      req.session.data['v6-v4']['completed-applications'].push(a);
     });
   }
-  ensureDefaultDemoRedetermination(req.session.data);
   ensureRedeterminationScenarioVariety(req);
 
   const applicationCollections = [
-    req.session.data['assigned-applications'] || [],
-    req.session.data['completed-applications'] || [],
-    req.session.data['open-applications'] || [],
-    req.session.data['open-applications-all'] || []
+    req.session.data['v6-v4']['assigned-applications'] || [],
+    req.session.data['v6-v4']['completed-applications'] || [],
+    req.session.data['v6-v4']['open-applications'] || [],
+    req.session.data['v6-v4']['open-applications-all'] || []
   ];
 
   function findApplicationVariant(isPriorAuthority, isRedetermination = false) {
@@ -3299,8 +3333,8 @@ router.get('/application/:reference', function(req, res) {
     if (!app) return null;
     const hydrated = { ...app };
     // decision-store is for the initial application decision, not PA requests.
-    if (!hydrated.isPriorAuthority && req.session.data['decision-store'] && req.session.data['decision-store'][reference]) {
-      const stored = req.session.data['decision-store'][reference];
+    if (!hydrated.isPriorAuthority && req.session.data['v6-v4']['decision-store'] && req.session.data['v6-v4']['decision-store'][reference]) {
+      const stored = req.session.data['v6-v4']['decision-store'][reference];
       hydrated.status = stored.status;
       hydrated.decisionDate = stored.decisionDate;
       hydrated.decisionType = stored.decisionType;
@@ -3322,8 +3356,8 @@ router.get('/application/:reference', function(req, res) {
     justification: submittedRedetermination.redeterminationJustification
   } : null;
   if (redeterminationAdditionalDetails) {
-    const providerAnswersByReference = req.session.data['redetermination-provider-answers-v3']
-      || (req.session.data['redetermination-provider-answers-v3'] = {});
+    const providerAnswersByReference = req.session.data['v6-v4']['redetermination-provider-answers-v4']
+      || (req.session.data['v6-v4']['redetermination-provider-answers-v4'] = {});
     if (!providerAnswersByReference[reference] || providerAnswersByReference[reference].schemaVersion !== 2) {
       const scenario = Math.floor(Math.random() * 3);
       providerAnswersByReference[reference] = {
@@ -3383,14 +3417,14 @@ router.get('/application/:reference', function(req, res) {
     ? (priorAuthorityApplicationData || resolvedInitialApplicationData || {})
     : (resolvedInitialApplicationData || priorAuthorityApplicationData || {});
   const hasPriorAuthority = Boolean(priorAuthorityApplicationData);
-  
+
   // Get prior authority type from the actual data
   let priorAuthorityType = null;
   if (priorAuthorityApplicationData) {
     priorAuthorityType = priorAuthorityApplicationData.priorAuthorityType || 'Expert';
   }
   if (!priorAuthorityType) priorAuthorityType = 'Expert';
-  
+
   // Generate fallback/derived data for the People tab
   const found = (applicationData && applicationData.ref) ? applicationData : {
     ref: reference,
@@ -3421,52 +3455,52 @@ router.get('/application/:reference', function(req, res) {
     providerAddress: `${nameLen} Liverpool Road<br>Manchester<br>MW2 5WT`,
     providerPhone: `0712345678${nameLen % 9}`
   };
-  
+
   // Initialize history with initial application received entry if it doesn't exist
-  if (!req.session.data['app-history']) {
-    req.session.data['app-history'] = {};
+  if (!req.session.data['v6-v4']['app-history']) {
+    req.session.data['v6-v4']['app-history'] = {};
   }
-  
+
   // Ensure the history entry exists and has the correct format
-  if (!req.session.data['app-history'][reference] || req.session.data['app-history'][reference].length === 0 || 
-      (req.session.data['app-history'][reference].length > 0 && !req.session.data['app-history'][reference][0].action)) {
-    
+  if (!req.session.data['v6-v4']['app-history'][reference] || req.session.data['v6-v4']['app-history'][reference].length === 0 ||
+      (req.session.data['v6-v4']['app-history'][reference].length > 0 && !req.session.data['v6-v4']['app-history'][reference][0].action)) {
+
     // Clear and initialize
-    req.session.data['app-history'][reference] = [];
-    
+    req.session.data['v6-v4']['app-history'][reference] = [];
+
     // Add initial application received entry
     let submittedDate = 'N/A';
-    
+
     // Try to get submitted date from applicationData first
     if (applicationData && applicationData.submitted) {
       submittedDate = applicationData.submitted;
-    } else if (req.session.data['open-applications']) {
+    } else if (req.session.data['v6-v4']['open-applications']) {
       // Try to get from open-applications if not found in applicationData
-      const openApp = req.session.data['open-applications'].find(app => app.ref === reference);
+      const openApp = req.session.data['v6-v4']['open-applications'].find(app => app.ref === reference);
       if (openApp && openApp.submitted) {
         submittedDate = openApp.submitted;
       }
     }
-    
+
     // If still not found, use current date as fallback
     if (submittedDate === 'N/A') {
       const now = new Date();
       submittedDate = now.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
     }
-    
+
     const randomHour = Math.floor(Math.random() * 24);
     const randomMin = Math.floor(Math.random() * 60);
     const timeStr = String(randomHour).padStart(2, '0') + ':' + String(randomMin).padStart(2, '0');
     const datetime = submittedDate + ' ' + timeStr;
-    
-    req.session.data['app-history'][reference].push({
+
+    req.session.data['v6-v4']['app-history'][reference].push({
       timestamp: datetime,
       action: 'Initial application received',
       caseworker: 'N/A',
       details: null
     });
   }
-  
+
   // Check if application is already assigned (in your list)
   const requestedRedeterminationIndex = Number(req.query.redeterminationIndex);
   const selectedRedetermination = requestedRedetermination
@@ -3487,12 +3521,12 @@ router.get('/application/:reference', function(req, res) {
   const isStatusApplicationAssigned = requestedRedetermination || (requestedPriorAuthority && resolvedInitialApplicationData && !isLateLinkedCase)
     ? isInitialApplicationAssigned
     : isAssigned;
-  
+
   // Convert app-history to historyEvents format for template
   let historyEvents = [];
-  if (req.session.data['app-history'] && req.session.data['app-history'][reference]) {
-    const totalEvents = req.session.data['app-history'][reference].length;
-    historyEvents = req.session.data['app-history'][reference].map((event, index) => {
+  if (req.session.data['v6-v4']['app-history'] && req.session.data['v6-v4']['app-history'][reference]) {
+    const totalEvents = req.session.data['v6-v4']['app-history'][reference].length;
+    historyEvents = req.session.data['v6-v4']['app-history'][reference].map((event, index) => {
       const action = event.action || event.title;
       const isPAEvent = action && (action.toLowerCase().includes('prior authority') || action.toLowerCase().includes('amendment') || action.toLowerCase().includes('appeal'));
       const tabAnchor = isPAEvent ? '#prior-authority' : '';
@@ -3501,7 +3535,7 @@ router.get('/application/:reference', function(req, res) {
         datetime: event.timestamp || event.datetime,
         caseworker: event.caseworker,
         title: action,
-        versionLink: !isLastEvent ? `/v6-v3/application/${reference}?viewVersion=${index}${tabAnchor}` : null,
+        versionLink: !isLastEvent ? `/v6-v4/application/${reference}?viewVersion=${index}${tabAnchor}` : null,
         changes: event.changes || null,
         notes: event.notes || null,
         details: event.details || null,  // Pass details separately for notes
@@ -3511,31 +3545,31 @@ router.get('/application/:reference', function(req, res) {
       };
     });
   }
-  
+
   // Check if viewing a previous version
   const viewVersion = req.query.viewVersion ? parseInt(req.query.viewVersion) : null;
   const isViewingPreviousVersion = viewVersion !== null && viewVersion < historyEvents.length - 1;
-  
+
   // Get history array for reconstruction
-  const historyArray = req.session.data['app-history'] && req.session.data['app-history'][reference] 
-    ? req.session.data['app-history'][reference]
+  const historyArray = req.session.data['v6-v4']['app-history'] && req.session.data['v6-v4']['app-history'][reference]
+    ? req.session.data['v6-v4']['app-history'][reference]
     : [];
-  
+
   // If viewing a specific version, reconstruct the application state at that point
   let versionedApplication = application;
   let versionedTitle = null;
-  
+
   if (isViewingPreviousVersion && viewVersion !== null) {
     // Reconstruct application state at this version
     versionedApplication = reconstructApplicationAtVersion(application, historyArray, viewVersion);
-    
+
     // Get the event title for display
     if (historyArray[viewVersion]) {
       versionedTitle = historyArray[viewVersion].action || 'Unknown event';
     }
   }
-  
-  res.render('v6-v3/application-details.njk', {
+
+  res.render('v6-v4/application-details.njk', {
     pageTitle: reference,
     reference: reference,
     application: isViewingPreviousVersion ? versionedApplication : application,
@@ -3549,13 +3583,13 @@ router.get('/application/:reference', function(req, res) {
     redeterminationAssignmentIndex: selectedRedeterminationIndex,
     groupedRedeterminationFlow: redeterminations.some(request => request.groupedRedeterminationFlow),
     linkedLeadReference: linkedLeadReference,
-    applicationRoutePrefix: '/v6-v3',
+    applicationRoutePrefix: '/v6-v4',
     hasPriorAuthority: hasPriorAuthority,
     priorAuthorityType: priorAuthorityType,
     redeterminations: redeterminations,
     redeterminationAdditionalDetails: redeterminationAdditionalDetails,
     pendingRedeterminationCount: pendingRedeterminationCount,
-    sessionData: req.session.data,
+    sessionData: req.session.data['v6-v4'],
     isAssigned: isAssigned,
     isInitialApplicationAssigned: isInitialApplicationAssigned,
     isPriorAuthorityAssigned: isPriorAuthorityAssigned,
@@ -3566,19 +3600,19 @@ router.get('/application/:reference', function(req, res) {
     viewVersion: viewVersion,
     versionedTitle: versionedTitle
   });
-  
+
   // Clear toast after rendering so it only shows once (clear on next request to this route)
-  if (req.session.data && req.session.data.toast) {
-    req.session.data.toast = null;
+  if (req.session.data['v6-v4'] && req.session.data['v6-v4'].toast) {
+    req.session.data['v6-v4'].toast = null;
   }
-  
+
   console.log('APPLICATION REF:', application.ref, 'REFERENCE:', reference);
 });
 
 // GET /change/:reference/:field - Display change input form
 router.get('/change/:reference/:field', function(req, res) {
   const { reference, field } = req.params;
-  
+
   // Map field names to display names
   const fieldNames = {
     'first-name': 'First name',
@@ -3594,16 +3628,16 @@ router.get('/change/:reference/:field', function(req, res) {
     'child-2-name': 'Child 2 name',
     'child-2-dob': 'Child 2 date of birth'
   };
-  
+
   if (!fieldNames[field]) {
     return res.status(404).send('Field not found');
   }
-  
+
   res.render(`v6/change/${field}.njk`, {
     reference: reference,
     field: field,
     fieldName: fieldNames[field],
-    sessionData: req.session.data
+    sessionData: req.session.data['v6-v4']
   });
 });
 
@@ -3611,20 +3645,20 @@ router.get('/change/:reference/:field', function(req, res) {
 router.post('/change/:reference/:field', function(req, res) {
   const { reference, field } = req.params;
   const { newValue, justification } = req.body;
-  
+
   // Save to session
-  req.session.data['change-reference'] = reference;
-  req.session.data['change-field'] = field;
-  req.session.data['change-new-value'] = newValue;
-  req.session.data['change-justification'] = justification;
-  
-  res.redirect(`/v6-v3/change/${reference}/${field}/confirm`);
+  req.session.data['v6-v4']['change-reference'] = reference;
+  req.session.data['v6-v4']['change-field'] = field;
+  req.session.data['v6-v4']['change-new-value'] = newValue;
+  req.session.data['v6-v4']['change-justification'] = justification;
+
+  res.redirect(`/v6-v4/change/${reference}/${field}/confirm`);
 });
 
 // GET /change/:reference/:field/confirm - Display confirmation page
 router.get('/change/:reference/:field/confirm', function(req, res) {
   const { reference, field } = req.params;
-  
+
   const fieldNames = {
     'first-name': 'First name',
     'last-name': 'Last name',
@@ -3639,37 +3673,37 @@ router.get('/change/:reference/:field/confirm', function(req, res) {
     'child-2-name': 'Child 2 name',
     'child-2-dob': 'Child 2 date of birth'
   };
-  
-  res.render('v6-v3/change/confirm.njk', {
+
+  res.render('v6-v4/change/confirm.njk', {
     reference: reference,
     field: field,
     fieldName: fieldNames[field] || field,
-    sessionData: req.session.data
+    sessionData: req.session.data['v6-v4']
   });
 });
 
 // POST /change/:reference/:field/confirm - Confirm change and save to history
 router.post('/change/:reference/:field/confirm', function(req, res) {
   const { reference, field } = req.params;
-  const newValue = req.session.data['change-new-value'];
-  const justification = req.session.data['change-justification'];
-  
+  const newValue = req.session.data['v6-v4']['change-new-value'];
+  const justification = req.session.data['v6-v4']['change-justification'];
+
   // Find the application
   let application = null;
-  if (req.session.data['assigned-applications']) {
-    application = req.session.data['assigned-applications'].find(app => app.ref === reference);
+  if (req.session.data['v6-v4']['assigned-applications']) {
+    application = req.session.data['v6-v4']['assigned-applications'].find(app => app.ref === reference);
   }
-  if (!application && req.session.data['completed-applications']) {
-    application = req.session.data['completed-applications'].find(app => app.ref === reference);
+  if (!application && req.session.data['v6-v4']['completed-applications']) {
+    application = req.session.data['v6-v4']['completed-applications'].find(app => app.ref === reference);
   }
-  if (!application && req.session.data['open-applications']) {
-    application = req.session.data['open-applications'].find(app => app.ref === reference);
+  if (!application && req.session.data['v6-v4']['open-applications']) {
+    application = req.session.data['v6-v4']['open-applications'].find(app => app.ref === reference);
   }
-  
+
   // Get old value from application
   let oldValue = 'N/A';
   let displayField = field.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase());
-  
+
   if (field === 'first-name') oldValue = application?.firstName || 'N/A';
   else if (field === 'last-name') oldValue = application?.lastName || 'N/A';
   else if (field === 'last-name-birth') oldValue = application?.lastName || 'N/A';
@@ -3682,7 +3716,7 @@ router.post('/change/:reference/:field/confirm', function(req, res) {
   else if (field === 'child-1-dob') oldValue = application?.children?.[0]?.dob || 'N/A';
   else if (field === 'child-2-name') oldValue = application?.children?.[1]?.name || 'N/A';
   else if (field === 'child-2-dob') oldValue = application?.children?.[1]?.dob || 'N/A';
-  
+
   // Update application data
   if (field === 'first-name') application.firstName = newValue;
   else if (field === 'last-name') application.lastName = newValue;
@@ -3696,36 +3730,36 @@ router.post('/change/:reference/:field/confirm', function(req, res) {
   else if (field === 'child-1-dob' && application.children?.[0]) application.children[0].dob = newValue;
   else if (field === 'child-2-name' && application.children?.[1]) application.children[1].name = newValue;
   else if (field === 'child-2-dob' && application.children?.[1]) application.children[1].dob = newValue;
-  
+
   // Add to history
-  if (!req.session.data['app-history']) {
-    req.session.data['app-history'] = {};
+  if (!req.session.data['v6-v4']['app-history']) {
+    req.session.data['v6-v4']['app-history'] = {};
   }
-  if (!req.session.data['app-history'][reference]) {
-    req.session.data['app-history'][reference] = [];
+  if (!req.session.data['v6-v4']['app-history'][reference]) {
+    req.session.data['v6-v4']['app-history'][reference] = [];
   }
-  
+
   // Generate timestamp
   const now = new Date();
   const dateStr = now.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
   const timeStr = now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
   const datetime = dateStr + ' ' + timeStr;
   const caseworker = application?.caseworker || 'Mo Bradshaw';
-  
-  req.session.data['app-history'][reference].push({
+
+  req.session.data['v6-v4']['app-history'][reference].push({
     timestamp: datetime,
     action: `${displayField} updated`,
     caseworker: caseworker,
     details: justification || null
   });
-  
+
   // Clear change session data
-  delete req.session.data['change-reference'];
-  delete req.session.data['change-field'];
-  delete req.session.data['change-new-value'];
-  delete req.session.data['change-justification'];
-  
-  res.redirect(`/v6-v3/application/${reference}#people`);
+  delete req.session.data['v6-v4']['change-reference'];
+  delete req.session.data['v6-v4']['change-field'];
+  delete req.session.data['v6-v4']['change-new-value'];
+  delete req.session.data['v6-v4']['change-justification'];
+
+  res.redirect(`/v6-v4/application/${reference}#people`);
 });
 
 // =========================================================
@@ -3734,9 +3768,9 @@ router.post('/change/:reference/:field/confirm', function(req, res) {
 
 function findApplicationByReference(req, reference, isPriorAuthority) {
   const collections = [
-    req.session.data['assigned-applications'] || [],
-    req.session.data['completed-applications'] || [],
-    req.session.data['open-applications'] || []
+    req.session.data['v6-v4']['assigned-applications'] || [],
+    req.session.data['v6-v4']['completed-applications'] || [],
+    req.session.data['v6-v4']['open-applications'] || []
   ];
 
   for (const collection of collections) {
@@ -3761,9 +3795,9 @@ function defaultCounselTypeForApplication(application) {
 
 function updatePriorAuthorityStatusForReference(req, reference, decision) {
   const collections = [
-    req.session.data['assigned-applications'] || [],
-    req.session.data['completed-applications'] || [],
-    req.session.data['open-applications'] || []
+    req.session.data['v6-v4']['assigned-applications'] || [],
+    req.session.data['v6-v4']['completed-applications'] || [],
+    req.session.data['v6-v4']['open-applications'] || []
   ];
 
   const status = decision === 'Refuse' ? 'Refused' : 'Granted';
@@ -3780,24 +3814,24 @@ function updatePriorAuthorityStatusForReference(req, reference, decision) {
 }
 
 function removePriorAuthorityFromAssignedList(req, reference) {
-  const assigned = req.session.data['assigned-applications'] || [];
-  req.session.data['assigned-applications'] = assigned.filter(app => !(app.ref === reference && app.isPriorAuthority));
+  const assigned = req.session.data['v6-v4']['assigned-applications'] || [];
+  req.session.data['v6-v4']['assigned-applications'] = assigned.filter(app => !(app.ref === reference && app.isPriorAuthority));
 }
 
 router.get('/counsel-assessment/decision', function (req, res) {
-  const reference = req.query.reference || req.session.data['counsel-assessment-reference'] || '';
-  const currentReference = req.session.data['counsel-assessment-reference'];
+  const reference = req.query.reference || req.session.data['v6-v4']['counsel-assessment-reference'] || '';
+  const currentReference = req.session.data['v6-v4']['counsel-assessment-reference'];
 
   if (reference && reference !== currentReference) {
     // Entering from application details starts a fresh decision step; do not preselect Grant.
-    delete req.session.data['counsel-decision'];
-    delete req.session.data['counsel-covers'];
-    delete req.session.data['counsel-justification'];
-    delete req.session.data['counsel-refuse-justification'];
-    delete req.session.data['counsel-type-granted'];
-    delete req.session.data['counsel-assessment-errors'];
-    delete req.session.data['counsel-refuse-justification-errors'];
-    req.session.data['counsel-assessment-reference'] = reference;
+    delete req.session.data['v6-v4']['counsel-decision'];
+    delete req.session.data['v6-v4']['counsel-covers'];
+    delete req.session.data['v6-v4']['counsel-justification'];
+    delete req.session.data['v6-v4']['counsel-refuse-justification'];
+    delete req.session.data['v6-v4']['counsel-type-granted'];
+    delete req.session.data['v6-v4']['counsel-assessment-errors'];
+    delete req.session.data['v6-v4']['counsel-refuse-justification-errors'];
+    req.session.data['v6-v4']['counsel-assessment-reference'] = reference;
   }
 
   const priorAuthorityApplication = reference
@@ -3809,25 +3843,25 @@ router.get('/counsel-assessment/decision', function (req, res) {
 
   // Do not allow a new assessment when a decision already exists.
   if (reference && priorAuthorityAlreadyDecided) {
-    res.redirect(`/v6-v3/application/${reference}?isPriorAuthority=true#prior-authority`);
+    res.redirect(`/v6-v4/application/${reference}?isPriorAuthority=true#prior-authority`);
     return;
   }
 
   const defaultCounselType = defaultCounselTypeForApplication(priorAuthorityApplication);
-  req.session.data['counsel-default-counsel-type'] = defaultCounselType;
+  req.session.data['v6-v4']['counsel-default-counsel-type'] = defaultCounselType;
 
-  if (!req.session.data['counsel-type-granted']) {
-    req.session.data['counsel-type-granted'] = defaultCounselType;
+  if (!req.session.data['v6-v4']['counsel-type-granted']) {
+    req.session.data['v6-v4']['counsel-type-granted'] = defaultCounselType;
   }
 
-  req.session.data['counsel-application-type'] = (priorAuthorityApplication && priorAuthorityApplication.priorAuthorityType)
+  req.session.data['v6-v4']['counsel-application-type'] = (priorAuthorityApplication && priorAuthorityApplication.priorAuthorityType)
     ? `Prior authority - ${priorAuthorityApplication.priorAuthorityType}`
     : 'Prior authority - Counsel';
 
-  const errors = req.session.data['counsel-assessment-errors'] || null;
-  delete req.session.data['counsel-assessment-errors'];
+  const errors = req.session.data['v6-v4']['counsel-assessment-errors'] || null;
+  delete req.session.data['v6-v4']['counsel-assessment-errors'];
 
-  res.render('v6-v3/counsel-assessment/decision.njk', {
+  res.render('v6-v4/counsel-assessment/decision.njk', {
     pageTitle: 'Make your decision - Prior Authority',
     reference: reference,
     defaultCounselType: defaultCounselType,
@@ -3844,31 +3878,31 @@ router.post('/counsel-assessment/decision-handler', function (req, res) {
   }
 
   if (Object.keys(errors).length > 0) {
-    req.session.data['counsel-assessment-errors'] = errors;
-    res.redirect('/v6-v3/counsel-assessment/decision');
+    req.session.data['v6-v4']['counsel-assessment-errors'] = errors;
+    res.redirect('/v6-v4/counsel-assessment/decision');
     return;
   }
 
   // Counsel type should always resolve to a value (selected or pre-selected default).
-  if (!req.session.data['counsel-type-granted']) {
-    req.session.data['counsel-type-granted'] = req.session.data['counsel-default-counsel-type'] || "King's Counsel";
+  if (!req.session.data['v6-v4']['counsel-type-granted']) {
+    req.session.data['v6-v4']['counsel-type-granted'] = req.session.data['v6-v4']['counsel-default-counsel-type'] || "King's Counsel";
   }
 
   if (decision === 'Refuse') {
-    res.redirect('/v6-v3/counsel-assessment/refuse-justification');
+    res.redirect('/v6-v4/counsel-assessment/refuse-justification');
     return;
   }
 
-  res.redirect('/v6-v3/counsel-assessment/what-it-covers');
+  res.redirect('/v6-v4/counsel-assessment/what-it-covers');
 });
 
 router.get('/counsel-assessment/refuse-justification', function (req, res) {
-  const errors = req.session.data['counsel-refuse-justification-errors'] || null;
-  delete req.session.data['counsel-refuse-justification-errors'];
+  const errors = req.session.data['v6-v4']['counsel-refuse-justification-errors'] || null;
+  delete req.session.data['v6-v4']['counsel-refuse-justification-errors'];
 
-  res.render('v6-v3/counsel-assessment/refuse-justification.njk', {
+  res.render('v6-v4/counsel-assessment/refuse-justification.njk', {
     pageTitle: 'Why are you refusing this request? - Prior Authority',
-    reference: req.session.data['counsel-assessment-reference'] || '',
+    reference: req.session.data['v6-v4']['counsel-assessment-reference'] || '',
     errors: errors
   });
 });
@@ -3882,39 +3916,39 @@ router.post('/counsel-assessment/refuse-justification-handler', function (req, r
   }
 
   if (Object.keys(errors).length > 0) {
-    req.session.data['counsel-refuse-justification-errors'] = errors;
-    res.redirect('/v6-v3/counsel-assessment/refuse-justification');
+    req.session.data['v6-v4']['counsel-refuse-justification-errors'] = errors;
+    res.redirect('/v6-v4/counsel-assessment/refuse-justification');
     return;
   }
 
-  req.session.data['counsel-refuse-justification'] = justification;
-  res.redirect('/v6-v3/counsel-assessment/check-your-answers');
+  req.session.data['v6-v4']['counsel-refuse-justification'] = justification;
+  res.redirect('/v6-v4/counsel-assessment/check-your-answers');
 });
 
 router.get('/counsel-assessment/what-it-covers', function (req, res) {
-  res.render('v6-v3/counsel-assessment/what-it-covers.njk', {
+  res.render('v6-v4/counsel-assessment/what-it-covers.njk', {
     pageTitle: 'What does this application cover? - Prior Authority',
-    reference: req.session.data['counsel-assessment-reference'] || ''
+    reference: req.session.data['v6-v4']['counsel-assessment-reference'] || ''
   });
 });
 
 router.post('/counsel-assessment/covers-handler', function (req, res) {
-  res.redirect('/v6-v3/counsel-assessment/check-your-answers');
+  res.redirect('/v6-v4/counsel-assessment/check-your-answers');
 });
 
 router.get('/counsel-assessment/check-your-answers', function (req, res) {
-  res.render('v6-v3/counsel-assessment/check-your-answers.njk', {
+  res.render('v6-v4/counsel-assessment/check-your-answers.njk', {
     pageTitle: 'Check your answers - Prior Authority',
-    reference: req.session.data['counsel-assessment-reference'] || ''
+    reference: req.session.data['v6-v4']['counsel-assessment-reference'] || ''
   });
 });
 
 router.post('/counsel-assessment/submit-assessment', function (req, res) {
-  const reference = req.session.data['counsel-assessment-reference'];
-  const decision = req.session.data['counsel-decision'];
+  const reference = req.session.data['v6-v4']['counsel-assessment-reference'];
+  const decision = req.session.data['v6-v4']['counsel-decision'];
 
   if (!decision) {
-    res.redirect(`/v6-v3/counsel-assessment/decision?reference=${reference || ''}`);
+    res.redirect(`/v6-v4/counsel-assessment/decision?reference=${reference || ''}`);
     return;
   }
 
@@ -3922,13 +3956,13 @@ router.post('/counsel-assessment/submit-assessment', function (req, res) {
     updatePriorAuthorityStatusForReference(req, reference, decision);
     removePriorAuthorityFromAssignedList(req, reference);
   }
-  res.redirect('/v6-v3/counsel-assessment/confirmation');
+  res.redirect('/v6-v4/counsel-assessment/confirmation');
 });
 
 router.get('/counsel-assessment/confirmation', function (req, res) {
-  res.render('v6-v3/counsel-assessment/confirmation.njk', {
+  res.render('v6-v4/counsel-assessment/confirmation.njk', {
     pageTitle: 'Assessment for prior authority completed - Prior Authority',
-    reference: req.session.data['counsel-assessment-reference'] || 'CRM4-Counsel-123'
+    reference: req.session.data['v6-v4']['counsel-assessment-reference'] || 'CRM4-Counsel-123'
   });
 });
 
@@ -4018,28 +4052,28 @@ function postcodeForExpertLocation(location, priorAuthorityType) {
 }
 
 router.get('/expert-assessment/decision', function (req, res) {
-  const reference = req.query.reference || req.session.data['expert-assessment-reference'] || '';
-  const currentReference = req.session.data['expert-assessment-reference'];
+  const reference = req.query.reference || req.session.data['v6-v4']['expert-assessment-reference'] || '';
+  const currentReference = req.session.data['v6-v4']['expert-assessment-reference'];
 
   if (reference && reference !== currentReference) {
     // Starting from the details page resets this flow.
-    delete req.session.data['expert-decision'];
-    delete req.session.data['expert-justification'];
-    delete req.session.data['expert-refuse-justification'];
-    delete req.session.data['expert-amount-decision'];
-    delete req.session.data['expert-new-amount'];
-    delete req.session.data['expert-new-name'];
-    delete req.session.data['expert-new-type'];
-    delete req.session.data['expert-new-location'];
-    delete req.session.data['expert-new-rate'];
-    delete req.session.data['expert-new-hours'];
-    delete req.session.data['expert-new-minutes'];
-    delete req.session.data['expert-new-total-amount'];
-    delete req.session.data['expert-assessment-errors'];
-    delete req.session.data['expert-refuse-justification-errors'];
-    delete req.session.data['expert-assessment-amount-errors'];
-    delete req.session.data['expert-assessment-new-amount-errors'];
-    req.session.data['expert-assessment-reference'] = reference;
+    delete req.session.data['v6-v4']['expert-decision'];
+    delete req.session.data['v6-v4']['expert-justification'];
+    delete req.session.data['v6-v4']['expert-refuse-justification'];
+    delete req.session.data['v6-v4']['expert-amount-decision'];
+    delete req.session.data['v6-v4']['expert-new-amount'];
+    delete req.session.data['v6-v4']['expert-new-name'];
+    delete req.session.data['v6-v4']['expert-new-type'];
+    delete req.session.data['v6-v4']['expert-new-location'];
+    delete req.session.data['v6-v4']['expert-new-rate'];
+    delete req.session.data['v6-v4']['expert-new-hours'];
+    delete req.session.data['v6-v4']['expert-new-minutes'];
+    delete req.session.data['v6-v4']['expert-new-total-amount'];
+    delete req.session.data['v6-v4']['expert-assessment-errors'];
+    delete req.session.data['v6-v4']['expert-refuse-justification-errors'];
+    delete req.session.data['v6-v4']['expert-assessment-amount-errors'];
+    delete req.session.data['v6-v4']['expert-assessment-new-amount-errors'];
+    req.session.data['v6-v4']['expert-assessment-reference'] = reference;
   }
 
   const priorAuthorityApplication = reference
@@ -4050,28 +4084,28 @@ router.get('/expert-assessment/decision', function (req, res) {
     (priorAuthorityApplication.status === 'Granted' || priorAuthorityApplication.status === 'Refused');
 
   if (reference && priorAuthorityAlreadyDecided) {
-    res.redirect(`/v6-v3/application/${reference}?isPriorAuthority=true#prior-authority`);
+    res.redirect(`/v6-v4/application/${reference}?isPriorAuthority=true#prior-authority`);
     return;
   }
 
   const expertDetails = expertDetailsForApplication(priorAuthorityApplication);
 
-  req.session.data['expert-application-type'] = (priorAuthorityApplication && priorAuthorityApplication.priorAuthorityType)
+  req.session.data['v6-v4']['expert-application-type'] = (priorAuthorityApplication && priorAuthorityApplication.priorAuthorityType)
     ? `Prior authority - ${priorAuthorityApplication.priorAuthorityType}`
     : 'Prior authority - Expert';
-  req.session.data['expert-request-type'] = expertDetails.requestType;
-  req.session.data['expert-default-name'] = expertDetails.name;
-  req.session.data['expert-default-type'] = expertDetails.type;
-  req.session.data['expert-default-location'] = postcodeForExpertLocation(expertDetails.location, priorAuthorityApplication && priorAuthorityApplication.priorAuthorityType);
-  req.session.data['expert-default-rate'] = expertDetails.rate;
-  req.session.data['expert-default-hours'] = expertDetails.hours;
-  req.session.data['expert-default-minutes'] = expertDetails.minutes;
-  req.session.data['expert-requested-amount'] = expertDetails.requestedAmount;
+  req.session.data['v6-v4']['expert-request-type'] = expertDetails.requestType;
+  req.session.data['v6-v4']['expert-default-name'] = expertDetails.name;
+  req.session.data['v6-v4']['expert-default-type'] = expertDetails.type;
+  req.session.data['v6-v4']['expert-default-location'] = postcodeForExpertLocation(expertDetails.location, priorAuthorityApplication && priorAuthorityApplication.priorAuthorityType);
+  req.session.data['v6-v4']['expert-default-rate'] = expertDetails.rate;
+  req.session.data['v6-v4']['expert-default-hours'] = expertDetails.hours;
+  req.session.data['v6-v4']['expert-default-minutes'] = expertDetails.minutes;
+  req.session.data['v6-v4']['expert-requested-amount'] = expertDetails.requestedAmount;
 
-  const errors = req.session.data['expert-assessment-errors'] || null;
-  delete req.session.data['expert-assessment-errors'];
+  const errors = req.session.data['v6-v4']['expert-assessment-errors'] || null;
+  delete req.session.data['v6-v4']['expert-assessment-errors'];
 
-  res.render('v6-v3/expert-assessment/decision.njk', {
+  res.render('v6-v4/expert-assessment/decision.njk', {
     pageTitle: 'Make a decision - Prior Authority',
     reference: reference,
     errors: errors
@@ -4085,26 +4119,26 @@ router.post('/expert-assessment/decision-handler', function (req, res) {
   if (!decision) errors.decision = 'Select grant or refuse to continue';
 
   if (Object.keys(errors).length > 0) {
-    req.session.data['expert-assessment-errors'] = errors;
-    res.redirect('/v6-v3/expert-assessment/decision');
+    req.session.data['v6-v4']['expert-assessment-errors'] = errors;
+    res.redirect('/v6-v4/expert-assessment/decision');
     return;
   }
 
   if (decision === 'Refuse') {
-    res.redirect('/v6-v3/expert-assessment/refuse-justification');
+    res.redirect('/v6-v4/expert-assessment/refuse-justification');
     return;
   }
 
-  res.redirect('/v6-v3/expert-assessment/amount');
+  res.redirect('/v6-v4/expert-assessment/amount');
 });
 
 router.get('/expert-assessment/refuse-justification', function (req, res) {
-  const errors = req.session.data['expert-refuse-justification-errors'] || null;
-  delete req.session.data['expert-refuse-justification-errors'];
+  const errors = req.session.data['v6-v4']['expert-refuse-justification-errors'] || null;
+  delete req.session.data['v6-v4']['expert-refuse-justification-errors'];
 
-  res.render('v6-v3/expert-assessment/refuse-justification.njk', {
+  res.render('v6-v4/expert-assessment/refuse-justification.njk', {
     pageTitle: 'Why are you refusing this request? - Prior Authority',
-    reference: req.session.data['expert-assessment-reference'] || '',
+    reference: req.session.data['v6-v4']['expert-assessment-reference'] || '',
     errors: errors
   });
 });
@@ -4118,23 +4152,23 @@ router.post('/expert-assessment/refuse-justification-handler', function (req, re
   }
 
   if (Object.keys(errors).length > 0) {
-    req.session.data['expert-refuse-justification-errors'] = errors;
-    res.redirect('/v6-v3/expert-assessment/refuse-justification');
+    req.session.data['v6-v4']['expert-refuse-justification-errors'] = errors;
+    res.redirect('/v6-v4/expert-assessment/refuse-justification');
     return;
   }
 
-  req.session.data['expert-refuse-justification'] = justification;
-  res.redirect('/v6-v3/expert-assessment/check-your-answers');
+  req.session.data['v6-v4']['expert-refuse-justification'] = justification;
+  res.redirect('/v6-v4/expert-assessment/check-your-answers');
 });
 
 router.get('/expert-assessment/amount', function (req, res) {
-  const errors = req.session.data['expert-assessment-amount-errors'] || null;
-  delete req.session.data['expert-assessment-amount-errors'];
+  const errors = req.session.data['v6-v4']['expert-assessment-amount-errors'] || null;
+  delete req.session.data['v6-v4']['expert-assessment-amount-errors'];
 
-  res.render('v6-v3/expert-assessment/amount.njk', {
+  res.render('v6-v4/expert-assessment/amount.njk', {
     pageTitle: 'Make a decision - Prior Authority',
-    reference: req.session.data['expert-assessment-reference'] || '',
-    requestedAmount: formatCurrencyGBP(req.session.data['expert-requested-amount']),
+    reference: req.session.data['v6-v4']['expert-assessment-reference'] || '',
+    requestedAmount: formatCurrencyGBP(req.session.data['v6-v4']['expert-requested-amount']),
     errors: errors
   });
 });
@@ -4148,51 +4182,51 @@ router.post('/expert-assessment/amount-handler', function (req, res) {
   if (!justification) errors.justification = 'Enter justification';
 
   if (Object.keys(errors).length > 0) {
-    req.session.data['expert-assessment-amount-errors'] = errors;
-    res.redirect('/v6-v3/expert-assessment/amount');
+    req.session.data['v6-v4']['expert-assessment-amount-errors'] = errors;
+    res.redirect('/v6-v4/expert-assessment/amount');
     return;
   }
 
-  req.session.data['expert-justification'] = justification;
+  req.session.data['v6-v4']['expert-justification'] = justification;
 
   if (amountDecision === 'new') {
-    req.session.data['expert-new-name'] = (req.body['expert-new-name'] || '').trim() || req.session.data['expert-default-name'] || 'Dr Andrew Wilson';
-    req.session.data['expert-new-type'] = (req.body['expert-new-type'] || '').trim() || req.session.data['expert-default-type'] || 'Medical examiner';
-    req.session.data['expert-new-location'] = (req.body['expert-new-location'] || '').trim() || req.session.data['expert-default-location'] || 'B1 1AA';
-    req.session.data['expert-new-rate'] = (req.body['expert-new-rate'] || '').trim() || req.session.data['expert-default-rate'] || '95.00';
-    req.session.data['expert-new-hours'] = (req.body['expert-new-hours'] || '').trim() || req.session.data['expert-default-hours'] || '50';
-    req.session.data['expert-new-minutes'] = (req.body['expert-new-minutes'] || '').trim() || req.session.data['expert-default-minutes'] || '00';
+    req.session.data['v6-v4']['expert-new-name'] = (req.body['expert-new-name'] || '').trim() || req.session.data['v6-v4']['expert-default-name'] || 'Dr Andrew Wilson';
+    req.session.data['v6-v4']['expert-new-type'] = (req.body['expert-new-type'] || '').trim() || req.session.data['v6-v4']['expert-default-type'] || 'Medical examiner';
+    req.session.data['v6-v4']['expert-new-location'] = (req.body['expert-new-location'] || '').trim() || req.session.data['v6-v4']['expert-default-location'] || 'B1 1AA';
+    req.session.data['v6-v4']['expert-new-rate'] = (req.body['expert-new-rate'] || '').trim() || req.session.data['v6-v4']['expert-default-rate'] || '95.00';
+    req.session.data['v6-v4']['expert-new-hours'] = (req.body['expert-new-hours'] || '').trim() || req.session.data['v6-v4']['expert-default-hours'] || '50';
+    req.session.data['v6-v4']['expert-new-minutes'] = (req.body['expert-new-minutes'] || '').trim() || req.session.data['v6-v4']['expert-default-minutes'] || '00';
 
     const rawTotalAmount = (req.body['expert-new-total-amount'] || '').trim();
-    req.session.data['expert-new-total-amount'] = rawTotalAmount;
+    req.session.data['v6-v4']['expert-new-total-amount'] = rawTotalAmount;
 
     const normalized = rawTotalAmount.replace(/[£,\s]/g, '');
     const parsed = Number(normalized);
-    req.session.data['expert-new-amount'] = Number.isFinite(parsed) && parsed > 0
+    req.session.data['v6-v4']['expert-new-amount'] = Number.isFinite(parsed) && parsed > 0
       ? parsed.toFixed(2)
-      : req.session.data['expert-requested-amount'];
+      : req.session.data['v6-v4']['expert-requested-amount'];
   } else {
-    delete req.session.data['expert-new-name'];
-    delete req.session.data['expert-new-type'];
-    delete req.session.data['expert-new-location'];
-    delete req.session.data['expert-new-rate'];
-    delete req.session.data['expert-new-hours'];
-    delete req.session.data['expert-new-minutes'];
-    delete req.session.data['expert-new-total-amount'];
-    delete req.session.data['expert-new-amount'];
+    delete req.session.data['v6-v4']['expert-new-name'];
+    delete req.session.data['v6-v4']['expert-new-type'];
+    delete req.session.data['v6-v4']['expert-new-location'];
+    delete req.session.data['v6-v4']['expert-new-rate'];
+    delete req.session.data['v6-v4']['expert-new-hours'];
+    delete req.session.data['v6-v4']['expert-new-minutes'];
+    delete req.session.data['v6-v4']['expert-new-total-amount'];
+    delete req.session.data['v6-v4']['expert-new-amount'];
   }
 
-  res.redirect('/v6-v3/expert-assessment/check-your-answers');
+  res.redirect('/v6-v4/expert-assessment/check-your-answers');
 });
 
 router.get('/expert-assessment/new-amount', function (req, res) {
-  const errors = req.session.data['expert-assessment-new-amount-errors'] || null;
-  delete req.session.data['expert-assessment-new-amount-errors'];
+  const errors = req.session.data['v6-v4']['expert-assessment-new-amount-errors'] || null;
+  delete req.session.data['v6-v4']['expert-assessment-new-amount-errors'];
 
-  res.render('v6-v3/expert-assessment/new-amount.njk', {
+  res.render('v6-v4/expert-assessment/new-amount.njk', {
     pageTitle: 'Make a decision - Prior Authority',
-    reference: req.session.data['expert-assessment-reference'] || '',
-    requestedAmount: formatCurrencyGBP(req.session.data['expert-requested-amount']),
+    reference: req.session.data['v6-v4']['expert-assessment-reference'] || '',
+    requestedAmount: formatCurrencyGBP(req.session.data['v6-v4']['expert-requested-amount']),
     errors: errors
   });
 });
@@ -4203,41 +4237,41 @@ router.post('/expert-assessment/new-amount-handler', function (req, res) {
   const parsed = Number(normalized);
 
   if (!normalized || !Number.isFinite(parsed) || parsed <= 0) {
-    req.session.data['expert-assessment-new-amount-errors'] = {
+    req.session.data['v6-v4']['expert-assessment-new-amount-errors'] = {
       newAmount: 'Enter a valid new amount'
     };
-    res.redirect('/v6-v3/expert-assessment/new-amount');
+    res.redirect('/v6-v4/expert-assessment/new-amount');
     return;
   }
 
-  req.session.data['expert-new-amount'] = parsed.toFixed(2);
-  res.redirect('/v6-v3/expert-assessment/check-your-answers');
+  req.session.data['v6-v4']['expert-new-amount'] = parsed.toFixed(2);
+  res.redirect('/v6-v4/expert-assessment/check-your-answers');
 });
 
 router.get('/expert-assessment/check-your-answers', function (req, res) {
-  const requestedAmount = req.session.data['expert-requested-amount'];
-  const newAmount = req.session.data['expert-new-amount'];
-  const amountDecision = req.session.data['expert-amount-decision'];
+  const requestedAmount = req.session.data['v6-v4']['expert-requested-amount'];
+  const newAmount = req.session.data['v6-v4']['expert-new-amount'];
+  const amountDecision = req.session.data['v6-v4']['expert-amount-decision'];
 
   let grantedAmount = null;
-  if (req.session.data['expert-decision'] === 'Grant') {
+  if (req.session.data['v6-v4']['expert-decision'] === 'Grant') {
     grantedAmount = amountDecision === 'new' ? newAmount : requestedAmount;
   }
 
-  res.render('v6-v3/expert-assessment/check-your-answers.njk', {
+  res.render('v6-v4/expert-assessment/check-your-answers.njk', {
     pageTitle: 'Check your answers - Prior Authority',
-    reference: req.session.data['expert-assessment-reference'] || '',
+    reference: req.session.data['v6-v4']['expert-assessment-reference'] || '',
     requestedAmount: formatCurrencyGBP(requestedAmount),
     grantedAmount: formatCurrencyGBP(grantedAmount)
   });
 });
 
 router.post('/expert-assessment/submit-assessment', function (req, res) {
-  const reference = req.session.data['expert-assessment-reference'];
-  const decision = req.session.data['expert-decision'];
+  const reference = req.session.data['v6-v4']['expert-assessment-reference'];
+  const decision = req.session.data['v6-v4']['expert-decision'];
 
   if (!decision) {
-    res.redirect(`/v6-v3/expert-assessment/decision?reference=${reference || ''}`);
+    res.redirect(`/v6-v4/expert-assessment/decision?reference=${reference || ''}`);
     return;
   }
 
@@ -4246,13 +4280,13 @@ router.post('/expert-assessment/submit-assessment', function (req, res) {
     removePriorAuthorityFromAssignedList(req, reference);
   }
 
-  res.redirect('/v6-v3/expert-assessment/confirmation');
+  res.redirect('/v6-v4/expert-assessment/confirmation');
 });
 
 router.get('/expert-assessment/confirmation', function (req, res) {
-  res.render('v6-v3/expert-assessment/confirmation.njk', {
+  res.render('v6-v4/expert-assessment/confirmation.njk', {
     pageTitle: 'Assessment for prior authority completed - Prior Authority',
-    reference: req.session.data['expert-assessment-reference'] || 'CRM4-Expert-123'
+    reference: req.session.data['v6-v4']['expert-assessment-reference'] || 'CRM4-Expert-123'
   });
 });
 

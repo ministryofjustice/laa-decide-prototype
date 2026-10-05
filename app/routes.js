@@ -22,6 +22,7 @@ const v5 = require('./routes/v5.js');
 const v6 = require('./routes/v6.js');
 const v6v2 = require('./routes/v6-v2.js');
 const v6v3 = require('./routes/v6-v3.js');
+const v6v4 = require('./routes/v6-v4.js');
 
 // Call in routes file from routes folder to keep routes.js cleaner
 router.use('/v2', v2);
@@ -31,6 +32,7 @@ router.use('/v5', v5);
 router.use('/v6', v6);
 router.use('/v6-v2', v6v2);
 router.use('/v6-v3', v6v3);
+router.use('/v6-v4', v6v4);
 router.use('/latest', latest);
 router.use('/static', static);
 

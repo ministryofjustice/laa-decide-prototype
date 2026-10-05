@@ -1,0 +1,141 @@
+{% extends "v6-v4/redetermination-decision.njk" %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/textarea/macro.njk" import govukTextarea %}
+
+{% block head %}
+  {{ super() }}
+  <style>
+    [data-remove-proceeding][hidden] { display: none; }
+    .additional-proceeding-heading {
+      display: flex;
+      width: 100%;
+      align-items: baseline;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .additional-proceeding-heading [data-remove-proceeding] { margin-bottom: 0; }
+  </style>
+{% endblock %}
+
+{% block beforeContent %}
+  {{ govukPhaseBanner({ tag: { text: "Beta" }, html: 'This is a new service - your <a class="govuk-link" href="#">feedback</a> will help us to improve it.' }) }}
+  {{ govukBackLink({ text: "Back to application", href: "/v6-v4/application/" ~ reference ~ "?isRedetermination=true" }) }}
+{% endblock %}
+
+{% macro additionalFields(position, item) %}
+  <fieldset class="govuk-fieldset govuk-!-margin-bottom-6" data-additional-proceeding>
+    <legend class="govuk-fieldset__legend govuk-fieldset__legend--s additional-proceeding-heading">
+      <span>Details of request</span>
+      <button type="button" class="govuk-button govuk-button--secondary" data-remove-proceeding aria-label="Remove details of request {{ position }}">Remove</button>
+    </legend>
+    {{ govukInput({ id: "additional-name-" ~ position, name: "additional-name", value: item.proceedingName, label: { text: "Proceeding" } }) }}
+    {{ govukInput({ id: "additional-role-" ~ position, name: "additional-role", value: item.clientRole, label: { text: "Client role" } }) }}
+    {{ govukTextarea({ id: "additional-scope-" ~ position, name: "additional-scope", value: item.scopeLimitations or "Final Hearing\n\nTo be represented on all steps up to and including a final hearing.", rows: 4, label: { text: "Scope limitations" } }) }}
+    {{ govukInput({ id: "additional-service-" ~ position, name: "additional-service", value: item.levelOfService or "Full representation", label: { text: "Level of service" } }) }}
+  </fieldset>
+{% endmacro %}
+
+{% block content %}
+  <div class="govuk-grid-row"><div class="govuk-grid-column-two-thirds">
+    {% if draft.errors.length %}{{ govukErrorSummary({ titleText: "There is a problem", errorList: draft.errors }) }}{% endif %}
+    <p class="govuk-body-l govuk-!-margin-bottom-1">Application reference</p>
+    <p class="govuk-heading-l">{{ reference }}</p>
+    <h1 class="govuk-heading-xl">Make a decision</h1>
+    <p class="govuk-body">Use this section to make decisions on one or more proceedings. Each decision will be recorded in application history and will be shared with the provider.</p>
+    <form method="post" action="/v6-v4/application/{{ reference }}/redeterminations/decision">
+      {% set appliedProceedingsHtml %}
+      {% for request in requests %}
+        <section class="govuk-!-margin-top-6 govuk-!-margin-bottom-8" aria-labelledby="request-heading-{{ request.index }}">
+          <h2 class="govuk-heading-m" id="request-heading-{{ request.index }}">{{ request.redeterminationProceeding }}</h2>
+          <p class="govuk-body">Details of request</p>
+          <dl class="govuk-summary-list">
+            <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">Proceeding</dt><dd class="govuk-summary-list__value">{{ request.answer.proceedingName or request.redeterminationProceeding }}</dd></div>
+            <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">Client role</dt><dd class="govuk-summary-list__value">{{ request.answer.clientRole or request.redeterminationClientRole }}</dd></div>
+            <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">Scope limitations</dt><dd class="govuk-summary-list__value">Final Hearing<br><br>To be represented on all steps up to and including a final hearing.</dd></div>
+            <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">Level of service</dt><dd class="govuk-summary-list__value">Full representation</dd></div>
+          </dl>
+          {% if request.editingDetails %}
+            {{ govukInput({ id: "proceeding-" ~ request.index, name: "proceeding-" ~ request.index, value: request.answer.proceedingName or request.redeterminationProceeding, label: { text: "Proceeding" } }) }}
+            {{ govukInput({ id: "role-" ~ request.index, name: "role-" ~ request.index, value: request.answer.clientRole or request.redeterminationClientRole, label: { text: "Client role" } }) }}
+          {% endif %}
+          {% set refusalHtml %}
+            {{ govukRadios({ name: "refusal-" ~ request.index, idPrefix: "refusal-" ~ request.index,
+              fieldset: { legend: { text: "Select a reason for refusal", classes: "govuk-fieldset__legend--s" } },
+              items: [
+                { value: "Not in scope", text: "Not in scope", checked: request.answer.refusalReason == "Not in scope" },
+                { value: "Insufficient Information", text: "Insufficient Information", checked: request.answer.refusalReason == "Insufficient Information" },
+                { value: "Duplicate Case", text: "Duplicate Case", checked: request.answer.refusalReason == "Duplicate Case" }
+              ] }) }}
+          {% endset %}
+          {{ govukRadios({ name: "decision-" ~ request.index, idPrefix: "decision-" ~ request.index,
+            fieldset: { legend: { text: "What is your decision", classes: "govuk-fieldset__legend--s" } },
+            items: [
+              { value: "grant", text: "Grant", checked: request.answer.decision == "grant" },
+              { value: "refuse", text: "Refuse", checked: request.answer.decision == "refuse", conditional: { html: refusalHtml } }
+            ] }) }}
+        </section>
+      {% endfor %}
+      {% endset %}
+      {% set additionsHtml %}
+        <div id="additional-proceedings">
+          {% if draft.additions.length %}
+            {% for item in draft.additions %}{{ additionalFields(loop.index, item) }}{% endfor %}
+          {% else %}
+            {{ additionalFields(1, {}) }}
+          {% endif %}
+        </div>
+        <button type="button" class="govuk-button govuk-button--secondary" id="add-another-proceeding">Add another</button>
+        <p class="govuk-visually-hidden" id="additional-proceeding-status" aria-live="polite"></p>
+      {% endset %}
+      {{ govukRadios({ name: "proceeding-mode", idPrefix: "proceeding-mode", items: [
+        { value: "existing", text: "Details of request", checked: draft.proceedingMode != "new", conditional: { html: appliedProceedingsHtml } },
+        { value: "new", text: "New proceeding", checked: draft.proceedingMode == "new", conditional: { html: additionsHtml } }
+      ] }) }}
+      {{ govukTextarea({ name: "grouped-explanation", id: "grouped-explanation", value: draft.explanation,
+        label: { text: "Explain your decision", classes: "govuk-label--m" },
+        hint: { text: "We will share this decision with the provider in the notification email. You will also find this saved in the application history." },
+        attributes: { maxlength: 10000 } }) }}
+      <p class="govuk-hint">You can enter up to 10,000 characters</p>
+      {{ govukButton({ text: "Continue" }) }}
+    </form>
+    <template id="additional-proceeding-template">{{ additionalFields("template", {}) }}</template>
+  </div></div>
+{% endblock %}
+
+{% block bodyEnd %}
+  {{ super() }}
+  <script>
+    const additionalContainer = document.getElementById('additional-proceedings');
+    const addButton = document.getElementById('add-another-proceeding');
+    const statusMessage = document.getElementById('additional-proceeding-status');
+    let nextPosition = additionalContainer.children.length + 1;
+    function updateRemoveButtons() {
+      const items = additionalContainer.querySelectorAll('[data-additional-proceeding]');
+      items.forEach(item => { item.querySelector('[data-remove-proceeding]').hidden = items.length === 1; });
+    }
+    addButton.addEventListener('click', () => {
+      const fragment = document.getElementById('additional-proceeding-template').content.cloneNode(true);
+      const position = nextPosition++;
+      fragment.querySelector('[data-remove-proceeding]').setAttribute('aria-label', 'Remove details of request ' + position);
+      fragment.querySelectorAll('input, textarea').forEach(input => {
+        const oldId = input.id;
+        input.id = oldId.replace('template', position);
+        fragment.querySelector('label[for="' + oldId + '"]').htmlFor = input.id;
+      });
+      additionalContainer.appendChild(fragment);
+      updateRemoveButtons();
+      additionalContainer.lastElementChild.querySelector('input').focus();
+      statusMessage.textContent = 'New proceeding added';
+    });
+    additionalContainer.addEventListener('click', event => {
+      const removeButton = event.target.closest('[data-remove-proceeding]');
+      if (!removeButton || additionalContainer.children.length === 1) return;
+      removeButton.closest('[data-additional-proceeding]').remove();
+      updateRemoveButtons();
+      addButton.focus();
+      statusMessage.textContent = 'New proceeding removed';
+    });
+    updateRemoveButtons();
+  </script>
+{% endblock %}
