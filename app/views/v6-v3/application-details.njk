@@ -494,10 +494,12 @@
                     <dd class="govuk-summary-list__value">Final Hearing<br><br>To be represented on all steps up to and including a final hearing.</dd>
                     {% endif %}
                   </div>
-                  <div class="govuk-summary-list__row">
-                    <dt class="govuk-summary-list__key">Justification of request</dt>
-                    <dd class="govuk-summary-list__value">{{ redetermination.redeterminationJustification or ("On " + redetermination.submitted + ", the Local Authority issued a formal application for a " + (redetermination.redeterminationProceeding or 'Child assessment order') + " due to ongoing concerns regarding the child's welfare. Representation is urgently required to prepare the client's response and represent them at the upcoming hearing.") }}</dd>
-                  </div>
+                  {% if not groupedRedeterminationFlow %}
+                    <div class="govuk-summary-list__row">
+                      <dt class="govuk-summary-list__key">Justification of request</dt>
+                      <dd class="govuk-summary-list__value">{{ redetermination.redeterminationJustification or ("On " + redetermination.submitted + ", the Local Authority issued a formal application for a " + (redetermination.redeterminationProceeding or 'Child assessment order') + " due to ongoing concerns regarding the child's welfare. Representation is urgently required to prepare the client's response and represent them at the upcoming hearing.") }}</dd>
+                    </div>
+                  {% endif %}
                   <div class="govuk-summary-list__row">
                     <dt class="govuk-summary-list__key">Decision</dt>
                     <dd class="govuk-summary-list__value">{{ govukTag({ text: redetermination.status, classes: redetermination.statusClass }) }}</dd>
@@ -508,6 +510,56 @@
           {% endfor %}
         {% else %}
           <p class="govuk-body">There are currently no redetermination requests linked to this application.</p>
+        {% endif %}
+
+        {% if redeterminations.length > 0 and redeterminationAdditionalDetails %}
+          <div class="govuk-summary-card govuk-!-margin-bottom-6" id="redetermination-additional-details">
+            <div class="govuk-summary-card__title-wrapper">
+              <h3 class="govuk-summary-card__title">Additional details</h3>
+            </div>
+            <div class="govuk-summary-card__content">
+              <dl class="govuk-summary-list">
+                <div class="govuk-summary-list__row">
+                  <dt class="govuk-summary-list__key">Does your client still have parental responsibility for the children</dt>
+                  <dd class="govuk-summary-list__value">{{ redeterminationAdditionalDetails.parentalResponsibility }}</dd>
+                </div>
+                <div class="govuk-summary-list__row">
+                  <dt class="govuk-summary-list__key">Has a final order been made in any existing proceedings</dt>
+                  <dd class="govuk-summary-list__value">{{ redeterminationAdditionalDetails.finalOrderMade }}</dd>
+                </div>
+                <div class="govuk-summary-list__row">
+                  <dt class="govuk-summary-list__key">Justification of request</dt>
+                  <dd class="govuk-summary-list__value">{{ redeterminationAdditionalDetails.justification }}</dd>
+                </div>
+              </dl>
+            </div>
+          </div>
+          <div class="govuk-summary-card govuk-!-margin-bottom-6" id="redetermination-supporting-evidence">
+            <div class="govuk-summary-card__title-wrapper">
+              <h3 class="govuk-summary-card__title">Supporting evidence</h3>
+            </div>
+            <div class="govuk-summary-card__content">
+              <table class="govuk-table govuk-!-margin-bottom-0">
+                <caption class="govuk-table__caption govuk-visually-hidden">Redetermination supporting evidence</caption>
+                <thead class="govuk-table__head">
+                  <tr class="govuk-table__row">
+                    <th scope="col" class="govuk-table__header">Type of evidence</th>
+                    <th scope="col" class="govuk-table__header">File name &amp; Date received</th>
+                  </tr>
+                </thead>
+                <tbody class="govuk-table__body">
+                  <tr class="govuk-table__row">
+                    <td class="govuk-table__cell">Court order</td>
+                    <td class="govuk-table__cell"><a class="govuk-link" href="/public/downloads/v6-v3/court_order.pdf">court_order.pdf</a><br>14 July 2026</td>
+                  </tr>
+                  <tr class="govuk-table__row">
+                    <td class="govuk-table__cell">Parental evidence</td>
+                    <td class="govuk-table__cell"><a class="govuk-link" href="/public/downloads/v6-v3/parental_responsibility.pdf">parental_responsibility.pdf</a><br>14 July 2026</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
         {% endif %}
 
         {% if not viewingRedetermination %}

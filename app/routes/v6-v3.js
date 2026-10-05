@@ -2545,10 +2545,10 @@ router.get('/search', function(req, res) {
           .filter(request => request.reference === entry.reference && !request.replacedByNewProceedings)
           .map(request => request.status);
       const hasPendingRequests = requestStatuses.some(status => !['Granted', 'Refused'].includes(status));
-      const outcome = hasPendingRequests
-        ? requestStatuses.includes('In progress') ? 'In progress' : 'Submitted'
-        : new Set(requestStatuses).size === 1 ? requestStatuses[0] : 'Completed';
-      const outcomeClasses = { Granted: 'green', Refused: 'red', 'In progress': 'light-blue', Submitted: 'pink', Completed: 'blue' };
+      const outcome = requestStatuses.includes('Granted')
+        ? 'Granted'
+        : hasPendingRequests ? requestStatuses.includes('In progress') ? 'In progress' : 'Submitted' : 'Refused';
+      const outcomeClasses = { Granted: 'green', Refused: 'red', 'In progress': 'light-blue', Submitted: 'pink' };
       const linkedRequest = requests.find(request => !['Granted', 'Refused'].includes(request.status)) || requests[0];
       // A redetermination can only be submitted against an initial application that
       // has already been granted, so guarantee that companion row appears in results
@@ -3314,6 +3314,13 @@ router.get('/application/:reference', function(req, res) {
   const priorAuthorityApplicationData = applyStoredDecision(findApplicationVariant(true));
   const redeterminations = getRedeterminationsForReference(req, reference);
   const pendingRedeterminationCount = redeterminations.filter(redetermination => !['Granted', 'Refused'].includes(redetermination.status)).length;
+  const submittedRedetermination = applicationCollections.flat().find(request => request.ref === reference
+    && request.isRedetermination && !request.newProceedingDetails) || redeterminations[0];
+  const redeterminationAdditionalDetails = submittedRedetermination ? {
+    parentalResponsibility: submittedRedetermination.redeterminationParentalResponsibility || 'Yes',
+    finalOrderMade: submittedRedetermination.redeterminationFinalOrderMade || 'No',
+    justification: submittedRedetermination.redeterminationJustification
+  } : null;
   if (initialApplicationData && priorAuthorityApplicationData && !initialApplicationData.status) {
     initialApplicationData.status = 'Granted';
     initialApplicationData.decisionType = 'Grant';
@@ -3511,6 +3518,7 @@ router.get('/application/:reference', function(req, res) {
     hasPriorAuthority: hasPriorAuthority,
     priorAuthorityType: priorAuthorityType,
     redeterminations: redeterminations,
+    redeterminationAdditionalDetails: redeterminationAdditionalDetails,
     pendingRedeterminationCount: pendingRedeterminationCount,
     sessionData: req.session.data,
     isAssigned: isAssigned,
