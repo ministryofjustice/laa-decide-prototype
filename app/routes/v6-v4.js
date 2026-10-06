@@ -2728,6 +2728,50 @@ router.get('/application/:reference/redeterminations/decision', function(req, re
   res.render('v6-v4/grouped-redetermination-decision.njk', { reference, requests: requestsWithAnswers, draft });
 });
 
+function getGroupedCertificateGrantDate(body, index) {
+  const dateType = body['certificate-grant-date-type-' + index];
+  const day = String(body['certificate-grant-date-' + index + '-day'] || '').trim();
+  const month = String(body['certificate-grant-date-' + index + '-month'] || '').trim();
+  const year = String(body['certificate-grant-date-' + index + '-year'] || '').trim();
+  let certificateGrantDate;
+
+  if (dateType === 'today') {
+    certificateGrantDate = new Date().toLocaleDateString('en-GB', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric'
+    });
+  } else if (dateType === 'another-date') {
+    const date = new Date(Number(year), Number(month) - 1, Number(day));
+    const isValidDate = /^\d{1,2}$/.test(day)
+      && /^\d{1,2}$/.test(month)
+      && /^\d{4}$/.test(year)
+      && Number(year) >= 1000
+      && date.getFullYear() === Number(year)
+      && date.getMonth() === Number(month) - 1
+      && date.getDate() === Number(day);
+    if (isValidDate) {
+      certificateGrantDate = date.toLocaleDateString('en-GB', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric'
+      });
+    }
+  }
+
+  return {
+    values: {
+      certificateGrantDateType: dateType,
+      certificateGrantDateDay: day,
+      certificateGrantDateMonth: month,
+      certificateGrantDateYear: year,
+      certificateGrantDate
+    },
+    dateTypeMissing: !['today', 'another-date'].includes(dateType),
+    dateMissingOrInvalid: dateType === 'another-date' && !certificateGrantDate
+  };
+}
+
 router.post('/application/:reference/redeterminations/decision', function(req, res) {
   const reference = req.params.reference;
   const requests = res.locals.groupedRequests.filter(request => !['Granted', 'Refused'].includes(request.status));
@@ -2741,13 +2785,16 @@ router.post('/application/:reference/redeterminations/decision', function(req, r
   const decisions = proceedingMode === 'new' ? [] : requests.map(request => {
     const decision = req.body['decision-' + request.index];
     const refusalReason = req.body['refusal-' + request.index];
+    const grantDate = decision === 'grant' ? getGroupedCertificateGrantDate(req.body, request.index) : null;
     const previousAnswer = req.session.data['v6-v4']['grouped-redetermination-drafts']?.[reference]?.decisions?.find(answer => answer.index === request.index);
     const proceedingName = (req.body['proceeding-' + request.index] ?? previousAnswer?.proceedingName ?? request.redeterminationProceeding).trim();
     const clientRole = (req.body['role-' + request.index] ?? previousAnswer?.clientRole ?? request.redeterminationClientRole).trim();
     if (!proceedingName || !clientRole) errors.push({ text: 'Enter the proceeding and client role', href: '#request-heading-' + request.index });
     if (!['grant', 'refuse'].includes(decision)) errors.push({ text: 'Select a decision for ' + request.redeterminationProceeding, href: '#decision-' + request.index });
     if (decision === 'refuse' && !REDETERMINATION_REFUSAL_REASONS.includes(refusalReason)) errors.push({ text: 'Select a refusal reason for ' + request.redeterminationProceeding, href: '#refusal-' + request.index });
-    return { index: request.index, decision, proceedingName, clientRole, refusalReason: decision === 'refuse' ? refusalReason : '' };
+    if (grantDate?.dateTypeMissing) errors.push({ text: 'Select when the certificate should be granted from for ' + request.redeterminationProceeding, href: '#certificate-grant-date-type-' + request.index });
+    if (grantDate?.dateMissingOrInvalid) errors.push({ text: 'Enter a real date for when the certificate should be granted from for ' + request.redeterminationProceeding, href: '#certificate-grant-date-' + request.index + '-day' });
+    return { index: request.index, decision, proceedingName, clientRole, refusalReason: decision === 'refuse' ? refusalReason : '', ...(grantDate ? grantDate.values : {}) };
   });
   const explanation = (req.body['grouped-explanation'] || '').trim();
   if (!explanation || explanation.length > 10000) errors.push({ text: 'Explain your decision using up to 10,000 characters', href: '#grouped-explanation' });
@@ -2769,6 +2816,11 @@ router.post('/application/:reference/redeterminations/decision', function(req, r
     if (previous && Object.keys(addition).every(key => addition[key] === previous[key])) {
       addition.decision = previous.decision;
       addition.refusalReason = previous.refusalReason;
+      addition.certificateGrantDateType = previous.certificateGrantDateType;
+      addition.certificateGrantDateDay = previous.certificateGrantDateDay;
+      addition.certificateGrantDateMonth = previous.certificateGrantDateMonth;
+      addition.certificateGrantDateYear = previous.certificateGrantDateYear;
+      addition.certificateGrantDate = previous.certificateGrantDate;
     }
     return addition;
   }) : [];
@@ -2782,7 +2834,8 @@ router.post('/application/:reference/redeterminations/decision', function(req, r
 
 function hasValidNewProceedingDecisions(draft) {
   return draft.additions?.length > 0 && draft.additions.every(addition => ['grant', 'refuse'].includes(addition.decision)
-    && (addition.decision !== 'refuse' || REDETERMINATION_REFUSAL_REASONS.includes(addition.refusalReason)));
+    && (addition.decision !== 'refuse' || REDETERMINATION_REFUSAL_REASONS.includes(addition.refusalReason))
+    && (addition.decision !== 'grant' || Boolean(addition.certificateGrantDate)));
 }
 
 router.get('/application/:reference/redeterminations/new-proceedings/decision', function(req, res) {
@@ -2803,7 +2856,14 @@ router.get('/application/:reference/redeterminations/new-proceedings/decision', 
     redeterminationClientRole: addition.clientRole,
     scopeLimitations: addition.scopeLimitations,
     levelOfService: addition.levelOfService,
-    answer: { decision: addition.decision, refusalReason: addition.refusalReason }
+    answer: {
+      decision: addition.decision,
+      refusalReason: addition.refusalReason,
+      certificateGrantDateType: addition.certificateGrantDateType,
+      certificateGrantDateDay: addition.certificateGrantDateDay,
+      certificateGrantDateMonth: addition.certificateGrantDateMonth,
+      certificateGrantDateYear: addition.certificateGrantDateYear
+    }
   }));
   res.render('v6-v4/grouped-redetermination-decision.njk', {
     reference,
@@ -2824,8 +2884,12 @@ router.post('/application/:reference/redeterminations/new-proceedings/decision',
   draft.additions.forEach((addition, position) => {
     addition.decision = req.body['decision-new-' + position];
     addition.refusalReason = addition.decision === 'refuse' ? req.body['refusal-new-' + position] : '';
+    const grantDate = addition.decision === 'grant' ? getGroupedCertificateGrantDate(req.body, 'new-' + position) : null;
+    if (grantDate) Object.assign(addition, grantDate.values);
     if (!['grant', 'refuse'].includes(addition.decision)) errors.push({ text: 'Select a decision for ' + addition.proceedingName, href: '#decision-new-' + position });
     if (addition.decision === 'refuse' && !REDETERMINATION_REFUSAL_REASONS.includes(addition.refusalReason)) errors.push({ text: 'Select a refusal reason for ' + addition.proceedingName, href: '#refusal-new-' + position });
+    if (grantDate?.dateTypeMissing) errors.push({ text: 'Select when the certificate should be granted from for ' + addition.proceedingName, href: '#certificate-grant-date-type-new-' + position });
+    if (grantDate?.dateMissingOrInvalid) errors.push({ text: 'Enter a real date for when the certificate should be granted from for ' + addition.proceedingName, href: '#certificate-grant-date-new-' + position + '-day' });
   });
   draft.explanation = (req.body['grouped-explanation'] || '').trim();
   if (!draft.explanation || draft.explanation.length > 10000) errors.push({ text: 'Explain your decision using up to 10,000 characters', href: '#grouped-explanation' });
@@ -2871,7 +2935,7 @@ router.post('/application/:reference/redeterminations/check-answers', function(r
   draft.decisions.forEach(answer => {
     const request = requests.find(item => item.index === answer.index);
     const status = answer.decision === 'grant' ? 'Granted' : 'Refused';
-    store[reference + '|' + answer.index] = { ...request, reference, redeterminationProceeding: answer.proceedingName, redeterminationClientRole: answer.clientRole, status, decisionType: answer.decision === 'grant' ? 'Grant' : 'Refuse', refusalReason: answer.refusalReason, decisionReason: draft.explanation };
+    store[reference + '|' + answer.index] = { ...request, ...answer, reference, redeterminationProceeding: answer.proceedingName, redeterminationClientRole: answer.clientRole, status, decisionType: answer.decision === 'grant' ? 'Grant' : 'Refuse', refusalReason: answer.refusalReason, decisionReason: draft.explanation };
     addHistoryEvent(req, reference, request.redeterminationProceeding + ': ' + status, request.caseworker || 'Caseworker', draft.explanation, { From: request.status, To: status });
   });
   let nextIndex = Math.max(...requests.map(request => request.index)) + 1;
@@ -2888,7 +2952,12 @@ router.post('/application/:reference/redeterminations/check-answers', function(r
       newProceedingDetails: addition,
       status,
       decisionType: addition.decision === 'grant' ? 'Grant' : 'Refuse',
-      refusalReason: addition.refusalReason
+      refusalReason: addition.refusalReason,
+      certificateGrantDateType: addition.certificateGrantDateType,
+      certificateGrantDateDay: addition.certificateGrantDateDay,
+      certificateGrantDateMonth: addition.certificateGrantDateMonth,
+      certificateGrantDateYear: addition.certificateGrantDateYear,
+      certificateGrantDate: addition.certificateGrantDate
     };
     req.session.data['v6-v4']['completed-applications'].push(request);
     store[reference + '|' + index] = { ...request, reference, index, decisionReason: draft.explanation };

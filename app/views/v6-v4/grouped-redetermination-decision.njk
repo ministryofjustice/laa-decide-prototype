@@ -1,5 +1,6 @@
 {% extends "v6-v4/redetermination-decision.njk" %}
 {% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/date-input/macro.njk" import govukDateInput %}
 {% from "govuk/components/textarea/macro.njk" import govukTextarea %}
 
 {% block head %}
@@ -68,10 +69,34 @@
                 { value: "Duplicate Case", text: "Duplicate Case", checked: request.answer.refusalReason == "Duplicate Case" }
               ] }) }}
           {% endset %}
+          {% set anotherGrantDateHtml %}
+            {{ govukDateInput({
+              id: "certificate-grant-date-" ~ request.index,
+              namePrefix: "certificate-grant-date-" ~ request.index,
+              fieldset: { legend: { text: "Enter date", classes: "govuk-fieldset__legend--s" } },
+              hint: { text: "For example, 12 6 2026" },
+              items: [
+                { name: "day", value: request.answer.certificateGrantDateDay, classes: "govuk-input--width-2" },
+                { name: "month", value: request.answer.certificateGrantDateMonth, classes: "govuk-input--width-2" },
+                { name: "year", value: request.answer.certificateGrantDateYear, classes: "govuk-input--width-4" }
+              ]
+            }) }}
+          {% endset %}
+          {% set grantDateHtml %}
+            {{ govukRadios({
+              name: "certificate-grant-date-type-" ~ request.index,
+              idPrefix: "certificate-grant-date-type-" ~ request.index,
+              fieldset: { legend: { text: "When should the certificate be granted from?", classes: "govuk-fieldset__legend--s" } },
+              items: [
+                { value: "today", text: "Today", checked: request.answer.certificateGrantDateType == "today" },
+                { value: "another-date", text: "Another date", checked: request.answer.certificateGrantDateType == "another-date", conditional: { html: anotherGrantDateHtml } }
+              ]
+            }) }}
+          {% endset %}
           {{ govukRadios({ name: "decision-" ~ request.index, idPrefix: "decision-" ~ request.index,
             fieldset: { legend: { text: "What is your decision", classes: "govuk-fieldset__legend--s" } },
             items: [
-              { value: "grant", text: "Grant", checked: request.answer.decision == "grant" },
+              { value: "grant", text: "Grant", conditional: { html: grantDateHtml } },
               { value: "refuse", text: "Refuse", checked: request.answer.decision == "refuse", conditional: { html: refusalHtml } }
             ] }) }}
         </section>

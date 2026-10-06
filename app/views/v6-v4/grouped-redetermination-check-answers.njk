@@ -5,7 +5,7 @@
   {{ govukBackLink({ text: "Back to application", href: "/v6-v4/application/" ~ reference ~ "?isRedetermination=true" }) }}
 {% endblock %}
 
-{% macro summaryCard(title, decision, role, scope, service, refusal, changeHref, anchor, decisionHref) %}
+{% macro summaryCard(title, decision, role, scope, service, refusal, grantDate, changeHref, anchor, decisionHref) %}
   {% set detailsHref = changeHref ~ anchor if anchor == "#additional-proceedings" else changeHref ~ "?edit=" ~ (anchor | replace('#request-heading-', '')) ~ anchor %}
   <div class="govuk-summary-card govuk-!-margin-bottom-6">
     <div class="govuk-summary-card__title-wrapper"><h2 class="govuk-summary-card__title">{{ title }}</h2></div>
@@ -19,6 +19,12 @@
           <div class="govuk-summary-list__row">
             <dt class="govuk-summary-list__key">Refusal reason</dt><dd class="govuk-summary-list__value">{{ refusal }}</dd>
             <dd class="govuk-summary-list__actions"><a href="{{ decisionHref or (changeHref ~ anchor) }}" class="govuk-link">Change<span class="govuk-visually-hidden"> refusal reason for {{ title }}</span></a></dd>
+          </div>
+        {% endif %}
+        {% if decision == 'Grant' %}
+          <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">Certificate grant date</dt><dd class="govuk-summary-list__value">{{ grantDate }}</dd>
+            <dd class="govuk-summary-list__actions"><a href="{{ decisionHref or (changeHref ~ anchor) }}" class="govuk-link">Change<span class="govuk-visually-hidden"> certificate grant date for {{ title }}</span></a></dd>
           </div>
         {% endif %}
         <div class="govuk-summary-list__row">
@@ -45,10 +51,10 @@
     <h1 class="govuk-heading-xl">Check your answers</h1>
     {% for item in decisions %}
       {{ summaryCard(item.proceedingName, "Grant" if item.decision == "grant" else "Refuse", item.clientRole,
-        "Final Hearing\n\nTo be represented on all steps up to and including a final hearing.", "Full representation", item.refusalReason, changeHref, "#request-heading-" ~ item.index) }}
+        "Final Hearing\n\nTo be represented on all steps up to and including a final hearing.", "Full representation", item.refusalReason, item.certificateGrantDate, changeHref, "#request-heading-" ~ item.index) }}
     {% endfor %}
     {% for item in draft.additions %}
-      {{ summaryCard(item.proceedingName, "Grant" if item.decision == "grant" else "Refuse", item.clientRole, item.scopeLimitations, item.levelOfService, item.refusalReason, changeHref, "#additional-proceedings", newDecisionHref ~ "#request-heading-new-" ~ loop.index0) }}
+      {{ summaryCard(item.proceedingName, "Grant" if item.decision == "grant" else "Refuse", item.clientRole, item.scopeLimitations, item.levelOfService, item.refusalReason, item.certificateGrantDate, changeHref, "#additional-proceedings", newDecisionHref ~ "#request-heading-new-" ~ loop.index0) }}
     {% endfor %}
     <div class="govuk-summary-card govuk-!-margin-bottom-6">
       <div class="govuk-summary-card__title-wrapper"><h2 class="govuk-summary-card__title">Decision reason</h2></div>
