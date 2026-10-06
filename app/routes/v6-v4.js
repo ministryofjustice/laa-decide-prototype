@@ -593,10 +593,79 @@ function recordRedeterminationSubmitted(req, application) {
   if (!application || !application.isRedetermination) return;
   initializeAppHistory(req, application.ref);
   const history = req.session.data['v6-v4']['app-history'][application.ref];
-  if (!history.some(event => event.action === 'Redetermination submitted' && event.redeterminationType === application.redeterminationType)) {
-    addHistoryEvent(req, application.ref, 'Redetermination submitted', 'N/A', application.redeterminationJustification || null, null);
-    history[history.length - 1].redeterminationType = application.redeterminationType || 'Add a proceeding';
+  if (application.groupedRedeterminationFlow) {
+    const groupedRequests = getRedeterminationsForReference(req, application.ref)
+      .filter(request => request.groupedRedeterminationFlow);
+    const groupKey = application.ref + '-grouped-redetermination-received';
+    const groupedRequestIds = new Set(groupedRequests.map(request => request.redeterminationId));
+    const matchingEvents = history.filter(event => event.action === 'Redetermination request received'
+      && (event.redeterminationId === groupKey || groupedRequestIds.has(event.redeterminationId)));
+    if (matchingEvents.length === 0) {
+      addHistoryEvent(req, application.ref, 'Redetermination request received', 'N/A', null, null);
+      matchingEvents.push(history[history.length - 1]);
+    }
+    const groupEvent = matchingEvents.find(event => event.redeterminationId === groupKey) || matchingEvents[0];
+    groupEvent.redeterminationId = groupKey;
+    groupEvent.redeterminationCount = groupedRequests.length;
+    groupEvent.redeterminationType = 'Add a proceeding';
+    matchingEvents.slice(1).forEach(duplicate => history.splice(history.indexOf(duplicate), 1));
+    return;
   }
+  const requestId = application.redeterminationId || `${application.redeterminationProceeding}|${application.submitted}`;
+  if (!history.some(event => event.action === 'Redetermination request received' && event.redeterminationId === requestId)) {
+    addHistoryEvent(req, application.ref, 'Redetermination request received', 'N/A', application.redeterminationJustification || null, null);
+    history[history.length - 1].redeterminationType = application.redeterminationType || 'Add a proceeding';
+    history[history.length - 1].redeterminationId = requestId;
+    history[history.length - 1].proceeding = application.redeterminationProceeding;
+  }
+}
+
+
+function ensureGeneratedRedeterminationHistory(req, reference) {
+  const sessionData = req.session.data['v6-v4'];
+  const seeded = sessionData['generated-redetermination-history'] || (sessionData['generated-redetermination-history'] = {});
+  const requests = getRedeterminationsForReference(req, reference).filter(request => request.groupedRedeterminationFlow);
+  if (!requests.length) return;
+  requests.forEach(request => recordRedeterminationSubmitted(req, request));
+  if (seeded[reference]) return;
+  const parent = (sessionData['completed-applications'] || []).find(application => application.ref === reference
+    && !application.isPriorAuthority && !application.isRedetermination);
+  if (!parent) return;
+
+  const caseworkerIndex = Array.from(reference).reduce((sum, character) => sum + character.charCodeAt(0), 0);
+  const caseworker = caseworkers[caseworkerIndex % caseworkers.length];
+  const noteOptions = [
+    'Provider called to confirm the hearing date. The updated date has been added to the case record.',
+    'Reviewed the latest assessment and flagged the new evidence for the caseworker handling the hearing.',
+    'Provider called to check which documents are required. Explained what is needed before the next hearing.'
+  ];
+  const note = noteOptions[caseworkerIndex % noteOptions.length];
+  initializeAppHistory(req, reference);
+  const history = sessionData['app-history'][reference];
+
+  recordApplicationReceived(req, parent);
+  if (!history.some(event => event.action === 'Initial application assigned to ' + caseworker)) {
+    addHistoryEvent(req, reference, 'Initial application assigned to ' + caseworker, caseworker);
+  }
+  if (!history.some(event => event.action === 'Initial application granted')) {
+    addHistoryEvent(req, reference, 'Initial application granted', caseworker,
+      ['Initial application approved following merits assessment.', 'The application was granted after reviewing the available evidence.', 'Grant approved; the provider was notified of the decision.'][caseworkerIndex % 3],
+      { From: 'In progress', To: 'Granted' });
+  }
+
+  if (!history.some(event => event.action === 'Prior authority granted')) {
+    const priorAuthorityType = caseworkerIndex % 2 === 0 ? 'Expert - Psychiatrist' : 'Expert - Medical examiner';
+    addHistoryEvent(req, reference, 'Prior authority request received', 'N/A', `Previous ${priorAuthorityType.toLowerCase()} request received.`);
+    addHistoryEvent(req, reference, 'Prior authority assigned to ' + caseworker, caseworker);
+    addHistoryEvent(req, reference, 'Prior authority granted', caseworker,
+      ['Prior authority approved for the requested expert evidence.', 'The requested expert evidence was considered necessary for the proceedings.', 'Prior authority granted following review of the expert request.'][caseworkerIndex % 3],
+      { From: 'In progress', To: 'Granted' });
+  }
+  if (!history.some(event => event.action === 'Note added' && event.type === 'note')) {
+    addHistoryEvent(req, reference, 'Caseworker note added', caseworker, note);
+    history[history.length - 1].type = 'note';
+  }
+  seeded[reference] = true;
 }
 
 function hasGrantedInitialApplication(req, reference) {
@@ -1652,6 +1721,10 @@ router.get('/open-applications', function(req, res) {
       recordApplicationReceived(req, application);
       recordRedeterminationSubmitted(req, application);
     });
+  [...new Set((req.session.data['v6-v4']['open-applications-all'] || [])
+    .filter(application => application.groupedRedeterminationFlow)
+    .map(application => application.ref))]
+    .forEach(reference => ensureGeneratedRedeterminationHistory(req, reference));
   const priorAuthorityReferences = [...new Set((req.session.data['v6-v4']['open-applications-all'] || [])
     .filter(application => application.isPriorAuthority)
     .map(application => application.ref))];
@@ -3384,6 +3457,7 @@ router.get('/application/:reference', function(req, res) {
     });
   }
   ensureRedeterminationScenarioVariety(req);
+  ensureGeneratedRedeterminationHistory(req, reference);
 
   const applicationCollections = [
     req.session.data['v6-v4']['assigned-applications'] || [],
