@@ -496,6 +496,11 @@ router.get('/', function(req, res) {
   }
 });
 
+// Avoid a direct GET request to the submission endpoint from causing an invalid page load.
+router.get('/password-submit', function(req, res) {
+  res.redirect('/v6-v2/');
+});
+
 // Password submission
 router.post('/password-submit', function(req, res) {
   const enteredPassword = req.body.password;

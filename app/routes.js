@@ -6,10 +6,9 @@ const express = require('express');
 const govukPrototypeKit = require('govuk-prototype-kit')
 const router = govukPrototypeKit.requests.setupRouter()
 
-// Version 3 is the active target for all future work.
-// Older versions are intentionally frozen and left read-only.
+// The root URL opens the current working prototype directly.
 router.get('/', function(req, res) {
-  res.redirect('/v6-v3/');
+  res.redirect('/v6-v5/open-applications');
 });
 
 // Add your routes here
@@ -23,6 +22,7 @@ const v6 = require('./routes/v6.js');
 const v6v2 = require('./routes/v6-v2.js');
 const v6v3 = require('./routes/v6-v3.js');
 const v6v4 = require('./routes/v6-v4.js');
+const v6v5 = require('./routes/v6-v5.js');
 
 // Call in routes file from routes folder to keep routes.js cleaner
 router.use('/v2', v2);
@@ -33,7 +33,9 @@ router.use('/v6', v6);
 router.use('/v6-v2', v6v2);
 router.use('/v6-v3', v6v3);
 router.use('/v6-v4', v6v4);
+router.use('/v6-v5', v6v5);
 router.use('/latest', latest);
 router.use('/static', static);
 
+router.use('/assets', express.static('node_modules/govuk-frontend/dist/govuk/assets'));
 router.use('/node_modules', express.static('node_modules'));
