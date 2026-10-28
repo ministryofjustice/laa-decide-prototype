@@ -6,10 +6,51 @@ const express = require('express');
 const govukPrototypeKit = require('govuk-prototype-kit')
 const router = govukPrototypeKit.requests.setupRouter()
 
-// Version 3 is the active target for all future work.
-// Older versions are intentionally frozen and left read-only.
+// Route old landing-page bookmarks to the canonical versions page.
+router.get([
+  '/static',
+  '/static/index',
+  '/v6',
+  '/v6/index',
+  '/v6-v2',
+  '/v6-v2/index',
+  '/v6-v3',
+  '/v6-v3/index',
+  '/v6-v4',
+  '/v6-v4/index'
+], function(req, res) {
+  res.redirect('/');
+});
+
+const PROTOTYPE_PASSWORD = 'prototype';
+
 router.get('/', function(req, res) {
-  res.redirect('/v6-v3/');
+  if (req.session.data && req.session.data['v6-authenticated']) {
+    res.render('v6-v3/index.njk', { pageTitle: 'Civil Decide prototype' });
+    return;
+  }
+
+  res.render('v6-v3/password.njk', {
+    pageTitle: 'Enter password',
+    errorMessage: req.session.data && req.session.data['password-error'] ? req.session.data['password-error'] : null
+  });
+  if (req.session.data) {
+    delete req.session.data['password-error'];
+  }
+});
+
+router.post('/', function(req, res) {
+  if (!req.session.data) {
+    req.session.data = {};
+  }
+
+  if (req.body.password === PROTOTYPE_PASSWORD) {
+    req.session.data['v6-authenticated'] = true;
+  } else {
+    req.session.data['password-error'] = 'Incorrect password';
+  }
+
+  res.redirect('/');
 });
 
 // Add your routes here
