@@ -53,8 +53,10 @@
         value: decisionReason,
         label: { text: "Explain your decision", classes: "govuk-label--m" },
         hint: { text: "We will share this decision with the provider in the notification email. You will also find it saved in the application history." },
-        errorMessage: errors.decisionReason and { text: errors.decisionReason } or null
+        errorMessage: errors.decisionReason and { text: errors.decisionReason } or null,
+        attributes: { maxlength: 250 }
       }) }}
+      <p class="govuk-hint">You can enter up to 250 characters</p>
       {{ govukButton({ text: "Continue" }) }}
     </form>
   </div></div>

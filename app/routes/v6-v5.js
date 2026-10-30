@@ -534,7 +534,8 @@ router.get('/sign-out', function(req, res) {
   if (req.session.data['v6-v5']) {
     delete req.session.data['v6-v5']['v6-authenticated'];
   }
-  res.redirect('/v6-v5/');
+  delete req.session.data['v6-authenticated'];
+  res.redirect('/');
 });
 
 // Welcome/index page - requires auth
@@ -3018,8 +3019,8 @@ router.post('/application/:reference/redeterminations/decision', function(req, r
   if (hasRefusal && !explanation) {
     explanationError = 'Explain your decision';
     errors.push({ text: explanationError, href: '#grouped-explanation' });
-  } else if (explanation.length > 10000) {
-    explanationError = 'Your explanation must be 10,000 characters or fewer';
+  } else if (explanation.length > 250) {
+    explanationError = 'Your explanation must be 250 characters or fewer';
     errors.push({ text: explanationError, href: '#grouped-explanation' });
   }
   const draft = { decisions, explanation, explanationError, proceedingMode: 'existing', additions: [], errors };
@@ -3094,8 +3095,8 @@ router.post('/application/:reference/redeterminations/new-proceedings/decision',
   if (hasRefusal && !draft.explanation) {
     draft.explanationError = 'Explain your decision';
     errors.push({ text: draft.explanationError, href: '#grouped-explanation' });
-  } else if (draft.explanation.length > 10000) {
-    draft.explanationError = 'Your explanation must be 10,000 characters or fewer';
+  } else if (draft.explanation.length > 250) {
+    draft.explanationError = 'Your explanation must be 250 characters or fewer';
     errors.push({ text: draft.explanationError, href: '#grouped-explanation' });
   }
   draft.newProceedingErrors = errors;
@@ -3287,6 +3288,8 @@ router.post('/application/:reference/redetermination/:index/refuse', function(re
   }
   if (!decisionReason) {
     errors.decisionReason = 'Explain your decision';
+  } else if (decisionReason.length > 250) {
+    errors.decisionReason = 'Your explanation must be 250 characters or fewer';
   }
 
   if (Object.keys(errors).length > 0) {

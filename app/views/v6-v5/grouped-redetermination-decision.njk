@@ -92,8 +92,8 @@
           label: { text: "Explain your decision", classes: "govuk-label--m" },
           hint: { text: "We will share this decision with the provider in the notification email. You will also find this saved in the application history." },
           errorMessage: draft.explanationError and { text: draft.explanationError } or null,
-          attributes: { maxlength: 10000 } }) }}
-        <p class="govuk-hint">You can enter up to 10,000 characters</p>
+          attributes: { maxlength: 250 } }) }}
+        <p class="govuk-hint">You can enter up to 250 characters</p>
       </div>
       <div id="grouped-explanation-placeholder" hidden></div>
       {{ govukButton({ text: "Continue" }) }}
