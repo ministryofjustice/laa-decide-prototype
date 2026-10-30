@@ -9,6 +9,19 @@ const router = govukPrototypeKit.requests.setupRouter()
 router.use(function(req, res, next) {
   req.session.data = req.session.data || {};
   const versionData = req.session.data['v6-v5'] || (req.session.data['v6-v5'] = {});
+  if (req.method === 'GET' && req.accepts('html')) {
+    const journey = req.path.match(/^\/application\/([^/]+)\/redeterminations(?:\/|$)/);
+    const application = req.path.match(/^\/application\/([^/]+)\/?$/);
+    const reference = journey?.[1] || application?.[1];
+    for (const key of ['grouped-redetermination-drafts', 'grouped-redetermination-edits']) {
+      const entries = versionData[key];
+      if (!entries) continue;
+      for (const storedReference of Object.keys(entries)) {
+        if (encodeURIComponent(storedReference) !== reference) delete entries[storedReference];
+      }
+    }
+    if (journey) res.set('Cache-Control', 'no-store');
+  }
   Object.assign(versionData, req.body || {});
   res.locals.data = versionData;
   next();
@@ -3200,6 +3213,7 @@ router.post('/application/:reference/redeterminations/check-answers', function(r
   req.session.data['v6-v5']['grouped-redetermination-completed'] = req.session.data['v6-v5']['grouped-redetermination-completed'] || {};
   req.session.data['v6-v5']['grouped-redetermination-completed'][reference] = true;
   delete req.session.data['v6-v5']['grouped-redetermination-drafts'][reference];
+  delete req.session.data['v6-v5']['grouped-redetermination-edits']?.[reference];
   ensureGroupedRedeterminationExamples(req);
   res.redirect('/v6-v5/application/' + encodeURIComponent(reference) + '/redeterminations/confirmation');
 });
