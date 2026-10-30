@@ -42,10 +42,9 @@
       {% for request in requests %}
         <section class="govuk-!-margin-top-6 govuk-!-margin-bottom-8" aria-labelledby="request-heading-{{ request.index }}">
           <div class="redetermination-proceeding-heading">
-            <h2 class="govuk-heading-m" id="request-heading-{{ request.index }}">Proceeding {{ request.index + 1 }}</h2>
-            <button type="submit" class="govuk-body govuk-link redetermination-edit-button govuk-!-margin-bottom-5" formaction="/v6-v5/application/{{ reference }}/redeterminations/proceeding/{{ request.index }}/start-edit" formnovalidate>Change proceeding<span class="govuk-visually-hidden"> {{ request.index + 1 }}</span></button>
+            <h2 class="govuk-heading-m" id="request-heading-{{ request.index }}">Details of request</h2>
+            <button type="submit" class="govuk-body govuk-link redetermination-edit-button govuk-!-margin-bottom-5" formaction="/v6-v5/application/{{ reference }}/redeterminations/proceeding/{{ request.index }}/start-edit" formnovalidate>Change proceeding<span class="govuk-visually-hidden"> {{ request.answer.proceedingName or request.redeterminationProceeding }}</span></button>
           </div>
-          <p class="govuk-body">Details of request</p>
           <dl class="govuk-summary-list">
             <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">Proceeding</dt><dd class="govuk-summary-list__value">{{ request.answer.proceedingName or request.redeterminationProceeding }}</dd></div>
             <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">Client role</dt><dd class="govuk-summary-list__value">{{ request.answer.clientRole or request.redeterminationClientRole }}</dd></div>

@@ -318,7 +318,7 @@
 
         <div class="govuk-summary-card govuk-!-margin-bottom-6">
           <div class="govuk-summary-card__title-wrapper" style="background-color: #f3f2f1; padding: 15px;">
-            <h2 class="govuk-summary-card__title govuk-heading-s govuk-!-margin-bottom-0">1. Care order</h2>
+            <h2 class="govuk-summary-card__title govuk-heading-s govuk-!-margin-bottom-0">Care order</h2>
           </div>
           <div class="govuk-summary-card__content">
             <dl class="govuk-summary-list">
@@ -378,7 +378,7 @@
 
         <div class="govuk-summary-card govuk-!-margin-bottom-6">
           <div class="govuk-summary-card__title-wrapper" style="background-color: #f3f2f1; padding: 15px;">
-            <h2 class="govuk-summary-card__title govuk-heading-s govuk-!-margin-bottom-0">2. Supervision order</h2>
+            <h2 class="govuk-summary-card__title govuk-heading-s govuk-!-margin-bottom-0">Supervision order</h2>
           </div>
           <div class="govuk-summary-card__content">
             <dl class="govuk-summary-list">
@@ -461,7 +461,7 @@
           {% for redetermination in redeterminations %}
             <div class="govuk-summary-card govuk-!-margin-bottom-6">
               <div class="govuk-summary-card__title-wrapper" style="background-color: #f3f2f1; padding: 15px; display: flex; justify-content: space-between; align-items: center;">
-                <h3 class="govuk-summary-card__title govuk-heading-s govuk-!-margin-bottom-0">{{ loop.index }}. {{ redetermination.redeterminationProceeding or 'Child assessment order' }}</h3>
+                <h3 class="govuk-summary-card__title govuk-heading-s govuk-!-margin-bottom-0">{{ redetermination.redeterminationProceeding or 'Child assessment order' }}</h3>
                 {% if redetermination.status == 'In progress' and not groupedRedeterminationFlow %}
                   <div style="display: flex; gap: 6px; align-items: center;">
                     <a href="/v6-v5/application/{{ reference }}/redetermination/{{ redetermination.index }}/decision" class="govuk-link">Grant</a>
