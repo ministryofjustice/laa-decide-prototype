@@ -43,6 +43,11 @@
       background-color: #d2e2f1;
       color: #0b0c0c;
     }
+
+    .version-status-tag--ur-round {
+      background-color: #dbd5e9;
+      color: #3d2375;
+    }
   </style>
 {% endblock %}
 
@@ -81,6 +86,42 @@
         You can use this prototype during user testing, to present early designs and vision to stakeholders and teams,
         to review design versions and history, and to view work in progress.
       </p>
+
+      <div class="govuk-summary-card govuk-!-margin-bottom-6">
+        <div class="govuk-summary-card__title-wrapper version-header">
+          <div>
+            <h3 class="govuk-summary-card__title govuk-!-margin-bottom-2">Updated prototype</h3>
+            <p class="govuk-body govuk-!-margin-bottom-0">September 2026</p>
+          </div>
+          <div class="version-status-stack">
+            <span class="version-status-tag version-status-tag--previous">Stakeholders</span>
+            <span class="version-status-tag version-status-tag--ur-complete">Up to date changes</span>
+          </div>
+        </div>
+        <div class="govuk-summary-card__content">
+          <h4 class="govuk-heading-m govuk-!-margin-bottom-3">What you can do with this prototype</h4>
+          <ul class="govuk-list govuk-list--bullet govuk-!-margin-bottom-5">
+            <li>Use this prototype version to present the up-to-date version of Civil Decide</li>
+            <li>Note that this is a prototype and some functionality may not have been built in UAT</li>
+          </ul>
+
+          <h4 class="govuk-heading-m govuk-!-margin-bottom-3">Notes</h4>
+          <ul class="govuk-list govuk-list--bullet govuk-!-margin-bottom-6">
+            <li>This prototype consolidates all flows from:</li>
+            <li>Open applications</li>
+            <li>Make a decision (Grant/Refuse)</li>
+            <li>Prior authority experts</li>
+            <li>Apportionment and disbursement</li>
+            <li>Linked cases and managing linked cases</li>
+            <li>Application history versioning</li>
+          </ul>
+
+          {{ govukButton({
+            text: "Start prototype",
+            href: "/v6/open-applications?consolidated=true"
+          }) }}
+        </div>
+      </div>
 
       <div class="govuk-summary-card govuk-!-margin-bottom-6">
         <div class="govuk-summary-card__title-wrapper version-header">
@@ -188,12 +229,27 @@
           </div>
           <div class="version-status-stack">
             <span class="version-status-tag version-status-tag--ur-complete">Completed</span>
-            <span class="version-status-tag version-status-tag--ur-complete">Ready for UR</span>
+            <span class="version-status-tag version-status-tag--ur-round">UR round 1</span>
           </div>
         </div>
         <div class="govuk-summary-card__content">
           <p class="govuk-body govuk-!-margin-bottom-6">Redetermination assessments.</p>
-          {{ govukButton({ text: "Start version 4", href: "/v6-v5/open-applications" }) }}
+          {{ govukButton({ text: "Start version 4", href: "/v6-v4/open-applications" }) }}
+        </div>
+      </div>
+
+      <div class="govuk-summary-card govuk-!-margin-bottom-2">
+        <div class="govuk-summary-card__title-wrapper version-header">
+          <div>
+            <h3 class="govuk-summary-card__title govuk-!-margin-bottom-2">Version 5</h3>
+          </div>
+          <div class="version-status-stack">
+            <span class="version-status-tag version-status-tag--ur-round">UR round 2</span>
+            <span class="version-status-tag version-status-tag--in-progress">In progress</span>
+          </div>
+        </div>
+        <div class="govuk-summary-card__content">
+          {{ govukButton({ text: "Start version 5", href: "/v6-v5/open-applications" }) }}
         </div>
       </div>
     </div>

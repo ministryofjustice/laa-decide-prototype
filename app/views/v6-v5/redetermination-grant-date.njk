@@ -55,7 +55,7 @@
         idPrefix: "certificate-date-type",
         errorMessage: errors.dateType and { text: errors.dateType } or null,
         items: [
-          { value: "today", text: "Today", checked: selectedDateType == "today" },
+          { value: "today", text: "Submitted date", checked: selectedDateType == "today" },
           { value: "another-date", text: "Another date", checked: selectedDateType == "another-date", conditional: { html: anotherDateHtml } }
         ]
       }) }}

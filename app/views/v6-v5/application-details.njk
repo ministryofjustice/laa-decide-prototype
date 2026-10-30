@@ -494,6 +494,49 @@
                     <dd class="govuk-summary-list__value">Final Hearing<br><br>To be represented on all steps up to and including a final hearing.</dd>
                     {% endif %}
                   </div>
+                  {% if redetermination.proceedingAnswers %}
+                    {% set proceedingAnswer = redetermination.proceedingAnswers %}
+                    {% if proceedingAnswer.childSubjectOfSecureAccommodation %}
+                      <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">Is the client the child subject of the secure accommodation order?</dt>
+                        <dd class="govuk-summary-list__value">{{ proceedingAnswer.childSubjectOfSecureAccommodation }}</dd>
+                      </div>
+                    {% endif %}
+                    {% if proceedingAnswer.existingSupervisionOrder %}
+                      <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">Is there already an existing supervision order in force?</dt>
+                        <dd class="govuk-summary-list__value">{{ proceedingAnswer.existingSupervisionOrder }}</dd>
+                      </div>
+                    {% endif %}
+                    {% if proceedingAnswer.proceedingType == 'Standalone' %}
+                      <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">Has the proceeding been issued?</dt>
+                        <dd class="govuk-summary-list__value">{{ proceedingAnswer.proceedingIssued }}</dd>
+                      </div>
+                      {% if proceedingAnswer.proceedingIssued == 'No' %}
+                        <div class="govuk-summary-list__row">
+                          <dt class="govuk-summary-list__key">Why has the proceeding not been issued?</dt>
+                          <dd class="govuk-summary-list__value">{{ proceedingAnswer.notIssuedReason }}</dd>
+                        </div>
+                      {% endif %}
+                    {% endif %}
+                    {% if proceedingAnswer.proceedingType == 'Related' %}
+                      <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">Will the proceeding be heard together with an existing standalone proceeding?</dt>
+                        <dd class="govuk-summary-list__value">{{ proceedingAnswer.heardTogether }}{% if proceedingAnswer.heardTogether == 'Yes' %}, {{ proceedingAnswer.heardTogetherWith }}{% endif %}</dd>
+                      </div>
+                      {% if proceedingAnswer.heardTogether == 'No' %}
+                        <div class="govuk-summary-list__row">
+                          <dt class="govuk-summary-list__key">Will the proceeding be heard as an alternative to any of the SCA proceedings?</dt>
+                          <dd class="govuk-summary-list__value">{{ proceedingAnswer.heardAsAlternative }}</dd>
+                        </div>
+                      {% endif %}
+                    {% endif %}
+                    <div class="govuk-summary-list__row">
+                      <dt class="govuk-summary-list__key">Which children are covered by this proceeding?</dt>
+                      <dd class="govuk-summary-list__value">{{ proceedingAnswer.childrenCovered | join(', ') }}</dd>
+                    </div>
+                  {% endif %}
                   <div class="govuk-summary-list__row">
                     <dt class="govuk-summary-list__key">Decision</dt>
                     <dd class="govuk-summary-list__value">{{ govukTag({ text: redetermination.status, classes: redetermination.statusClass }) }}</dd>
@@ -521,30 +564,38 @@
                   <dt class="govuk-summary-list__key">Has a final order been made in any existing proceedings</dt>
                   <dd class="govuk-summary-list__value">{{ redeterminationAdditionalDetails.finalOrderMade }}</dd>
                 </div>
-                  <div class="govuk-summary-list__row">
-                    <dt class="govuk-summary-list__key">What has changed since the previous legal aid decision?</dt>
-                    <dd class="govuk-summary-list__value">{{ redeterminationAdditionalDetails.providerAnswers.changesSinceDecision }}</dd>
-                  </div>
-                  <div class="govuk-summary-list__row">
-                    <dt class="govuk-summary-list__key">Who has issued the proceedings?</dt>
-                    <dd class="govuk-summary-list__value">{{ redeterminationAdditionalDetails.providerAnswers.issuedBy }}</dd>
-                  </div>
-                  <div class="govuk-summary-list__row">
-                    <dt class="govuk-summary-list__key">When will they be heard?</dt>
-                    <dd class="govuk-summary-list__value">{{ redeterminationAdditionalDetails.providerAnswers.hearingDate or 'Not provided' }}</dd>
-                  </div>
-                  <div class="govuk-summary-list__row">
-                    <dt class="govuk-summary-list__key">If we agree to your request, how will this help your client?</dt>
-                    <dd class="govuk-summary-list__value">{{ redeterminationAdditionalDetails.providerAnswers.clientBenefit }}</dd>
-                  </div>
-                  <div class="govuk-summary-list__row">
-                    <dt class="govuk-summary-list__key">How will this help your client's case to progress?</dt>
-                    <dd class="govuk-summary-list__value">{{ redeterminationAdditionalDetails.providerAnswers.caseProgress }}</dd>
-                  </div>
-                  <div class="govuk-summary-list__row">
-                    <dt class="govuk-summary-list__key">Have your client's prospects of success changed since the last application?</dt>
-                    <dd class="govuk-summary-list__value">{{ redeterminationAdditionalDetails.providerAnswers.prospectsOfSuccess }}</dd>
-                  </div>
+                {% if redeterminationAdditionalDetails.finalOrderMade == 'Yes' %}
+                  {% for finalOrder in redeterminationAdditionalDetails.providerAnswers.finalOrderDetails %}
+                    <div class="govuk-summary-list__row">
+                      <dt class="govuk-summary-list__key">Final order: Proceeding</dt>
+                      <dd class="govuk-summary-list__value">{{ finalOrder.proceedingName }}</dd>
+                    </div>
+                    <div class="govuk-summary-list__row">
+                      <dt class="govuk-summary-list__key">Final order: Date</dt>
+                      <dd class="govuk-summary-list__value">{{ finalOrder.date }}</dd>
+                    </div>
+                    <div class="govuk-summary-list__row">
+                      <dt class="govuk-summary-list__key">Final order: Outcome</dt>
+                      <dd class="govuk-summary-list__value">{{ finalOrder.outcome }}</dd>
+                    </div>
+                  {% endfor %}
+                {% endif %}
+                <div class="govuk-summary-list__row">
+                  <dt class="govuk-summary-list__key">What remains in dispute and why is representation needed?</dt>
+                  <dd class="govuk-summary-list__value">{{ redeterminationAdditionalDetails.providerAnswers.dispute }}</dd>
+                </div>
+                <div class="govuk-summary-list__row">
+                  <dt class="govuk-summary-list__key">What is your client seeking?</dt>
+                  <dd class="govuk-summary-list__value">{{ redeterminationAdditionalDetails.providerAnswers.clientSeeking }}</dd>
+                </div>
+                <div class="govuk-summary-list__row">
+                  <dt class="govuk-summary-list__key">If aid is granted, how will your client's case progress?</dt>
+                  <dd class="govuk-summary-list__value">{{ redeterminationAdditionalDetails.providerAnswers.caseProgress }}</dd>
+                </div>
+                <div class="govuk-summary-list__row">
+                  <dt class="govuk-summary-list__key">How is the merits test met?</dt>
+                  <dd class="govuk-summary-list__value">{{ redeterminationAdditionalDetails.providerAnswers.merits }}</dd>
+                </div>
               </dl>
             </div>
           </div>

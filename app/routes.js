@@ -6,9 +6,21 @@ const express = require('express');
 const govukPrototypeKit = require('govuk-prototype-kit')
 const router = govukPrototypeKit.requests.setupRouter()
 
-// The root URL opens the current working prototype directly.
+// Keep old landing-page bookmarks on the same versions page.
+router.get([
+  '/static', '/static/index',
+  '/v6', '/v6/index',
+  '/v6-v2', '/v6-v2/index',
+  '/v6-v3', '/v6-v3/index',
+  '/v6-v4', '/v6-v4/index',
+  '/v6-v5', '/v6-v5/index'
+], function(req, res) {
+  res.redirect('/');
+});
+
+// The root URL keeps the version-selection page at a clean address.
 router.get('/', function(req, res) {
-  res.redirect('/v6-v5/open-applications');
+  res.render('v6-v5/index.njk', { pageTitle: 'Civil Decide prototype' });
 });
 
 // Add your routes here

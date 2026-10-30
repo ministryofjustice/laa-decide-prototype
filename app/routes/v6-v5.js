@@ -964,6 +964,7 @@ const REDETERMINATION_PROCEEDINGS = [
   'Emergency protection order - extend',
   'Emergency protection order - discharge',
   'Secure accommodation order',
+  'SCA supervision order',
   'Contact with a child in care',
   'Recovery of children order',
   'End contact with a child in care',
@@ -981,6 +982,71 @@ const REDETERMINATION_PROCEEDINGS = [
   'Special guardianship order'
 ];
 const REDETERMINATION_CLIENT_ROLES = ['Applicant', 'Respondent', 'Intervenor', 'Subject of proceeding (Child)', 'Joined party'];
+const MOCK_EDIT_CLIENT_ROLES = ['Applicant', 'Respondent', 'A child subject of the proceeding', 'Intervenor', 'Joined party'];
+// Illustrative UR round 2 options only; these are not legal eligibility rules.
+const MOCK_EDIT_PROCEEDINGS = REDETERMINATION_PROCEEDINGS.map(name => ({
+  name,
+  roles: MOCK_EDIT_CLIENT_ROLES
+}));
+// Illustrative user-research categories only, not legal proceeding classifications.
+const MOCK_STANDALONE_PROCEEDINGS = new Set([
+  'Child assessment order',
+  'Emergency protection order - extend',
+  'Emergency protection order - discharge',
+  'Secure accommodation order',
+  'SCA supervision order',
+  'Contact with a child in care',
+  'Recovery of children order',
+  'Emergency protection order',
+  'Placement order',
+  'Special guardianship order'
+]);
+const MOCK_CHILD_NAMES = ['Alex Smith', 'Jamie Smith', 'Taylor Smith'];
+const MOCK_SPECIAL_PROCEEDING_CODES = {
+  'Secure accommodation order': 'P006',
+  'SCA supervision order': 'P059'
+};
+const MOCK_NOT_ISSUED_REASONS = [
+  'The provider is waiting for the court to confirm the next steps before issuing the proceeding.',
+  'The application is being prepared and will be issued once the supporting evidence is ready.',
+  'The provider is waiting for further information before issuing the proceeding.'
+];
+
+function randomMockAnswer(values) {
+  return values[Math.floor(Math.random() * values.length)];
+}
+
+function createMockProceedingAnswers(redeterminations) {
+  const standaloneNames = redeterminations
+    .map(request => request.redeterminationProceeding)
+    .filter(name => MOCK_STANDALONE_PROCEEDINGS.has(name));
+  const existingStandaloneNames = standaloneNames.length ? standaloneNames : ['Care order', 'Supervision order'];
+
+  return redeterminations.map(request => {
+    const proceedingName = request.redeterminationProceeding;
+    const isStandalone = MOCK_STANDALONE_PROCEEDINGS.has(proceedingName);
+    const proceedingCode = MOCK_SPECIAL_PROCEEDING_CODES[proceedingName];
+    const hasSecureAccommodationQuestion = proceedingCode === 'P006';
+    const hasSupervisionOrderQuestion = proceedingCode === 'P059';
+    const proceedingIssued = isStandalone ? randomMockAnswer(['Yes', 'No']) : null;
+    const heardTogether = isStandalone ? null : randomMockAnswer(['Yes', 'No']);
+    const childrenCovered = MOCK_CHILD_NAMES.filter(() => Math.random() < 0.5);
+
+    return {
+      redeterminationId: request.redeterminationId,
+      proceedingName,
+      proceedingType: isStandalone ? 'Standalone' : 'Related',
+      childSubjectOfSecureAccommodation: hasSecureAccommodationQuestion ? randomMockAnswer(['Yes', 'No']) : null,
+      existingSupervisionOrder: hasSupervisionOrderQuestion ? randomMockAnswer(['Yes', 'No']) : null,
+      proceedingIssued,
+      notIssuedReason: proceedingIssued === 'No' ? randomMockAnswer(MOCK_NOT_ISSUED_REASONS) : null,
+      heardTogether,
+      heardTogetherWith: heardTogether === 'Yes' ? randomMockAnswer(existingStandaloneNames) : null,
+      heardAsAlternative: heardTogether === 'No' ? randomMockAnswer(['Yes', 'No']) : null,
+      childrenCovered: childrenCovered.length ? childrenCovered : [randomMockAnswer(MOCK_CHILD_NAMES)]
+    };
+  });
+}
 const REDETERMINATION_REFUSAL_REASONS = ['Not in scope', 'Insufficient Information', 'Duplicate Case'];
 
 // L-12Z-13P is the default/most commonly viewed demo application across the
@@ -2721,6 +2787,34 @@ router.use('/application/:reference/redeterminations', function(req, res, next) 
   next();
 });
 
+router.post('/application/:reference/redeterminations/proceeding/:index/start-edit', function(req, res) {
+  const reference = req.params.reference;
+  const index = Number(req.params.index);
+  const requests = res.locals.groupedRequests.filter(request => !['Granted', 'Refused'].includes(request.status));
+  if (!requests.some(request => request.index === index)) {
+    res.redirect('/v6-v5/application/' + encodeURIComponent(reference) + '/redeterminations/decision');
+    return;
+  }
+
+  const drafts = req.session.data['v6-v5']['grouped-redetermination-drafts'] || (req.session.data['v6-v5']['grouped-redetermination-drafts'] = {});
+  const previousDraft = drafts[reference] || {};
+  drafts[reference] = {
+    ...previousDraft,
+    proceedingMode: 'existing',
+    additions: [],
+    decisions: requests.map(request => ({
+      ...(previousDraft.decisions?.find(answer => answer.index === request.index) || {}),
+      index: request.index,
+      decision: req.body['decision-' + request.index] || '',
+      refusalReason: req.body['refusal-' + request.index] || '',
+      ...getGroupedCertificateGrantDate(req.body, request.index, req, reference).values
+    })),
+    explanation: req.body['grouped-explanation'] || '',
+    errors: []
+  };
+  res.redirect('/v6-v5/application/' + encodeURIComponent(reference) + '/redeterminations/proceeding/' + index + '/edit');
+});
+
 router.get('/application/:reference/redeterminations/proceeding/:index/edit', function(req, res) {
   const reference = req.params.reference;
   const index = Number(req.params.index);
@@ -2738,9 +2832,10 @@ router.get('/application/:reference/redeterminations/proceeding/:index/edit', fu
     index,
     proceedingNumber: index + 1,
     request,
+    proceedingOptions: MOCK_EDIT_PROCEEDINGS,
     values: {
-      proceedingName: savedEdit.proceedingName || request.redeterminationProceeding,
-      clientRole: savedEdit.clientRole || request.redeterminationClientRole,
+      proceedingName: savedEdit.proceedingName || '',
+      clientRole: savedEdit.clientRole || '',
       scopeLimitations: savedEdit.scopeLimitations || request.newProceedingDetails?.scopeLimitations || 'Final Hearing\n\nTo be represented on all steps up to and including a final hearing.',
       levelOfService: savedEdit.levelOfService || request.newProceedingDetails?.levelOfService || 'Full representation'
     },
@@ -2758,18 +2853,27 @@ router.post('/application/:reference/redeterminations/proceeding/:index/edit', f
     return;
   }
 
+  const savedEdit = req.session.data['v6-v5']['grouped-redetermination-edits']?.[reference]?.[index] || {};
   const values = {
     proceedingName: String(req.body.proceedingName || '').trim(),
     clientRole: String(req.body.clientRole || '').trim(),
-    scopeLimitations: String(req.body.scopeLimitations || '').trim(),
-    levelOfService: String(req.body.levelOfService || '').trim()
+    scopeLimitations: String(req.body.scopeLimitations ?? savedEdit.scopeLimitations ?? request.newProceedingDetails?.scopeLimitations ?? request.scopeLimitations ?? 'Final Hearing\n\nTo be represented on all steps up to and including a final hearing.').trim(),
+    levelOfService: String(req.body.levelOfService ?? savedEdit.levelOfService ?? request.newProceedingDetails?.levelOfService ?? request.levelOfService ?? 'Full representation').trim()
   };
   const errors = Object.entries({
     proceedingName: 'Enter the proceeding',
-    clientRole: 'Enter the client role',
-    scopeLimitations: 'Enter the scope limitations',
-    levelOfService: 'Enter the level of service'
-  }).filter(([field]) => !values[field]).map(([, text]) => ({ text, href: '#proceeding-name' }));
+    clientRole: 'Enter the client role'
+  }).filter(([field]) => !values[field]).map(([field, text]) => ({
+    text,
+    href: '#' + ({ proceedingName: 'proceeding-name', clientRole: 'client-role', scopeLimitations: 'scope-limitations', levelOfService: 'level-of-service' })[field]
+  }));
+  const selectedProceeding = MOCK_EDIT_PROCEEDINGS.find(item => item.name === values.proceedingName);
+  if (values.proceedingName && !selectedProceeding) {
+    errors.push({ text: 'Select a proceeding from the list', href: '#proceeding-name' });
+  }
+  if (values.clientRole && selectedProceeding && !MOCK_EDIT_CLIENT_ROLES.includes(values.clientRole)) {
+    errors.push({ text: 'Select a client role from the list', href: '#client-role' });
+  }
 
   if (errors.length) {
     res.render('v6-v5/redetermination-edit-proceeding.njk', {
@@ -2777,6 +2881,7 @@ router.post('/application/:reference/redeterminations/proceeding/:index/edit', f
       index,
       proceedingNumber: index + 1,
       request,
+      proceedingOptions: MOCK_EDIT_PROCEEDINGS,
       values,
       errors
     });
@@ -2786,6 +2891,17 @@ router.post('/application/:reference/redeterminations/proceeding/:index/edit', f
   const edits = req.session.data['v6-v5']['grouped-redetermination-edits'] || (req.session.data['v6-v5']['grouped-redetermination-edits'] = {});
   edits[reference] = edits[reference] || {};
   edits[reference][index] = values;
+  const draft = req.session.data['v6-v5']['grouped-redetermination-drafts']?.[reference];
+  if (draft) {
+    draft.decisions = (draft.decisions || []).map(answer => answer.index === index ? {
+      ...answer,
+      ...values,
+      decision: '',
+      refusalReason: '',
+      ...getGroupedCertificateGrantDate({}, index, req, reference).values
+    } : answer);
+    draft.errors = [];
+  }
   res.redirect('/v6-v5/application/' + encodeURIComponent(reference) + '/redeterminations/decision');
 });
 
@@ -2805,10 +2921,25 @@ router.get('/application/:reference/redeterminations/decision', function(req, re
       ...(proceedingEdits[request.index] || {})
     }
   }));
-  res.render('v6-v5/grouped-redetermination-decision.njk', { reference, requests: requestsWithAnswers, draft });
+  const showExplanation = draft.decisions?.some(answer => answer.decision === 'refuse') || false;
+  res.render('v6-v5/grouped-redetermination-decision.njk', { reference, requests: requestsWithAnswers, draft, showExplanation });
 });
 
-function getGroupedCertificateGrantDate(body, index) {
+function getApplicationSubmittedDate(req, reference) {
+  const applicationSources = [
+    req.session.data['v6-v5']['open-applications-all'],
+    req.session.data['v6-v5']['assigned-applications'],
+    req.session.data['v6-v5']['completed-applications'],
+    req.session.data['v6-v5']['open-applications']
+  ];
+  const application = applicationSources
+    .flat()
+    .find(item => item && item.ref === reference && !item.isRedetermination && !item.isPriorAuthority && (item.submitted || item.dateSubmitted));
+
+  return application ? (application.submitted || application.dateSubmitted) : null;
+}
+
+function getGroupedCertificateGrantDate(body, index, req, reference) {
   const dateType = body['certificate-grant-date-type-' + index];
   const day = String(body['certificate-grant-date-' + index + '-day'] || '').trim();
   const month = String(body['certificate-grant-date-' + index + '-month'] || '').trim();
@@ -2816,11 +2947,7 @@ function getGroupedCertificateGrantDate(body, index) {
   let certificateGrantDate;
 
   if (dateType === 'today') {
-    certificateGrantDate = new Date().toLocaleDateString('en-GB', {
-      day: 'numeric',
-      month: 'long',
-      year: 'numeric'
-    });
+    certificateGrantDate = getApplicationSubmittedDate(req, reference);
   } else if (dateType === 'another-date') {
     const date = new Date(Number(year), Number(month) - 1, Number(day));
     const isValidDate = /^\d{1,2}$/.test(day)
@@ -2848,7 +2975,8 @@ function getGroupedCertificateGrantDate(body, index) {
       certificateGrantDate
     },
     dateTypeMissing: !['today', 'another-date'].includes(dateType),
-    dateMissingOrInvalid: dateType === 'another-date' && !certificateGrantDate
+    dateMissingOrInvalid: dateType === 'another-date' && !certificateGrantDate,
+    submittedDateMissing: dateType === 'today' && !certificateGrantDate
   };
 }
 
@@ -2860,22 +2988,19 @@ router.post('/application/:reference/redeterminations/decision', function(req, r
     return;
   }
   const errors = [];
-  const proceedingMode = req.body['proceeding-mode'];
-  if (!['existing', 'new'].includes(proceedingMode)) errors.push({ text: 'Select Details of request or New proceeding', href: '#proceeding-mode' });
   const proceedingEdits = req.session.data['v6-v5']['grouped-redetermination-edits']?.[reference] || {};
-  const decisions = proceedingMode === 'new' ? [] : requests.map(request => {
+  const decisions = requests.map(request => {
     const decision = req.body['decision-' + request.index];
-    const refusalReason = req.body['refusal-' + request.index];
-    const grantDate = decision === 'grant' ? getGroupedCertificateGrantDate(req.body, request.index) : null;
+    const grantDate = decision === 'grant' ? getGroupedCertificateGrantDate(req.body, request.index, req, reference) : null;
     const previousAnswer = req.session.data['v6-v5']['grouped-redetermination-drafts']?.[reference]?.decisions?.find(answer => answer.index === request.index);
     const proceedingEdit = proceedingEdits[request.index] || {};
     const proceedingName = (req.body['proceeding-' + request.index] ?? proceedingEdit.proceedingName ?? previousAnswer?.proceedingName ?? request.redeterminationProceeding).trim();
     const clientRole = (req.body['role-' + request.index] ?? proceedingEdit.clientRole ?? previousAnswer?.clientRole ?? request.redeterminationClientRole).trim();
     if (!proceedingName || !clientRole) errors.push({ text: 'Enter the proceeding and client role', href: '#request-heading-' + request.index });
     if (!['grant', 'refuse'].includes(decision)) errors.push({ text: 'Select a decision for ' + request.redeterminationProceeding, href: '#decision-' + request.index });
-    if (decision === 'refuse' && !REDETERMINATION_REFUSAL_REASONS.includes(refusalReason)) errors.push({ text: 'Select a refusal reason for ' + request.redeterminationProceeding, href: '#refusal-' + request.index });
     if (grantDate?.dateTypeMissing) errors.push({ text: 'Select when the certificate should be granted from for ' + request.redeterminationProceeding, href: '#certificate-grant-date-type-' + request.index });
     if (grantDate?.dateMissingOrInvalid) errors.push({ text: 'Enter a real date for when the certificate should be granted from for ' + request.redeterminationProceeding, href: '#certificate-grant-date-' + request.index + '-day' });
+    if (grantDate?.submittedDateMissing) errors.push({ text: 'The application submission date is unavailable. Select another date for ' + request.redeterminationProceeding, href: '#certificate-grant-date-type-' + request.index });
     return {
       index: request.index,
       decision,
@@ -2883,49 +3008,29 @@ router.post('/application/:reference/redeterminations/decision', function(req, r
       clientRole,
       scopeLimitations: proceedingEdit.scopeLimitations || previousAnswer?.scopeLimitations || request.newProceedingDetails?.scopeLimitations || 'Final Hearing\n\nTo be represented on all steps up to and including a final hearing.',
       levelOfService: proceedingEdit.levelOfService || previousAnswer?.levelOfService || request.newProceedingDetails?.levelOfService || 'Full representation',
-      refusalReason: decision === 'refuse' ? refusalReason : '',
+      refusalReason: '',
       ...(grantDate ? grantDate.values : {})
     };
   });
   const explanation = (req.body['grouped-explanation'] || '').trim();
-  if (!explanation || explanation.length > 10000) errors.push({ text: 'Explain your decision using up to 10,000 characters', href: '#grouped-explanation' });
-  const replaceProceedings = proceedingMode === 'new';
-  const asArray = value => Array.isArray(value) ? value : value === undefined ? [] : [value];
-  const names = asArray(req.body['additional-name']);
-  const roles = asArray(req.body['additional-role']);
-  const scopes = asArray(req.body['additional-scope']);
-  const services = asArray(req.body['additional-service']);
-  const previousDraft = req.session.data['v6-v5']['grouped-redetermination-drafts']?.[reference];
-  const additions = replaceProceedings ? names.map((name, position) => {
-    const addition = {
-      proceedingName: String(name || '').trim(),
-      clientRole: String(roles[position] || '').trim(),
-      scopeLimitations: String(scopes[position] || '').trim(),
-      levelOfService: String(services[position] || '').trim()
-    };
-    const previous = previousDraft?.additions?.[position];
-    if (previous && Object.keys(addition).every(key => addition[key] === previous[key])) {
-      addition.decision = previous.decision;
-      addition.refusalReason = previous.refusalReason;
-      addition.certificateGrantDateType = previous.certificateGrantDateType;
-      addition.certificateGrantDateDay = previous.certificateGrantDateDay;
-      addition.certificateGrantDateMonth = previous.certificateGrantDateMonth;
-      addition.certificateGrantDateYear = previous.certificateGrantDateYear;
-      addition.certificateGrantDate = previous.certificateGrantDate;
-    }
-    return addition;
-  }) : [];
-  if (replaceProceedings && (!additions.length || additions.some(item => !item.proceedingName || !item.clientRole || !item.scopeLimitations || !item.levelOfService))) errors.push({ text: 'Complete all fields for each new proceeding', href: '#additional-proceedings' });
-  const draft = { decisions, explanation, proceedingMode, additions, errors };
+  const hasRefusal = decisions.some(answer => answer.decision === 'refuse');
+  let explanationError = '';
+  if (hasRefusal && !explanation) {
+    explanationError = 'Explain your decision';
+    errors.push({ text: explanationError, href: '#grouped-explanation' });
+  } else if (explanation.length > 10000) {
+    explanationError = 'Your explanation must be 10,000 characters or fewer';
+    errors.push({ text: explanationError, href: '#grouped-explanation' });
+  }
+  const draft = { decisions, explanation, explanationError, proceedingMode: 'existing', additions: [], errors };
   req.session.data['v6-v5']['grouped-redetermination-drafts'] = req.session.data['v6-v5']['grouped-redetermination-drafts'] || {};
   req.session.data['v6-v5']['grouped-redetermination-drafts'][reference] = draft;
-  const nextStep = errors.length ? 'decision' : replaceProceedings ? 'new-proceedings/decision' : 'check-answers';
+  const nextStep = errors.length ? 'decision' : 'check-answers';
   res.redirect('/v6-v5/application/' + encodeURIComponent(reference) + '/redeterminations/' + nextStep);
 });
 
 function hasValidNewProceedingDecisions(draft) {
   return draft.additions?.length > 0 && draft.additions.every(addition => ['grant', 'refuse'].includes(addition.decision)
-    && (addition.decision !== 'refuse' || REDETERMINATION_REFUSAL_REASONS.includes(addition.refusalReason))
     && (addition.decision !== 'grant' || Boolean(addition.certificateGrantDate)));
 }
 
@@ -2960,6 +3065,7 @@ router.get('/application/:reference/redeterminations/new-proceedings/decision', 
     reference,
     requests,
     draft: { ...draft, errors: draft.newProceedingErrors || [] },
+    showExplanation: draft.additions.some(addition => addition.decision === 'refuse'),
     assessmentOfNewProceedings: true
   });
 });
@@ -2974,16 +3080,24 @@ router.post('/application/:reference/redeterminations/new-proceedings/decision',
   const errors = [];
   draft.additions.forEach((addition, position) => {
     addition.decision = req.body['decision-new-' + position];
-    addition.refusalReason = addition.decision === 'refuse' ? req.body['refusal-new-' + position] : '';
-    const grantDate = addition.decision === 'grant' ? getGroupedCertificateGrantDate(req.body, 'new-' + position) : null;
+    addition.refusalReason = '';
+    const grantDate = addition.decision === 'grant' ? getGroupedCertificateGrantDate(req.body, 'new-' + position, req, reference) : null;
     if (grantDate) Object.assign(addition, grantDate.values);
     if (!['grant', 'refuse'].includes(addition.decision)) errors.push({ text: 'Select a decision for ' + addition.proceedingName, href: '#decision-new-' + position });
-    if (addition.decision === 'refuse' && !REDETERMINATION_REFUSAL_REASONS.includes(addition.refusalReason)) errors.push({ text: 'Select a refusal reason for ' + addition.proceedingName, href: '#refusal-new-' + position });
     if (grantDate?.dateTypeMissing) errors.push({ text: 'Select when the certificate should be granted from for ' + addition.proceedingName, href: '#certificate-grant-date-type-new-' + position });
     if (grantDate?.dateMissingOrInvalid) errors.push({ text: 'Enter a real date for when the certificate should be granted from for ' + addition.proceedingName, href: '#certificate-grant-date-new-' + position + '-day' });
+    if (grantDate?.submittedDateMissing) errors.push({ text: 'The application submission date is unavailable. Select another date for ' + addition.proceedingName, href: '#certificate-grant-date-type-new-' + position });
   });
   draft.explanation = (req.body['grouped-explanation'] || '').trim();
-  if (!draft.explanation || draft.explanation.length > 10000) errors.push({ text: 'Explain your decision using up to 10,000 characters', href: '#grouped-explanation' });
+  const hasRefusal = draft.additions.some(addition => addition.decision === 'refuse');
+  draft.explanationError = '';
+  if (hasRefusal && !draft.explanation) {
+    draft.explanationError = 'Explain your decision';
+    errors.push({ text: draft.explanationError, href: '#grouped-explanation' });
+  } else if (draft.explanation.length > 10000) {
+    draft.explanationError = 'Your explanation must be 10,000 characters or fewer';
+    errors.push({ text: draft.explanationError, href: '#grouped-explanation' });
+  }
   draft.newProceedingErrors = errors;
   res.redirect('/v6-v5/application/' + encodeURIComponent(reference) + '/redeterminations/' + (errors.length ? 'new-proceedings/decision' : 'check-answers'));
 });
@@ -3332,11 +3446,10 @@ router.post('/application/:reference/redetermination/:index/grant-date', functio
   if (!['today', 'another-date'].includes(dateType)) {
     errors.dateType = 'Select when the certificate should be granted from';
   } else if (dateType === 'today') {
-    certificateGrantDate = new Date().toLocaleDateString('en-GB', {
-      day: 'numeric',
-      month: 'long',
-      year: 'numeric'
-    });
+    certificateGrantDate = getApplicationSubmittedDate(req, reference);
+    if (!certificateGrantDate) {
+      errors.dateType = 'The application submission date is unavailable. Select another date';
+    }
   } else {
     const date = new Date(Number(year), Number(month) - 1, Number(day));
     const isValidDate = /^\d{1,2}$/.test(day)
@@ -3419,6 +3532,7 @@ router.get('/application/:reference/redetermination/:index/check-answers', funct
     reference: reference,
     index: index,
     decision: answers.decision === 'refuse' ? 'Refuse' : 'Grant',
+    certificateGrantDateType: answers.certificateGrantDateType,
     proceedingName: isNewProceeding ? answers.newProceeding.proceedingName : (redetermination ? redetermination.redeterminationProceeding : 'Child assessment order'),
     clientRole: isNewProceeding ? answers.newProceeding.clientRole : (redetermination ? redetermination.redeterminationClientRole : 'Applicant'),
     scopeLimitations: isNewProceeding ? answers.newProceeding.scopeLimitations : 'Final Hearing<br><br>To be represented on all steps up to and including a final hearing.',
@@ -3654,6 +3768,12 @@ router.get('/application/:reference', function(req, res) {
   const initialApplicationData = applyStoredDecision(findApplicationVariant(false));
   const priorAuthorityApplicationData = applyStoredDecision(findApplicationVariant(true));
   const redeterminations = getRedeterminationsForReference(req, reference);
+  const groupedProceedingEdits = req.session.data['v6-v5']['grouped-redetermination-edits']?.[reference] || {};
+  redeterminations.forEach(redetermination => {
+    const edit = groupedProceedingEdits[redetermination.index];
+    if (edit?.proceedingName) redetermination.redeterminationProceeding = edit.proceedingName;
+    if (edit?.clientRole) redetermination.redeterminationClientRole = edit.clientRole;
+  });
   const pendingRedeterminationCount = redeterminations.filter(redetermination => !['Granted', 'Refused'].includes(redetermination.status)).length;
   const submittedRedetermination = applicationCollections.flat().find(request => request.ref === reference
     && request.isRedetermination && !request.newProceedingDetails) || redeterminations[0];
@@ -3665,17 +3785,48 @@ router.get('/application/:reference', function(req, res) {
   if (redeterminationAdditionalDetails) {
     const providerAnswersByReference = req.session.data['v6-v5']['redetermination-provider-answers-v4']
       || (req.session.data['v6-v5']['redetermination-provider-answers-v4'] = {});
-    if (!providerAnswersByReference[reference] || providerAnswersByReference[reference].schemaVersion !== 2) {
+    if (!providerAnswersByReference[reference] || providerAnswersByReference[reference].schemaVersion !== 6) {
       const scenario = Math.floor(Math.random() * 3);
       providerAnswersByReference[reference] = {
-        schemaVersion: 2,
+        schemaVersion: 6,
         parentalResponsibility: Math.random() < 0.5 ? 'Yes' : 'No',
         finalOrderMade: Math.random() < 0.5 ? 'Yes' : 'No',
+        finalOrderDetails: [{
+          proceedingName: 'Care order',
+          date: randomMockAnswer(['12 September 2026', '3 October 2026', '18 August 2026']),
+          outcome: randomMockAnswer(['A final care order was made.', 'A supervision order was made.', 'The application was dismissed.'])
+        }],
+        reasonForRequest: [
+          'The provider is seeking funding for additional proceedings following a change in the family’s circumstances.',
+          'Further proceedings are needed because the court is considering new arrangements for the children.',
+          'The client needs representation in additional proceedings that were not covered by the original application.'
+        ][scenario],
+        dispute: [
+          'The arrangements for the children remain disputed. The client needs representation to respond to the applications and present their position.',
+          'The client disagrees with the proposed arrangements and needs representation to explain their concerns to the court.',
+          'There is disagreement about where the children should live and how they should maintain contact with family members.'
+        ][scenario],
+        clientSeeking: [
+          'The client seeks arrangements that allow them to maintain a relationship with their children.',
+          'The client wants the court to consider their proposals for the children’s care and contact.',
+          'The client is seeking a safe and stable arrangement that reflects the children’s needs.'
+        ][scenario],
         caseProgress: [
           'The client has been ordered to attend the final hearing. Representation will help them respond to the updated assessments and present evidence supporting their proposed arrangements.',
           'The client needs legal representation to challenge the new evidence and explain their position at the hearing. The provider will prepare their response and identify the issues the court needs to decide.',
           'Representation will allow the client to take part in the additional proceedings and respond to the local authority. The provider will help prepare the documents needed for the final hearing.'
         ][scenario],
+        merits: [
+          'The evidence supports the client’s case and there is a reasonable prospect of achieving the outcome they seek.',
+          'The client’s evidence raises issues that need to be considered by the court. The provider considers the merits test is met.',
+          'The client has a substantial interest in the outcome and the available evidence supports their position.'
+        ][scenario],
+        additionalProceedingsReason: [
+          'The existing proceedings do not cover the additional orders now being sought.',
+          'The additional proceedings are needed to resolve issues that have arisen since the original application.',
+          'The court needs to consider these matters alongside the current proceedings to determine arrangements for the children.'
+        ][scenario],
+        proceedingAnswers: createMockProceedingAnswers(redeterminations),
         issuedBy: ['Manchester City Council', 'Leeds City Council', 'Birmingham City Council'][scenario],
         hearingDate: scenario === 0 ? null : ['28 August 2026', '15 September 2026'][scenario - 1],
         clientBenefit: [
@@ -3690,12 +3841,26 @@ router.get('/application/:reference', function(req, res) {
         ][scenario],
         prospectsOfSuccess: ['Better', 'Worse', 'Unchanged'][scenario]
       };
+    } else {
+      const currentAnswers = providerAnswersByReference[reference].proceedingAnswers || [];
+      const answersMatchProceedings = currentAnswers.length === redeterminations.length
+        && redeterminations.every(redetermination => currentAnswers.some(answer =>
+          answer.redeterminationId === redetermination.redeterminationId
+          && answer.proceedingName === redetermination.redeterminationProceeding
+        ));
+      if (!answersMatchProceedings) {
+        providerAnswersByReference[reference].proceedingAnswers = createMockProceedingAnswers(redeterminations);
+      }
     }
     redeterminationAdditionalDetails.providerAnswers = providerAnswersByReference[reference];
     redeterminationAdditionalDetails.parentalResponsibility = submittedRedetermination.redeterminationParentalResponsibility
       || providerAnswersByReference[reference].parentalResponsibility;
     redeterminationAdditionalDetails.finalOrderMade = submittedRedetermination.redeterminationFinalOrderMade
       || providerAnswersByReference[reference].finalOrderMade;
+    redeterminations.forEach(redetermination => {
+      redetermination.proceedingAnswers = providerAnswersByReference[reference].proceedingAnswers
+        .find(answer => answer.redeterminationId === redetermination.redeterminationId);
+    });
   }
   if (initialApplicationData && priorAuthorityApplicationData && !initialApplicationData.status) {
     initialApplicationData.status = 'Granted';

@@ -4,9 +4,30 @@
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 {% from "govuk/components/input/macro.njk" import govukInput %}
 {% from "govuk/components/phase-banner/macro.njk" import govukPhaseBanner %}
-{% from "govuk/components/textarea/macro.njk" import govukTextarea %}
+{% from "govuk/components/select/macro.njk" import govukSelect %}
 
-{% block pageTitle %}Change or edit proceeding{% endblock %}
+{% block pageTitle %}Change proceeding{% endblock %}
+
+{% block head %}
+  {{ super() }}
+  <style>
+    .v5-new-details-heading { display: flex; align-items: center; gap: 12px; }
+    .v5-selected-radio { position: relative; flex: 0 0 40px; width: 40px; height: 40px; border: 2px solid #0b0c0c; border-radius: 50%; }
+    .v5-selected-radio::after { position: absolute; top: 9px; left: 9px; width: 18px; height: 18px; border-radius: 50%; background: #0b0c0c; content: ""; }
+    .v5-proceeding-fields { margin-left: 19px; padding-left: 26px; border-left: 4px solid #b1b4b6; }
+    .v5-proceeding-suggestions { margin: 0; padding: 0; border: 2px solid #0b0c0c; border-top: 0; list-style: none; }
+    .v5-proceeding-suggestions li { padding: 8px; border-bottom: 1px solid #b1b4b6; cursor: pointer; }
+    .v5-proceeding-suggestions li:last-child { border-bottom: 0; }
+    .v5-proceeding-suggestions [aria-selected="true"] { background: #1d70b8; color: #fff; }
+    .v5-proceeding-readonly .govuk-summary-list__row:last-child { border-bottom: 0; }
+    @media (min-width: 40.0625em) {
+      .v5-proceeding-fields .govuk-form-group { display: grid; grid-template-columns: 30% minmax(0, 1fr); column-gap: 15px; align-items: start; }
+      .v5-proceeding-fields .govuk-label { grid-column: 1; grid-row: 1; padding-top: 7px; }
+      .v5-proceeding-fields .govuk-form-group > :not(.govuk-label) { grid-column: 2; }
+      .v5-proceeding-fields .govuk-input, .v5-proceeding-fields .govuk-select { width: 100%; }
+    }
+  </style>
+{% endblock %}
 
 {% block beforeContent %}
   {{ govukPhaseBanner({ tag: { text: "Beta" }, html: 'This is a new service - your <a class="govuk-link" href="#">feedback</a> will help us to improve it.' }) }}
@@ -20,19 +41,128 @@
     {% endif %}
     <p class="govuk-body-l govuk-!-margin-bottom-1">Application reference</p>
     <p class="govuk-heading-l">{{ reference }}</p>
-    <h1 class="govuk-heading-xl">Change or edit proceeding</h1>
-    <h2 class="govuk-heading-m">Details of request</h2>
-    <hr class="govuk-section-break govuk-section-break--visible govuk-!-margin-bottom-6">
-    <div class="govuk-grid-row govuk-!-margin-bottom-4">
-      <div class="govuk-grid-column-one-half"><h3 class="govuk-heading-s">Proceeding {{ proceedingNumber }}</h3></div>
-      <div class="govuk-grid-column-one-half govuk-!-text-align-right"><a class="govuk-link" href="/v6-v5/application/{{ reference }}/redeterminations/decision">Discard changes<span class="govuk-visually-hidden"> to proceeding {{ proceedingNumber }}</span></a></div>
-    </div>
+    <h1 class="govuk-heading-xl">Change proceeding</h1>
     <form method="post" action="/v6-v5/application/{{ reference }}/redeterminations/proceeding/{{ index }}/edit">
-      {{ govukInput({ id: "proceeding-name", name: "proceedingName", value: values.proceedingName, label: { text: "Proceeding", classes: "govuk-label--s" }, errorMessage: errors.length and { text: errors[0].text } or null }) }}
-      {{ govukInput({ id: "client-role", name: "clientRole", value: values.clientRole, label: { text: "Client role", classes: "govuk-label--s" } }) }}
-      {{ govukTextarea({ id: "scope-limitations", name: "scopeLimitations", value: values.scopeLimitations, rows: 4, label: { text: "Scope limitations", classes: "govuk-label--s" } }) }}
-      {{ govukInput({ id: "level-of-service", name: "levelOfService", value: values.levelOfService, label: { text: "Level of service", classes: "govuk-label--s" } }) }}
+      <p class="govuk-hint">Proceeding and client role options are illustrative mock data for user research, not legal eligibility rules.</p>
+      {% set proceedingError = null %}
+      {% set roleError = null %}
+      {% for error in errors %}
+        {% if error.href == '#proceeding-name' %}{% set proceedingError = { text: error.text } %}{% endif %}
+        {% if error.href == '#client-role' %}{% set roleError = { text: error.text } %}{% endif %}
+      {% endfor %}
+      <div class="v5-new-details-heading govuk-!-margin-bottom-4">
+        <span class="v5-selected-radio" aria-hidden="true"></span>
+        <h2 class="govuk-heading-s govuk-!-margin-bottom-0">New details</h2>
+      </div>
+      <div class="v5-proceeding-fields">
+      {{ govukInput({ id: "proceeding-name", name: "proceedingName", value: values.proceedingName, label: { text: "Proceeding", classes: "govuk-label--s" }, attributes: { autocomplete: "off" }, errorMessage: proceedingError }) }}
+      <datalist id="proceeding-options">
+        {% for option in proceedingOptions %}
+          <option value="{{ option.name }}" data-roles="{{ option.roles | join('|') }}"></option>
+        {% endfor %}
+      </datalist>
+      {{ govukSelect({ id: "client-role", name: "clientRole", classes: "govuk-!-width-full", label: { text: "Client role", classes: "govuk-label--s" }, errorMessage: roleError, items: [
+        { value: "", text: "Select a client role", selected: not values.clientRole },
+        { value: "Applicant", text: "Applicant", selected: values.clientRole == "Applicant" },
+        { value: "Respondent", text: "Respondent", selected: values.clientRole == "Respondent" },
+        { value: "A child subject of the proceeding", text: "A child subject of the proceeding", selected: values.clientRole == "A child subject of the proceeding" },
+        { value: "Intervenor", text: "Intervenor", selected: values.clientRole == "Intervenor" },
+        { value: "Joined party", text: "Joined party", selected: values.clientRole == "Joined party" }
+      ] }) }}
+      <dl class="govuk-summary-list v5-proceeding-readonly">
+        <div class="govuk-summary-list__row">
+          <dt class="govuk-summary-list__key">Scope limitations</dt>
+          <dd class="govuk-summary-list__value" style="white-space: pre-line;">{{ values.scopeLimitations }}</dd>
+        </div>
+        <div class="govuk-summary-list__row">
+          <dt class="govuk-summary-list__key">Level of service</dt>
+          <dd class="govuk-summary-list__value">{{ values.levelOfService }}</dd>
+        </div>
+      </dl>
+      </div>
       {{ govukButton({ text: "Save and continue" }) }}
     </form>
   </div></div>
+{% endblock %}
+
+{% block bodyEnd %}
+  {{ super() }}
+  <script>
+    const proceedingInput = document.getElementById('proceeding-name');
+    const roleSelect = document.getElementById('client-role');
+    const proceedingOptions = Array.from(document.querySelectorAll('#proceeding-options option'));
+    const suggestions = document.createElement('ul');
+    suggestions.id = 'proceeding-suggestions';
+    suggestions.className = 'v5-proceeding-suggestions govuk-body';
+    suggestions.setAttribute('role', 'listbox');
+    suggestions.setAttribute('aria-label', 'Proceedings');
+    suggestions.hidden = true;
+    proceedingInput.after(suggestions);
+    proceedingInput.setAttribute('role', 'combobox');
+    proceedingInput.setAttribute('aria-autocomplete', 'list');
+    proceedingInput.setAttribute('aria-controls', suggestions.id);
+    proceedingInput.setAttribute('aria-expanded', 'false');
+    let activeIndex = -1;
+    function closeSuggestions() {
+      suggestions.hidden = true;
+      proceedingInput.setAttribute('aria-expanded', 'false');
+      proceedingInput.removeAttribute('aria-activedescendant');
+      activeIndex = -1;
+    }
+    function chooseProceeding(value) {
+      proceedingInput.value = value;
+      updateClientRoles();
+      closeSuggestions();
+    }
+    function showSuggestions() {
+      suggestions.replaceChildren();
+      activeIndex = -1;
+      proceedingInput.removeAttribute('aria-activedescendant');
+      const query = proceedingInput.value.trim().toLowerCase();
+      if (!query) { closeSuggestions(); return; }
+      proceedingOptions.filter(option => option.value.toLowerCase().includes(query)).forEach((option, index) => {
+        const item = document.createElement('li');
+        item.id = 'proceeding-suggestion-' + index;
+        item.setAttribute('role', 'option');
+        item.setAttribute('aria-selected', 'false');
+        item.textContent = option.value;
+        item.addEventListener('mousedown', event => event.preventDefault());
+        item.addEventListener('click', () => chooseProceeding(option.value));
+        suggestions.appendChild(item);
+      });
+      suggestions.hidden = !suggestions.children.length;
+      proceedingInput.setAttribute('aria-expanded', String(!suggestions.hidden));
+    }
+    function updateClientRoles() {
+      const selected = proceedingOptions.find(option => option.value === proceedingInput.value);
+      const roles = selected ? selected.dataset.roles.split('|') : [];
+      Array.from(roleSelect.options).forEach(option => {
+        if (!option.value) return;
+        option.hidden = !roles.includes(option.value);
+        option.disabled = option.hidden;
+      });
+      if (!roles.includes(roleSelect.value)) roleSelect.value = '';
+      roleSelect.disabled = !selected;
+    }
+    proceedingInput.addEventListener('input', () => { updateClientRoles(); showSuggestions(); });
+    proceedingInput.addEventListener('focus', showSuggestions);
+    proceedingInput.addEventListener('blur', closeSuggestions);
+    proceedingInput.addEventListener('keydown', event => {
+      if (event.key === 'Escape') { closeSuggestions(); return; }
+      if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+        if (suggestions.hidden) showSuggestions();
+        const items = Array.from(suggestions.children);
+        if (!items.length) return;
+        event.preventDefault();
+        activeIndex = (activeIndex + (event.key === 'ArrowDown' ? 1 : -1) + items.length) % items.length;
+        items.forEach((item, index) => item.setAttribute('aria-selected', String(index === activeIndex)));
+        proceedingInput.setAttribute('aria-activedescendant', items[activeIndex].id);
+      } else if (event.key === 'Enter' && !suggestions.hidden && activeIndex >= 0) {
+        event.preventDefault();
+        chooseProceeding(suggestions.children[activeIndex].textContent);
+      }
+    });
+    proceedingInput.addEventListener('change', updateClientRoles);
+    updateClientRoles();
+  </script>
 {% endblock %}
