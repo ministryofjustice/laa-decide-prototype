@@ -2808,9 +2808,10 @@ router.post('/application/:reference/redeterminations/proceeding/:index/start-ed
       index: request.index,
       decision: req.body['decision-' + request.index] || '',
       refusalReason: req.body['refusal-' + request.index] || '',
+      explanation: (req.body['explanation-' + request.index] || '').trim(),
+      explanationError: '',
       ...getGroupedCertificateGrantDate(req.body, request.index, req, reference).values
     })),
-    explanation: req.body['grouped-explanation'] || '',
     errors: []
   };
   res.redirect('/v6-v5/application/' + encodeURIComponent(reference) + '/redeterminations/proceeding/' + index + '/edit');
@@ -2899,6 +2900,8 @@ router.post('/application/:reference/redeterminations/proceeding/:index/edit', f
       ...values,
       decision: '',
       refusalReason: '',
+      explanation: '',
+      explanationError: '',
       ...getGroupedCertificateGrantDate({}, index, req, reference).values
     } : answer);
     draft.errors = [];
@@ -2922,9 +2925,24 @@ router.get('/application/:reference/redeterminations/decision', function(req, re
       ...(proceedingEdits[request.index] || {})
     }
   }));
-  const showExplanation = draft.decisions?.some(answer => answer.decision === 'refuse') || false;
-  res.render('v6-v5/grouped-redetermination-decision.njk', { reference, requests: requestsWithAnswers, draft, showExplanation });
+  res.render('v6-v5/grouped-redetermination-decision.njk', { reference, requests: requestsWithAnswers, draft });
 });
+
+function getProceedingExplanation(body, index, decision, proceedingName, errors) {
+  const explanation = (body['explanation-' + index] || '').trim();
+  let explanationError = '';
+  if (decision === 'refuse') {
+    if (!explanation) {
+      explanationError = 'Explain your decision';
+    } else if (explanation.length > 250) {
+      explanationError = 'Your explanation must be 250 characters or fewer';
+    }
+    if (explanationError) {
+      errors.push({ text: explanationError + ' for ' + proceedingName, href: '#explanation-' + index });
+    }
+  }
+  return { explanation, explanationError };
+}
 
 function getApplicationSubmittedDate(req, reference) {
   const applicationSources = [
@@ -3010,20 +3028,11 @@ router.post('/application/:reference/redeterminations/decision', function(req, r
       scopeLimitations: proceedingEdit.scopeLimitations || previousAnswer?.scopeLimitations || request.newProceedingDetails?.scopeLimitations || 'Final Hearing\n\nTo be represented on all steps up to and including a final hearing.',
       levelOfService: proceedingEdit.levelOfService || previousAnswer?.levelOfService || request.newProceedingDetails?.levelOfService || 'Full representation',
       refusalReason: '',
+      ...getProceedingExplanation(req.body, request.index, decision, proceedingName, errors),
       ...(grantDate ? grantDate.values : {})
     };
   });
-  const explanation = (req.body['grouped-explanation'] || '').trim();
-  const hasRefusal = decisions.some(answer => answer.decision === 'refuse');
-  let explanationError = '';
-  if (hasRefusal && !explanation) {
-    explanationError = 'Explain your decision';
-    errors.push({ text: explanationError, href: '#grouped-explanation' });
-  } else if (explanation.length > 250) {
-    explanationError = 'Your explanation must be 250 characters or fewer';
-    errors.push({ text: explanationError, href: '#grouped-explanation' });
-  }
-  const draft = { decisions, explanation, explanationError, proceedingMode: 'existing', additions: [], errors };
+  const draft = { decisions, proceedingMode: 'existing', additions: [], errors };
   req.session.data['v6-v5']['grouped-redetermination-drafts'] = req.session.data['v6-v5']['grouped-redetermination-drafts'] || {};
   req.session.data['v6-v5']['grouped-redetermination-drafts'][reference] = draft;
   const nextStep = errors.length ? 'decision' : 'check-answers';
@@ -3032,7 +3041,8 @@ router.post('/application/:reference/redeterminations/decision', function(req, r
 
 function hasValidNewProceedingDecisions(draft) {
   return draft.additions?.length > 0 && draft.additions.every(addition => ['grant', 'refuse'].includes(addition.decision)
-    && (addition.decision !== 'grant' || Boolean(addition.certificateGrantDate)));
+    && (addition.decision !== 'grant' || Boolean(addition.certificateGrantDate))
+    && (addition.decision !== 'refuse' || (Boolean(addition.explanation) && addition.explanation.length <= 250)));
 }
 
 router.get('/application/:reference/redeterminations/new-proceedings/decision', function(req, res) {
@@ -3056,6 +3066,8 @@ router.get('/application/:reference/redeterminations/new-proceedings/decision', 
     answer: {
       decision: addition.decision,
       refusalReason: addition.refusalReason,
+      explanation: addition.explanation,
+      explanationError: addition.explanationError,
       certificateGrantDateType: addition.certificateGrantDateType,
       certificateGrantDateDay: addition.certificateGrantDateDay,
       certificateGrantDateMonth: addition.certificateGrantDateMonth,
@@ -3066,7 +3078,6 @@ router.get('/application/:reference/redeterminations/new-proceedings/decision', 
     reference,
     requests,
     draft: { ...draft, errors: draft.newProceedingErrors || [] },
-    showExplanation: draft.additions.some(addition => addition.decision === 'refuse'),
     assessmentOfNewProceedings: true
   });
 });
@@ -3082,6 +3093,7 @@ router.post('/application/:reference/redeterminations/new-proceedings/decision',
   draft.additions.forEach((addition, position) => {
     addition.decision = req.body['decision-new-' + position];
     addition.refusalReason = '';
+    Object.assign(addition, getProceedingExplanation(req.body, 'new-' + position, addition.decision, addition.proceedingName, errors));
     const grantDate = addition.decision === 'grant' ? getGroupedCertificateGrantDate(req.body, 'new-' + position, req, reference) : null;
     if (grantDate) Object.assign(addition, grantDate.values);
     if (!['grant', 'refuse'].includes(addition.decision)) errors.push({ text: 'Select a decision for ' + addition.proceedingName, href: '#decision-new-' + position });
@@ -3089,23 +3101,25 @@ router.post('/application/:reference/redeterminations/new-proceedings/decision',
     if (grantDate?.dateMissingOrInvalid) errors.push({ text: 'Enter a real date for when the certificate should be granted from for ' + addition.proceedingName, href: '#certificate-grant-date-new-' + position + '-day' });
     if (grantDate?.submittedDateMissing) errors.push({ text: 'The application submission date is unavailable. Select another date for ' + addition.proceedingName, href: '#certificate-grant-date-type-new-' + position });
   });
-  draft.explanation = (req.body['grouped-explanation'] || '').trim();
-  const hasRefusal = draft.additions.some(addition => addition.decision === 'refuse');
-  draft.explanationError = '';
-  if (hasRefusal && !draft.explanation) {
-    draft.explanationError = 'Explain your decision';
-    errors.push({ text: draft.explanationError, href: '#grouped-explanation' });
-  } else if (draft.explanation.length > 250) {
-    draft.explanationError = 'Your explanation must be 250 characters or fewer';
-    errors.push({ text: draft.explanationError, href: '#grouped-explanation' });
-  }
   draft.newProceedingErrors = errors;
   res.redirect('/v6-v5/application/' + encodeURIComponent(reference) + '/redeterminations/' + (errors.length ? 'new-proceedings/decision' : 'check-answers'));
 });
 
+function validateGroupedRefusalExplanations(draft) {
+  const errors = [];
+  draft.decisions.forEach(answer => {
+    Object.assign(answer, getProceedingExplanation(
+      { ['explanation-' + answer.index]: answer.explanation },
+      answer.index, answer.decision, answer.proceedingName, errors
+    ));
+  });
+  draft.errors = [...draft.errors.filter(error => !error.href.startsWith('#explanation-')), ...errors];
+}
+
 router.get('/application/:reference/redeterminations/check-answers', function(req, res) {
   const reference = req.params.reference;
   const draft = req.session.data['v6-v5']['grouped-redetermination-drafts']?.[reference];
+  if (draft) validateGroupedRefusalExplanations(draft);
   if (!draft || draft.errors.length) {
     res.redirect('/v6-v5/application/' + encodeURIComponent(reference) + '/redeterminations/decision');
     return;
@@ -3121,6 +3135,7 @@ router.get('/application/:reference/redeterminations/check-answers', function(re
 router.post('/application/:reference/redeterminations/check-answers', function(req, res) {
   const reference = req.params.reference;
   const draft = req.session.data['v6-v5']['grouped-redetermination-drafts']?.[reference];
+  if (draft) validateGroupedRefusalExplanations(draft);
   const requests = res.locals.groupedRequests;
   const pending = requests.filter(request => !['Granted', 'Refused'].includes(request.status));
   if (!draft || draft.errors.length || !pending.length || (draft.proceedingMode !== 'new' && pending.some(request => !draft.decisions.some(answer => answer.index === request.index)))) {
@@ -3134,15 +3149,16 @@ router.post('/application/:reference/redeterminations/check-answers', function(r
   const store = req.session.data['v6-v5']['redetermination-decision-store'] || (req.session.data['v6-v5']['redetermination-decision-store'] = {});
   if (draft.proceedingMode === 'new') {
     pending.forEach(request => {
-      store[reference + '|' + request.index] = { ...request, reference, status: 'Granted', decisionType: 'Grant', replacedByNewProceedings: true, decisionReason: draft.explanation };
-      addHistoryEvent(req, reference, request.redeterminationProceeding + ': replaced by new proceedings', request.caseworker || 'Caseworker', draft.explanation);
+      store[reference + '|' + request.index] = { ...request, reference, status: 'Granted', decisionType: 'Grant', replacedByNewProceedings: true, decisionReason: '' };
+      addHistoryEvent(req, reference, request.redeterminationProceeding + ': replaced by new proceedings', request.caseworker || 'Caseworker', '');
     });
   }
   draft.decisions.forEach(answer => {
     const request = requests.find(item => item.index === answer.index);
     const status = answer.decision === 'grant' ? 'Granted' : 'Refused';
-    store[reference + '|' + answer.index] = { ...request, ...answer, reference, redeterminationProceeding: answer.proceedingName, redeterminationClientRole: answer.clientRole, status, decisionType: answer.decision === 'grant' ? 'Grant' : 'Refuse', refusalReason: answer.refusalReason, decisionReason: draft.explanation };
-    addHistoryEvent(req, reference, request.redeterminationProceeding + ': ' + status, request.caseworker || 'Caseworker', draft.explanation, { From: request.status, To: status });
+    const decisionReason = answer.decision === 'refuse' ? answer.explanation : '';
+    store[reference + '|' + answer.index] = { ...request, ...answer, reference, redeterminationProceeding: answer.proceedingName, redeterminationClientRole: answer.clientRole, status, decisionType: answer.decision === 'grant' ? 'Grant' : 'Refuse', refusalReason: answer.refusalReason, decisionReason };
+    addHistoryEvent(req, reference, request.redeterminationProceeding + ': ' + status, request.caseworker || 'Caseworker', decisionReason, { From: request.status, To: status });
   });
   let nextIndex = Math.max(...requests.map(request => request.index)) + 1;
   draft.additions.forEach(addition => {
@@ -3154,7 +3170,6 @@ router.post('/application/:reference/redeterminations/check-answers', function(r
       redeterminationOrder: index,
       redeterminationProceeding: addition.proceedingName,
       redeterminationClientRole: addition.clientRole,
-      redeterminationJustification: draft.explanation,
       newProceedingDetails: addition,
       status,
       decisionType: addition.decision === 'grant' ? 'Grant' : 'Refuse',
@@ -3166,8 +3181,9 @@ router.post('/application/:reference/redeterminations/check-answers', function(r
       certificateGrantDate: addition.certificateGrantDate
     };
     req.session.data['v6-v5']['completed-applications'].push(request);
-    store[reference + '|' + index] = { ...request, reference, index, decisionReason: draft.explanation };
-    addHistoryEvent(req, reference, addition.proceedingName + ': ' + status, request.caseworker || 'Caseworker', draft.explanation);
+    const decisionReason = addition.decision === 'refuse' ? addition.explanation : '';
+    store[reference + '|' + index] = { ...request, reference, index, decisionReason };
+    addHistoryEvent(req, reference, addition.proceedingName + ': ' + status, request.caseworker || 'Caseworker', decisionReason);
   });
   removeResolvedRedeterminationGroupFromList(req, reference);
   req.session.data['v6-v5']['grouped-redetermination-completed'] = req.session.data['v6-v5']['grouped-redetermination-completed'] || {};

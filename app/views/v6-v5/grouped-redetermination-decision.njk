@@ -75,59 +75,26 @@
               ]
             }) }}
           {% endset %}
+          {% set refusalExplanationHtml %}
+            {{ govukTextarea({ name: "explanation-" ~ request.index, id: "explanation-" ~ request.index, value: request.answer.explanation,
+              label: { text: "Explain your decision", classes: "govuk-label--m" },
+              hint: { text: "We will share this decision with the provider in the notification email. You will also find this saved in the application history." },
+              errorMessage: request.answer.explanationError and { text: request.answer.explanationError } or null,
+              attributes: { maxlength: 250 } }) }}
+            <p class="govuk-hint">You can enter up to 250 characters</p>
+          {% endset %}
           {{ govukRadios({ name: "decision-" ~ request.index, idPrefix: "decision-" ~ request.index,
             fieldset: { legend: { text: "What is your decision", classes: "govuk-fieldset__legend--s" } },
             items: [
               { value: "grant", text: "Grant", checked: request.answer.decision == "grant", conditional: { html: grantDateHtml } },
               { value: "refuse", text: "Refuse", checked: request.answer.decision == "refuse",
-                attributes: { "aria-controls": "grouped-explanation-container", "aria-expanded": showExplanation } }
+                conditional: { html: refusalExplanationHtml } }
             ] }) }}
         </section>
       {% endfor %}
       {% endset %}
       {{ appliedProceedingsHtml | safe }}
-      <div id="grouped-explanation-container" class="govuk-radios__conditional{% if not showExplanation %} govuk-radios__conditional--hidden{% endif %}">
-        {{ govukTextarea({ name: "grouped-explanation", id: "grouped-explanation", value: draft.explanation,
-          label: { text: "Explain your decision", classes: "govuk-label--m" },
-          hint: { text: "We will share this decision with the provider in the notification email. You will also find this saved in the application history." },
-          errorMessage: draft.explanationError and { text: draft.explanationError } or null,
-          attributes: { maxlength: 250 } }) }}
-        <p class="govuk-hint">You can enter up to 250 characters</p>
-      </div>
-      <div id="grouped-explanation-placeholder" hidden></div>
       {{ govukButton({ text: "Continue" }) }}
     </form>
   </div></div>
-{% endblock %}
-
-{% block bodyEnd %}
-  {{ super() }}
-  <script>
-    document.addEventListener('DOMContentLoaded', function () {
-      var explanation = document.getElementById('grouped-explanation-container');
-      var placeholder = document.getElementById('grouped-explanation-placeholder');
-      if (!explanation) return;
-      var refusalOptions = document.querySelectorAll('input[type="radio"][value="refuse"][name^="decision-"]');
-
-      function updateExplanationVisibility() {
-        var refusal = document.querySelector('input[type="radio"][name^="decision-"][value="refuse"]:checked');
-        var showExplanation = Boolean(refusal);
-        explanation.classList.toggle('govuk-radios__conditional--hidden', !showExplanation);
-        refusalOptions.forEach(function (option) {
-          option.setAttribute('aria-expanded', String(option === refusal));
-        });
-        if (refusal) {
-          var decisionRadios = refusal.closest('.govuk-radios');
-          if (decisionRadios) decisionRadios.insertAdjacentElement('afterend', explanation);
-        } else if (placeholder) {
-          placeholder.insertAdjacentElement('beforebegin', explanation);
-        }
-      }
-
-      document.querySelectorAll('input[type="radio"][name^="decision-"]').forEach(function (decision) {
-        decision.addEventListener('change', updateExplanationVisibility);
-      });
-      updateExplanationVisibility();
-    });
-  </script>
 {% endblock %}

@@ -8,7 +8,7 @@
   }) }}
 {% endblock %}
 
-{% macro summaryCard(title, decision, role, scope, service, refusal, grantDate, grantDateType, changeHref, anchor, decisionHref) %}
+{% macro summaryCard(title, decision, role, scope, service, explanation, grantDate, grantDateType, changeHref, anchor, decisionHref, explanationHref) %}
   {% set detailsHref = changeHref ~ anchor if anchor == "#additional-proceedings" else changeHref ~ "?edit=" ~ (anchor | replace('#request-heading-', '')) ~ anchor %}
   <div class="govuk-summary-card govuk-!-margin-bottom-6">
     <div class="govuk-summary-card__title-wrapper"><h2 class="govuk-summary-card__title">{{ title }}</h2></div>
@@ -34,6 +34,13 @@
         </div>
         <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">Scope limitations</dt><dd class="govuk-summary-list__value" style="white-space: pre-line;">{{ scope }}</dd></div>
         <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">Level of service</dt><dd class="govuk-summary-list__value">{{ service }}</dd></div>
+        {% if decision == 'Refuse' %}
+          <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">Decision reason</dt>
+            <dd class="govuk-summary-list__value" style="white-space: pre-line;">{{ explanation }}</dd>
+            <dd class="govuk-summary-list__actions"><a class="govuk-link" href="{{ explanationHref }}">Change<span class="govuk-visually-hidden"> decision reason for {{ title }}</span></a></dd>
+          </div>
+        {% endif %}
       </dl>
     </div>
   </div>
@@ -48,24 +55,11 @@
     <h1 class="govuk-heading-xl">Check your answers</h1>
     {% for item in decisions %}
       {{ summaryCard(item.proceedingName, "Grant" if item.decision == "grant" else "Refuse", item.clientRole,
-        "Final Hearing\n\nTo be represented on all steps up to and including a final hearing.", "Full representation", item.refusalReason, item.certificateGrantDate, item.certificateGrantDateType, changeHref, "#request-heading-" ~ item.index) }}
+        "Final Hearing\n\nTo be represented on all steps up to and including a final hearing.", "Full representation", item.explanation, item.certificateGrantDate, item.certificateGrantDateType, changeHref, "#request-heading-" ~ item.index, "", changeHref ~ "#explanation-" ~ item.index) }}
     {% endfor %}
     {% for item in draft.additions %}
-      {{ summaryCard(item.proceedingName, "Grant" if item.decision == "grant" else "Refuse", item.clientRole, item.scopeLimitations, item.levelOfService, item.refusalReason, item.certificateGrantDate, item.certificateGrantDateType, changeHref, "#additional-proceedings", newDecisionHref ~ "#request-heading-new-" ~ loop.index0) }}
+      {{ summaryCard(item.proceedingName, "Grant" if item.decision == "grant" else "Refuse", item.clientRole, item.scopeLimitations, item.levelOfService, item.explanation, item.certificateGrantDate, item.certificateGrantDateType, changeHref, "#additional-proceedings", newDecisionHref ~ "#request-heading-new-" ~ loop.index0, newDecisionHref ~ "#explanation-new-" ~ loop.index0) }}
     {% endfor %}
-    {% if draft.explanation %}
-      <div class="govuk-summary-card govuk-!-margin-bottom-6">
-        <div class="govuk-summary-card__title-wrapper">
-          <h2 class="govuk-summary-card__title">Decision reason</h2>
-          <ul class="govuk-summary-card__actions">
-            <li class="govuk-summary-card__action"><a class="govuk-link" href="{{ newDecisionHref if draft.proceedingMode == 'new' else changeHref }}#grouped-explanation">Change<span class="govuk-visually-hidden"> decision reason</span></a></li>
-          </ul>
-        </div>
-        <div class="govuk-summary-card__content">
-          <p class="govuk-body govuk-!-margin-bottom-0" style="white-space: pre-line;">{{ draft.explanation }}</p>
-        </div>
-      </div>
-    {% endif %}
     <form method="post" action="/v6-v5/application/{{ reference }}/redeterminations/check-answers">{{ govukButton({ text: "Submit decision" }) }}</form>
   </div></div>
 {% endblock %}
