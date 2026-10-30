@@ -8,7 +8,7 @@
   }) }}
 {% endblock %}
 
-{% macro summaryCard(title, decision, role, scope, service, explanation, grantDate, grantDateType, changeHref, anchor, decisionHref, explanationHref) %}
+{% macro summaryCard(title, decision, role, scope, service, explanation, grantDate, grantDateType, changeHref, anchor, decisionHref, explanationHref, changeExplanation) %}
   {% set detailsHref = changeHref ~ anchor if anchor == "#additional-proceedings" else changeHref ~ "?edit=" ~ (anchor | replace('#request-heading-', '')) ~ anchor %}
   <div class="govuk-summary-card govuk-!-margin-bottom-6">
     <div class="govuk-summary-card__title-wrapper"><h2 class="govuk-summary-card__title">{{ title }}</h2></div>
@@ -28,6 +28,13 @@
           <dt class="govuk-summary-list__key">Proceeding</dt><dd class="govuk-summary-list__value">{{ title }}</dd>
           <dd class="govuk-summary-list__actions"><a href="{{ detailsHref }}" class="govuk-link">Change<span class="govuk-visually-hidden"> proceeding {{ title }}</span></a></dd>
         </div>
+        {% if changeExplanation %}
+          <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">Reason for changing proceeding</dt>
+            <dd class="govuk-summary-list__value" style="white-space: pre-line;">{{ changeExplanation }}</dd>
+            <dd class="govuk-summary-list__actions"><a class="govuk-link" href="{{ detailsHref }}">Change<span class="govuk-visually-hidden"> reason for changing proceeding {{ title }}</span></a></dd>
+          </div>
+        {% endif %}
         <div class="govuk-summary-list__row">
           <dt class="govuk-summary-list__key">Client role</dt><dd class="govuk-summary-list__value">{{ role }}</dd>
           <dd class="govuk-summary-list__actions"><a href="{{ detailsHref }}" class="govuk-link">Change<span class="govuk-visually-hidden"> client role for {{ title }}</span></a></dd>
@@ -55,7 +62,7 @@
     <h1 class="govuk-heading-xl">Check your answers</h1>
     {% for item in decisions %}
       {{ summaryCard(item.proceedingName, "Grant" if item.decision == "grant" else "Refuse", item.clientRole,
-        "Final Hearing\n\nTo be represented on all steps up to and including a final hearing.", "Full representation", item.explanation, item.certificateGrantDate, item.certificateGrantDateType, changeHref, "#request-heading-" ~ item.index, "", changeHref ~ "#explanation-" ~ item.index) }}
+        "Final Hearing\n\nTo be represented on all steps up to and including a final hearing.", "Full representation", item.explanation, item.certificateGrantDate, item.certificateGrantDateType, changeHref, "#request-heading-" ~ item.index, "", changeHref ~ "#explanation-" ~ item.index, item.changeExplanation) }}
     {% endfor %}
     {% for item in draft.additions %}
       {{ summaryCard(item.proceedingName, "Grant" if item.decision == "grant" else "Refuse", item.clientRole, item.scopeLimitations, item.levelOfService, item.explanation, item.certificateGrantDate, item.certificateGrantDateType, changeHref, "#additional-proceedings", newDecisionHref ~ "#request-heading-new-" ~ loop.index0, newDecisionHref ~ "#explanation-new-" ~ loop.index0) }}

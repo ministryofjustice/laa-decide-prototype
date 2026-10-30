@@ -2838,6 +2838,7 @@ router.get('/application/:reference/redeterminations/proceeding/:index/edit', fu
     values: {
       proceedingName: savedEdit.proceedingName || '',
       clientRole: savedEdit.clientRole || '',
+      changeExplanation: savedEdit.changeExplanation || '',
       scopeLimitations: savedEdit.scopeLimitations || request.newProceedingDetails?.scopeLimitations || 'Final Hearing\n\nTo be represented on all steps up to and including a final hearing.',
       levelOfService: savedEdit.levelOfService || request.newProceedingDetails?.levelOfService || 'Full representation'
     },
@@ -2859,6 +2860,7 @@ router.post('/application/:reference/redeterminations/proceeding/:index/edit', f
   const values = {
     proceedingName: String(req.body.proceedingName || '').trim(),
     clientRole: String(req.body.clientRole || '').trim(),
+    changeExplanation: String(req.body.changeExplanation || '').trim(),
     scopeLimitations: String(req.body.scopeLimitations ?? savedEdit.scopeLimitations ?? request.newProceedingDetails?.scopeLimitations ?? request.scopeLimitations ?? 'Final Hearing\n\nTo be represented on all steps up to and including a final hearing.').trim(),
     levelOfService: String(req.body.levelOfService ?? savedEdit.levelOfService ?? request.newProceedingDetails?.levelOfService ?? request.levelOfService ?? 'Full representation').trim()
   };
@@ -2870,6 +2872,11 @@ router.post('/application/:reference/redeterminations/proceeding/:index/edit', f
     href: '#' + ({ proceedingName: 'proceeding-name', clientRole: 'client-role', scopeLimitations: 'scope-limitations', levelOfService: 'level-of-service' })[field]
   }));
   const selectedProceeding = MOCK_EDIT_PROCEEDINGS.find(item => item.name === values.proceedingName);
+  if (!values.changeExplanation) {
+    errors.push({ text: 'Explain your decision', href: '#change-explanation' });
+  } else if (values.changeExplanation.length > 250) {
+    errors.push({ text: 'Your explanation must be 250 characters or fewer', href: '#change-explanation' });
+  }
   if (values.proceedingName && !selectedProceeding) {
     errors.push({ text: 'Select a proceeding from the list', href: '#proceeding-name' });
   }
@@ -3025,6 +3032,7 @@ router.post('/application/:reference/redeterminations/decision', function(req, r
       decision,
       proceedingName,
       clientRole,
+      changeExplanation: proceedingEdit.changeExplanation || previousAnswer?.changeExplanation || '',
       scopeLimitations: proceedingEdit.scopeLimitations || previousAnswer?.scopeLimitations || request.newProceedingDetails?.scopeLimitations || 'Final Hearing\n\nTo be represented on all steps up to and including a final hearing.',
       levelOfService: proceedingEdit.levelOfService || previousAnswer?.levelOfService || request.newProceedingDetails?.levelOfService || 'Full representation',
       refusalReason: '',
@@ -3159,6 +3167,9 @@ router.post('/application/:reference/redeterminations/check-answers', function(r
     const decisionReason = answer.decision === 'refuse' ? answer.explanation : '';
     store[reference + '|' + answer.index] = { ...request, ...answer, reference, redeterminationProceeding: answer.proceedingName, redeterminationClientRole: answer.clientRole, status, decisionType: answer.decision === 'grant' ? 'Grant' : 'Refuse', refusalReason: answer.refusalReason, decisionReason };
     addHistoryEvent(req, reference, request.redeterminationProceeding + ': ' + status, request.caseworker || 'Caseworker', decisionReason, { From: request.status, To: status });
+    if (answer.changeExplanation) {
+      addHistoryEvent(req, reference, 'Proceeding changed to ' + answer.proceedingName, request.caseworker || 'Caseworker', answer.changeExplanation);
+    }
   });
   let nextIndex = Math.max(...requests.map(request => request.index)) + 1;
   draft.additions.forEach(addition => {

@@ -5,6 +5,7 @@
 {% from "govuk/components/input/macro.njk" import govukInput %}
 {% from "govuk/components/phase-banner/macro.njk" import govukPhaseBanner %}
 {% from "govuk/components/select/macro.njk" import govukSelect %}
+{% from "govuk/components/textarea/macro.njk" import govukTextarea %}
 
 {% block pageTitle %}Change proceeding{% endblock %}
 
@@ -46,9 +47,11 @@
       <p class="govuk-hint">Proceeding and client role options are illustrative mock data for user research, not legal eligibility rules.</p>
       {% set proceedingError = null %}
       {% set roleError = null %}
+      {% set explanationError = null %}
       {% for error in errors %}
         {% if error.href == '#proceeding-name' %}{% set proceedingError = { text: error.text } %}{% endif %}
         {% if error.href == '#client-role' %}{% set roleError = { text: error.text } %}{% endif %}
+        {% if error.href == '#change-explanation' %}{% set explanationError = { text: error.text } %}{% endif %}
       {% endfor %}
       <div class="v5-new-details-heading govuk-!-margin-bottom-4">
         <span class="v5-selected-radio" aria-hidden="true"></span>
@@ -80,6 +83,15 @@
         </div>
       </dl>
       </div>
+      {{ govukTextarea({
+        id: "change-explanation",
+        name: "changeExplanation",
+        value: values.changeExplanation,
+        label: { text: "Explain your decision", classes: "govuk-label--m" },
+        hint: { text: "We will share this decision with the provider in the notification email. You will also find this saved in the application history." },
+        attributes: { maxlength: 250 },
+        errorMessage: explanationError
+      }) }}
       {{ govukButton({ text: "Save and continue" }) }}
     </form>
   </div></div>
