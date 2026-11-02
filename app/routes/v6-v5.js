@@ -13,7 +13,7 @@ router.use(function(req, res, next) {
     const journey = req.path.match(/^\/application\/([^/]+)\/redeterminations(?:\/|$)/);
     const application = req.path.match(/^\/application\/([^/]+)\/?$/);
     const reference = journey?.[1] || application?.[1];
-    for (const key of ['grouped-redetermination-drafts', 'grouped-redetermination-edits']) {
+    for (const key of ['grouped-redetermination-drafts', 'grouped-redetermination-edits', 'grouped-redetermination-update-success']) {
       const entries = versionData[key];
       if (!entries) continue;
       for (const storedReference of Object.keys(entries)) {
@@ -2913,6 +2913,9 @@ router.post('/application/:reference/redeterminations/proceeding/:index/edit', f
   const edits = req.session.data['v6-v5']['grouped-redetermination-edits'] || (req.session.data['v6-v5']['grouped-redetermination-edits'] = {});
   edits[reference] = edits[reference] || {};
   edits[reference][index] = values;
+  const updateSuccess = req.session.data['v6-v5']['grouped-redetermination-update-success']
+    || (req.session.data['v6-v5']['grouped-redetermination-update-success'] = {});
+  updateSuccess[reference] = true;
   const draft = req.session.data['v6-v5']['grouped-redetermination-drafts']?.[reference];
   if (draft) {
     draft.decisions = (draft.decisions || []).map(answer => answer.index === index ? {
@@ -2945,7 +2948,9 @@ router.get('/application/:reference/redeterminations/decision', function(req, re
       ...(proceedingEdits[request.index] || {})
     }
   }));
-  res.render('v6-v5/grouped-redetermination-decision.njk', { reference, requests: requestsWithAnswers, draft });
+  const proceedingUpdated = req.session.data['v6-v5']['grouped-redetermination-update-success']?.[reference];
+  delete req.session.data['v6-v5']['grouped-redetermination-update-success']?.[reference];
+  res.render('v6-v5/grouped-redetermination-decision.njk', { reference, requests: requestsWithAnswers, draft, proceedingUpdated });
 });
 
 function getProceedingExplanation(body, index, decision, proceedingName, errors) {
@@ -2985,7 +2990,13 @@ function getGroupedCertificateGrantDate(body, index, req, reference) {
   const year = String(body['certificate-grant-date-' + index + '-year'] || '').trim();
   let certificateGrantDate;
 
-  if (dateType === 'today') {
+  if (dateType === 'current-date') {
+    certificateGrantDate = new Date().toLocaleDateString('en-GB', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric'
+    });
+  } else if (dateType === 'today') {
     certificateGrantDate = getApplicationSubmittedDate(req, reference);
   } else if (dateType === 'another-date') {
     const date = new Date(Number(year), Number(month) - 1, Number(day));
@@ -3013,7 +3024,7 @@ function getGroupedCertificateGrantDate(body, index, req, reference) {
       certificateGrantDateYear: year,
       certificateGrantDate
     },
-    dateTypeMissing: !['today', 'another-date'].includes(dateType),
+    dateTypeMissing: !['current-date', 'today', 'another-date'].includes(dateType),
     dateMissingOrInvalid: dateType === 'another-date' && !certificateGrantDate,
     submittedDateMissing: dateType === 'today' && !certificateGrantDate
   };
@@ -3487,8 +3498,14 @@ router.post('/application/:reference/redetermination/:index/grant-date', functio
   const errors = {};
   let certificateGrantDate;
 
-  if (!['today', 'another-date'].includes(dateType)) {
+  if (!['current-date', 'today', 'another-date'].includes(dateType)) {
     errors.dateType = 'Select when the certificate should be granted from';
+  } else if (dateType === 'current-date') {
+    certificateGrantDate = new Date().toLocaleDateString('en-GB', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric'
+    });
   } else if (dateType === 'today') {
     certificateGrantDate = getApplicationSubmittedDate(req, reference);
     if (!certificateGrantDate) {

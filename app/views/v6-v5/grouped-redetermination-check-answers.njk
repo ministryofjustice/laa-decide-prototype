@@ -20,8 +20,8 @@
         </div>
         {% if decision == 'Grant' %}
           <div class="govuk-summary-list__row">
-            <dt class="govuk-summary-list__key">Certificate grant date</dt><dd class="govuk-summary-list__value">{{ grantDate }}</dd>
-            <dd class="govuk-summary-list__actions"><a href="{{ decisionHref or (changeHref ~ anchor) }}" class="govuk-link">Change<span class="govuk-visually-hidden"> certificate grant date for {{ title }}</span></a></dd>
+            <dt class="govuk-summary-list__key">Date granted from</dt><dd class="govuk-summary-list__value">{{ grantDate }}</dd>
+            <dd class="govuk-summary-list__actions"><a href="{{ decisionHref or (changeHref ~ anchor) }}" class="govuk-link">Change<span class="govuk-visually-hidden"> date granted from for {{ title }}</span></a></dd>
           </div>
         {% endif %}
         <div class="govuk-summary-list__row">

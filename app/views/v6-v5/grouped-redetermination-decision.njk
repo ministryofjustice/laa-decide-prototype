@@ -2,6 +2,7 @@
 {% from "govuk/components/input/macro.njk" import govukInput %}
 {% from "govuk/components/date-input/macro.njk" import govukDateInput %}
 {% from "govuk/components/textarea/macro.njk" import govukTextarea %}
+{% from "govuk/components/notification-banner/macro.njk" import govukNotificationBanner %}
 
 {% block head %}
   {{ super() }}
@@ -32,6 +33,14 @@
 
 {% block content %}
   <div class="govuk-grid-row"><div class="govuk-grid-column-two-thirds">
+    {% if proceedingUpdated %}
+      {{ govukNotificationBanner({
+        type: "success",
+        disableAutoFocus: true,
+        attributes: { id: "proceeding-updated-banner" },
+        text: "Proceeding successfully updated"
+      }) }}
+    {% endif %}
     {% if draft.errors.length %}{{ govukErrorSummary({ titleText: "There is a problem", errorList: draft.errors }) }}{% endif %}
     <p class="govuk-body-l govuk-!-margin-bottom-1">Application reference</p>
     <p class="govuk-heading-l">{{ reference }}</p>
@@ -70,6 +79,7 @@
               idPrefix: "certificate-grant-date-type-" ~ request.index,
               fieldset: { legend: { text: "When should the certificate be granted from?", classes: "govuk-fieldset__legend--s" } },
               items: [
+                { value: "current-date", text: "Today's date", checked: request.answer.certificateGrantDateType == "current-date" },
                 { value: "today", text: "Submitted date", checked: request.answer.certificateGrantDateType == "today" },
                 { value: "another-date", text: "Another date", checked: request.answer.certificateGrantDateType == "another-date", conditional: { html: anotherGrantDateHtml } }
               ]
@@ -97,4 +107,16 @@
       {{ govukButton({ text: "Continue" }) }}
     </form>
   </div></div>
+{% endblock %}
+
+{% block bodyEnd %}
+  {{ super() }}
+  {% if proceedingUpdated %}
+    <script>
+      const proceedingUpdatedBanner = document.getElementById('proceeding-updated-banner');
+      if (proceedingUpdatedBanner) {
+        setTimeout(() => proceedingUpdatedBanner.remove(), 5000);
+      }
+    </script>
+  {% endif %}
 {% endblock %}
