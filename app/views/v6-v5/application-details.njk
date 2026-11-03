@@ -609,7 +609,7 @@
                 <thead class="govuk-table__head">
                   <tr class="govuk-table__row">
                     <th scope="col" class="govuk-table__header">Type of evidence</th>
-                    <th scope="col" class="govuk-table__header">File name &amp; Date received</th>
+                    <th scope="col" class="govuk-table__header">File name and date received</th>
                   </tr>
                 </thead>
                 <tbody class="govuk-table__body">
@@ -683,7 +683,7 @@
               <thead class="govuk-table__head">
                 <tr class="govuk-table__row">
                   <th scope="col" class="govuk-table__header" style="width: 50%;">Type of evidence</th>
-                  <th scope="col" class="govuk-table__header" style="width: 50%;">File name & Date received</th>
+                  <th scope="col" class="govuk-table__header" style="width: 50%;">File name and date received</th>
                 </tr>
               </thead>
               <tbody class="govuk-table__body">
@@ -811,9 +811,18 @@
                   {% elif event.changes %}
                     From: <strong>{{ event.changes.From }}</strong><br>
                     To: <strong>{{ event.changes.To }}</strong><br><br>
+                    {% if event.changes.clientRoleFrom %}
+                      Client role from: <strong>{{ event.changes.clientRoleFrom }}</strong><br>
+                      Client role to: <strong>{{ event.changes.clientRoleTo }}</strong><br>
+                    {% endif %}
+                    {% if event.changes.dateGrantedFrom %}
+                      Date granted from: <strong>{{ event.changes.dateGrantedFrom }}</strong><br>
+                    {% endif %}
                   {% endif %}
 
-                  {% if event.justification %}
+                  {% if event.title == 'Proceeding changed' and event.justification %}
+                    <p class="govuk-body govuk-!-margin-top-2 govuk-!-margin-bottom-0" style="white-space: pre-line;"><strong>Reason for changing proceeding:</strong><br>{{ event.justification }}</p>
+                  {% elif event.justification %}
                     <details class="govuk-details govuk-!-margin-bottom-0 govuk-!-margin-top-2">
                       <summary class="govuk-details__summary">
                         <span class="govuk-details__summary-text">Expand</span>
@@ -1215,6 +1224,7 @@
 {% endblock %}
 
 {% block bodyEnd %}
+  <script src="/public/javascripts/v5-focus-field.js"></script>
   <script src="/plugin-assets/govuk-prototype-kit/lib/assets/javascripts/kit.js"></script>
   <script src="/plugin-assets/govuk-prototype-kit/lib/assets/javascripts/auto-store-data.js"></script>
   <script type="module" src="/plugin-assets/govuk-frontend/dist/govuk/govuk-frontend.min.js"></script>

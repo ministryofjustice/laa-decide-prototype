@@ -2842,6 +2842,9 @@ router.get('/application/:reference/redeterminations/proceeding/:index/edit', fu
 
   const edits = req.session.data['v6-v5']['grouped-redetermination-edits']?.[reference] || {};
   const savedEdit = edits[index] || {};
+  const reviewAnswer = req.query.from === 'check-answers'
+    ? req.session.data['v6-v5']['grouped-redetermination-drafts']?.[reference]?.decisions?.find(answer => answer.index === index)
+    : null;
   res.render('v6-v5/redetermination-edit-proceeding.njk', {
     reference,
     index,
@@ -2849,8 +2852,8 @@ router.get('/application/:reference/redeterminations/proceeding/:index/edit', fu
     request,
     proceedingOptions: MOCK_EDIT_PROCEEDINGS,
     values: {
-      proceedingName: savedEdit.proceedingName || '',
-      clientRole: savedEdit.clientRole || '',
+      proceedingName: savedEdit.proceedingName || reviewAnswer?.proceedingName || '',
+      clientRole: savedEdit.clientRole || reviewAnswer?.clientRole || '',
       changeExplanation: savedEdit.changeExplanation || '',
       scopeLimitations: savedEdit.scopeLimitations || request.newProceedingDetails?.scopeLimitations || 'Final Hearing\n\nTo be represented on all steps up to and including a final hearing.',
       levelOfService: savedEdit.levelOfService || request.newProceedingDetails?.levelOfService || 'Full representation'
@@ -3189,11 +3192,21 @@ router.post('/application/:reference/redeterminations/check-answers', function(r
     const request = requests.find(item => item.index === answer.index);
     const status = answer.decision === 'grant' ? 'Granted' : 'Refused';
     const decisionReason = answer.decision === 'refuse' ? answer.explanation : '';
-    store[reference + '|' + answer.index] = { ...request, ...answer, reference, redeterminationProceeding: answer.proceedingName, redeterminationClientRole: answer.clientRole, status, decisionType: answer.decision === 'grant' ? 'Grant' : 'Refuse', refusalReason: answer.refusalReason, decisionReason };
-    addHistoryEvent(req, reference, request.redeterminationProceeding + ': ' + status, request.caseworker || 'Caseworker', decisionReason, { From: request.status, To: status });
-    if (answer.changeExplanation) {
-      addHistoryEvent(req, reference, 'Proceeding changed to ' + answer.proceedingName, request.caseworker || 'Caseworker', answer.changeExplanation);
+    const proceedingChange = answer.changeExplanation ? {
+      From: request.redeterminationProceeding,
+      To: answer.proceedingName,
+      clientRoleFrom: request.redeterminationClientRole,
+      clientRoleTo: answer.clientRole
+    } : null;
+    store[reference + '|' + answer.index] = { ...request, ...answer, reference, redeterminationProceeding: answer.proceedingName, redeterminationClientRole: answer.clientRole, status, decisionType: answer.decision === 'grant' ? 'Grant' : 'Refuse', refusalReason: answer.refusalReason, decisionReason, proceedingChange };
+    if (proceedingChange) {
+      addHistoryEvent(req, reference, 'Proceeding changed', request.caseworker || 'Caseworker', answer.changeExplanation, proceedingChange);
     }
+    addHistoryEvent(req, reference, answer.proceedingName + ': ' + status, request.caseworker || 'Caseworker', decisionReason, {
+      From: request.status,
+      To: status,
+      ...(answer.decision === 'grant' ? { dateGrantedFrom: answer.certificateGrantDate } : {})
+    });
   });
   let nextIndex = Math.max(...requests.map(request => request.index)) + 1;
   draft.additions.forEach(addition => {

@@ -10,6 +10,9 @@
     {{ govukPanel({ titleText: "Assessment complete", html: "Reference number:<br><strong>" ~ reference ~ "</strong>" }) }}
     <h2 class="govuk-heading-m">What happens next</h2>
     <p class="govuk-body">We've saved your decision and it has been sent to the provider.</p>
-    {{ govukButton({ text: "View your list", href: "/v6-v5/yourlist" }) }}
+    <div class="govuk-button-group">
+      {{ govukButton({ text: "View your list", href: "/v6-v5/yourlist" }) }}
+      <a class="govuk-link" href="/v6-v5/application/{{ reference }}?focus=historyNote#application-history">Add internal note</a>
+    </div>
   </div></div>
 {% endblock %}
