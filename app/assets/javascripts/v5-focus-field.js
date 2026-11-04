@@ -5,7 +5,7 @@ window.addEventListener('load', function () {
   const target = document.getElementById(targetId);
   if (!target) return;
 
-  const field = target.matches('input, select, textarea')
+  const field = target.matches('input, select, textarea, button')
     ? target
     : target.querySelector('input:checked') || target.querySelector('input, select, textarea');
   if (field && !field.disabled && field.getClientRects().length) {

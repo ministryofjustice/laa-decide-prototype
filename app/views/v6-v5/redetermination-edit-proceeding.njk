@@ -76,7 +76,7 @@
       <div class="v5-new-details-heading govuk-!-margin-bottom-4">
         <span class="v5-selected-radio" aria-hidden="true"></span>
         <h2 class="govuk-heading-s govuk-!-margin-bottom-0">New details</h2>
-        <a class="govuk-link govuk-body govuk-!-margin-bottom-0 v5-discard-changes" href="/v6-v5/application/{{ reference }}/redeterminations/decision">Discard changes</a>
+        <a class="govuk-link govuk-body govuk-!-margin-bottom-0 v5-discard-changes" href="/v6-v5/application/{{ reference }}/redeterminations/decision#change-proceeding-{{ index }}">Discard changes</a>
       </div>
       <div class="v5-proceeding-fields">
       {{ govukInput({ id: "proceeding-name", name: "proceedingName", value: values.proceedingName, label: { text: "Proceeding", classes: "govuk-label--s" }, attributes: { autocomplete: "off" }, errorMessage: proceedingError }) }}
