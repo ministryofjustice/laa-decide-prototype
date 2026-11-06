@@ -117,7 +117,7 @@
                 </td>
                 <td class="govuk-table__cell">
                   {% if app.isRedetermination %}
-                    Redetermination<br><strong>{{ app.redeterminationType or 'Add a proceeding' }}</strong>
+                    <strong>{{ app.redeterminationType or 'Add proceedings' }}</strong>
                   {% elif app.isPriorAuthority %}
                     Prior authority<br><strong>{{ app.priorAuthorityType }}</strong>
                   {% else %}

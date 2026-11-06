@@ -814,7 +814,7 @@
         }) }}
 
         <!-- Add note form -->
-        <h2 class="govuk-heading-s govuk-!-margin-top-6">Add a note to the application history</h2>
+        <h2 class="govuk-heading-s govuk-!-margin-top-6">Add a note</h2>
         <form action="/v6-v4/application/{{ reference }}/add-note" method="post">
           {{ govukTextarea({
             name: "historyNote",
@@ -823,9 +823,7 @@
           }) }}
 
           {{ govukButton({
-            text: "Add to application history",
-            classes: "govuk-button--secondary",
-            style: "background-color: #00703c; color: white;"
+            text: "Add a note"
           }) }}
         </form>
       {% endset -%}

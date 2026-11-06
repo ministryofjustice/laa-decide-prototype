@@ -24,6 +24,11 @@ router.use(function(req, res, next) {
   }
   Object.assign(versionData, req.body || {});
   res.locals.data = versionData;
+  const decisionJourney = req.path.match(/^\/application\/([^/]+)\/redeterminations?(?:\/|$)/);
+  if (decisionJourney && versionData['mock-request-types']?.[decodeURIComponent(decisionJourney[1])]) {
+    res.redirect('/v6-v5/application/' + decisionJourney[1] + '?isRedetermination=true');
+    return;
+  }
   next();
 });
 
@@ -626,7 +631,7 @@ function recordRedeterminationSubmitted(req, application) {
     const groupEvent = matchingEvents.find(event => event.redeterminationId === groupKey) || matchingEvents[0];
     groupEvent.redeterminationId = groupKey;
     groupEvent.redeterminationCount = groupedRequests.length;
-    groupEvent.redeterminationType = 'Add a proceeding';
+    groupEvent.redeterminationType = application.redeterminationType;
     matchingEvents.slice(1).forEach(duplicate => history.splice(history.indexOf(duplicate), 1));
     return;
   }
@@ -1635,6 +1640,25 @@ function ensureRedeterminationRequestIds(req) {
   const requestBySignature = new Map();
   const nextOrderByReference = new Map();
   const usedOrdersByReference = new Map();
+  const requestTypes = req.session.data['v6-v5']['mock-request-types']
+    || (req.session.data['v6-v5']['mock-request-types'] = {});
+  for (const reference of Object.keys(requestTypes)) {
+    if (requestTypes[reference] === 'Increase scope limitations') requestTypes[reference] = 'Increase scope limitation';
+  }
+  const assignedReferences = new Set((req.session.data['v6-v5']['assigned-applications'] || []).map(application => application.ref));
+  const decidedReferences = new Set(Object.keys(req.session.data['v6-v5']['redetermination-decision-store'] || {}).map(key => key.split('|')[0]));
+  const availableReferences = [...new Set((req.session.data['v6-v5']['open-applications-all'] || [])
+    .filter(application => application.isRedetermination && application.ref !== 'L-12Z-13P'
+      && !assignedReferences.has(application.ref) && !decidedReferences.has(application.ref))
+    .map(application => application.ref))];
+  for (const type of ['Increase cost limit', 'Increase scope limitation']) {
+    let count = availableReferences.filter(reference => requestTypes[reference] === type).length;
+    const candidates = [...availableReferences].reverse().filter(reference => !requestTypes[reference]);
+    while (count < 2 && candidates.length > 2) {
+      requestTypes[candidates.shift()] = type;
+      count += 1;
+    }
+  }
 
   collections.flat().forEach(application => {
     if (!application.isRedetermination || !Number.isInteger(application.redeterminationOrder)) return;
@@ -1645,7 +1669,7 @@ function ensureRedeterminationRequestIds(req) {
   collections.forEach(collection => {
     collection.forEach(application => {
       if (!application.isRedetermination) return;
-      application.redeterminationType = 'Add a proceeding';
+      application.redeterminationType = requestTypes[application.ref] || 'Add proceedings';
       const signature = [
         application.ref,
         application.redeterminationProceeding,
@@ -1928,6 +1952,9 @@ router.get('/open-applications', function(req, res) {
         for (let type of selectedTypes) {
           if (type === 'initial' && !app.isPriorAuthority && !app.isRedetermination) return true;
           if (type === 'prior' && app.isPriorAuthority) return true;
+          if (type === 'add-proceedings' && app.isRedetermination && app.redeterminationType === 'Add proceedings') return true;
+          if (type === 'increase-cost-limit' && app.redeterminationType === 'Increase cost limit') return true;
+          if (type === 'increase-scope-limitations' && app.redeterminationType === 'Increase scope limitation') return true;
           if (type === 'redetermination' && app.isRedetermination) return true;
         }
         return false;
@@ -2380,7 +2407,7 @@ router.get('/add-application/:reference', function(req, res) {
 
   req.session.data['v6-v5']['app-history'][ref].push({
     timestamp: datetime,
-    action: openApp && openApp.isRedetermination ? 'Redetermination assigned to your list' : 'Application assigned to ' + assignedCaseworker,
+    action: openApp && openApp.isRedetermination ? (openApp.redeterminationType || 'Add proceedings') + ' assigned to your list' : 'Application assigned to ' + assignedCaseworker,
     caseworker: assignedCaseworker,
     details: null
   });
@@ -2409,7 +2436,7 @@ router.get('/remove-application/:reference', function(req, res) {
     req.session.data['v6-v5']['assigned-applications'] = req.session.data['v6-v5']['assigned-applications'].filter(app => app.ref !== ref);
   }
   if (removedApplication) {
-    addHistoryEvent(req, ref, removedApplication.isRedetermination ? 'Redetermination removed from your list' : 'Application removed from your list', removedApplication.caseworker || 'Caseworker');
+    addHistoryEvent(req, ref, removedApplication.isRedetermination ? (removedApplication.redeterminationType || 'Add proceedings') + ' removed from your list' : 'Application removed from your list', removedApplication.caseworker || 'Caseworker');
   }
 
   res.redirect('/v6-v5/yourlist');
@@ -2822,7 +2849,7 @@ router.get('/search', function(req, res) {
         dob: entry.dob,
         submitted: entry.submitted,
         firm: entry.firm || 'Not available',
-        type: 'Redetermination<br><strong>' + (entry.redeterminationType || 'Add a proceeding') + '</strong>',
+        type: '<strong>' + (entry.redeterminationType === 'Add a proceeding' ? 'Add proceedings' : entry.redeterminationType || 'Add proceedings') + '</strong>',
         isRedetermination: true,
         redeterminationIndex: linkedRequest ? linkedRequest.index : entry.index,
         outcome: outcome,
@@ -3358,7 +3385,7 @@ router.post('/application/:reference/redetermination/:index/decision', function(
 
   if (decision === 'grant') {
     delete req.session.data['v6-v5']['redetermination-grant-answers'];
-    addHistoryEvent(req, reference, 'Redetermination decision started', 'Caseworker');
+    addHistoryEvent(req, reference, 'Add proceedings decision started', 'Caseworker');
     res.redirect('/v6-v5/application/' + encodeURIComponent(reference) + '/redetermination/' + index + '/grant');
     return;
   }
@@ -3707,7 +3734,7 @@ router.post('/application/:reference/redetermination/:index/check-answers', func
       submitted: redetermination.submitted,
       firm: redetermination.firm
     };
-    addHistoryEvent(req, reference, 'Redetermination refused', redetermination.caseworker || 'Caseworker', answers.decisionReason, { From: 'Submitted', To: 'Refused' });
+    addHistoryEvent(req, reference, 'Add proceedings refused', redetermination.caseworker || 'Caseworker', answers.decisionReason, { From: 'Submitted', To: 'Refused' });
     delete req.session.data['v6-v5']['redetermination-grant-answers'];
     removeResolvedRedeterminationGroupFromList(req, reference);
     res.redirect('/v6-v5/application/' + encodeURIComponent(reference) + '?isRedetermination=true&redeterminationIndex=' + index);
@@ -3739,7 +3766,7 @@ router.post('/application/:reference/redetermination/:index/check-answers', func
       submitted: redetermination.submitted,
       firm: redetermination.firm
     };
-    addHistoryEvent(req, reference, 'Redetermination granted', redetermination.caseworker || 'Caseworker', answers.justification, { From: 'Submitted', To: 'Granted' });
+    addHistoryEvent(req, reference, 'Add proceedings granted', redetermination.caseworker || 'Caseworker', answers.justification, { From: 'Submitted', To: 'Granted' });
     removeResolvedRedeterminationGroupFromList(req, reference);
   }
 
@@ -4130,7 +4157,9 @@ router.get('/application/:reference', function(req, res) {
       return {
         datetime: event.timestamp || event.datetime,
         caseworker: event.caseworker,
-        title: action,
+        title: action === 'Redetermination request received'
+          ? (event.redeterminationType === 'Add a proceeding' ? 'Add proceedings' : event.redeterminationType || 'Add proceedings') + ' request received'
+          : action,
         versionLink: !isLastEvent ? `/v6-v5/application/${reference}?viewVersion=${index}${tabAnchor}` : null,
         changes: event.changes || null,
         notes: event.notes || null,
@@ -4178,6 +4207,7 @@ router.get('/application/:reference', function(req, res) {
     viewingRedetermination: requestedRedetermination,
     redeterminationAssignmentIndex: selectedRedeterminationIndex,
     groupedRedeterminationFlow: redeterminations.some(request => request.groupedRedeterminationFlow),
+    amendmentRequestType: redeterminations[0]?.redeterminationType || 'Add proceedings',
     linkedLeadReference: linkedLeadReference,
     applicationRoutePrefix: '/v6-v5',
     hasPriorAuthority: hasPriorAuthority,

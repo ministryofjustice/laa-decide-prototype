@@ -168,7 +168,7 @@
       {% if pendingRedeterminationCount > 0 %}
         <div class="govuk-!-margin-bottom-6">
           <div style="display: flex; align-items: center; gap: 12px; background: #f3f2f1; border-left: 5px solid #1d70b8; padding: 12px 16px;">
-            <strong class="govuk-body govuk-!-margin-bottom-0">Redetermination request{{ 's' if pendingRedeterminationCount > 1 }}</strong>
+            <strong class="govuk-body govuk-!-margin-bottom-0">{{ amendmentRequestType or 'Add proceedings' }}</strong>
             <span class="govuk-tag govuk-tag--blue">{{ pendingRedeterminationCount }} request{{ 's' if pendingRedeterminationCount > 1 }}</span>
           </div>
         </div>
@@ -446,15 +446,19 @@
           </div>
         </div>
 
+        {% if amendmentRequestType and amendmentRequestType != 'Add proceedings' %}
+          <h2 class="govuk-heading-m govuk-!-margin-top-8">{{ amendmentRequestType }}</h2>
+          <div class="govuk-inset-text">This is an illustrative request for user research. Assessment of this request type is not available in this prototype.</div>
+        {% else %}
         {% if groupedRedeterminationFlow %}
           <div class="govuk-!-margin-top-8 govuk-!-margin-bottom-6" style="display: flex; justify-content: space-between; align-items: baseline; gap: 20px; flex-wrap: wrap;">
-            <h2 class="govuk-heading-m govuk-!-margin-bottom-0">Redetermination request</h2>
+            <h2 class="govuk-heading-m govuk-!-margin-bottom-0">Add proceedings</h2>
             {% if isAssigned and pendingRedeterminationCount > 0 %}
               <a href="/v6-v5/application/{{ reference }}/redeterminations/decision" class="govuk-link govuk-!-font-weight-bold">Make a decision</a>
             {% endif %}
           </div>
         {% else %}
-          <h2 class="govuk-heading-m govuk-!-margin-top-8">Redeterminations</h2>
+          <h2 class="govuk-heading-m govuk-!-margin-top-8">Add proceedings</h2>
         {% endif %}
 
         {% if redeterminations and redeterminations.length > 0 %}
@@ -601,7 +605,7 @@
             </div>
             <div class="govuk-summary-card__content">
               <table class="govuk-table govuk-!-margin-bottom-0">
-                <caption class="govuk-table__caption govuk-visually-hidden">Redetermination supporting evidence</caption>
+                <caption class="govuk-table__caption govuk-visually-hidden">Add proceedings supporting evidence</caption>
                 <thead class="govuk-table__head">
                   <tr class="govuk-table__row">
                     <th scope="col" class="govuk-table__header">Type of evidence</th>
@@ -619,6 +623,7 @@
           </div>
         {% endif %}
 
+        {% endif %}
         {% if not viewingRedetermination %}
         <h2 class="govuk-heading-m govuk-!-margin-top-8">Linked cases</h2>
 
@@ -866,7 +871,7 @@
         }) }}
 
         <!-- Add note form -->
-        <h2 class="govuk-heading-s govuk-!-margin-top-6">Add a note to the application history</h2>
+        <h2 class="govuk-heading-s govuk-!-margin-top-6">Add a note</h2>
         <form action="/v6-v5/application/{{ reference }}/add-note" method="post">
           {{ govukTextarea({
             name: "historyNote",
@@ -875,9 +880,7 @@
           }) }}
 
           {{ govukButton({
-            text: "Add to application history",
-            classes: "govuk-button--secondary",
-            style: "background-color: #00703c; color: white;"
+            text: "Add a note"
           }) }}
         </form>
       {% endset -%}

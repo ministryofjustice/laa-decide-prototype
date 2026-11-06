@@ -140,7 +140,9 @@
           items: [
             { value: "initial", text: "Initial application", checked: query.applicationType and ("initial" in query.applicationType) },
             { value: "prior", text: "Prior authority", checked: query.applicationType and ("prior" in query.applicationType) },
-            { value: "redetermination", text: "Redetermination", checked: query.applicationType and ("redetermination" in query.applicationType) }
+            { value: "add-proceedings", text: "Add proceedings", checked: query.applicationType and ("add-proceedings" in query.applicationType) },
+            { value: "increase-cost-limit", text: "Increase cost limit", checked: query.applicationType and ("increase-cost-limit" in query.applicationType) },
+            { value: "increase-scope-limitations", text: "Increase scope limitation", checked: query.applicationType and ("increase-scope-limitations" in query.applicationType) }
           ]
         }) }}
 
@@ -228,7 +230,7 @@
                       {% if app.isPriorAuthority %}
                         Prior authority<br><strong>{{ app.priorAuthorityType }}</strong>
                       {% elif app.isRedetermination %}
-                        Redetermination<br><strong>{{ app.redeterminationType }}</strong>
+                        <strong>{{ app.redeterminationType }}</strong>
                       {% else %}
                         Initial application
                       {% endif %}
@@ -284,7 +286,9 @@
       const filterLabels = {
         'initial': 'Initial application',
         'prior': 'Prior authority',
-        'redetermination': 'Redetermination',
+        'add-proceedings': 'Add proceedings',
+        'increase-cost-limit': 'Increase cost limit',
+        'increase-scope-limitations': 'Increase scope limitation',
         'sca': "Special Children's Act",
         'expert': 'Expert',
         'junior-counsel': 'Junior counsel',
