@@ -561,7 +561,7 @@
                   <dd class="govuk-summary-list__value">{{ redeterminationAdditionalDetails.parentalResponsibility }}</dd>
                 </div>
                 <div class="govuk-summary-list__row">
-                  <dt class="govuk-summary-list__key">Has a final order been made in any existing proceedings</dt>
+                  <dt class="govuk-summary-list__key">Has a final order been made in the Special Children Act proceedings</dt>
                   <dd class="govuk-summary-list__value">{{ redeterminationAdditionalDetails.finalOrderMade }}</dd>
                 </div>
                 {% if redeterminationAdditionalDetails.finalOrderMade == 'Yes' %}
@@ -581,20 +581,16 @@
                   {% endfor %}
                 {% endif %}
                 <div class="govuk-summary-list__row">
+                  <dt class="govuk-summary-list__key">What has changed since the previous legal aid decision?</dt>
+                  <dd class="govuk-summary-list__value">{{ redeterminationAdditionalDetails.providerAnswers.changesSinceDecision }}</dd>
+                </div>
+                <div class="govuk-summary-list__row">
                   <dt class="govuk-summary-list__key">What remains in dispute and why is representation needed?</dt>
                   <dd class="govuk-summary-list__value">{{ redeterminationAdditionalDetails.providerAnswers.dispute }}</dd>
                 </div>
                 <div class="govuk-summary-list__row">
                   <dt class="govuk-summary-list__key">What is your client seeking?</dt>
                   <dd class="govuk-summary-list__value">{{ redeterminationAdditionalDetails.providerAnswers.clientSeeking }}</dd>
-                </div>
-                <div class="govuk-summary-list__row">
-                  <dt class="govuk-summary-list__key">If aid is granted, how will your client's case progress?</dt>
-                  <dd class="govuk-summary-list__value">{{ redeterminationAdditionalDetails.providerAnswers.caseProgress }}</dd>
-                </div>
-                <div class="govuk-summary-list__row">
-                  <dt class="govuk-summary-list__key">How is the merits test met?</dt>
-                  <dd class="govuk-summary-list__value">{{ redeterminationAdditionalDetails.providerAnswers.merits }}</dd>
                 </div>
               </dl>
             </div>

@@ -1030,6 +1030,60 @@ function randomMockAnswer(values) {
   return values[Math.floor(Math.random() * values.length)];
 }
 
+function createMockRequestJustification(redeterminations, scenario) {
+  const topics = {
+    'Child assessment order': ['an updated assessment request', 'whether the proposed assessment is necessary', 'an assessment that addresses the concerns about the child'],
+    'Emergency protection order - extend': ['a request to extend the emergency protection arrangements', 'whether emergency protection needs to continue', 'a decision on the duration of emergency protection'],
+    'Emergency protection order - discharge': ['a request to discharge the emergency protection order', 'whether the emergency protection order should remain in place', 'a review of whether the order is still needed'],
+    'Secure accommodation order': ['an updated assessment of the proposed secure accommodation', 'whether secure accommodation is necessary and appropriate', 'a safe arrangement that takes account of alternatives to secure accommodation'],
+    'SCA supervision order': ['an updated supervision proposal', 'the proposed supervision arrangements and support', 'supervision arrangements that address the child’s needs'],
+    'Contact with a child in care': ['a revised proposal for contact with the child in care', 'the frequency and arrangements for contact', 'safe and regular contact with the child'],
+    'Recovery of children order': ['new information about the child’s whereabouts', 'the arrangements for locating and returning the child safely', 'a safe return for the child'],
+    'End contact with a child in care': ['a proposal to end contact with the child in care', 'whether contact should end or continue with safeguards', 'a decision that addresses the child’s safety and family relationships'],
+    'Prohibited steps order': ['a proposal concerning a specific action affecting the child', 'whether the proposed action should be prevented', 'clear restrictions on the disputed action'],
+    'Specific issue order': ['new information about a decision affecting the child', 'how the specific decision about the child should be resolved', 'a clear decision on the disputed issue'],
+    'Contact order - vary or discharge': ['a request to change or discharge the existing contact order', 'whether the existing contact arrangements should change', 'contact arrangements that reflect the child’s current needs'],
+    'Residence - vary or discharge': ['a request to change or discharge the existing residence arrangements', 'where the child should live under the revised arrangements', 'a stable living arrangement for the child'],
+    'Prohibited steps order - vary or discharge': ['a request to change or discharge the existing restrictions', 'whether the restrictions should be varied or removed', 'restrictions that reflect the child’s current circumstances'],
+    'Specific issue order - vary or discharge': ['a request to change or discharge the existing specific issue order', 'whether the earlier decision should be changed', 'an updated decision that addresses the disputed issue'],
+    'Emergency protection order': ['new safeguarding information relevant to emergency protection', 'whether emergency protection is necessary', 'a timely decision on safe arrangements for the child'],
+    'Parental responsibility': ['new information about the proposed parental responsibility arrangements', 'who should hold and exercise parental responsibility', 'clear arrangements for parental responsibility'],
+    'Child arrangements order - contact': ['an updated proposal for contact arrangements', 'when and how the child should spend time with family members', 'safe and workable contact arrangements'],
+    'Child arrangements order - residence': ['an updated proposal for the child’s living arrangements', 'where the child should live', 'a safe and stable home arrangement'],
+    'Placement order': ['an updated proposal for the child’s placement', 'whether the proposed placement should be authorised', 'a decision that considers the proposed placement and available alternatives'],
+    'Special guardianship order': ['an updated assessment of the proposed special guardian', 'the proposed special guardianship arrangements and support', 'a stable arrangement with appropriate support for the child'],
+    'Care order': ['an updated care plan', 'the proposed care arrangements', 'a care plan that meets the child’s needs'],
+    'Supervision order': ['an updated supervision plan', 'the proposed supervision and support', 'appropriate supervision and support for the child']
+  };
+  const proceedings = [...new Set(redeterminations.map(request => request.redeterminationProceeding))];
+  const descriptions = proceedings.map(name => ({
+    name,
+    topic: topics[name] || [
+      'updated information about the requested proceeding',
+      'the proposed arrangements in this proceeding',
+      'a decision that addresses the client’s proposals and the child’s needs'
+    ]
+  }));
+  return {
+    changesSinceDecision: [
+      'Since the previous legal aid decision, the provider has received:',
+      'The request now includes the following developments:',
+      'The provider has identified the following changes since the earlier decision:'
+    ][scenario] + ' ' + descriptions.map(({ name, topic }) => name + ': ' + topic[0] + '.').join(' '),
+    dispute: [
+      'The following issues remain disputed:',
+      'The court still needs to resolve the following issues:',
+      'The parties have not agreed on the following matters:'
+    ][scenario] + ' ' + descriptions.map(({ name, topic }) => name + ': ' + topic[1] + '.').join(' ')
+      + ' The client needs representation to respond to the evidence and present their position in these proceedings.',
+    clientSeeking: [
+      'The client is asking the court to consider:',
+      'The client seeks the following outcomes:',
+      'The client wants their proposals considered in relation to:'
+    ][scenario] + ' ' + descriptions.map(({ name, topic }) => name + ': ' + topic[2] + '.').join(' ')
+  };
+}
+
 function createMockProceedingAnswers(redeterminations) {
   const standaloneNames = redeterminations
     .map(request => request.redeterminationProceeding)
@@ -3875,16 +3929,7 @@ router.get('/application/:reference', function(req, res) {
           'Further proceedings are needed because the court is considering new arrangements for the children.',
           'The client needs representation in additional proceedings that were not covered by the original application.'
         ][scenario],
-        dispute: [
-          'The arrangements for the children remain disputed. The client needs representation to respond to the applications and present their position.',
-          'The client disagrees with the proposed arrangements and needs representation to explain their concerns to the court.',
-          'There is disagreement about where the children should live and how they should maintain contact with family members.'
-        ][scenario],
-        clientSeeking: [
-          'The client seeks arrangements that allow them to maintain a relationship with their children.',
-          'The client wants the court to consider their proposals for the children’s care and contact.',
-          'The client is seeking a safe and stable arrangement that reflects the children’s needs.'
-        ][scenario],
+        justificationScenario: scenario,
         caseProgress: [
           'The client has been ordered to attend the final hearing. Representation will help them respond to the updated assessments and present evidence supporting their proposed arrangements.',
           'The client needs legal representation to challenge the new evidence and explain their position at the hearing. The provider will prepare their response and identify the issues the court needs to decide.',
@@ -3908,11 +3953,6 @@ router.get('/application/:reference', function(req, res) {
           'Legal representation will help the client understand and respond to concerns about their family. This will support their emotional wellbeing and help them plan for a stable outcome.',
           'The client will receive advice on the proposed arrangements and be able to participate fully in the hearing. This will help them make informed decisions and provide greater stability and security for their family.'
         ][scenario],
-        changesSinceDecision: [
-          'A new independent assessment has been received since the previous legal aid decision. It supports the client\'s proposed contact arrangements, and additional proceedings have now been issued to consider these proposals.',
-          'The local authority has issued additional proceedings following an updated safeguarding assessment. The assessment raises further concerns that were not available when the previous legal aid decision was made.',
-          'The local authority has issued an additional application and the hearing timetable has changed. There is no new evidence affecting the merits, but the client needs representation for these further proceedings.'
-        ][scenario],
         prospectsOfSuccess: ['Better', 'Worse', 'Unchanged'][scenario]
       };
     } else {
@@ -3926,7 +3966,17 @@ router.get('/application/:reference', function(req, res) {
         providerAnswersByReference[reference].proceedingAnswers = createMockProceedingAnswers(redeterminations);
       }
     }
-    redeterminationAdditionalDetails.providerAnswers = providerAnswersByReference[reference];
+    const providerAnswers = providerAnswersByReference[reference];
+    const proceedingNames = [...new Set(redeterminations.map(request => request.redeterminationProceeding))].sort();
+    const justificationProceedings = JSON.stringify(proceedingNames);
+    if (providerAnswers.justificationProceedings !== justificationProceedings) {
+      const scenario = providerAnswers.justificationScenario ?? Math.floor(Math.random() * 3);
+      Object.assign(providerAnswers, createMockRequestJustification(redeterminations, scenario), {
+        justificationScenario: scenario,
+        justificationProceedings
+      });
+    }
+    redeterminationAdditionalDetails.providerAnswers = providerAnswers;
     redeterminationAdditionalDetails.parentalResponsibility = submittedRedetermination.redeterminationParentalResponsibility
       || providerAnswersByReference[reference].parentalResponsibility;
     redeterminationAdditionalDetails.finalOrderMade = submittedRedetermination.redeterminationFinalOrderMade
