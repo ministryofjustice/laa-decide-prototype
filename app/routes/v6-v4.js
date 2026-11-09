@@ -2003,6 +2003,14 @@ router.post('/your-list', function(req, res) {
 });
 
 router.get('/yourlist', function(req, res) {
+  const versionData = req.session.data['v6-v4'];
+  delete versionData['grouped-redetermination-drafts'];
+  for (const key of Object.keys(versionData)) {
+    if (/^(proceeding-mode|grouped-explanation|additional-(name|role|scope|service)|decision-\d+|refusal-\d+|proceeding-\d+|role-\d+|certificate-grant-date-type-\d+|certificate-grant-date-\d+-(day|month|year))$/.test(key)) {
+      delete versionData[key];
+    }
+  }
+
   if (!req.session.data['v6-v4']['assigned-applications']) {
     req.session.data['v6-v4']['assigned-applications'] = [];
   }
