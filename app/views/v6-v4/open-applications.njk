@@ -152,7 +152,7 @@
             legend: { text: "Matter type", classes: "govuk-fieldset__legend--s govuk-!-font-weight-bold" }
           },
           items: [
-            { value: "sca", text: "Special Children's Act", checked: query.matterType and ("sca" in query.matterType) }
+            { value: "sca", text: "Special Children Act", checked: query.matterType and ("sca" in query.matterType) }
           ]
         }) }}
 
@@ -206,7 +206,7 @@
               <thead class="govuk-table__head">
                 <tr class="govuk-table__row">
                   <th scope="col" class="govuk-table__header">Reference</th>
-                  <th scope="col" class="govuk-table__header" aria-sort="none" data-sort-type="date">Submitted</th>
+                  <th scope="col" class="govuk-table__header" aria-sort="ascending" data-sort-type="date">Submitted</th>
                   <th scope="col" class="govuk-table__header">Type</th>
                   <th scope="col" class="govuk-table__header" aria-sort="none">Delegated Functions</th>
                   <th scope="col" class="govuk-table__header" aria-sort="none">Matter type</th>
@@ -285,7 +285,7 @@
         'initial': 'Initial application',
         'prior': 'Prior authority',
         'redetermination': 'Redetermination',
-        'sca': "Special Children's Act",
+        'sca': "Special Children Act",
         'expert': 'Expert',
         'junior-counsel': 'Junior counsel',
         'expenses': 'Expenses'

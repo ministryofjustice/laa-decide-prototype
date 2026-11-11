@@ -22,7 +22,7 @@ Open applications
         </tr>
       </thead>
       <tbody class="govuk-table__body">
-        {% for application in data['applications'] %}
+        {% for application in data['applications'] | sort_by_submitted_date %}
         {% if application['applicationDetails']['refNo'] not in data['assignedApplications'] %}
 
         <tr class="govuk-table__row">

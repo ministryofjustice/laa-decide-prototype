@@ -85,7 +85,7 @@
                 <td class="govuk-table__cell">{{ application.submitted or 'Not available' }}</td>
                 <td class="govuk-table__cell">{{ application.type or 'Initial application' }}</td>
                 <td class="govuk-table__cell">{{ application.delegatedFunctions or 'Used' }}</td>
-                <td class="govuk-table__cell"><strong>{{ application.matterType.title if application.matterType else 'Family' }}</strong><br>{{ application.matterType.subtext if application.matterType else "Special Children's Act" }}</td>
+                <td class="govuk-table__cell"><strong>{{ application.matterType.title if application.matterType else 'Family' }}</strong><br>{{ application.matterType.subtext if application.matterType else "Special Children Act" }}</td>
                 <td class="govuk-table__cell"><span class="govuk-tag govuk-tag--light-blue">In progress</span></td>
               </tr>
             {% endfor %}

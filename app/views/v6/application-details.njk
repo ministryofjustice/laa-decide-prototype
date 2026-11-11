@@ -167,9 +167,11 @@
       <p class="govuk-body govuk-!-margin-bottom-1">
         <strong>Assigned to:</strong> <span id="assigned-caseworker">{{ assignedCaseworker }}</span>
       </p>
-      <p class="govuk-body govuk-!-margin-bottom-6">
-        <strong>Date received:</strong> 19 May 2023
-      </p>
+      {% if sessionData['consolidated-v6'] !== true %}
+        <p class="govuk-body govuk-!-margin-bottom-6">
+          <strong>Date received:</strong> 19 May 2023
+        </p>
+      {% endif %}
 
       {% if isAssociatedLinkedCase %}
         <div class="govuk-inset-text govuk-!-margin-bottom-6">
@@ -186,14 +188,14 @@
 
       {% if sessionData['decision-reference'] !== reference %}
         {% if isAssigned %}
-          <a href="/v6/reassign?reference={{ reference }}&isPriorAuthority={{ application.isPriorAuthority and 'true' or 'false' }}" class="govuk-button govuk-button--secondary govuk-!-margin-bottom-8" data-module="govuk-button" style="background-color: #00703c; color: white;">Reassign</a>
+          <a href="/v6/reassign?reference={{ reference }}&isPriorAuthority={{ application.isPriorAuthority and 'true' or 'false' }}" class="govuk-button{% if sessionData['consolidated-v6'] !== true %} govuk-button--secondary{% endif %} govuk-!-margin-bottom-8" data-module="govuk-button" style="background-color: #00703c; color: white;">Reassign</a>
         {% elif not hasDecision %}
           <form id="addToListForm" style="display: inline;">
             <input type="hidden" name="reference" value="{{ reference }}">
             <input type="hidden" name="isPriorAuthority" value="{{ application.isPriorAuthority and 'true' or 'false' }}">
             {{ govukButton({
-              text: "Add to your list",
-              classes: "govuk-button--secondary govuk-!-margin-bottom-8",
+              text: "Assign to your list" if sessionData['consolidated-v6'] === true else "Add to your list",
+              classes: ("govuk-!-margin-bottom-8" if sessionData['consolidated-v6'] === true else "govuk-button--secondary govuk-!-margin-bottom-8"),
               style: "background-color: #00703c; color: white;"
             }) }}
           </form>
@@ -242,7 +244,7 @@
                   // Stay on this page and switch CTA to Reassign once added.
                   const form = document.getElementById('addToListForm');
                   if (form) {
-                    form.outerHTML = '<a href="/v6/reassign?reference=' + encodeURIComponent(reference) + '&isPriorAuthority=' + encodeURIComponent(isPriorAuthority) + '" class="govuk-button govuk-button--secondary govuk-!-margin-bottom-8" data-module="govuk-button" style="background-color: #00703c; color: white;">Reassign</a>';
+                    form.outerHTML = '<a href="/v6/reassign?reference=' + encodeURIComponent(reference) + '&isPriorAuthority=' + encodeURIComponent(isPriorAuthority) + '" class="govuk-button{% if sessionData['consolidated-v6'] !== true %} govuk-button--secondary{% endif %} govuk-!-margin-bottom-8" data-module="govuk-button" style="background-color: #00703c; color: white;">Reassign</a>';
                   }
 
                   const assignedCaseworker = document.getElementById('assigned-caseworker');
@@ -294,9 +296,15 @@
                 <dt class="govuk-summary-list__key">Application type</dt>
                 <dd class="govuk-summary-list__value">Initial application</dd>
               </div>
+              {% if sessionData['consolidated-v6'] === true %}
+                <div class="govuk-summary-list__row">
+                  <dt class="govuk-summary-list__key">Date submitted</dt>
+                  <dd class="govuk-summary-list__value">{{ application.submitted or 'N/A' }}</dd>
+                </div>
+              {% endif %}
               <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">Matter type</dt>
-                <dd class="govuk-summary-list__value"><strong>Family:</strong> Special Children's Act</dd>
+                <dd class="govuk-summary-list__value"><strong>Family:</strong> Special Children Act</dd>
               </div>
               <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">Delegated functions</dt>
@@ -761,7 +769,7 @@
                 </div>
                 <div class="govuk-summary-list__row">
                   <dt class="govuk-summary-list__key">Matter type</dt>
-                  <dd class="govuk-summary-list__value"><strong>Family:</strong> Special Children's Act</dd>
+                  <dd class="govuk-summary-list__value"><strong>Family:</strong> Special Children Act</dd>
                 </div>
                 <div class="govuk-summary-list__row">
                   <dt class="govuk-summary-list__key">Submitted by</dt>
@@ -952,6 +960,7 @@
             </div>
           </div>
 
+          {% if sessionData['consolidated-v6'] !== true %}
           <h2 class="govuk-heading-m govuk-!-margin-top-8">Previous applications</h2>
           
           <div class="govuk-summary-card">
@@ -1049,6 +1058,7 @@
               </table>
             </div>
           </div>
+          {% endif %}
 
           {% if isPriorAuthorityAssigned and not priorAuthorityHasDecision and not (sessionData['consolidated-v6'] and priorAuthorityType and 'Counsel' in priorAuthorityType) %}
             {% set priorAuthorityAssessmentHref = "/v6/counsel-assessment/decision?reference=" + reference %}

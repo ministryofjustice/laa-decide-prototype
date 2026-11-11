@@ -5,6 +5,7 @@
 
 const govukPrototypeKit = require('govuk-prototype-kit')
 const addFilter = govukPrototypeKit.views.addFilter
+const { sortApplicationsBySubmittedDate } = require('./services/application.service')
 
 // Add your filters here
 
@@ -42,6 +43,8 @@ const addFilter = govukPrototypeKit.views.addFilter
 
   ------------------------------------------------------------------ */
   const moment = require('moment');
+
+  filters.sort_by_submitted_date = sortApplicationsBySubmittedDate;
 
   filters.date_parameter_for_filter = function(dateString) {
     return moment(dateString, 'DD/MM/YYYY').utcOffset('+0000').add(1, 'hours');

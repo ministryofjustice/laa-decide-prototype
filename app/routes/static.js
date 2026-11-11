@@ -5,6 +5,7 @@
 
 const govukPrototypeKit = require('govuk-prototype-kit')
 const router = govukPrototypeKit.requests.setupRouter()
+const { sortApplicationsBySubmittedDate } = require('../services/application.service')
 
 // Helper function to restore decision data to an application
 function restoreDecisionData(application, decisionStore) {
@@ -497,7 +498,7 @@ const SEEDED_APPLICATIONS = [
     decisionType: 'Grant',
     type: 'Initial application',
     delegatedFunctions: 'Used',
-    matterType: { title: 'Family', subtext: "Special Children's Act" },
+    matterType: { title: 'Family', subtext: "Special Children Act" },
     isPriorAuthority: false
   },
   {
@@ -511,7 +512,7 @@ const SEEDED_APPLICATIONS = [
     decisionType: 'Grant',
     type: 'Prior authority',
     delegatedFunctions: 'N/A',
-    matterType: { title: 'Family', subtext: "Special Children's Act" },
+    matterType: { title: 'Family', subtext: "Special Children Act" },
     isPriorAuthority: true,
     priorAuthorityType: 'Expert - Psychiatrist'
   },
@@ -526,7 +527,7 @@ const SEEDED_APPLICATIONS = [
     decisionType: 'Grant',
     type: 'Initial application',
     delegatedFunctions: 'Used',
-    matterType: { title: 'Family', subtext: "Special Children's Act" },
+    matterType: { title: 'Family', subtext: "Special Children Act" },
     isPriorAuthority: false
   },
   {
@@ -540,7 +541,7 @@ const SEEDED_APPLICATIONS = [
     decisionType: 'Grant',
     type: 'Prior authority',
     delegatedFunctions: 'N/A',
-    matterType: { title: 'Family', subtext: "Special Children's Act" },
+    matterType: { title: 'Family', subtext: "Special Children Act" },
     isPriorAuthority: true,
     priorAuthorityType: 'Expert - Psychiatrist'
   },
@@ -818,6 +819,7 @@ router.get('/open-applications', function(req, res) {
   
   console.log('Final filtered apps:', filteredApps.length);
   
+  filteredApps = sortApplicationsBySubmittedDate(filteredApps);
   req.session.data['open-applications'] = filteredApps;
   
   res.render('v6/open-applications.njk', { 

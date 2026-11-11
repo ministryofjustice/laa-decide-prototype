@@ -1,8 +1,23 @@
+const moment = require('moment');
+
+const sortApplicationsBySubmittedDate = (applications) => {
+    const parseSubmittedDate = (application) => {
+        const submitted = application.submitted || (application.applicationDetails && application.applicationDetails.dateSubmitted);
+        const parsedDate = moment(submitted, [
+            'D MMM YYYY',
+            'DD MMM YYYY',
+            'YYYY-MM-DD',
+            'YYYY-MM-DDTHH:mm:ss.SSSZ'
+        ], true);
+        return parsedDate.isValid() ? parsedDate.valueOf() : Number.POSITIVE_INFINITY;
+    };
+
+    return [...applications].sort((left, right) => parseSubmittedDate(left) - parseSubmittedDate(right));
+};
+
 /*
   * this is where we create a note that can be pushed to the application stack
 */
-const moment = require('moment');
-
 const create_note =  (user_display_name, title, content) => {
     const new_note = {
         'when': moment(),
@@ -187,5 +202,6 @@ module.exports = {
     update_merits_certificate_decisions,
     update_means_certificate_decisions,
     update_overall_decision,
-    return_application_to_provider
+    return_application_to_provider,
+    sortApplicationsBySubmittedDate
 }

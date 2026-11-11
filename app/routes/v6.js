@@ -5,6 +5,7 @@
 
 const govukPrototypeKit = require('govuk-prototype-kit')
 const router = govukPrototypeKit.requests.setupRouter()
+const { sortApplicationsBySubmittedDate } = require('../services/application.service')
 
 // Helper function to restore decision data to an application
 function restoreDecisionData(application, decisionStore) {
@@ -780,7 +781,7 @@ const SEEDED_APPLICATIONS = [
     decisionType: 'Grant',
     type: 'Initial application',
     delegatedFunctions: 'Used',
-    matterType: { title: 'Family', subtext: "Special Children's Act" },
+    matterType: { title: 'Family', subtext: "Special Children Act" },
     isPriorAuthority: false
   },
   {
@@ -794,7 +795,7 @@ const SEEDED_APPLICATIONS = [
     decisionType: 'Grant',
     type: 'Prior authority',
     delegatedFunctions: 'N/A',
-    matterType: { title: 'Family', subtext: "Special Children's Act" },
+    matterType: { title: 'Family', subtext: "Special Children Act" },
     isPriorAuthority: true,
     priorAuthorityType: 'Expert - Psychiatrist',
     expertName: 'Dr Morley Calzoni',
@@ -817,7 +818,7 @@ const SEEDED_APPLICATIONS = [
     decisionType: 'Grant',
     type: 'Initial application',
     delegatedFunctions: 'Used',
-    matterType: { title: 'Family', subtext: "Special Children's Act" },
+    matterType: { title: 'Family', subtext: "Special Children Act" },
     isPriorAuthority: false
   },
   {
@@ -831,7 +832,7 @@ const SEEDED_APPLICATIONS = [
     decisionType: 'Grant',
     type: 'Prior authority',
     delegatedFunctions: 'N/A',
-    matterType: { title: 'Family', subtext: "Special Children's Act" },
+    matterType: { title: 'Family', subtext: "Special Children Act" },
     isPriorAuthority: true,
     priorAuthorityType: 'Expert - Psychiatrist',
     expertName: 'Dr Morley Calzoni',
@@ -1041,7 +1042,7 @@ function generateMockApplications(count = 8) {
       firm: 'WATKINS SOLICITORS INC<br>OK514R',
       type: 'Initial application',
       delegatedFunctions: 'Used',
-      matterType: { title: 'Family', subtext: "Special Children's Act" },
+      matterType: { title: 'Family', subtext: "Special Children Act" },
       isPriorAuthority: false
       // No status — awaiting assessment
     });
@@ -1065,7 +1066,7 @@ function generateMockApplications(count = 8) {
       firm: 'WATKINS SOLICITORS INC<br>OK514R',
       type: 'Initial application',
       delegatedFunctions: 'Used',
-      matterType: { title: 'Family', subtext: "Special Children's Act" },
+      matterType: { title: 'Family', subtext: "Special Children Act" },
       isPriorAuthority: false,
       status: 'Granted',
       decisionType: 'Grant'
@@ -1092,7 +1093,7 @@ function generateMockApplications(count = 8) {
         type: 'Prior authority',
         priorAuthorityType: paType,
         delegatedFunctions: 'N/A',
-        matterType: { title: 'Family', subtext: "Special Children's Act" },
+        matterType: { title: 'Family', subtext: "Special Children Act" },
         isPriorAuthority: true
         // No status — awaiting PA assessment
       };
@@ -1443,7 +1444,7 @@ router.get('/open-applications', function(req, res) {
         type: 'Prior authority',
         priorAuthorityType: 'Disbursement',
         delegatedFunctions: 'N/A',
-        matterType: { title: 'Family', subtext: "Special Children's Act" },
+        matterType: { title: 'Family', subtext: "Special Children Act" },
         isPriorAuthority: true,
         disbursementType: 'Travel',
         disbursementAmount: '680',
@@ -1589,6 +1590,7 @@ router.get('/open-applications', function(req, res) {
   }
   
   console.log('Final filtered apps:', filteredApps.length);
+  filteredApps = sortApplicationsBySubmittedDate(filteredApps);
   
   // Keep full, unfiltered open applications in session for routes like search and add-by-reference.
   req.session.data['open-applications'] = applications;
@@ -1866,7 +1868,7 @@ router.get('/add-application/:reference', function(req, res) {
       submitted: openApp ? openApp.submitted : 'N/A',
       type: isPrimaryRef && openApp ? openApp.type : 'Initial application',
       delegatedFunctions: isPrimaryRef && openApp ? openApp.delegatedFunctions : 'Used',
-      matterType: openApp ? openApp.matterType : { title: 'Family', subtext: "Special Children's Act" },
+      matterType: openApp ? openApp.matterType : { title: 'Family', subtext: "Special Children Act" },
       isPriorAuthority: isPrimaryRef && openApp ? Boolean(openApp.isPriorAuthority) : false,
       priorAuthorityType: isPrimaryRef && openApp ? openApp.priorAuthorityType : null,
       linkedCaseGroupId: openApp && openApp.linkedCaseGroupId ? openApp.linkedCaseGroupId : null,
@@ -3917,13 +3919,28 @@ router.post('/expert-assessment/amount-handler', function (req, res) {
     req.session.data['expert-new-minutes'] = (req.body['expert-new-minutes'] || '').trim() || req.session.data['expert-default-minutes'] || '00';
 
     const rawTotalAmount = (req.body['expert-new-total-amount'] || '').trim();
-    req.session.data['expert-new-total-amount'] = rawTotalAmount;
+    if (req.session.data['consolidated-v6'] === true) {
+      const hourlyRate = Number(String(req.session.data['expert-new-rate']).replace(/[£,\s]/g, ''));
+      const hours = Number(String(req.session.data['expert-new-hours']));
+      const minutes = Number(String(req.session.data['expert-new-minutes']));
 
-    const normalized = rawTotalAmount.replace(/[£,\s]/g, '');
-    const parsed = Number(normalized);
-    req.session.data['expert-new-amount'] = Number.isFinite(parsed) && parsed > 0
-      ? parsed.toFixed(2)
-      : req.session.data['expert-requested-amount'];
+      if (Number.isFinite(hourlyRate) && hourlyRate >= 0 && Number.isFinite(hours) && hours >= 0 && Number.isFinite(minutes) && minutes >= 0 && minutes < 60) {
+        const totalAmount = ((hours + minutes / 60) * hourlyRate).toFixed(2);
+        req.session.data['expert-new-total-amount'] = totalAmount;
+        req.session.data['expert-new-amount'] = totalAmount;
+      } else {
+        req.session.data['expert-new-total-amount'] = '';
+        req.session.data['expert-new-amount'] = req.session.data['expert-requested-amount'];
+      }
+    } else {
+      req.session.data['expert-new-total-amount'] = rawTotalAmount;
+
+      const normalized = rawTotalAmount.replace(/[£,\s]/g, '');
+      const parsed = Number(normalized);
+      req.session.data['expert-new-amount'] = Number.isFinite(parsed) && parsed > 0
+        ? parsed.toFixed(2)
+        : req.session.data['expert-requested-amount'];
+    }
     req.session.data['expert-new-apportioned-amount'] = (req.body['expert-new-apportioned-amount'] || '').trim();
   } else {
     delete req.session.data['expert-new-name'];

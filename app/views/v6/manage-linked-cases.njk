@@ -76,11 +76,11 @@ Manage linked cases
       {% if not hasLinkedCases %}
         <p class="govuk-body">There are currently no linked cases to this application</p>
         {{ govukButton({
-          text: "Link to this case",
+          text: "Create a new link",
           href: "/v6/search?linkToReference=" ~ reference
         }) }}
       {% else %}
-        {{ govukButton({ text: "Link to this case", href: "/v6/search?linkToReference=" ~ reference }) }}
+        {{ govukButton({ text: "Create a new link", href: "/v6/search?linkToReference=" ~ reference }) }}
 
         <div class="manage-linked-card">
           <div class="manage-linked-card__header"><h2 class="govuk-heading-s">Lead</h2></div>

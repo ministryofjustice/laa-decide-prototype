@@ -5,6 +5,7 @@
 
 const govukPrototypeKit = require('govuk-prototype-kit')
 const router = govukPrototypeKit.requests.setupRouter()
+const { sortApplicationsBySubmittedDate } = require('../services/application.service')
 
 router.use(function(req, res, next) {
   req.session.data = req.session.data || {};
@@ -727,7 +728,7 @@ const SEEDED_APPLICATIONS = [
     decisionType: 'Grant',
     type: 'Initial application',
     delegatedFunctions: 'Used',
-    matterType: { title: 'Family', subtext: "Special Children's Act" },
+    matterType: { title: 'Family', subtext: "Special Children Act" },
     isPriorAuthority: false
   },
   {
@@ -741,7 +742,7 @@ const SEEDED_APPLICATIONS = [
     decisionType: 'Grant',
     type: 'Prior authority',
     delegatedFunctions: 'N/A',
-    matterType: { title: 'Family', subtext: "Special Children's Act" },
+    matterType: { title: 'Family', subtext: "Special Children Act" },
     isPriorAuthority: true,
     priorAuthorityType: 'Expert - Psychiatrist',
     expertName: 'Dr Morley Calzoni',
@@ -764,7 +765,7 @@ const SEEDED_APPLICATIONS = [
     decisionType: 'Grant',
     type: 'Initial application',
     delegatedFunctions: 'Used',
-    matterType: { title: 'Family', subtext: "Special Children's Act" },
+    matterType: { title: 'Family', subtext: "Special Children Act" },
     isPriorAuthority: false
   },
   {
@@ -778,7 +779,7 @@ const SEEDED_APPLICATIONS = [
     decisionType: 'Grant',
     type: 'Prior authority',
     delegatedFunctions: 'N/A',
-    matterType: { title: 'Family', subtext: "Special Children's Act" },
+    matterType: { title: 'Family', subtext: "Special Children Act" },
     isPriorAuthority: true,
     priorAuthorityType: 'Expert - Psychiatrist',
     expertName: 'Dr Morley Calzoni',
@@ -964,15 +965,15 @@ const redeterminationJustificationTemplates = {
     "On {submitted}, concerns regarding the child's welfare escalated following repeated missed appointments and safeguarding referrals. The Local Authority has issued a Care Order application under s.31 of the Children Act 1989, and a hearing has been listed. Representation is required to prepare the client's case and represent them at the final hearing."
   ],
   'SCA supervision order': [
-    "On {submitted}, the Local Authority issued a formal application for a Supervision Order under the Special Children's Act provisions due to ongoing concerns regarding the child's developmental progress and missed appointments. The court has listed a hearing to determine whether a supervision order should be made. Representation is urgently required to prepare the client's response and represent them at the hearing.",
-    "On {submitted}, the Local Authority proposed a period of supervision under the Special Children's Act following concerns raised at a recent review meeting. An application for an SCA Supervision Order has been issued, with a hearing listed to consider the proposal. Representation is required to represent the client's position at the hearing."
+    "On {submitted}, the Local Authority issued a formal application for a Supervision Order under the Special Children Act provisions due to ongoing concerns regarding the child's developmental progress and missed appointments. The court has listed a hearing to determine whether a supervision order should be made. Representation is urgently required to prepare the client's response and represent them at the hearing.",
+    "On {submitted}, the Local Authority proposed a period of supervision under the Special Children Act following concerns raised at a recent review meeting. An application for an SCA Supervision Order has been issued, with a hearing listed to consider the proposal. Representation is required to represent the client's position at the hearing."
   ]
 };
 
 function generateRedeterminationJustification(proceeding, submittedDate) {
   const templates = redeterminationJustificationTemplates[proceeding];
   if (!templates) {
-    return `On ${submittedDate}, a request was made in relation to the ${proceeding} under the Special Children's Act. Representation is required to prepare the client's response and represent them at the hearing.`;
+    return `On ${submittedDate}, a request was made in relation to the ${proceeding} under the Special Children Act. Representation is required to prepare the client's response and represent them at the hearing.`;
   }
   const template = templates[Math.floor(Math.random() * templates.length)];
   return template.replace('{submitted}', submittedDate);
@@ -1150,7 +1151,7 @@ function ensureDefaultDemoRedetermination(sessionData) {
       firm: 'WATKINS SOLICITORS INC<br>OK514R',
       type: 'Initial application',
       delegatedFunctions: 'Used',
-      matterType: { title: 'Family', subtext: "Special Children's Act" },
+      matterType: { title: 'Family', subtext: "Special Children Act" },
       isPriorAuthority: false,
       status: 'Granted',
       decisionType: 'Grant'
@@ -1192,7 +1193,7 @@ function ensureDefaultDemoRedetermination(sessionData) {
       redeterminationClientRole: REDETERMINATION_CLIENT_ROLES[Math.floor(Math.random() * REDETERMINATION_CLIENT_ROLES.length)],
       redeterminationJustification: generateRedeterminationJustification(proceeding, submitted),
       delegatedFunctions: 'N/A',
-      matterType: { title: 'Family', subtext: "Special Children's Act" },
+      matterType: { title: 'Family', subtext: "Special Children Act" },
       isPriorAuthority: false,
       isRedetermination: true
     };
@@ -1354,7 +1355,7 @@ function ensureOtherApplicationExamples(req) {
         firm: 'WATKINS SOLICITORS INC<br>OK514R',
         type: exampleType === 'initial' ? 'Initial application' : 'Prior authority',
         delegatedFunctions: exampleType === 'initial' ? 'Used' : 'N/A',
-        matterType: { title: 'Family', subtext: "Special Children's Act" },
+        matterType: { title: 'Family', subtext: "Special Children Act" },
         isPriorAuthority: exampleType === 'prior-authority',
         isRedetermination: false,
         comparisonExampleType: exampleType
@@ -1421,7 +1422,7 @@ function generateMockApplications(count = 8) {
       firm: 'WATKINS SOLICITORS INC<br>OK514R',
       type: 'Initial application',
       delegatedFunctions: 'Used',
-      matterType: { title: 'Family', subtext: "Special Children's Act" },
+      matterType: { title: 'Family', subtext: "Special Children Act" },
       isPriorAuthority: false,
       status: 'Granted',
       decisionType: 'Grant'
@@ -1450,7 +1451,7 @@ function generateMockApplications(count = 8) {
         redeterminationClientRole: redeterminationClientRoles[Math.floor(Math.random() * redeterminationClientRoles.length)],
         redeterminationJustification: generateRedeterminationJustification(redeterminationProceeding, redeterminationSubmitted),
         delegatedFunctions: 'N/A',
-        matterType: { title: 'Family', subtext: "Special Children's Act" },
+        matterType: { title: 'Family', subtext: "Special Children Act" },
         isPriorAuthority: false,
         isRedetermination: true,
         groupedRedeterminationFlow: true
@@ -1913,12 +1914,6 @@ router.get('/open-applications', function(req, res) {
   // Remove applications already in a caseworker's list from open applications.
   const assignedKeys = new Set((req.session.data['v6-v5']['assigned-applications'] || []).map(applicationVariantKey));
   applications = applications.filter(app => !assignedKeys.has(applicationVariantKey(app)));
-  const displayOrder = req.session.data['v6-v5']['open-application-display-order']
-    || (req.session.data['v6-v5']['open-application-display-order'] = {});
-  applications.forEach(application => {
-    if (displayOrder[application.ref] === undefined) displayOrder[application.ref] = Math.random();
-  });
-  applications.sort((left, right) => displayOrder[left.ref] - displayOrder[right.ref]);
   const generatedLinkedCases = assignLinkedCaseMetadata(applications);
   req.session.data['v6-v5']['linked-cases-by-reference-v4'] = {
     ...(req.session.data['v6-v5']['linked-cases-by-reference-v4'] || {}),
@@ -2008,6 +2003,7 @@ router.get('/open-applications', function(req, res) {
   console.log('Final filtered apps:', filteredApps.length);
 
   filteredApps = groupRedeterminationApplications(filteredApps);
+  filteredApps = sortApplicationsBySubmittedDate(filteredApps);
 
   // Keep full, unfiltered open applications in session for routes like search and add-by-reference.
   req.session.data['v6-v5']['open-applications'] = applications;
@@ -2283,7 +2279,7 @@ router.get('/add-application/:reference', function(req, res) {
       firm: sourceApplication ? sourceApplication.firm : 'WATKINS SOLICITORS INC<br>OK514R',
       type: isPrimaryRef && sourceApplication ? sourceApplication.type : 'Initial application',
       delegatedFunctions: isPrimaryRef && sourceApplication ? sourceApplication.delegatedFunctions : 'Used',
-      matterType: sourceApplication ? sourceApplication.matterType : { title: 'Family', subtext: "Special Children's Act" },
+      matterType: sourceApplication ? sourceApplication.matterType : { title: 'Family', subtext: "Special Children Act" },
       isPriorAuthority: isPrimaryRef && sourceApplication ? Boolean(sourceApplication.isPriorAuthority) : false,
       isRedetermination: isPrimaryRef && sourceApplication ? Boolean(sourceApplication.isRedetermination) : false,
       priorAuthorityType: isPrimaryRef && sourceApplication ? sourceApplication.priorAuthorityType : null,

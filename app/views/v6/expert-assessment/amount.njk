@@ -276,7 +276,7 @@
               </div>
               <div class="expert-detail-row">
                 <div class="expert-detail-label govuk-body-s">Expert fee hourly rate</div>
-                <input class="govuk-input expert-detail-input" type="text" name="expert-new-rate" value="{{ data['expert-new-rate'] or '' }}">
+                <input class="govuk-input expert-detail-input" type="text" id="expert-new-rate" name="expert-new-rate" value="{{ data['expert-new-rate'] or '' }}">
               </div>
               <div class="expert-detail-row">
                 <div class="expert-detail-label govuk-body-s">Hours requested</div>
@@ -302,7 +302,7 @@
               {% endif %}
               <div class="expert-detail-row govuk-!-margin-bottom-0">
                 <div class="expert-detail-label govuk-body-s">Total amount</div>
-                <input class="govuk-input expert-detail-input" type="text" id="expert-new-total-amount" name="expert-new-total-amount" value="{{ data['expert-new-total-amount'] or '' }}">
+                <input class="govuk-input expert-detail-input" type="text" id="expert-new-total-amount" name="expert-new-total-amount" value="{{ data['expert-new-total-amount'] or '' }}"{% if consolidated %} readonly{% endif %}>
               </div>
             </div>
           </div>
@@ -334,4 +334,36 @@
     </form>
   </div>
 </div>
+{% if consolidated %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const rateInput = document.getElementById('expert-new-rate');
+    const hoursInput = document.getElementById('expert-new-hours');
+    const minutesInput = document.getElementById('expert-new-minutes');
+    const totalInput = document.getElementById('expert-new-total-amount');
+    if (!rateInput || !hoursInput || !minutesInput || !totalInput) return;
+
+    function updateTotal() {
+      const rateText = rateInput.value.replace(/[£,\s]/g, '');
+      const hoursText = hoursInput.value.trim();
+      const minutesText = minutesInput.value.trim() || '0';
+      const rate = Number(rateText);
+      const hours = Number(hoursText);
+      const minutes = Number(minutesText);
+
+      if (!rateText || !hoursText || !minutesText || !Number.isFinite(rate) || !Number.isFinite(hours) || !Number.isFinite(minutes) || rate < 0 || hours < 0 || minutes < 0 || minutes >= 60) {
+        totalInput.value = '';
+        return;
+      }
+
+      totalInput.value = ((hours + minutes / 60) * rate).toFixed(2);
+    }
+
+    [rateInput, hoursInput, minutesInput].forEach(function(input) {
+      input.addEventListener('input', updateTotal);
+    });
+    updateTotal();
+  });
+</script>
+{% endif %}
 {% endblock %}
