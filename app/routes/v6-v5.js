@@ -6,10 +6,12 @@
 const govukPrototypeKit = require('govuk-prototype-kit')
 const router = govukPrototypeKit.requests.setupRouter()
 const { sortApplicationsBySubmittedDate } = require('../services/application.service')
+const { ensureTestingScenarios, documents: testingScenarioDocuments, references: testingScenarioReferences } = require('../services/v5-testing-scenarios')
 
 router.use(function(req, res, next) {
   req.session.data = req.session.data || {};
   const versionData = req.session.data['v6-v5'] || (req.session.data['v6-v5'] = {});
+  ensureTestingScenarios(versionData);
   if (req.method === 'GET' && req.accepts('html')) {
     const journey = req.path.match(/^\/application\/([^/]+)\/redeterminations(?:\/|$)/);
     const application = req.path.match(/^\/application\/([^/]+)\/?$/);
@@ -1218,6 +1220,7 @@ function ensureDefaultDemoRedetermination(sessionData) {
 }
 
 function ensureRedeterminationScenarioVariety(req) {
+  ensureTestingScenarios(req.session.data['v6-v5']);
   ensureRedeterminationRequestIds(req);
   const openApplications = req.session.data['v6-v5']['open-applications-all'] || [];
   const assignedApplications = req.session.data['v6-v5']['assigned-applications'] || [];
@@ -1650,6 +1653,7 @@ function ensureRedeterminationRequestIds(req) {
   const decidedReferences = new Set(Object.keys(req.session.data['v6-v5']['redetermination-decision-store'] || {}).map(key => key.split('|')[0]));
   const availableReferences = [...new Set((req.session.data['v6-v5']['open-applications-all'] || [])
     .filter(application => application.isRedetermination && application.ref !== 'L-12Z-13P'
+      && !testingScenarioReferences.includes(application.ref)
       && !assignedReferences.has(application.ref) && !decidedReferences.has(application.ref))
     .map(application => application.ref))];
   for (const type of ['Increase cost limit', 'Increase scope limitation']) {
@@ -2585,6 +2589,15 @@ router.post('/manage-linked-cases/:reference', function(req, res) {
     .filter(application => application.ref !== newLinkedReference);
 
   res.redirect('/v6-v5/application/' + encodeURIComponent(reference));
+});
+
+router.get('/testing-scenario/:document', function(req, res) {
+  const document = testingScenarioDocuments[req.params.document];
+  if (!Object.hasOwn(testingScenarioDocuments, req.params.document)) {
+    res.status(404).send('Testing document not found');
+    return;
+  }
+  res.render('v6-v5/testing-scenario-document.njk', { document });
 });
 
 router.get('/application/:reference/history', function(req, res) {
@@ -4063,8 +4076,8 @@ router.get('/application/:reference', function(req, res) {
     prevReference: `30000123${nameLen}`,
     correspondenceAddress: found.correspondenceAddress || `${nameLen} Armitage house<br>108 petty France<br>London<br>SW2 8QT`,
     homeAddress: found.homeAddress || `${nameLen * 2} Knightsbridge place<br>117A Russell Square<br>London<br>NW3 6BD`,
-    opponentName: `${found.lastName} city council`,
-    children: [
+    opponentName: found.opponentName || `${found.lastName} city council`,
+    children: found.children || [
       { name: `Kaylynn ${found.lastName}`, dob: `20 Dec 202${nameLen % 9}` },
       { name: `Gustavo ${found.lastName}`, dob: `15 Jan 202${(nameLen + 1) % 9}` }
     ],

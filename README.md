@@ -19,6 +19,31 @@ Run `yarn run dev` to spin up locally
 
 In the `app/views` folder, there are a number of different prototype views. `static` is the one that will be deployed and used when running this. All the others are historic versions. Confusingly, `latest` is in the fact the last `javascript` version, and not the actual latest. 
 
+## Version 5 testing scenario
+
+In `/v6-v5/open-applications`, `M-MDDT-WBYS` is a fixed mock application
+with emergency protection order extension and discharge requests. Assign it to
+your list to assess both requests. Its initial grant, provider answers and case
+history are fixed for repeatable comparison tasks. Granting funding for both
+requests does not mean asking the court to make both orders.
+
+Refreshes preserve assignments, notes and decisions within the session. After
+completion, find the reference through Version 5 search. A fresh browser session
+(or clearing prototype session data) restores the undecided scenario.
+
+`L-VXQO-YZBU` is the fixed change-proceeding scenario. It starts with one
+undecided Secure accommodation order request. Assign it, use Change proceeding
+to search for any replacement, then follow the existing decision, check answers,
+confirmation and internal-note journey. No replacement is preselected. The same
+session persistence and fresh-session reset rules apply.
+
+`Y-HCMT-YBYZ` is the fixed mixed-decision scenario. It starts with three
+undecided requests: Emergency protection order, Secure accommodation order and
+Supervision order. The research task is to refuse the first two and change the
+third using the existing journey. No decisions, refusal reasons or replacement
+proceeding are preselected. The same session persistence, post-completion search
+and fresh-session reset rules apply.
+
 ## Deployment
 
 This will automatically deploy to the above URL once merged into Main. 
