@@ -556,7 +556,8 @@ router.get('/sign-out', function(req, res) {
     delete req.session.data['v6-v5']['v6-authenticated'];
   }
   delete req.session.data['v6-authenticated'];
-  res.redirect('/');
+  res.clearCookie('authentication', { path: '/' });
+  res.redirect('/manage-prototype/password?returnURL=%2F');
 });
 
 // Welcome/index page - requires auth

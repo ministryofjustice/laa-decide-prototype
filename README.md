@@ -46,4 +46,8 @@ and fresh-session reset rules apply.
 
 ## Deployment
 
+Signing out of the stakeholder or Version 2-5 prototype clears prototype access
+and returns to the research disclaimer/password page. Casework session data is
+preserved; signing out does not reset research scenarios.
+
 This will automatically deploy to the above URL once merged into Main. 
