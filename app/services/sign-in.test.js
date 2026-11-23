@@ -88,6 +88,39 @@ test('one branded Kit sign-in protects direct links and preserves casework on si
     assert.equal(landing.status, 200);
     assert.doesNotMatch(await landing.text(), /type="password"/);
 
+    async function checkEvidenceLinks(path, expectedLinks) {
+      const response = await request(path);
+      assert.equal(response.status, 200, path);
+      const html = await response.text();
+      for (const href of expectedLinks) {
+        const links = [...html.matchAll(/<a\b[^>]*>[\s\S]*?<\/a>/g)].map(match => match[0]);
+        const link = links.find(candidate => candidate.includes(`href="${href}"`));
+        assert.ok(link, `Missing evidence link ${href} on ${path}`);
+        assert.match(link, /target="_blank"/);
+        assert.match(link, /rel="noopener noreferrer"/);
+        assert.match(link, /opens in a new tab/);
+        const document = await request(href);
+        assert.equal(document.status, 200, href);
+      }
+    }
+
+    for (const version of ['v6', 'v6-v2', 'v6-v3', 'v6-v4', 'v6-v5']) {
+      const parental = version === 'v6-v4' ? 'v6-v4' : 'v6-v3';
+      await checkEvidenceLinks(`/${version}/application/L-12Z-13P`, [
+        '/public/downloads/merits-report.pdf',
+        `/public/downloads/${parental}/parental_responsibility.pdf`
+      ]);
+    }
+    await checkEvidenceLinks('/v6-v3/application/L-12Z-13P?isRedetermination=true&redeterminationIndex=0', [
+      '/public/downloads/v6-v3/court_order.pdf',
+      '/public/downloads/v6-v3/parental_responsibility.pdf'
+    ]);
+    await checkEvidenceLinks('/v6-v5/application/M-MDDT-WBYS?isRedetermination=true&redeterminationIndex=0', [
+      '/v6-v5/testing-scenario/statement',
+      '/v6-v5/testing-scenario/merits',
+      '/v6-v5/testing-scenario/certificate'
+    ]);
+
     const assigned = await request('/v6/assigned-to-others/assign', {
       method: 'POST',
       headers: { 'content-type': 'application/x-www-form-urlencoded' },

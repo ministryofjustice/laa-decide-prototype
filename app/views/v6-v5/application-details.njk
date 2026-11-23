@@ -637,7 +637,7 @@
                     <td class="govuk-table__cell">ProceedingEvidence.pdf<br>Mock reference only; document not supplied</td>
                     {% else %}
                     <td class="govuk-table__cell">Statement of case</td>
-                    <td class="govuk-table__cell"><a class="govuk-link" href="{{ '/v6-v5/testing-scenario/statement' if reference == 'M-MDDT-WBYS' else '/public/downloads/statement-of-case.pdf' }}">{{ 'Updated statement of case (mock document)' if reference == 'M-MDDT-WBYS' else 'statement-of-case.pdf' }}</a><br>14 July 2026</td>
+                    <td class="govuk-table__cell"><a class="govuk-link" href="{{ '/v6-v5/testing-scenario/statement' if reference == 'M-MDDT-WBYS' else '/public/downloads/statement-of-case.pdf' }}" target="_blank" rel="noopener noreferrer">{{ 'Updated statement of case (mock document)' if reference == 'M-MDDT-WBYS' else 'statement-of-case.pdf' }} (opens in a new tab)</a><br>14 July 2026</td>
                     {% endif %}
                   </tr>
                 </tbody>
@@ -720,20 +720,20 @@
                 <tr class="govuk-table__row">
                   <td class="govuk-table__cell">Merits report</td>
                   <td class="govuk-table__cell">
-                    <a href="{{ '/v6-v5/testing-scenario/merits' if reference == 'M-MDDT-WBYS' else '#' }}" class="govuk-link">{{ 'Initial merits report (mock document)' if reference == 'M-MDDT-WBYS' else 'merits_report.pdf' }}</a><br>
+                    <a href="{{ '/v6-v5/testing-scenario/merits' if reference == 'M-MDDT-WBYS' else '/public/downloads/merits-report.pdf' }}" class="govuk-link" target="_blank" rel="noopener noreferrer">{{ 'Initial merits report (mock document)' if reference == 'M-MDDT-WBYS' else 'merits_report.pdf (example)' }} (opens in a new tab)</a><br>
                     {{ '1 July 2026' if reference == 'M-MDDT-WBYS' else '14 July 2024' }}
                   </td>
                 </tr>
                 {% if reference == 'M-MDDT-WBYS' %}
                   <tr class="govuk-table__row">
                     <td class="govuk-table__cell">Initial certificate</td>
-                    <td class="govuk-table__cell"><a href="/v6-v5/testing-scenario/certificate" class="govuk-link">Initial certificate (mock document)</a><br>3 July 2026</td>
+                    <td class="govuk-table__cell"><a href="/v6-v5/testing-scenario/certificate" class="govuk-link" target="_blank" rel="noopener noreferrer">Initial certificate (mock document) (opens in a new tab)</a><br>3 July 2026</td>
                   </tr>
                 {% endif %}
                 <tr class="govuk-table__row">
                   <td class="govuk-table__cell">Parental evidence</td>
                   <td class="govuk-table__cell">
-                    <a href="#" class="govuk-link">parental_responsibility.pdf</a><br>
+                    <a href="/public/downloads/v6-v3/parental_responsibility.pdf" class="govuk-link" target="_blank" rel="noopener noreferrer">parental_responsibility.pdf (example, opens in a new tab)</a><br>
                     14 July 2024
                   </td>
                 </tr>

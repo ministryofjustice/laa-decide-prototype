@@ -62,6 +62,10 @@ prototype session; a fresh session restores the example colleague lists.
 Cases assigned to colleagues also appear in Search with their caseworker. They
 are view-only until transferred to Your list.
 
+Evidence links on application details open in a new tab. Where an uploaded
+document is only represented by an example, the link is labelled accordingly;
+documents not supplied for a research scenario remain non-clickable.
+
 ## Deployment
 
 Signing out of the stakeholder or Version 2-5 prototype clears prototype access
