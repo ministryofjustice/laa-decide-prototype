@@ -10,6 +10,28 @@ const LOUISE_JUSTIFICATION = {
   clientSeeking: 'Louise wants to maintain contact with her mother and have her wishes and circumstances considered by the court in the secure accommodation proceedings.'
 };
 
+function resetCompletedLouiseScenario(data) {
+  const reference = 'L-YU5-UY3';
+  if (!data['grouped-redetermination-completed']?.[reference]) return false;
+
+  for (const key of ['open-applications-all', 'open-applications', 'assigned-applications', 'completed-applications']) {
+    if (Array.isArray(data[key])) {
+      data[key] = data[key].filter(application => application.ref !== reference || !application.isRedetermination);
+    }
+  }
+  for (const key of ['grouped-redetermination-completed', 'grouped-redetermination-drafts',
+    'grouped-redetermination-edits', 'grouped-redetermination-update-success',
+    'redetermination-provider-answers-v4', 'generated-redetermination-history', 'app-history']) {
+    if (data[key]) delete data[key][reference];
+  }
+  const decisions = data['redetermination-decision-store'] || {};
+  for (const key of Object.keys(decisions)) {
+    if (key.startsWith(`${reference}|`)) delete decisions[key];
+  }
+  ensureLouiseBevanScenario(data);
+  return true;
+}
+
 function ensureTestingScenarios(data) {
   for (const reference of references) {
     if (data['mock-request-types']) delete data['mock-request-types'][reference];
@@ -443,4 +465,4 @@ const documents = {
   }
 };
 
-module.exports = { ensureTestingScenarios, documents, references };
+module.exports = { ensureTestingScenarios, resetCompletedLouiseScenario, documents, references };

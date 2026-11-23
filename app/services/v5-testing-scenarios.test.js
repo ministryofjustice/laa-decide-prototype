@@ -1,6 +1,6 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { ensureTestingScenarios } = require('./v5-testing-scenarios');
+const { ensureTestingScenarios, resetCompletedLouiseScenario } = require('./v5-testing-scenarios');
 
 const reference = 'M-MDDT-WBYS';
 
@@ -96,6 +96,37 @@ test('updates Louise placeholders in existing sessions without resetting progres
   assert.equal(history[0].timestamp, '3 Jul 2026');
   assert.equal(history.at(-1).details, 'Research note');
   assert.equal(data['open-applications-all'].filter(app => app.ref === 'L-YU5-UY3').length, 2);
+});
+
+test('resets only completed Louise requests and retains other cases', () => {
+  const data = {};
+  const ref = 'L-YU5-UY3';
+  ensureTestingScenarios(data);
+  const requests = data['open-applications-all'].filter(app => app.ref === ref);
+  data['open-applications-all'] = data['open-applications-all'].filter(app => app.ref !== ref);
+  data['assigned-applications'] = requests.map(app => ({ ...app }));
+  data['completed-applications'].push({ ...requests[0], status: 'Granted' }, { ...requests[1], status: 'Refused' });
+  data['redetermination-decision-store'] = {
+    [`${ref}|0`]: { status: 'Granted' }, [`${ref}|1`]: { status: 'Refused' },
+    'M-MDDT-WBYS|0': { status: 'Granted' }
+  };
+  data['grouped-redetermination-completed'] = { [ref]: true, 'M-MDDT-WBYS': true };
+  data['grouped-redetermination-edits'] = { [ref]: { 0: { proceedingName: 'Edited' } }, OTHER: { kept: true } };
+  data['app-history'][ref].push({ action: 'Note added', details: 'Previous run' });
+  assert.equal(resetCompletedLouiseScenario(data), true);
+  const reset = data['open-applications-all'].filter(app => app.ref === ref);
+  assert.deepEqual(reset.map(app => app.redeterminationProceeding), ['Contact with a child in care', 'Secure accommodation order']);
+  assert.ok(reset.every(app => !app.status));
+  assert.equal(data['assigned-applications'].filter(app => app.ref === ref).length, 0);
+  assert.equal(data['completed-applications'].filter(app => app.ref === ref && app.isRedetermination).length, 0);
+  assert.equal(data['completed-applications'].filter(app => app.ref === ref && !app.isRedetermination).length, 1);
+  assert.deepEqual(data['redetermination-decision-store'], { 'M-MDDT-WBYS|0': { status: 'Granted' } });
+  assert.deepEqual(data['grouped-redetermination-completed'], { 'M-MDDT-WBYS': true });
+  assert.deepEqual(data['grouped-redetermination-edits'], { OTHER: { kept: true } });
+  assert.ok(!data['app-history'][ref].some(event => event.details === 'Previous run'));
+  assert.equal(resetCompletedLouiseScenario(data), false);
+  ensureTestingScenarios(data);
+  assert.equal(data['open-applications-all'].filter(app => app.ref === ref).length, 2);
 });
 
 test('creates a repeatable scenario with two requests and an earlier initial grant', () => {

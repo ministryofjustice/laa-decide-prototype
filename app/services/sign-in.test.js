@@ -149,6 +149,49 @@ test('one branded Kit sign-in protects direct links and preserves casework on si
     assert.equal(louiseHistory.status, 200);
     assert.doesNotMatch(await louiseHistory.text(), /not supplied/i);
 
+    const louise = '/v6-v5/application/L-YU5-UY3/redeterminations';
+    const versionOpen = '/v6-v5/open-applications';
+    assert.match(await (await request(versionOpen)).text(), /L-YU5-UY3/);
+    assert.equal((await request('/v6-v5/add-application/L-YU5-UY3?isRedetermination=true&redeterminationIndex=0')).status, 302);
+    assert.doesNotMatch(await (await request(versionOpen)).text(), /L-YU5-UY3/);
+    const decisionPage = await request(`${louise}/decision`);
+    assert.equal(decisionPage.status, 200);
+    assert.match(await decisionPage.text(), /Contact with a child in care/);
+    const decision = await request(`${louise}/decision`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({
+        'decision-0': 'grant', 'certificate-grant-date-type-0': 'current-date',
+        'decision-1': 'grant', 'certificate-grant-date-type-1': 'current-date'
+      })
+    });
+    assert.equal(decision.headers.get('location'), `${louise}/check-answers`);
+    assert.equal((await request(`${louise}/check-answers`, { method: 'POST' })).headers.get('location'), `${louise}/confirmation`);
+    const confirmation = await request(`${louise}/confirmation`);
+    assert.equal(confirmation.status, 200);
+    assert.match(await confirmation.text(), /Assessment complete/);
+    const reopened = await (await request(versionOpen)).text();
+    assert.match(reopened, /L-YU5-UY3/);
+    assert.equal((await request('/v6-v5/add-application/L-YU5-UY3?isRedetermination=true&redeterminationIndex=0')).status, 302);
+    const repeatedDecision = await request(`${louise}/decision`);
+    assert.equal(repeatedDecision.status, 200);
+    const repeatedPage = await repeatedDecision.text();
+    assert.match(repeatedPage, /Contact with a child in care/);
+    assert.match(repeatedPage, /Secure accommodation order/);
+    assert.doesNotMatch(repeatedPage, /value="grant"\s+checked/);
+    const secondDecision = await request(`${louise}/decision`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({
+        'decision-0': 'grant', 'certificate-grant-date-type-0': 'current-date',
+        'decision-1': 'grant', 'certificate-grant-date-type-1': 'current-date'
+      })
+    });
+    assert.equal(secondDecision.headers.get('location'), `${louise}/check-answers`);
+    assert.equal((await request(`${louise}/check-answers`, { method: 'POST' })).headers.get('location'), `${louise}/confirmation`);
+    assert.equal((await request(`${louise}/confirmation`)).status, 200);
+    assert.match(await (await request(versionOpen)).text(), /L-YU5-UY3/);
+
     const assigned = await request('/v6/assigned-to-others/assign', {
       method: 'POST',
       headers: { 'content-type': 'application/x-www-form-urlencoded' },

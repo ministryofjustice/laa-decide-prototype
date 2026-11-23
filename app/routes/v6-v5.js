@@ -6,7 +6,7 @@
 const govukPrototypeKit = require('govuk-prototype-kit')
 const router = govukPrototypeKit.requests.setupRouter()
 const { sortApplicationsBySubmittedDate } = require('../services/application.service')
-const { ensureTestingScenarios, documents: testingScenarioDocuments, references: testingScenarioReferences } = require('../services/v5-testing-scenarios')
+const { ensureTestingScenarios, resetCompletedLouiseScenario, documents: testingScenarioDocuments, references: testingScenarioReferences } = require('../services/v5-testing-scenarios')
 
 router.use(function(req, res, next) {
   req.session.data = req.session.data || {};
@@ -1800,6 +1800,7 @@ function generateReplacementOpenApplication(preferredType, existingVariantKeys =
 }
 
 router.get('/open-applications', function(req, res) {
+  resetCompletedLouiseScenario(req.session.data['v6-v5']);
   if (!req.session.data['v6-v5']['assigned-applications']) {
     req.session.data['v6-v5']['assigned-applications'] = [];
   }

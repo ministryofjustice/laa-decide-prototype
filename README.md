@@ -54,7 +54,11 @@ justifications and initial care order role, delegated functions, level of
 service and scope, dates, cost limit, personal and provider details are mock
 details based on the walkthrough. Fictional initial and proceeding evidence
 PDFs are provided for research.
-The same session persistence and fresh-session reset rules apply.
+Progress persists while the case is being assessed. After both requests are
+decided, returning to Open applications resets this case to its original
+undecided state for another run. Its previous decisions, notes and proceeding
+edits are cleared; other cases are unaffected. The confirmation remains available
+until returning to Open applications.
 
 In the stakeholder consolidated view, Your list includes an Assigned to others
 tab. Search the mock caseworkers by name or email to view their example cases
