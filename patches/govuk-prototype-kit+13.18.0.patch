@@ -1,8 +1,22 @@
 diff --git a/node_modules/govuk-prototype-kit/lib/nunjucks/views/manage-prototype/password.njk b/node_modules/govuk-prototype-kit/lib/nunjucks/views/manage-prototype/password.njk
-index 1472c8e..3e5b8fb 100644
+index 1472c8e..f8c2a7b 100644
 --- a/node_modules/govuk-prototype-kit/lib/nunjucks/views/manage-prototype/password.njk
 +++ b/node_modules/govuk-prototype-kit/lib/nunjucks/views/manage-prototype/password.njk
-@@ -54,7 +54,8 @@
+@@ -31,4 +31,12 @@
+     font-family: sans-serif;
+   }
++  .caseworker-journey {
++    font-size: 16px;
++  }
++  @media (min-width: 40.0625em) {
++    .caseworker-journey {
++      font-size: 24px;
++    }
++  }
+ </style>
+ {% endblock %}
+@@ -54,7 +62,9 @@
++      <p class="govuk-body-l govuk-!-margin-bottom-2 caseworker-journey" style="font-weight: normal; color: #505a5f;">Civil Decide: Caseworker Journey</p>
        <h1 class="govuk-heading-xl">
 -        This is a prototype used for research
 +        Civil Decide prototype

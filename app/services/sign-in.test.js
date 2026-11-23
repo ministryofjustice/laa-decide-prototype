@@ -69,6 +69,7 @@ test('one branded Kit sign-in protects direct links and preserves casework on si
     assert.equal(signInUrl.searchParams.get('returnURL'), directLink);
 
     const page = await (await request(signInUrl.pathname + signInUrl.search)).text();
+    assert.match(page, /Civil Decide: Caseworker Journey[\s\S]*Civil Decide prototype/);
     assert.match(page, /Civil Decide prototype/);
     assert.match(page, /This is a prototype used for research/);
     assert.match(page, /It is not a real service/);
