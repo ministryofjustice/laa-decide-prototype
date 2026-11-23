@@ -67,6 +67,37 @@ test('updates old Louise placeholders without overwriting existing session answe
   assert.match(answers.clientSeeking, /contact.*mother.*secure accommodation/i);
 });
 
+test('updates Louise placeholders in existing sessions without resetting progress', () => {
+  const data = {};
+  ensureTestingScenarios(data);
+  const initial = data['completed-applications'].find(app => app.ref === 'L-YU5-UY3' && !app.isRedetermination);
+  initial.dob = 'Not supplied (aged 15)';
+  initial.firm = 'Not supplied';
+  initial.opponentName = 'Local authority (name not supplied)';
+  initial.children[0].dob = 'Not supplied';
+  initial.submitted = 'Not supplied';
+  initial.delegatedFunctions = 'Not supplied';
+  const answers = data['redetermination-provider-answers-v4']['L-YU5-UY3'];
+  answers.parentalResponsibility = 'Not supplied';
+  answers.dispute = 'A session-specific answer';
+  const history = data['app-history']['L-YU5-UY3'];
+  history[0].timestamp = 'Date not supplied';
+  history[0].caseworker = 'Not supplied';
+  history.push({ action: 'Note added', details: 'Research note' });
+  ensureTestingScenarios(data);
+  assert.equal(initial.dob, '15 May 2011');
+  assert.equal(initial.children[0].dob, initial.dob);
+  assert.equal(initial.firm, 'Bevan Family Law<br>BF123A');
+  assert.equal(initial.opponentName, 'Manchester City Council');
+  assert.equal(initial.submitted, '1 Jul 2026');
+  assert.equal(initial.delegatedFunctions, 'Not used');
+  assert.equal(answers.parentalResponsibility, 'No');
+  assert.equal(answers.dispute, 'A session-specific answer');
+  assert.equal(history[0].timestamp, '3 Jul 2026');
+  assert.equal(history.at(-1).details, 'Research note');
+  assert.equal(data['open-applications-all'].filter(app => app.ref === 'L-YU5-UY3').length, 2);
+});
+
 test('creates a repeatable scenario with two requests and an earlier initial grant', () => {
   const first = {};
   const second = {};

@@ -4018,20 +4018,20 @@ router.get('/application/:reference', function(req, res) {
     ...found,
     ref: reference,
     reference: reference,
-    niNumber: reference === 'L-YU5-UY3' ? 'Not supplied' : `JT${nameLen}15${nameLen}B`,
-    prevReference: reference === 'L-YU5-UY3' ? 'Not supplied' : `30000123${nameLen}`,
-    correspondenceAddress: found.correspondenceAddress || (reference === 'L-YU5-UY3' ? 'Not supplied' : `${nameLen} Armitage house<br>108 petty France<br>London<br>SW2 8QT`),
-    homeAddress: found.homeAddress || (reference === 'L-YU5-UY3' ? 'Not supplied' : `${nameLen * 2} Knightsbridge place<br>117A Russell Square<br>London<br>NW3 6BD`),
+    niNumber: reference === 'L-YU5-UY3' ? 'Not applicable' : `JT${nameLen}15${nameLen}B`,
+    prevReference: reference === 'L-YU5-UY3' ? '300001235' : `30000123${nameLen}`,
+    correspondenceAddress: found.correspondenceAddress || (reference === 'L-YU5-UY3' ? 'Bevan Family Law<br>12 Example Street<br>Manchester<br>M1 1AA' : `${nameLen} Armitage house<br>108 petty France<br>London<br>SW2 8QT`),
+    homeAddress: found.homeAddress || (reference === 'L-YU5-UY3' ? '25 Example Road<br>Manchester<br>M1 1AA' : `${nameLen * 2} Knightsbridge place<br>117A Russell Square<br>London<br>NW3 6BD`),
     opponentName: found.opponentName || `${found.lastName} city council`,
     children: found.children || [
       { name: `Kaylynn ${found.lastName}`, dob: `20 Dec 202${nameLen % 9}` },
       { name: `Gustavo ${found.lastName}`, dob: `15 Jan 202${(nameLen + 1) % 9}` }
     ],
-    isBioParent: reference === 'L-YU5-UY3' ? 'Not supplied' : nameLen % 2 === 0 ? 'Yes' : 'No',
+    isBioParent: reference === 'L-YU5-UY3' ? 'No' : nameLen % 2 === 0 ? 'Yes' : 'No',
     providerFirm: found.firm ? found.firm.split('<br>')[0] : 'Gray and associations at law',
-    providerAccount: found.firm && found.firm.includes('<br>') ? found.firm.split('<br>')[1] : reference === 'L-YU5-UY3' ? 'Not supplied' : 'OK514R',
-    providerAddress: reference === 'L-YU5-UY3' ? 'Not supplied' : `${nameLen} Liverpool Road<br>Manchester<br>MW2 5WT`,
-    providerPhone: reference === 'L-YU5-UY3' ? 'Not supplied' : `0712345678${nameLen % 9}`
+    providerAccount: found.firm && found.firm.includes('<br>') ? found.firm.split('<br>')[1] : reference === 'L-YU5-UY3' ? 'BF123A' : 'OK514R',
+    providerAddress: reference === 'L-YU5-UY3' ? '12 Example Street<br>Manchester<br>M1 1AA' : `${nameLen} Liverpool Road<br>Manchester<br>MW2 5WT`,
+    providerPhone: reference === 'L-YU5-UY3' ? '01632 960456' : `0712345678${nameLen % 9}`
   };
 
   // Initialize history with initial application received entry if it doesn't exist

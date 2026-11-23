@@ -99,6 +99,7 @@ test('one branded Kit sign-in protects direct links and preserves casework on si
         assert.match(link, /target="_blank"/);
         assert.match(link, /rel="noopener noreferrer"/);
         assert.match(link, /opens in a new tab/);
+        assert.doesNotMatch(link, /\bexample\b/i);
         const document = await request(href);
         assert.equal(document.status, 200, href);
       }
@@ -120,6 +121,33 @@ test('one branded Kit sign-in protects direct links and preserves casework on si
       '/v6-v5/testing-scenario/merits',
       '/v6-v5/testing-scenario/certificate'
     ]);
+
+    await checkEvidenceLinks('/v6-v5/application/L-YU5-UY3?isRedetermination=true&redeterminationIndex=0', [
+      '/public/downloads/ProceedingEvidence.pdf',
+      '/public/downloads/LouiseInitialEvidence.pdf'
+    ]);
+    const louiseDocument = await request('/public/downloads/ProceedingEvidence.pdf');
+    assert.match(louiseDocument.headers.get('content-type'), /application\/pdf/);
+    assert.equal(Buffer.from(await louiseDocument.arrayBuffer()).subarray(0, 5).toString(), '%PDF-');
+
+    for (const suffix of ['', '?isRedetermination=true&redeterminationIndex=0', '?isRedetermination=true&redeterminationIndex=1']) {
+      const html = await (await request(`/v6-v5/application/L-YU5-UY3${suffix}`)).text();
+      assert.doesNotMatch(html, /not supplied/i);
+      assert.match(html, /£25,000/);
+      for (const value of ['15 May 2011', 'Bevan Family Law', 'BF123A', 'Manchester City Council', '01632 960456']) {
+        assert.ok(html.includes(value), `Louise’s People tab should display ${value}`);
+      }
+      const careOrder = html.match(/>Care order<\/h2>[\s\S]*?<\/dl>/);
+      assert.ok(careOrder, 'Louise’s care order details are displayed');
+      assert.match(careOrder[0], /Client role<\/dt>\s*<dd[^>]*>Child subject of proceedings<\/dd>/);
+      assert.match(careOrder[0], /Delegated functions<\/dt>[\s\S]*?Not used/);
+      assert.match(careOrder[0], /Substantive level of service<\/dt>[\s\S]*?Full representation/);
+      assert.match(careOrder[0], /Substantive scope limitations<\/dt>[\s\S]*?Final hearing/);
+      assert.doesNotMatch(careOrder[0], /Not supplied/);
+    }
+    const louiseHistory = await request('/v6-v5/application/L-YU5-UY3/history');
+    assert.equal(louiseHistory.status, 200);
+    assert.doesNotMatch(await louiseHistory.text(), /not supplied/i);
 
     const assigned = await request('/v6/assigned-to-others/assign', {
       method: 'POST',

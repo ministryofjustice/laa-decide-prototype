@@ -309,19 +309,31 @@ function ensureLouiseBevanScenario(data) {
     reference,
     firstName: 'Louise',
     lastName: 'Bevan',
-    dob: 'Not supplied (aged 15)',
-    firm: 'Not supplied',
-    opponentName: 'Local authority (name not supplied)',
-    children: [{ name: 'Louise Bevan', dob: 'Not supplied' }],
+    dob: '15 May 2011',
+    firm: 'Bevan Family Law<br>BF123A',
+    opponentName: 'Manchester City Council',
+    children: [{ name: 'Louise Bevan', dob: '15 May 2011' }],
     matterType: { title: 'Family', subtext: 'Special Children Act' },
     isPriorAuthority: false
   };
+  for (const application of applications.filter(app => app.ref === reference)) {
+    if (application.dob === 'Not supplied (aged 15)') application.dob = client.dob;
+    if (application.firm === 'Not supplied') application.firm = client.firm;
+    if (application.opponentName === 'Local authority (name not supplied)') application.opponentName = client.opponentName;
+    for (const child of application.children || []) {
+      if (child.name === 'Louise Bevan' && child.dob === 'Not supplied') child.dob = client.dob;
+    }
+    if (!application.isRedetermination && !application.isPriorAuthority) {
+      if (application.submitted === 'Not supplied') application.submitted = '1 Jul 2026';
+      if (application.delegatedFunctions === 'Not supplied') application.delegatedFunctions = 'Not used';
+    }
+  }
   if (!applications.some(app => app.ref === reference && !app.isRedetermination && !app.isPriorAuthority)) {
     data['completed-applications'].push({
       ...client,
-      submitted: 'Not supplied',
+      submitted: '1 Jul 2026',
       type: 'Initial application',
-      delegatedFunctions: 'Not supplied',
+      delegatedFunctions: 'Not used',
       status: 'Granted',
       decisionType: 'Grant'
     });
@@ -352,9 +364,15 @@ function ensureLouiseBevanScenario(data) {
   data['app-history'] = data['app-history'] || {};
   if (!data['app-history'][reference]) {
     data['app-history'][reference] = [
-      { timestamp: 'Date not supplied', action: 'Initial application granted', caseworker: 'Not supplied', details: 'Existing certificate covers ongoing care proceedings. Louise is described as subject to an interim care order.' },
+      { timestamp: '3 Jul 2026', action: 'Initial application granted', caseworker: 'Emma Wilson', details: 'Existing certificate covers ongoing care proceedings. Louise is described as subject to an interim care order.' },
       { timestamp: '23 Nov 2026', action: 'Redetermination request received', caseworker: 'N/A', redeterminationId: `${reference}-grouped-redetermination-received`, redeterminationCount: 2, redeterminationType: 'Add a proceeding', details: 'Mock submission date. The provider requested Contact with a child in care and Secure accommodation order.' }
     ];
+  }
+  for (const event of data['app-history'][reference]) {
+    if (event.action === 'Initial application granted' && event.timestamp === 'Date not supplied' && event.caseworker === 'Not supplied') {
+      event.timestamp = '3 Jul 2026';
+      event.caseworker = 'Emma Wilson';
+    }
   }
   data['generated-redetermination-history'] = data['generated-redetermination-history'] || {};
   data['generated-redetermination-history'][reference] = true;
@@ -363,7 +381,7 @@ function ensureLouiseBevanScenario(data) {
     data['redetermination-provider-answers-v4'][reference] = {
       schemaVersion: 6,
       preserveSubmittedAnswers: true,
-      parentalResponsibility: 'Not supplied',
+      parentalResponsibility: 'No',
       finalOrderMade: 'Yes',
       finalOrderDetails: [{ date: '23 November 2026' }],
       justificationProceedings: JSON.stringify([...proceedings].sort()),
@@ -389,6 +407,7 @@ function ensureLouiseBevanScenario(data) {
     };
   }
   const answers = data['redetermination-provider-answers-v4'][reference];
+  if (answers.parentalResponsibility === 'Not supplied') answers.parentalResponsibility = 'No';
   for (const [key, value] of Object.entries(LOUISE_JUSTIFICATION)) {
     if (answers[key] === 'Not supplied in the walkthrough') answers[key] = value;
   }

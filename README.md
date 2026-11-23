@@ -50,9 +50,10 @@ and fresh-session reset rules apply.
 
 `L-YU5-UY3` is the Louise Bevan add-proceedings scenario, with Contact with a
 child in care and Secure accommodation order requests. The free-text
-justifications are mock answers based on the walkthrough; the evidence file was
-not supplied and is shown as a mock reference only. The submission date is a
-mock date.
+justifications and initial care order role, delegated functions, level of
+service and scope, dates, cost limit, personal and provider details are mock
+details based on the walkthrough. Fictional initial and proceeding evidence
+PDFs are provided for research.
 The same session persistence and fresh-session reset rules apply.
 
 In the stakeholder consolidated view, Your list includes an Assigned to others
@@ -62,9 +63,8 @@ prototype session; a fresh session restores the example colleague lists.
 Cases assigned to colleagues also appear in Search with their caseworker. They
 are view-only until transferred to Your list.
 
-Evidence links on application details open in a new tab. Where an uploaded
-document is only represented by an example, the link is labelled accordingly;
-documents not supplied for a research scenario remain non-clickable.
+Evidence links on application details open in a new tab. Some links point to
+example documents.
 
 ## Deployment
 

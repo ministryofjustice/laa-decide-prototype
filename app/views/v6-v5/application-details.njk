@@ -162,7 +162,7 @@
         <strong>Assigned to:</strong> Caseworker name
       </p>
       <p class="govuk-body govuk-!-margin-bottom-6">
-        <strong>Date received:</strong> {% if reference == 'L-YU5-UY3' %}{{ '23 November 2026 (mock date)' if viewingRedetermination else 'Not supplied' }}{% else %}{{ ('14 July 2026' if viewingRedetermination else '1 July 2026') if reference == 'M-MDDT-WBYS' else '19 May 2023' }}{% endif %}
+        <strong>Date received:</strong> {% if reference == 'L-YU5-UY3' %}{{ '23 November 2026' if viewingRedetermination else '1 July 2026' }}{% else %}{{ ('14 July 2026' if viewingRedetermination else '1 July 2026') if reference == 'M-MDDT-WBYS' else '19 May 2023' }}{% endif %}
       </p>
 
       {% if pendingRedeterminationCount > 0 %}
@@ -324,28 +324,26 @@
             <dl class="govuk-summary-list">
               <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">Client role</dt>
-                <dd class="govuk-summary-list__value">{{ 'Not supplied' if reference == 'L-YU5-UY3' else 'Respondent' }}</dd>
+                <dd class="govuk-summary-list__value">{{ 'Child subject of proceedings' if reference == 'L-YU5-UY3' else 'Respondent' }}</dd>
               </div>
               <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">Delegated functions</dt>
                 <dd class="govuk-summary-list__value">
-                  {% if reference and 'L-12Z' in reference %}
+                  {% if reference == 'L-YU5-UY3' or (reference and 'L-12Z' in reference) %}
                     Not used
                   {% elif reference and 'L-W1X' in reference %}
                     02 Oct 2025
                   {% elif reference and 'N-J5S' in reference %}
                     15 Nov 2025
                   {% else %}
-                    {{ 'Not supplied' if reference == 'L-YU5-UY3' else ('1 July 2026' if reference == 'M-MDDT-WBYS' else '05 Sept 2025') }}
+                    {{ '1 July 2026' if reference == 'M-MDDT-WBYS' else '05 Sept 2025' }}
                   {% endif %}
                 </dd>
               </div>
               <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">Substantive level of service</dt>
                 <dd class="govuk-summary-list__value">
-                  {% if reference == 'L-YU5-UY3' %}
-                    Not supplied
-                  {% elif reference and 'L-12Z' in reference %}
+                  {% if reference and 'L-12Z' in reference %}
                     Limited representation
                   {% elif reference and 'L-W1X' in reference %}
                     Full representation
@@ -359,9 +357,7 @@
               <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">Substantive scope limitations</dt>
                 <dd class="govuk-summary-list__value">
-                  {% if reference == 'L-YU5-UY3' %}
-                    Not supplied
-                  {% elif reference and 'L-12Z' in reference %}
+                  {% if reference and 'L-12Z' in reference %}
                     Mediation<br><br>
                     Limited to mediation and any action necessary to settle the dispute.
                   {% elif reference and 'L-W1X' in reference %}
@@ -634,7 +630,7 @@
                   <tr class="govuk-table__row">
                     {% if reference == 'L-YU5-UY3' %}
                     <td class="govuk-table__cell">Proceeding evidence</td>
-                    <td class="govuk-table__cell">ProceedingEvidence.pdf<br>Mock reference only; document not supplied</td>
+                    <td class="govuk-table__cell"><a class="govuk-link" href="/public/downloads/ProceedingEvidence.pdf" target="_blank" rel="noopener noreferrer">ProceedingEvidence.pdf (opens in a new tab)</a><br>23 November 2026</td>
                     {% else %}
                     <td class="govuk-table__cell">Statement of case</td>
                     <td class="govuk-table__cell"><a class="govuk-link" href="{{ '/v6-v5/testing-scenario/statement' if reference == 'M-MDDT-WBYS' else '/public/downloads/statement-of-case.pdf' }}" target="_blank" rel="noopener noreferrer">{{ 'Updated statement of case (mock document)' if reference == 'M-MDDT-WBYS' else 'statement-of-case.pdf' }} (opens in a new tab)</a><br>14 July 2026</td>
@@ -690,7 +686,7 @@
             <dl class="govuk-summary-list">
               <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">Substantive certificate</dt>
-                <dd class="govuk-summary-list__value">{{ 'Not supplied' if reference == 'L-YU5-UY3' else '£25,000' }}</dd>
+                <dd class="govuk-summary-list__value">£25,000</dd>
               </div>
             </dl>
           </div>
@@ -714,13 +710,13 @@
                 {% if reference == 'L-YU5-UY3' %}
                 <tr class="govuk-table__row">
                   <td class="govuk-table__cell">Initial application evidence</td>
-                  <td class="govuk-table__cell">Not supplied in the walkthrough</td>
+                  <td class="govuk-table__cell"><a href="/public/downloads/LouiseInitialEvidence.pdf" class="govuk-link" target="_blank" rel="noopener noreferrer">InitialEvidence.pdf (opens in a new tab)</a><br>1 July 2026</td>
                 </tr>
                 {% else %}
                 <tr class="govuk-table__row">
                   <td class="govuk-table__cell">Merits report</td>
                   <td class="govuk-table__cell">
-                    <a href="{{ '/v6-v5/testing-scenario/merits' if reference == 'M-MDDT-WBYS' else '/public/downloads/merits-report.pdf' }}" class="govuk-link" target="_blank" rel="noopener noreferrer">{{ 'Initial merits report (mock document)' if reference == 'M-MDDT-WBYS' else 'merits_report.pdf (example)' }} (opens in a new tab)</a><br>
+                    <a href="{{ '/v6-v5/testing-scenario/merits' if reference == 'M-MDDT-WBYS' else '/public/downloads/merits-report.pdf' }}" class="govuk-link" target="_blank" rel="noopener noreferrer">{{ 'Initial merits report (mock document)' if reference == 'M-MDDT-WBYS' else 'merits_report.pdf' }} (opens in a new tab)</a><br>
                     {{ '1 July 2026' if reference == 'M-MDDT-WBYS' else '14 July 2024' }}
                   </td>
                 </tr>
@@ -733,7 +729,7 @@
                 <tr class="govuk-table__row">
                   <td class="govuk-table__cell">Parental evidence</td>
                   <td class="govuk-table__cell">
-                    <a href="/public/downloads/v6-v3/parental_responsibility.pdf" class="govuk-link" target="_blank" rel="noopener noreferrer">parental_responsibility.pdf (example, opens in a new tab)</a><br>
+                    <a href="/public/downloads/v6-v3/parental_responsibility.pdf" class="govuk-link" target="_blank" rel="noopener noreferrer">parental_responsibility.pdf (opens in a new tab)</a><br>
                     14 July 2024
                   </td>
                 </tr>
