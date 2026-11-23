@@ -1,0 +1,15 @@
+diff --git a/node_modules/govuk-prototype-kit/lib/nunjucks/views/manage-prototype/password.njk b/node_modules/govuk-prototype-kit/lib/nunjucks/views/manage-prototype/password.njk
+index 1472c8e..3e5b8fb 100644
+--- a/node_modules/govuk-prototype-kit/lib/nunjucks/views/manage-prototype/password.njk
++++ b/node_modules/govuk-prototype-kit/lib/nunjucks/views/manage-prototype/password.njk
+@@ -54,7 +54,8 @@
+       <h1 class="govuk-heading-xl">
+-        This is a prototype used for research
++        Civil Decide prototype
+       </h1>
+-
++      <h2 class="govuk-heading-l">This is a prototype used for research</h2>
++
+       <p>
+           It is not a real service. You should only continue if you have been invited to test this prototype.
+       </p>

@@ -481,54 +481,9 @@ router.get('/overall-decision-error', function(req, res) {
   res.render('v6-v4/overall-decision-error.html', { pageTitle: 'Error', decisionReference: decisionReference });
 });
 
-// Password for accessing the prototype
-const PROTOTYPE_PASSWORD = 'prototype';
-
-// Authentication middleware
-function requireAuth(req, res, next) {
-  if (req.session.data['v6-v4'] && req.session.data['v6-v4']['v6-authenticated']) {
-    next();
-  } else {
-    res.redirect('/v6-v4/');
-  }
-}
-
-// Default root route - shows password form
-router.get('/', function(req, res) {
-  res.render('v6-v4/password.njk', {
-    pageTitle: 'Enter password',
-    errorMessage: req.session.data['v6-v4'] && req.session.data['v6-v4']['password-error'] ? req.session.data['v6-v4']['password-error'] : null
-  });
-  // Clear error after displaying
-  if (req.session.data['v6-v4']) {
-    delete req.session.data['v6-v4']['password-error'];
-  }
-});
-
-// Avoid a direct GET request to the submission endpoint from causing an invalid page load.
-router.get('/password-submit', function(req, res) {
-  res.redirect('/v6-v4/');
-});
-
-// Password submission
-router.post('/password-submit', function(req, res) {
-  const enteredPassword = req.body.password;
-
-  if (enteredPassword === PROTOTYPE_PASSWORD) {
-    // Store auth in session
-    if (!req.session.data['v6-v4']) {
-      req.session.data['v6-v4'] = {};
-    }
-    req.session.data['v6-v4']['v6-authenticated'] = true;
-    res.redirect('/v6-v4/index');
-  } else {
-    // Store error and redirect back
-    if (!req.session.data['v6-v4']) {
-      req.session.data['v6-v4'] = {};
-    }
-    req.session.data['v6-v4']['password-error'] = 'Incorrect password';
-    res.redirect('/v6-v4/');
-  }
+// Redirect old password form links to the versions page.
+router.all('/password-submit', function(req, res) {
+  res.redirect('/');
 });
 
 router.get('/sign-out', function(req, res) {
@@ -538,16 +493,6 @@ router.get('/sign-out', function(req, res) {
   delete req.session.data['v6-authenticated'];
   res.clearCookie('authentication', { path: '/' });
   res.redirect('/manage-prototype/password?returnURL=%2F');
-});
-
-// Welcome/index page - requires auth
-router.get('/index', function(req, res) {
-  // Check authentication
-  if (!req.session.data['v6-v4'] || !req.session.data['v6-v4']['v6-authenticated']) {
-    res.redirect('/v6-v4/');
-    return;
-  }
-  res.render('v6-v4/index.njk', { pageTitle: 'Civil Decide prototype' });
 });
 
 function initializeAppHistory(req, ref) {

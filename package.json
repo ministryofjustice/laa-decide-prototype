@@ -2,7 +2,8 @@
   "scripts": {
     "dev": "govuk-prototype-kit dev",
     "serve": "govuk-prototype-kit serve",
-    "start": "govuk-prototype-kit start"
+    "start": "govuk-prototype-kit start",
+    "postinstall": "patch-package --error-on-fail"
   },
   "name": "govuk-prototype-kit",
   "dependencies": {
@@ -11,7 +12,8 @@
     "govuk-frontend": "5.11.1",
     "govuk-prototype-kit": "13.18.0",
     "jquery": "3.7.1",
-    "moment": "2.30.1"
+    "moment": "2.30.1",
+    "patch-package": "8.0.0"
   },
   "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e",
   "version": "1.22.22"

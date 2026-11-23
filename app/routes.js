@@ -23,35 +23,8 @@ router.get([
   res.redirect('/');
 });
 
-const PROTOTYPE_PASSWORD = 'prototype';
-
 router.get('/', function(req, res) {
-  if (req.session.data && req.session.data['v6-authenticated']) {
-    res.render('v6-v5/index.njk', { pageTitle: 'Civil Decide prototype' });
-    return;
-  }
-
-  res.render('v6-v3/password.njk', {
-    pageTitle: 'Enter password',
-    errorMessage: req.session.data && req.session.data['password-error'] ? req.session.data['password-error'] : null
-  });
-  if (req.session.data) {
-    delete req.session.data['password-error'];
-  }
-});
-
-router.post('/', function(req, res) {
-  if (!req.session.data) {
-    req.session.data = {};
-  }
-
-  if (req.body.password === PROTOTYPE_PASSWORD) {
-    req.session.data['v6-authenticated'] = true;
-  } else {
-    req.session.data['password-error'] = 'Incorrect password';
-  }
-  res.redirect('/');
-  res.redirect('/');
+  res.render('v6-v5/index.njk', { pageTitle: 'Civil Decide prototype' });
 });
 
 // Add your routes here

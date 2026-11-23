@@ -4,9 +4,7 @@ Prototype for the LAA's 'Decide If An Applicant Can Get Legal Aid' service.
 This deploys to: 
 https://laa-decide-prototype.apps.live.cloud-platform.service.justice.gov.uk/
 
-Username: decide
-
-Password: prototype
+Published environments use the configured GOV.UK Prototype Kit password.
 
 ## Local Development
 
@@ -14,6 +12,12 @@ Install dependencies using `yarn install`
 Run `yarn run dev` to spin up locally 
 
 (Note, npm might have issues if you are on a Mac with an Apple Chip. Yarn doesn't seem to though)
+
+To test signing back in after signing out locally, create an untracked `.env`
+file in the project root containing `PASSWORD=your-local-test-password` and
+restart the development server. Use that password on the research sign-in page.
+The file is excluded from Git and Docker builds and does not set the published
+environment's password.
 
 ### Views Folders
 
@@ -64,4 +68,9 @@ Signing out of the stakeholder or Version 2-5 prototype clears prototype access
 and returns to the research disclaimer/password page. Casework session data is
 preserved; signing out does not reset research scenarios.
 
-This will automatically deploy to the above URL once merged into Main. 
+The research sign-in page is branded using a patch to GOV.UK Prototype Kit's
+management template, applied during dependency installation. Review the patch
+when upgrading the Kit. Authentication and password handling remain the Kit's.
+The Kit does not enforce its password in local development.
+
+This will automatically deploy to the above URL once merged into Main.
