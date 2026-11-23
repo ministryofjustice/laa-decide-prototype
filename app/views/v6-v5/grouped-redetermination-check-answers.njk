@@ -78,7 +78,7 @@
     <h1 class="govuk-heading-xl">Check your answers</h1>
     {% for item in decisions %}
       {{ summaryCard(item.proceedingName, "Grant" if item.decision == "grant" else "Refuse", item.clientRole,
-        "Final Hearing\n\nTo be represented on all steps up to and including a final hearing.", "Full representation", item.explanation, item.certificateGrantDate, item.certificateGrantDateType, changeHref, "#request-heading-" ~ item.index, "", changeHref ~ "#explanation-" ~ item.index, item.changeExplanation, item.redeterminationProceeding, item.redeterminationClientRole) }}
+        item.scopeLimitations or "Final Hearing\n\nTo be represented on all steps up to and including a final hearing.", item.levelOfService or "Full representation", item.explanation, item.certificateGrantDate, item.certificateGrantDateType, changeHref, "#request-heading-" ~ item.index, "", changeHref ~ "#explanation-" ~ item.index, item.changeExplanation, item.redeterminationProceeding, item.redeterminationClientRole) }}
     {% endfor %}
     {% for item in draft.additions %}
       {{ summaryCard(item.proceedingName, "Grant" if item.decision == "grant" else "Refuse", item.clientRole, item.scopeLimitations, item.levelOfService, item.explanation, item.certificateGrantDate, item.certificateGrantDateType, changeHref, "#additional-proceedings", newDecisionHref ~ "#request-heading-new-" ~ loop.index0, newDecisionHref ~ "#explanation-new-" ~ loop.index0) }}

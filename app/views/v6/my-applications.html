@@ -92,6 +92,15 @@
       
       <h1 class="govuk-heading-xl govuk-!-margin-bottom-6">Your list</h1>
 
+      {% if consolidated %}
+        {{ govukButton({ text: "View open applications", href: "/v6/open-applications" }) }}
+        <nav class="moj-sub-navigation" aria-label="Work lists">
+          <ul class="moj-sub-navigation__list">
+            <li class="moj-sub-navigation__item"><a class="moj-sub-navigation__link" aria-current="page" href="/v6/yourlist">Your list</a></li>
+            <li class="moj-sub-navigation__item"><a class="moj-sub-navigation__link" href="/v6/assigned-to-others">Assigned to others</a></li>
+          </ul>
+        </nav>
+      {% endif %}
       {% if applications and applications.length > 0 %}
         <table class="govuk-table" data-module="govuk-table">
           <thead class="govuk-table__head">
@@ -101,7 +110,7 @@
               <th scope="col" class="govuk-table__header">Type</th>
               <th scope="col" class="govuk-table__header">Delegated Functions</th>
               <th scope="col" class="govuk-table__header">Matter type</th>
-              <th scope="col" class="govuk-table__header">Actions</th>
+              {% if not consolidated %}<th scope="col" class="govuk-table__header">Actions</th>{% endif %}
             </tr>
           </thead>
           <tbody class="govuk-table__body">
@@ -128,15 +137,20 @@
                 <td class="govuk-table__cell">
                   <strong>{{ app.matterType.title }}</strong><br>{{ app.matterType.subtext }}
                 </td>
-                <td class="govuk-table__cell">
+                {% if not consolidated %}<td class="govuk-table__cell">
                   <a href="/v6/reassign?reference={{ app.ref }}" class="govuk-link">Reassign</a>
-                </td>
+                </td>{% endif %}
               </tr>
             {% endfor %}
           </tbody>
         </table>
       {% else %}
-        <p class="govuk-body">You have no applications in your list.</p>
+        {% if consolidated %}
+          <h2 class="govuk-heading-m">You currently have no cases in your list.</h2>
+          <p class="govuk-body">View open applications to add cases to your list.</p>
+        {% else %}
+          <p class="govuk-body">You have no applications in your list.</p>
+        {% endif %}
       {% endif %}
 
     </div>

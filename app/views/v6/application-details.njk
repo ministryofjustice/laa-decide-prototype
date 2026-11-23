@@ -188,8 +188,10 @@
 
       {% if sessionData['decision-reference'] !== reference %}
         {% if isAssigned %}
+          {% if sessionData['consolidated-v6'] !== true %}
           <a href="/v6/reassign?reference={{ reference }}&isPriorAuthority={{ application.isPriorAuthority and 'true' or 'false' }}" class="govuk-button{% if sessionData['consolidated-v6'] !== true %} govuk-button--secondary{% endif %} govuk-!-margin-bottom-8" data-module="govuk-button" style="background-color: #00703c; color: white;">Reassign</a>
-        {% elif not hasDecision %}
+          {% endif %}
+        {% elif not hasDecision and not isAssignedToColleague %}
           <form id="addToListForm" style="display: inline;">
             <input type="hidden" name="reference" value="{{ reference }}">
             <input type="hidden" name="isPriorAuthority" value="{{ application.isPriorAuthority and 'true' or 'false' }}">
@@ -241,10 +243,13 @@
                   
                   toastContainer.appendChild(toast);
 
-                  // Stay on this page and switch CTA to Reassign once added.
                   const form = document.getElementById('addToListForm');
                   if (form) {
+                    {% if sessionData['consolidated-v6'] === true %}
+                    form.remove();
+                    {% else %}
                     form.outerHTML = '<a href="/v6/reassign?reference=' + encodeURIComponent(reference) + '&isPriorAuthority=' + encodeURIComponent(isPriorAuthority) + '" class="govuk-button{% if sessionData['consolidated-v6'] !== true %} govuk-button--secondary{% endif %} govuk-!-margin-bottom-8" data-module="govuk-button" style="background-color: #00703c; color: white;">Reassign</a>';
+                    {% endif %}
                   }
 
                   const assignedCaseworker = document.getElementById('assigned-caseworker');
@@ -557,7 +562,7 @@
           </div>
         </div>
 
-        {% if not hasDecision %}
+        {% if not hasDecision and not isAssignedToColleague %}
           <div class="govuk-!-margin-top-8" id="make-decision-container"{% if not isInitialApplicationAssigned %} hidden{% endif %}>
             {{ govukButton({
               text: "Make a decision",

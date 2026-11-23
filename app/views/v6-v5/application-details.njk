@@ -162,7 +162,7 @@
         <strong>Assigned to:</strong> Caseworker name
       </p>
       <p class="govuk-body govuk-!-margin-bottom-6">
-        <strong>Date received:</strong> {{ ('14 July 2026' if viewingRedetermination else '1 July 2026') if reference == 'M-MDDT-WBYS' else '19 May 2023' }}
+        <strong>Date received:</strong> {% if reference == 'L-YU5-UY3' %}{{ '23 November 2026 (mock date)' if viewingRedetermination else 'Not supplied' }}{% else %}{{ ('14 July 2026' if viewingRedetermination else '1 July 2026') if reference == 'M-MDDT-WBYS' else '19 May 2023' }}{% endif %}
       </p>
 
       {% if pendingRedeterminationCount > 0 %}
@@ -324,7 +324,7 @@
             <dl class="govuk-summary-list">
               <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">Client role</dt>
-                <dd class="govuk-summary-list__value">Respondent</dd>
+                <dd class="govuk-summary-list__value">{{ 'Not supplied' if reference == 'L-YU5-UY3' else 'Respondent' }}</dd>
               </div>
               <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">Delegated functions</dt>
@@ -336,14 +336,16 @@
                   {% elif reference and 'N-J5S' in reference %}
                     15 Nov 2025
                   {% else %}
-                    {{ '1 July 2026' if reference == 'M-MDDT-WBYS' else '05 Sept 2025' }}
+                    {{ 'Not supplied' if reference == 'L-YU5-UY3' else ('1 July 2026' if reference == 'M-MDDT-WBYS' else '05 Sept 2025') }}
                   {% endif %}
                 </dd>
               </div>
               <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">Substantive level of service</dt>
                 <dd class="govuk-summary-list__value">
-                  {% if reference and 'L-12Z' in reference %}
+                  {% if reference == 'L-YU5-UY3' %}
+                    Not supplied
+                  {% elif reference and 'L-12Z' in reference %}
                     Limited representation
                   {% elif reference and 'L-W1X' in reference %}
                     Full representation
@@ -357,7 +359,9 @@
               <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">Substantive scope limitations</dt>
                 <dd class="govuk-summary-list__value">
-                  {% if reference and 'L-12Z' in reference %}
+                  {% if reference == 'L-YU5-UY3' %}
+                    Not supplied
+                  {% elif reference and 'L-12Z' in reference %}
                     Mediation<br><br>
                     Limited to mediation and any action necessary to settle the dispute.
                   {% elif reference and 'L-W1X' in reference %}
@@ -376,6 +380,7 @@
           </div>
         </div>
 
+        {% if reference != 'L-YU5-UY3' %}
         <div class="govuk-summary-card govuk-!-margin-bottom-6">
           <div class="govuk-summary-card__title-wrapper" style="background-color: #f3f2f1; padding: 15px;">
             <h2 class="govuk-summary-card__title govuk-heading-s govuk-!-margin-bottom-0">Supervision order</h2>
@@ -446,6 +451,7 @@
           </div>
         </div>
 
+        {% endif %}
         {% if amendmentRequestType and amendmentRequestType != 'Add proceedings' %}
           <h2 class="govuk-heading-m govuk-!-margin-top-8">{{ amendmentRequestType }}</h2>
           <div class="govuk-inset-text">This is an illustrative request for user research. Assessment of this request type is not available in this prototype.</div>
@@ -486,14 +492,22 @@
                     <dt class="govuk-summary-list__key">Client role</dt>
                     <dd class="govuk-summary-list__value">{{ redetermination.redeterminationClientRole or 'Applicant' }}</dd>
                   </div>
+                  {% if redetermination.applicationType %}
+                  <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">Application type</dt>
+                    <dd class="govuk-summary-list__value">{{ redetermination.applicationType }}</dd>
+                  </div>
+                  {% endif %}
                   <div class="govuk-summary-list__row">
                     <dt class="govuk-summary-list__key">Substantive level of service</dt>
-                    <dd class="govuk-summary-list__value">{{ redetermination.newProceedingDetails.levelOfService if groupedRedeterminationFlow and redetermination.newProceedingDetails else 'Full representation' }}</dd>
+                    <dd class="govuk-summary-list__value">{{ redetermination.newProceedingDetails.levelOfService if groupedRedeterminationFlow and redetermination.newProceedingDetails else (redetermination.levelOfService or 'Full representation') }}</dd>
                   </div>
                   <div class="govuk-summary-list__row">
                     <dt class="govuk-summary-list__key">Substantive scope limitations</dt>
                     {% if groupedRedeterminationFlow and redetermination.newProceedingDetails %}
                       <dd class="govuk-summary-list__value" style="white-space: pre-line;">{{ redetermination.newProceedingDetails.scopeLimitations }}</dd>
+                    {% elif redetermination.scopeLimitations %}
+                      <dd class="govuk-summary-list__value" style="white-space: pre-line;">{{ redetermination.scopeLimitations }}</dd>
                     {% else %}
                     <dd class="govuk-summary-list__value">Final Hearing<br><br>To be represented on all steps up to and including a final hearing.</dd>
                     {% endif %}
@@ -570,18 +584,22 @@
                 </div>
                 {% if redeterminationAdditionalDetails.finalOrderMade == 'Yes' %}
                   {% for finalOrder in redeterminationAdditionalDetails.providerAnswers.finalOrderDetails %}
+                    {% if finalOrder.proceedingName %}
                     <div class="govuk-summary-list__row">
                       <dt class="govuk-summary-list__key">Final order: Proceeding</dt>
                       <dd class="govuk-summary-list__value">{{ finalOrder.proceedingName }}</dd>
                     </div>
+                    {% endif %}
                     <div class="govuk-summary-list__row">
                       <dt class="govuk-summary-list__key">Final order: Date</dt>
                       <dd class="govuk-summary-list__value">{{ finalOrder.date }}</dd>
                     </div>
+                    {% if finalOrder.outcome %}
                     <div class="govuk-summary-list__row">
                       <dt class="govuk-summary-list__key">Final order: Outcome</dt>
                       <dd class="govuk-summary-list__value">{{ finalOrder.outcome }}</dd>
                     </div>
+                    {% endif %}
                   {% endfor %}
                 {% endif %}
                 <div class="govuk-summary-list__row">
@@ -589,11 +607,11 @@
                   <dd class="govuk-summary-list__value">{{ redeterminationAdditionalDetails.providerAnswers.changesSinceDecision }}</dd>
                 </div>
                 <div class="govuk-summary-list__row">
-                  <dt class="govuk-summary-list__key">What remains in dispute and why is representation needed?</dt>
+                  <dt class="govuk-summary-list__key">{{ 'Why is representation required?' if reference == 'L-YU5-UY3' else 'What remains in dispute and why is representation needed?' }}</dt>
                   <dd class="govuk-summary-list__value">{{ redeterminationAdditionalDetails.providerAnswers.dispute }}</dd>
                 </div>
                 <div class="govuk-summary-list__row">
-                  <dt class="govuk-summary-list__key">What is your client seeking?</dt>
+                  <dt class="govuk-summary-list__key">{{ 'What is your client seeking to achieve?' if reference == 'L-YU5-UY3' else 'What is your client seeking?' }}</dt>
                   <dd class="govuk-summary-list__value">{{ redeterminationAdditionalDetails.providerAnswers.clientSeeking }}</dd>
                 </div>
               </dl>
@@ -614,8 +632,13 @@
                 </thead>
                 <tbody class="govuk-table__body">
                   <tr class="govuk-table__row">
+                    {% if reference == 'L-YU5-UY3' %}
+                    <td class="govuk-table__cell">Proceeding evidence</td>
+                    <td class="govuk-table__cell">ProceedingEvidence.pdf<br>Mock reference only; document not supplied</td>
+                    {% else %}
                     <td class="govuk-table__cell">Statement of case</td>
                     <td class="govuk-table__cell"><a class="govuk-link" href="{{ '/v6-v5/testing-scenario/statement' if reference == 'M-MDDT-WBYS' else '/public/downloads/statement-of-case.pdf' }}">{{ 'Updated statement of case (mock document)' if reference == 'M-MDDT-WBYS' else 'statement-of-case.pdf' }}</a><br>14 July 2026</td>
+                    {% endif %}
                   </tr>
                 </tbody>
               </table>
@@ -667,7 +690,7 @@
             <dl class="govuk-summary-list">
               <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">Substantive certificate</dt>
-                <dd class="govuk-summary-list__value">£25,000</dd>
+                <dd class="govuk-summary-list__value">{{ 'Not supplied' if reference == 'L-YU5-UY3' else '£25,000' }}</dd>
               </div>
             </dl>
           </div>
@@ -688,6 +711,12 @@
                 </tr>
               </thead>
               <tbody class="govuk-table__body">
+                {% if reference == 'L-YU5-UY3' %}
+                <tr class="govuk-table__row">
+                  <td class="govuk-table__cell">Initial application evidence</td>
+                  <td class="govuk-table__cell">Not supplied in the walkthrough</td>
+                </tr>
+                {% else %}
                 <tr class="govuk-table__row">
                   <td class="govuk-table__cell">Merits report</td>
                   <td class="govuk-table__cell">
@@ -708,6 +737,7 @@
                     14 July 2024
                   </td>
                 </tr>
+                {% endif %}
               </tbody>
             </table>
           </div>
@@ -761,10 +791,12 @@
         {% if application.children and application.children.length > 0 %}
           {% set childrenRows = [
             { key: { text: "Child 1 name" }, value: { text: application.children[0].name }, actions: { items: [{ href: "/v6-v5/change/" ~ reference ~ "/child-name", text: "Change" }] } },
-            { key: { text: "Child 1 date of birth" }, value: { text: application.children[0].dob }, actions: { items: [{ href: "/v6-v5/change/" ~ reference ~ "/child-1-dob", text: "Change" }] } },
-            { key: { text: "Child 2 name" }, value: { text: application.children[1].name }, actions: { items: [{ href: "/v6-v5/change/" ~ reference ~ "/child-2-name", text: "Change" }] } },
-            { key: { text: "Child 2 date of birth" }, value: { text: application.children[1].dob }, actions: { items: [{ href: "/v6-v5/change/" ~ reference ~ "/child-2-dob", text: "Change" }] } }
+            { key: { text: "Child 1 date of birth" }, value: { text: application.children[0].dob }, actions: { items: [{ href: "/v6-v5/change/" ~ reference ~ "/child-1-dob", text: "Change" }] } }
           ] %}
+          {% if application.children.length > 1 %}
+            {% set childrenRows = (childrenRows.push({ key: { text: "Child 2 name" }, value: { text: application.children[1].name }, actions: { items: [{ href: "/v6-v5/change/" ~ reference ~ "/child-2-name", text: "Change" }] } }), childrenRows) %}
+            {% set childrenRows = (childrenRows.push({ key: { text: "Child 2 date of birth" }, value: { text: application.children[1].dob }, actions: { items: [{ href: "/v6-v5/change/" ~ reference ~ "/child-2-dob", text: "Change" }] } }), childrenRows) %}
+          {% endif %}
         {% endif %}
 
         {{ govukSummaryList({

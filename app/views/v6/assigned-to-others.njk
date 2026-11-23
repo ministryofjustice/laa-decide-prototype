@@ -1,0 +1,179 @@
+{% extends "v6/my-applications.html" %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+
+{% block head %}
+  {{ super() }}
+  <style>
+    .colleague-autocomplete { position: relative; width: 100%; max-width: 600px; }
+    .colleague-suggestions { position: absolute; z-index: 10; box-sizing: border-box; width: 100%; max-height: 16em; overflow-y: auto; margin: 0; padding: 0; border: 2px solid #0b0c0c; background: #fff; list-style: none; }
+    .colleague-suggestions[hidden] { display: none; }
+    .colleague-suggestions__option { padding: 10px; cursor: pointer; }
+    .colleague-suggestions__option:hover, .colleague-suggestions__option[aria-selected="true"] { background: #1d70b8; color: #fff; }
+    .assign-to-me { border: 0; background: none; padding: 0; color: #1d70b8; cursor: pointer; font: inherit; text-decoration: underline; white-space: nowrap; }
+    .assign-to-me:hover { color: #003078; }
+    .assign-to-me:focus { color: #0b0c0c; }
+  </style>
+{% endblock %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full" style="width: 70%;">
+      {% if success %}
+        <div class="govuk-notification-banner govuk-notification-banner--success" role="alert" aria-labelledby="assignment-success-title" data-module="govuk-notification-banner">
+          <div class="govuk-notification-banner__header">
+            <h2 class="govuk-notification-banner__title" id="assignment-success-title">Success</h2>
+          </div>
+          <div class="govuk-notification-banner__content">
+            <p class="govuk-notification-banner__heading">You assigned this application {{ success.reference }} to your work list.</p>
+            <p class="govuk-body">This application has been removed from {{ success.colleague }}'s list.</p>
+          </div>
+        </div>
+      {% endif %}
+
+      <h1 class="govuk-heading-xl">{{ pageTitle }}</h1>
+      <nav class="moj-sub-navigation" aria-label="Work lists">
+        <ul class="moj-sub-navigation__list">
+          <li class="moj-sub-navigation__item"><a class="moj-sub-navigation__link" href="/v6/yourlist">Your list</a></li>
+          <li class="moj-sub-navigation__item"><a class="moj-sub-navigation__link" aria-current="page" href="/v6/assigned-to-others">Assigned to others</a></li>
+        </ul>
+      </nav>
+
+      {% if error %}
+        {{ govukErrorSummary({ titleText: "There is a problem", errorList: [{ text: error, href: "#caseworker" }] }) }}
+      {% endif %}
+      <form method="get" action="/v6/assigned-to-others">
+        <div class="govuk-form-group{% if error %} govuk-form-group--error{% endif %}">
+          <h2 class="govuk-heading-s">Search by caseworker name or email</h2>
+          <label class="govuk-label" for="caseworker">Caseworker details</label>
+          <div id="caseworker-hint" class="govuk-hint">Enter caseworker name or email address</div>
+          {% if error %}<p id="caseworker-error" class="govuk-error-message"><span class="govuk-visually-hidden">Error:</span> {{ error }}</p>{% endif %}
+          <div class="colleague-autocomplete">
+            <input class="govuk-input{% if error %} govuk-input--error{% endif %}" id="caseworker" name="caseworker" type="text" value="{{ query }}" autocomplete="off" aria-describedby="caseworker-hint{% if error %} caseworker-error{% endif %}">
+            <ul id="caseworker-suggestions" class="colleague-suggestions govuk-body" role="listbox" aria-label="Matching caseworkers" hidden></ul>
+            <span id="caseworker-results" class="govuk-visually-hidden" role="status" aria-live="polite"></span>
+          </div>
+          <select id="caseworker-options" hidden tabindex="-1" aria-hidden="true">
+            {% for person in colleagues %}<option value="{{ person.name }} - {{ person.email }}">{{ person.name }} - {{ person.email }}</option>{% endfor %}
+          </select>
+        </div>
+        <noscript>{{ govukButton({ text: "Search" }) }}</noscript>
+      </form>
+
+      {% if colleague %}
+        {% if applications.length %}
+          <table class="govuk-table">
+            <thead class="govuk-table__head">
+              <tr class="govuk-table__row">
+                <th scope="col" class="govuk-table__header">Reference</th>
+                <th scope="col" class="govuk-table__header">Submitted</th>
+                <th scope="col" class="govuk-table__header">Type</th>
+                <th scope="col" class="govuk-table__header">Delegated functions</th>
+                <th scope="col" class="govuk-table__header">Matter type</th>
+                <th scope="col" class="govuk-table__header">Action</th>
+              </tr>
+            </thead>
+            <tbody class="govuk-table__body">
+              {% for app in applications %}
+                <tr class="govuk-table__row">
+                  <td class="govuk-table__cell"><a class="govuk-link" href="/v6/application/{{ app.ref }}{% if app.isPriorAuthority %}?isPriorAuthority=true#prior-authority{% endif %}">{{ app.ref }}</a></td>
+                  <td class="govuk-table__cell">{{ app.submitted }}</td>
+                  <td class="govuk-table__cell">{% if app.isPriorAuthority %}Prior authority<br><strong>{{ app.priorAuthorityType }}</strong>{% else %}{{ app.type }}{% endif %}</td>
+                  <td class="govuk-table__cell">{{ app.delegatedFunctions }}</td>
+                  <td class="govuk-table__cell"><strong>{{ app.matterType.title }}</strong><br>{{ app.matterType.subtext }}</td>
+                  <td class="govuk-table__cell">
+                    <form method="post" action="/v6/assigned-to-others/assign">
+                      <input type="hidden" name="reference" value="{{ app.ref }}">
+                      <input type="hidden" name="isPriorAuthority" value="{{ 'true' if app.isPriorAuthority else 'false' }}">
+                      <input type="hidden" name="caseworker" value="{{ colleague.name }}">
+                      <button type="submit" class="govuk-link assign-to-me">Assign to me<span class="govuk-visually-hidden"> {{ app.ref }}</span></button>
+                    </form>
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        {% else %}
+          <h2 class="govuk-heading-m">There are currently no cases in this list.</h2>
+        {% endif %}
+      {% endif %}
+    </div>
+  </div>
+{% endblock %}
+
+{% block bodyEnd %}
+  {{ super() }}
+  <script>
+    const caseworkerInput = document.getElementById('caseworker');
+    const suggestions = document.getElementById('caseworker-suggestions');
+    const results = document.getElementById('caseworker-results');
+    const options = Array.from(document.querySelectorAll('#caseworker-options option'), option => option.value);
+    let activeIndex = -1;
+
+    caseworkerInput.setAttribute('role', 'combobox');
+    caseworkerInput.setAttribute('aria-autocomplete', 'list');
+    caseworkerInput.setAttribute('aria-controls', suggestions.id);
+    caseworkerInput.setAttribute('aria-expanded', 'false');
+
+    function closeSuggestions() {
+      suggestions.hidden = true;
+      caseworkerInput.setAttribute('aria-expanded', 'false');
+      caseworkerInput.removeAttribute('aria-activedescendant');
+      activeIndex = -1;
+    }
+
+    function chooseCaseworker(value) {
+      caseworkerInput.value = value;
+      closeSuggestions();
+      caseworkerInput.form.requestSubmit();
+    }
+
+    function showSuggestions() {
+      suggestions.replaceChildren();
+      caseworkerInput.removeAttribute('aria-activedescendant');
+      activeIndex = -1;
+      const query = caseworkerInput.value.trim().toLowerCase();
+      if (!query) {
+        results.textContent = '';
+        closeSuggestions();
+        return;
+      }
+      const matches = options.filter(option => option.toLowerCase().includes(query));
+      matches.forEach((value, index) => {
+        const item = document.createElement('li');
+        item.id = 'caseworker-suggestion-' + index;
+        item.className = 'colleague-suggestions__option';
+        item.setAttribute('role', 'option');
+        item.setAttribute('aria-selected', 'false');
+        item.textContent = value;
+        item.addEventListener('mousedown', event => event.preventDefault());
+        item.addEventListener('click', () => chooseCaseworker(value));
+        suggestions.appendChild(item);
+      });
+      suggestions.hidden = matches.length === 0;
+      caseworkerInput.setAttribute('aria-expanded', String(matches.length > 0));
+      results.textContent = matches.length ? matches.length + ' matching caseworker' + (matches.length === 1 ? '' : 's') + ' available.' : 'No matching caseworkers.';
+    }
+
+    caseworkerInput.addEventListener('input', showSuggestions);
+    caseworkerInput.addEventListener('focus', showSuggestions);
+    caseworkerInput.addEventListener('blur', closeSuggestions);
+    caseworkerInput.addEventListener('keydown', event => {
+      if (event.key === 'Escape') {
+        closeSuggestions();
+      } else if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+        if (suggestions.hidden) showSuggestions();
+        const items = Array.from(suggestions.children);
+        if (!items.length) return;
+        event.preventDefault();
+        activeIndex = activeIndex < 0 ? (event.key === 'ArrowDown' ? 0 : items.length - 1)
+          : (activeIndex + (event.key === 'ArrowDown' ? 1 : -1) + items.length) % items.length;
+        items.forEach((item, index) => item.setAttribute('aria-selected', String(index === activeIndex)));
+        caseworkerInput.setAttribute('aria-activedescendant', items[activeIndex].id);
+        items[activeIndex].scrollIntoView({ block: 'nearest' });
+      } else if (event.key === 'Enter' && !suggestions.hidden && activeIndex >= 0) {
+        event.preventDefault();
+        chooseCaseworker(suggestions.children[activeIndex].textContent);
+      }
+    });
+  </script>
+{% endblock %}

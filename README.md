@@ -44,6 +44,20 @@ third using the existing journey. No decisions, refusal reasons or replacement
 proceeding are preselected. The same session persistence, post-completion search
 and fresh-session reset rules apply.
 
+`L-YU5-UY3` is the Louise Bevan add-proceedings scenario, with Contact with a
+child in care and Secure accommodation order requests. The free-text
+justifications are mock answers based on the walkthrough; the evidence file was
+not supplied and is shown as a mock reference only. The submission date is a
+mock date.
+The same session persistence and fresh-session reset rules apply.
+
+In the stakeholder consolidated view, Your list includes an Assigned to others
+tab. Search the mock caseworkers by name or email to view their example cases
+and assign a case to your own list. Transfers and list contents persist in the
+prototype session; a fresh session restores the example colleague lists.
+Cases assigned to colleagues also appear in Search with their caseworker. They
+are view-only until transferred to Your list.
+
 ## Deployment
 
 Signing out of the stakeholder or Version 2-5 prototype clears prototype access

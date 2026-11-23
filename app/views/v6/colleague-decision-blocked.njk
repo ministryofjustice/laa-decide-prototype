@@ -1,0 +1,12 @@
+{% extends "v6/my-applications.html" %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      <h1 class="govuk-heading-l">This case is assigned to {{ colleague }}</h1>
+      <p class="govuk-body">You cannot make a decision until the case is assigned to your list.</p>
+      <p class="govuk-body">Go to <a class="govuk-link" href="/v6/assigned-to-others">Assigned to others</a> to find the caseworker's list and assign the case to yourself.</p>
+      <p class="govuk-body"><a class="govuk-link" href="/v6/application/{{ reference }}{% if isPriorAuthority %}?isPriorAuthority=true#prior-authority{% endif %}">Return to application {{ reference }}</a></p>
+    </div>
+  </div>
+{% endblock %}

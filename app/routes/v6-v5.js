@@ -2946,8 +2946,8 @@ router.get('/application/:reference/redeterminations/proceeding/:index/edit', fu
       proceedingName: savedEdit.proceedingName || reviewAnswer?.proceedingName || '',
       clientRole: savedEdit.clientRole || reviewAnswer?.clientRole || '',
       changeExplanation: savedEdit.changeExplanation || '',
-      scopeLimitations: savedEdit.scopeLimitations || request.newProceedingDetails?.scopeLimitations || 'Final Hearing\n\nTo be represented on all steps up to and including a final hearing.',
-      levelOfService: savedEdit.levelOfService || request.newProceedingDetails?.levelOfService || 'Full representation'
+      scopeLimitations: savedEdit.scopeLimitations || request.newProceedingDetails?.scopeLimitations || request.scopeLimitations || 'Final Hearing\n\nTo be represented on all steps up to and including a final hearing.',
+      levelOfService: savedEdit.levelOfService || request.newProceedingDetails?.levelOfService || request.levelOfService || 'Full representation'
     },
     errors: []
   });
@@ -3151,8 +3151,8 @@ router.post('/application/:reference/redeterminations/decision', function(req, r
       proceedingName,
       clientRole,
       changeExplanation: proceedingEdit.changeExplanation || previousAnswer?.changeExplanation || '',
-      scopeLimitations: proceedingEdit.scopeLimitations || previousAnswer?.scopeLimitations || request.newProceedingDetails?.scopeLimitations || 'Final Hearing\n\nTo be represented on all steps up to and including a final hearing.',
-      levelOfService: proceedingEdit.levelOfService || previousAnswer?.levelOfService || request.newProceedingDetails?.levelOfService || 'Full representation',
+      scopeLimitations: proceedingEdit.scopeLimitations || previousAnswer?.scopeLimitations || request.newProceedingDetails?.scopeLimitations || request.scopeLimitations || 'Final Hearing\n\nTo be represented on all steps up to and including a final hearing.',
+      levelOfService: proceedingEdit.levelOfService || previousAnswer?.levelOfService || request.newProceedingDetails?.levelOfService || request.levelOfService || 'Full representation',
       refusalReason: '',
       ...getProceedingExplanation(req.body, request.index, decision, proceedingName, errors),
       ...(grantDate ? grantDate.values : {})
@@ -3999,14 +3999,14 @@ router.get('/application/:reference', function(req, res) {
           answer.redeterminationId === redetermination.redeterminationId
           && answer.proceedingName === redetermination.redeterminationProceeding
         ));
-      if (!answersMatchProceedings) {
+      if (!answersMatchProceedings && !providerAnswersByReference[reference].preserveSubmittedAnswers) {
         providerAnswersByReference[reference].proceedingAnswers = createMockProceedingAnswers(redeterminations);
       }
     }
     const providerAnswers = providerAnswersByReference[reference];
     const proceedingNames = [...new Set(redeterminations.map(request => request.redeterminationProceeding))].sort();
     const justificationProceedings = JSON.stringify(proceedingNames);
-    if (providerAnswers.justificationProceedings !== justificationProceedings) {
+    if (!providerAnswers.preserveSubmittedAnswers && providerAnswers.justificationProceedings !== justificationProceedings) {
       const scenario = providerAnswers.justificationScenario ?? Math.floor(Math.random() * 3);
       Object.assign(providerAnswers, createMockRequestJustification(redeterminations, scenario), {
         justificationScenario: scenario,
@@ -4073,20 +4073,20 @@ router.get('/application/:reference', function(req, res) {
     ...found,
     ref: reference,
     reference: reference,
-    niNumber: `JT${nameLen}15${nameLen}B`,
-    prevReference: `30000123${nameLen}`,
-    correspondenceAddress: found.correspondenceAddress || `${nameLen} Armitage house<br>108 petty France<br>London<br>SW2 8QT`,
-    homeAddress: found.homeAddress || `${nameLen * 2} Knightsbridge place<br>117A Russell Square<br>London<br>NW3 6BD`,
+    niNumber: reference === 'L-YU5-UY3' ? 'Not supplied' : `JT${nameLen}15${nameLen}B`,
+    prevReference: reference === 'L-YU5-UY3' ? 'Not supplied' : `30000123${nameLen}`,
+    correspondenceAddress: found.correspondenceAddress || (reference === 'L-YU5-UY3' ? 'Not supplied' : `${nameLen} Armitage house<br>108 petty France<br>London<br>SW2 8QT`),
+    homeAddress: found.homeAddress || (reference === 'L-YU5-UY3' ? 'Not supplied' : `${nameLen * 2} Knightsbridge place<br>117A Russell Square<br>London<br>NW3 6BD`),
     opponentName: found.opponentName || `${found.lastName} city council`,
     children: found.children || [
       { name: `Kaylynn ${found.lastName}`, dob: `20 Dec 202${nameLen % 9}` },
       { name: `Gustavo ${found.lastName}`, dob: `15 Jan 202${(nameLen + 1) % 9}` }
     ],
-    isBioParent: nameLen % 2 === 0 ? 'Yes' : 'No',
+    isBioParent: reference === 'L-YU5-UY3' ? 'Not supplied' : nameLen % 2 === 0 ? 'Yes' : 'No',
     providerFirm: found.firm ? found.firm.split('<br>')[0] : 'Gray and associations at law',
-    providerAccount: found.firm && found.firm.includes('<br>') ? found.firm.split('<br>')[1] : 'OK514R',
-    providerAddress: `${nameLen} Liverpool Road<br>Manchester<br>MW2 5WT`,
-    providerPhone: `0712345678${nameLen % 9}`
+    providerAccount: found.firm && found.firm.includes('<br>') ? found.firm.split('<br>')[1] : reference === 'L-YU5-UY3' ? 'Not supplied' : 'OK514R',
+    providerAddress: reference === 'L-YU5-UY3' ? 'Not supplied' : `${nameLen} Liverpool Road<br>Manchester<br>MW2 5WT`,
+    providerPhone: reference === 'L-YU5-UY3' ? 'Not supplied' : `0712345678${nameLen % 9}`
   };
 
   // Initialize history with initial application received entry if it doesn't exist

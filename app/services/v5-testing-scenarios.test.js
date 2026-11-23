@@ -9,10 +9,62 @@ test('removes random request classifications from fixed scenarios without changi
     'M-MDDT-WBYS': 'Increase cost limit',
     'L-VXQO-YZBU': 'Increase scope limitation',
     'Y-HCMT-YBYZ': 'Increase cost limit',
+    'L-YU5-UY3': 'Increase scope limitation',
     'OTHER-REFERENCE': 'Increase cost limit'
   } };
   ensureTestingScenarios(data);
   assert.deepEqual(data['mock-request-types'], { 'OTHER-REFERENCE': 'Increase cost limit' });
+});
+
+test('Louise Bevan scenario retains the supplied provider answers and session progress', () => {
+  const data = {};
+  const reference = 'L-YU5-UY3';
+  ensureTestingScenarios(data);
+  const requests = data['open-applications-all'].filter(application => application.ref === reference);
+  assert.deepEqual(requests.map(request => request.redeterminationProceeding), ['Contact with a child in care', 'Secure accommodation order']);
+  assert.deepEqual(requests.map(request => request.redeterminationClientRole), ['Applicant', 'Child subject of proceedings']);
+  assert.ok(requests.every(request => request.status === undefined && request.applicationType === 'Substantive'));
+  const answers = data['redetermination-provider-answers-v4'][reference];
+  assert.equal(answers.finalOrderMade, 'Yes');
+  assert.deepEqual(answers.finalOrderDetails, [{ date: '23 November 2026' }]);
+  assert.equal(answers.proceedingAnswers[0].heardTogether, 'No');
+  assert.equal(answers.proceedingAnswers[0].heardAsAlternative, 'No');
+  assert.equal(answers.proceedingAnswers[1].childSubjectOfSecureAccommodation, 'Yes');
+  assert.equal(answers.proceedingAnswers[1].proceedingIssued, 'Yes');
+  const justifications = [answers.changesSinceDecision, answers.dispute, answers.clientSeeking];
+  assert.ok(justifications.every(answer => answer.length > 0 && answer.length <= 250));
+  assert.match(answers.changesSinceDecision, /contact.*mother.*secure accommodation/i);
+  assert.match(answers.dispute, /representation.*contact.*secure accommodation/i);
+  assert.match(answers.clientSeeking, /contact.*mother.*secure accommodation/i);
+  const original = JSON.parse(JSON.stringify(data));
+  ensureTestingScenarios(data);
+  assert.deepEqual(data, original);
+  data['assigned-applications'] = requests;
+  data['open-applications-all'] = data['open-applications-all'].filter(app => app.ref !== reference);
+  data['app-history'][reference].push({ action: 'Note added', details: 'Research note' });
+  ensureTestingScenarios(data);
+  assert.equal(data['open-applications-all'].filter(app => app.ref === reference).length, 0);
+  assert.equal(data['app-history'][reference].at(-1).details, 'Research note');
+  data['assigned-applications'] = [];
+  data['grouped-redetermination-completed'] = { [reference]: true };
+  ensureTestingScenarios(data);
+  assert.equal(data['open-applications-all'].filter(app => app.ref === reference).length, 0);
+  const fresh = {};
+  ensureTestingScenarios(fresh);
+  assert.equal(fresh['open-applications-all'].filter(app => app.ref === reference).length, 2);
+});
+
+test('updates old Louise placeholders without overwriting existing session answers', () => {
+  const data = {};
+  ensureTestingScenarios(data);
+  const answers = data['redetermination-provider-answers-v4']['L-YU5-UY3'];
+  answers.changesSinceDecision = 'Not supplied in the walkthrough';
+  answers.dispute = 'A session-specific answer';
+  answers.clientSeeking = 'Not supplied in the walkthrough';
+  ensureTestingScenarios(data);
+  assert.match(answers.changesSinceDecision, /contact.*mother.*secure accommodation/i);
+  assert.equal(answers.dispute, 'A session-specific answer');
+  assert.match(answers.clientSeeking, /contact.*mother.*secure accommodation/i);
 });
 
 test('creates a repeatable scenario with two requests and an earlier initial grant', () => {

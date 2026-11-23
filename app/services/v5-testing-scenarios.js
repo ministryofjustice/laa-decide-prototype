@@ -1,9 +1,14 @@
 const REFERENCE = 'M-MDDT-WBYS';
-const references = [REFERENCE, 'L-VXQO-YZBU', 'Y-HCMT-YBYZ'];
+const references = [REFERENCE, 'L-VXQO-YZBU', 'Y-HCMT-YBYZ', 'L-YU5-UY3'];
 const PROCEEDINGS = [
   'Emergency protection order - extend',
   'Emergency protection order - discharge'
 ];
+const LOUISE_JUSTIFICATION = {
+  changesSinceDecision: "Since the previous decision, there is a disagreement about Louise's contact with her mother, and the local authority has applied for a secure accommodation order concerning Louise.",
+  dispute: "Louise needs representation to participate in the contact and secure accommodation proceedings, understand the local authority's application and put her wishes to the court.",
+  clientSeeking: 'Louise wants to maintain contact with her mother and have her wishes and circumstances considered by the court in the secure accommodation proceedings.'
+};
 
 function ensureTestingScenarios(data) {
   for (const reference of references) {
@@ -11,6 +16,7 @@ function ensureTestingScenarios(data) {
   }
   ensureChangeProceedingScenario(data);
   ensureMixedDecisionScenario(data);
+  ensureLouiseBevanScenario(data);
   const collections = ['open-applications-all', 'open-applications', 'assigned-applications', 'completed-applications'];
   data['open-applications-all'] = data['open-applications-all'] || [];
   data['completed-applications'] = data['completed-applications'] || [];
@@ -288,6 +294,103 @@ function ensureMixedDecisionScenario(data) {
         childrenCovered: name === 'Secure accommodation order' ? ['Charlie Patel'] : ['Charlie Patel', 'Ellis Patel']
       }))
     };
+  }
+}
+
+function ensureLouiseBevanScenario(data) {
+  const reference = 'L-YU5-UY3';
+  const proceedings = ['Contact with a child in care', 'Secure accommodation order'];
+  const applications = ['open-applications-all', 'open-applications', 'assigned-applications', 'completed-applications']
+    .flatMap(key => data[key] || []);
+  data['open-applications-all'] = data['open-applications-all'] || [];
+  data['completed-applications'] = data['completed-applications'] || [];
+  const client = {
+    ref: reference,
+    reference,
+    firstName: 'Louise',
+    lastName: 'Bevan',
+    dob: 'Not supplied (aged 15)',
+    firm: 'Not supplied',
+    opponentName: 'Local authority (name not supplied)',
+    children: [{ name: 'Louise Bevan', dob: 'Not supplied' }],
+    matterType: { title: 'Family', subtext: 'Special Children Act' },
+    isPriorAuthority: false
+  };
+  if (!applications.some(app => app.ref === reference && !app.isRedetermination && !app.isPriorAuthority)) {
+    data['completed-applications'].push({
+      ...client,
+      submitted: 'Not supplied',
+      type: 'Initial application',
+      delegatedFunctions: 'Not supplied',
+      status: 'Granted',
+      decisionType: 'Grant'
+    });
+  }
+  proceedings.forEach((proceeding, index) => {
+    const id = `${reference}-redetermination-${index + 1}`;
+    if (applications.some(app => app.redeterminationId === id)
+      || data['redetermination-decision-store']?.[`${reference}|${index}`]
+      || data['grouped-redetermination-completed']?.[reference]) return;
+    data['open-applications-all'].push({
+      ...client,
+      submitted: '23 Nov 2026',
+      type: 'Redetermination',
+      delegatedFunctions: 'N/A',
+      isRedetermination: true,
+      groupedRedeterminationFlow: true,
+      redeterminationType: 'Add a proceeding',
+      redeterminationId: id,
+      redeterminationOrder: index,
+      redeterminationProceeding: proceeding,
+      redeterminationClientRole: index === 0 ? 'Applicant' : 'Child subject of proceedings',
+      applicationType: 'Substantive',
+      levelOfService: 'Full representation',
+      scopeLimitations: 'Limited to all steps up to and including final hearing and any action necessary to implement (but not enforce) the order.',
+      redeterminationFinalOrderMade: 'Yes'
+    });
+  });
+  data['app-history'] = data['app-history'] || {};
+  if (!data['app-history'][reference]) {
+    data['app-history'][reference] = [
+      { timestamp: 'Date not supplied', action: 'Initial application granted', caseworker: 'Not supplied', details: 'Existing certificate covers ongoing care proceedings. Louise is described as subject to an interim care order.' },
+      { timestamp: '23 Nov 2026', action: 'Redetermination request received', caseworker: 'N/A', redeterminationId: `${reference}-grouped-redetermination-received`, redeterminationCount: 2, redeterminationType: 'Add a proceeding', details: 'Mock submission date. The provider requested Contact with a child in care and Secure accommodation order.' }
+    ];
+  }
+  data['generated-redetermination-history'] = data['generated-redetermination-history'] || {};
+  data['generated-redetermination-history'][reference] = true;
+  data['redetermination-provider-answers-v4'] = data['redetermination-provider-answers-v4'] || {};
+  if (!data['redetermination-provider-answers-v4'][reference]) {
+    data['redetermination-provider-answers-v4'][reference] = {
+      schemaVersion: 6,
+      preserveSubmittedAnswers: true,
+      parentalResponsibility: 'Not supplied',
+      finalOrderMade: 'Yes',
+      finalOrderDetails: [{ date: '23 November 2026' }],
+      justificationProceedings: JSON.stringify([...proceedings].sort()),
+      ...LOUISE_JUSTIFICATION,
+      proceedingAnswers: [
+        {
+          redeterminationId: `${reference}-redetermination-1`,
+          proceedingName: proceedings[0],
+          proceedingType: 'Related',
+          heardTogether: 'No',
+          heardAsAlternative: 'No',
+          childrenCovered: ['Louise Bevan']
+        },
+        {
+          redeterminationId: `${reference}-redetermination-2`,
+          proceedingName: proceedings[1],
+          proceedingType: 'Standalone',
+          childSubjectOfSecureAccommodation: 'Yes',
+          proceedingIssued: 'Yes',
+          childrenCovered: ['Louise Bevan']
+        }
+      ]
+    };
+  }
+  const answers = data['redetermination-provider-answers-v4'][reference];
+  for (const [key, value] of Object.entries(LOUISE_JUSTIFICATION)) {
+    if (answers[key] === 'Not supplied in the walkthrough') answers[key] = value;
   }
 }
 

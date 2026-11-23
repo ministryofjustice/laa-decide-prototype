@@ -6,6 +6,37 @@
 const govukPrototypeKit = require('govuk-prototype-kit')
 const router = govukPrototypeKit.requests.setupRouter()
 const { sortApplicationsBySubmittedDate } = require('../services/application.service')
+const { currentCaseworker, colleagues, ensureColleagueLists, findColleague } = require('../services/consolidated-colleague-lists')
+
+router.use(function(req, res, next) {
+  const data = req.session.data;
+  if (!data || data['consolidated-v6'] !== true) return next();
+  const initialDecisionPaths = [
+    '/decision-start', '/overall-decision', '/overall-decision-error', '/decision-check',
+    '/grant-certificate-date', '/grant-date-submit', '/refuse-reason', '/refuse-submit',
+    '/refuse-decision-submit', '/check-answers', '/check-answers-submit'
+  ];
+  let reference;
+  let isPriorAuthority = false;
+  if (initialDecisionPaths.includes(req.path)) {
+    reference = req.path === '/decision-start' ? req.query.ref : data['decision-reference'];
+  } else {
+    const assessment = req.path.match(/^\/(expert|counsel|disbursement)-assessment(?:\/|$)/);
+    if (!assessment) return next();
+    reference = req.query.reference || data[`${assessment[1]}-assessment-reference`];
+    isPriorAuthority = true;
+  }
+  if (!reference) return next();
+  ensureColleagueLists(data);
+  const colleagueApplication = data['consolidated-colleague-applications-v6'].find(app =>
+    app.ref === reference && Boolean(app.isPriorAuthority) === isPriorAuthority);
+  if (!colleagueApplication) return next();
+  res.status(403).render('v6/colleague-decision-blocked.njk', {
+    reference,
+    colleague: colleagueApplication.caseworker,
+    isPriorAuthority
+  });
+});
 
 // Helper function to restore decision data to an application
 function restoreDecisionData(application, decisionStore) {
@@ -635,7 +666,8 @@ function applicationsForReference(req, reference) {
     req.session.data['completed-applications'] || [],
     req.session.data['open-applications'] || [],
     req.session.data['open-applications-all'] || [],
-    req.session.data['consolidated-extra-initial-applications-v6'] || []
+    req.session.data['consolidated-extra-initial-applications-v6'] || [],
+    ...(req.session.data['consolidated-v6'] === true ? [req.session.data['consolidated-colleague-applications-v6'] || []] : [])
   ];
   return collections.flat().filter(application => application && application.ref === reference);
 }
@@ -1779,6 +1811,7 @@ router.get('/yourlist', function(req, res) {
   
   res.render('v6/my-applications.html', { 
     pageTitle: 'Your list',
+    consolidated: req.session.data['consolidated-v6'] === true,
     applications: req.session.data['assigned-applications'],
     reassigned: reassigned,
     reassignedTo: reassignedTo,
@@ -1786,7 +1819,65 @@ router.get('/yourlist', function(req, res) {
   });
 });
 
+router.get('/assigned-to-others', function(req, res) {
+  if (req.session.data['consolidated-v6'] !== true) return res.status(404).send('Page not found');
+  ensureColleagueLists(req.session.data);
+  const query = String(req.query.caseworker || '').trim();
+  const colleague = findColleague(query);
+  const success = req.session.data['consolidated-colleague-assignment-success'];
+  delete req.session.data['consolidated-colleague-assignment-success'];
+  res.render('v6/assigned-to-others.njk', {
+    pageTitle: colleague ? `${colleague.name}'s list` : 'Search other work list',
+    colleagues,
+    colleague,
+    query,
+    error: query && !colleague ? 'Select a caseworker from the list' : null,
+    applications: colleague ? sortApplicationsBySubmittedDate(req.session.data['consolidated-colleague-applications-v6'].filter(app => app.caseworker === colleague.name)) : [],
+    success: success && colleague && success.colleague === colleague.name ? success : null
+  });
+});
+
+router.post('/assigned-to-others/assign', function(req, res) {
+  if (req.session.data['consolidated-v6'] !== true) return res.status(404).send('Page not found');
+  ensureColleagueLists(req.session.data);
+  const colleague = findColleague(req.body.caseworker);
+  if (!colleague) return res.status(400).send('Select a valid caseworker');
+  const applications = req.session.data['consolidated-colleague-applications-v6'];
+  const index = applications.findIndex(app => app.ref === req.body.reference
+    && Boolean(app.isPriorAuthority) === (req.body.isPriorAuthority === 'true')
+    && app.caseworker === colleague.name);
+  if (index === -1) return res.status(404).send('Application is not in this caseworker’s list');
+  const application = applications[index];
+  const assigned = req.session.data['assigned-applications'] || (req.session.data['assigned-applications'] = []);
+  if (assigned.some(app => applicationVariantKey(app) === applicationVariantKey(application))) {
+    return res.status(409).send('Application is already in your list');
+  }
+  applications.splice(index, 1);
+  application.caseworker = currentCaseworker;
+  assigned.push(application);
+  const variant = application.isPriorAuthority ? 'prior-authority' : 'initial';
+  const caseworkersByReference = req.session.data['consolidated-caseworkers-v6']
+    || (req.session.data['consolidated-caseworkers-v6'] = {});
+  caseworkersByReference[`${application.ref}|${variant}`] = currentCaseworker;
+  appendConsolidatedHistory(req, application.ref, {
+    action: `${application.isPriorAuthority ? 'Prior authority' : 'Initial application'} assigned to ${currentCaseworker}`,
+    caseworker: currentCaseworker,
+    type: application.isPriorAuthority ? 'pa_assignment' : 'assignment',
+    justification: `Assigned from ${colleague.name}'s list.`
+  }, application);
+  req.session.data['consolidated-colleague-assignment-success'] = { reference: application.ref, colleague: colleague.name };
+  res.redirect('/v6/assigned-to-others?caseworker=' + encodeURIComponent(colleague.name));
+});
+
 router.get('/add-application/:reference', function(req, res) {
+  if (req.session.data['consolidated-v6'] === true) {
+    ensureColleagueLists(req.session.data);
+    const colleagueApplication = req.session.data['consolidated-colleague-applications-v6'].find(app =>
+      app.ref === req.params.reference && Boolean(app.isPriorAuthority) === (req.query.isPriorAuthority === 'true'));
+    if (colleagueApplication) {
+      return res.status(409).send('This application is assigned to another caseworker. Use Assigned to others to assign it to your list.');
+    }
+  }
   if (!req.session.data['assigned-applications']) {
     req.session.data['assigned-applications'] = [];
   }
@@ -1794,7 +1885,8 @@ router.get('/add-application/:reference', function(req, res) {
   const ref = req.params.reference;
   const isPriorAuthorityRequested = req.query.isPriorAuthority === 'true';
   const hasPriorAuthorityParam = typeof req.query.isPriorAuthority !== 'undefined';
-  const assignedCaseworker = caseworkers[Math.floor(Math.random() * caseworkers.length)];
+  const assignedCaseworker = req.session.data['consolidated-v6'] === true
+    ? currentCaseworker : caseworkers[Math.floor(Math.random() * caseworkers.length)];
   if (!req.session.data['consolidated-caseworkers-v6']) {
     req.session.data['consolidated-caseworkers-v6'] = {};
   }
@@ -1932,6 +2024,11 @@ router.get('/add-application/:reference', function(req, res) {
   (req.session.data['assigned-applications'] || []).forEach(app => {
     existingVariantKeys.add(applicationVariantKey(app));
   });
+  if (req.session.data['consolidated-v6'] === true) {
+    (req.session.data['consolidated-colleague-applications-v6'] || []).forEach(app => {
+      existingVariantKeys.add(applicationVariantKey(app));
+    });
+  }
 
   const replacementScenarioIndex = req.session.data['demo-replacement-scenario-index-v6'] || 0;
   const replacementScenario = DEMO_REPLACEMENT_SCENARIOS[
@@ -2674,6 +2771,8 @@ router.post('/application/:reference/add-note', function(req, res) {
 });
 
 router.get('/search', function(req, res) {
+  const consolidated = req.session.data['consolidated-v6'] === true;
+  if (consolidated) ensureColleagueLists(req.session.data);
   const searchFields = ['reference', 'firstName', 'lastName', 'dob-day', 'dob-month', 'dob-year'];
   const showResults = searchFields.some(field => req.query[field]);
   let results = [];
@@ -2713,6 +2812,11 @@ router.get('/search', function(req, res) {
       req.session.data['completed-applications'].forEach(app => {
         if (!uniqueApps[variantKey(app)]) {
           uniqueApps[variantKey(app)] = app;
+        }
+        if (consolidated) {
+          req.session.data['consolidated-colleague-applications-v6'].forEach(app => {
+            if (!uniqueApps[variantKey(app)]) uniqueApps[variantKey(app)] = app;
+          });
         }
       });
     }
@@ -2779,6 +2883,9 @@ router.get('/search', function(req, res) {
         matterTypeSubtext: app.matterType && app.matterType.subtext,
         firmName: firmName,
         firmNumber: firmNumber || 'OK514R',
+        assignedCaseworker: consolidated && ((req.session.data['assigned-applications'] || []).some(assigned => applicationVariantKey(assigned) === applicationVariantKey(app))
+          || (req.session.data['consolidated-colleague-applications-v6'] || []).some(assigned => applicationVariantKey(assigned) === applicationVariantKey(app)))
+          ? app.caseworker : null,
         outcome: outcome,
         outcomeClass: outcomeClass
       };
@@ -2790,6 +2897,7 @@ router.get('/search', function(req, res) {
     showResults: showResults,
     results: results,
     resultCount: results.length,
+    consolidated,
     query: req.query
   });
 });
@@ -2839,7 +2947,8 @@ router.get('/application/:reference', function(req, res) {
     req.session.data['completed-applications'] || [],
     req.session.data['open-applications'] || [],
     req.session.data['open-applications-all'] || [],
-    req.session.data['consolidated-extra-initial-applications-v6'] || []
+    req.session.data['consolidated-extra-initial-applications-v6'] || [],
+    ...(req.session.data['consolidated-v6'] === true ? [req.session.data['consolidated-colleague-applications-v6'] || []] : [])
   ];
 
   const linkedCasesByReference = {
@@ -3143,12 +3252,16 @@ router.get('/application/:reference', function(req, res) {
   const selectedAssignedApplication = assignedApplications.find(app => app.ref === reference && Boolean(app.isPriorAuthority) === requestedPriorAuthority) || null;
   const selectedCompletedApplication = (req.session.data['completed-applications'] || [])
     .find(app => app.ref === reference && Boolean(app.isPriorAuthority) === requestedPriorAuthority) || null;
+  const selectedColleagueApplication = req.session.data['consolidated-v6'] === true
+    ? (req.session.data['consolidated-colleague-applications-v6'] || []).find(app => app.ref === reference && Boolean(app.isPriorAuthority) === requestedPriorAuthority)
+    : null;
   const relevantCaseworkerEvent = [...historyArray].reverse().find(event => {
     if (!event.caseworker || event.caseworker === 'N/A' || event.caseworker === 'Caseworker name') return false;
     if (requestedPriorAuthority) return event.type === 'pa_assignment' || event.type === 'pa_decision';
     return (event.type === 'assignment' || event.type === 'decision') && !/prior authority/i.test(event.action || '');
   });
   const assignedCaseworker = (selectedAssignedApplication && selectedAssignedApplication.caseworker)
+    || (selectedColleagueApplication && selectedColleagueApplication.caseworker)
     || (selectedCompletedApplication && selectedCompletedApplication.caseworker)
     || (relevantCaseworkerEvent && relevantCaseworkerEvent.caseworker)
     || 'Unassigned';
@@ -3170,6 +3283,7 @@ router.get('/application/:reference', function(req, res) {
     otherPriorAuthorityApplications: otherPriorAuthorityApplications,
     sessionData: req.session.data,
     isAssigned: isAssigned,
+    isAssignedToColleague: Boolean(selectedColleagueApplication),
     isInitialApplicationAssigned: isInitialApplicationAssigned,
     isPriorAuthorityAssigned: isPriorAuthorityAssigned,
     isStatusApplicationAssigned: isStatusApplicationAssigned,
