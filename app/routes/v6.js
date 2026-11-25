@@ -7,6 +7,7 @@ const govukPrototypeKit = require('govuk-prototype-kit')
 const router = govukPrototypeKit.requests.setupRouter()
 const { sortApplicationsBySubmittedDate } = require('../services/application.service')
 const { currentCaseworker, colleagues, ensureColleagueLists, findColleague } = require('../services/consolidated-colleague-lists')
+const { scenarios: repeatableExperts, ensureRepeatableExperts } = require('../services/consolidated-repeatable-experts')
 
 router.use(function(req, res, next) {
   const data = req.session.data;
@@ -1392,6 +1393,8 @@ router.get('/open-applications', function(req, res) {
       req.session.data['completed-applications'].push(a);
     });
   }
+  if (consolidated) ensureRepeatableExperts(req.session.data);
+
   let applications = [...req.session.data['open-applications-all']]
     .filter(app => !app.isRedetermination);
 
@@ -1449,7 +1452,8 @@ router.get('/open-applications', function(req, res) {
       applications.push(disbursement);
     }
 
-    const expertApplications = applications.filter(app => app.isPriorAuthority && app.priorAuthorityType && app.priorAuthorityType.includes('Expert'));
+    const expertApplications = applications.filter(app => app.isPriorAuthority && app.priorAuthorityType && app.priorAuthorityType.includes('Expert')
+      && !repeatableExperts.some(scenario => scenario.reference === app.ref));
     const apportionedCount = Math.floor(expertApplications.length / 2);
     expertApplications.forEach((app, index) => {
       app.apportioned = index < apportionedCount;

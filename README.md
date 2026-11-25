@@ -67,6 +67,13 @@ prototype session; a fresh session restores the example colleague lists.
 Cases assigned to colleagues also appear in Search with their caseworker. They
 are view-only until transferred to Your list.
 
+Two fixed prior authority expert requests are available in the consolidated
+Open applications list: `E-XPT-001` is not apportioned and `A-APP-002` is
+apportioned between two parties. Once a request has been granted or refused,
+returning to Open applications resets that request for another run. Its prior
+authority decision and assignment history are cleared; its initial grant and
+other cases are preserved. In-progress requests remain assigned.
+
 Evidence links on application details open in a new tab. Some links point to
 example documents.
 

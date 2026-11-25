@@ -3,6 +3,7 @@ const assert = require('node:assert/strict');
 const { once } = require('node:events');
 const { spawn } = require('node:child_process');
 const path = require('node:path');
+const { createAssignmentQueue } = require('../assets/javascripts/v6-assignment-queue');
 
 test('one branded Kit sign-in protects direct links and preserves casework on sign-out', async () => {
   const server = spawn(process.execPath, ['-e', `
@@ -192,6 +193,23 @@ test('one branded Kit sign-in protects direct links and preserves casework on si
     assert.equal((await request(`${louise}/confirmation`)).status, 200);
     assert.match(await (await request(versionOpen)).text(), /L-YU5-UY3/);
 
+    const openHtml = await (await request('/v6/open-applications')).text();
+    assert.match(openHtml, /v6-assignment-queue\.js[\s\S]*v6-open-assignments\.js/);
+    for (const script of ['v6-assignment-queue.js', 'v6-open-assignments.js']) {
+      assert.equal((await request(`/public/javascripts/${script}`)).status, 200);
+    }
+    const openReferences = [...openHtml.matchAll(/data-ref="([^"]+)" data-is-prior-authority="false"/g)]
+      .map(match => match[1]).filter(ref => ref !== 'V-KL6-429').slice(0, 2);
+    assert.equal(openReferences.length, 2);
+    const assignmentQueue = createAssignmentQueue(reference =>
+      request(`/v6/add-application/${reference}?isPriorAuthority=false`, {
+        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+      })
+    );
+    const assignmentResponses = await Promise.all(openReferences.map(reference => assignmentQueue.enqueue(reference)));
+    await assignmentQueue.whenIdle();
+    for (const response of assignmentResponses) assert.equal(response.status, 200);
+
     const assigned = await request('/v6/assigned-to-others/assign', {
       method: 'POST',
       headers: { 'content-type': 'application/x-www-form-urlencoded' },
@@ -207,6 +225,75 @@ test('one branded Kit sign-in protects direct links and preserves casework on si
     assert.match(await (await request(signOut.headers.get('location'))).text(), /Civil Decide prototype/);
     assert.equal((await signIn('local-test-password')).headers.get('location'), '/');
     assert.match(await (await request('/v6/your-list')).text(), /V-KL6-429/);
+
+    let list = await (await request('/v6/yourlist')).text();
+    for (const reference of [...openReferences, 'V-KL6-429']) assert.ok(list.includes(reference));
+
+    await request('/v6/decision-start?ref=V-KL6-429');
+    assert.equal((await request('/v6/decision-check', {
+      method: 'POST',
+      headers: { 'content-type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({ 'overall-decision': 'grant' })
+    })).headers.get('location'), '/v6/grant-certificate-date');
+    assert.equal((await request('/v6/grant-date-submit', {
+      method: 'POST',
+      headers: { 'content-type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({ 'cert-date-type': 'today' })
+    })).headers.get('location'), '/v6/check-answers');
+    assert.equal((await request('/v6/check-answers-submit', { method: 'POST' })).headers.get('location'), '/v6/confirmation-screen');
+    const consolidatedConfirmation = await (await request('/v6/confirmation-screen')).text();
+    assert.match(consolidatedConfirmation, /Assessment complete/);
+    assert.match(consolidatedConfirmation, /href="\/v6\/yourlist"/);
+    list = await (await request('/v6/yourlist')).text();
+    for (const reference of openReferences) assert.ok(list.includes(reference), `${reference} remains in your list`);
+    assert.ok(!list.includes('V-KL6-429'));
+    const decided = await (await request('/v6/application/V-KL6-429')).text();
+    assert.match(decided, /Granted/);
+
+    async function postForm(url, fields) {
+      return request(url, {
+        method: 'POST',
+        headers: { 'content-type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams(fields)
+      });
+    }
+
+    for (const [reference, apportioned] of [['E-XPT-001', false], ['A-APP-002', true]]) {
+      for (let run = 0; run < 2; run++) {
+        let open = await (await request('/v6/open-applications')).text();
+        assert.match(open, new RegExp(`data-ref="${reference}" data-is-prior-authority="true"`));
+        const detail = await (await request(`/v6/application/${reference}?isPriorAuthority=true`)).text();
+        assert.match(detail, new RegExp(`Apportioned</dt>\\s*<dd[^>]*>${apportioned ? 'Yes' : 'No'}</dd>`));
+        if (apportioned) assert.match(detail, /Amount claimed for this prior authority[\s\S]*?3024\.00/);
+        assert.equal((await request(`/v6/add-application/${reference}?isPriorAuthority=true`)).status, 302);
+        open = await (await request('/v6/open-applications')).text();
+        assert.doesNotMatch(open, new RegExp(`data-ref="${reference}"`));
+        assert.match(await (await request('/v6/yourlist')).text(), new RegExp(reference));
+        assert.equal((await request(`/v6/expert-assessment/decision?reference=${reference}`)).status, 200);
+        if (run === 0) {
+          assert.equal((await postForm('/v6/expert-assessment/decision-handler', { 'expert-decision': 'Grant' })).headers.get('location'), '/v6/expert-assessment/amount');
+          const amount = await (await request('/v6/expert-assessment/amount')).text();
+          assert.match(amount, new RegExp(`Apportioned</dt><dd[^>]*>${apportioned ? 'Yes' : 'No'}</dd>`));
+          assert.equal((await postForm('/v6/expert-assessment/amount-handler', {
+            'expert-amount-decision': 'requested', 'expert-justification': 'Appropriate'
+          })).headers.get('location'), '/v6/expert-assessment/check-your-answers');
+        } else {
+          assert.equal((await postForm('/v6/expert-assessment/decision-handler', { 'expert-decision': 'Refuse' })).headers.get('location'), '/v6/expert-assessment/refuse-justification');
+          assert.equal((await postForm('/v6/expert-assessment/refuse-justification-handler', {
+            'expert-refuse-justification': 'Not appropriate'
+          })).headers.get('location'), '/v6/expert-assessment/check-your-answers');
+        }
+        assert.equal((await request('/v6/expert-assessment/submit-assessment', { method: 'POST' })).headers.get('location'), '/v6/expert-assessment/confirmation');
+        assert.match(await (await request('/v6/expert-assessment/confirmation')).text(), new RegExp(reference));
+        const completedDetails = await (await request(`/v6/application/${reference}?isPriorAuthority=true`)).text();
+        assert.match(completedDetails, run === 0 ? /Granted/ : /Refused/);
+        assert.doesNotMatch(await (await request('/v6/yourlist')).text(), new RegExp(reference));
+      }
+      const restored = await (await request('/v6/open-applications')).text();
+      assert.match(restored, new RegExp(`data-ref="${reference}" data-is-prior-authority="true"`));
+    }
+    list = await (await request('/v6/yourlist')).text();
+    for (const reference of openReferences) assert.ok(list.includes(reference), `${reference} remains assigned`);
 
     for (const version of ['v6', 'v6-v2', 'v6-v3', 'v6-v4', 'v6-v5']) {
       assert.equal((await request(`/${version}/index`)).headers.get('location'), '/');

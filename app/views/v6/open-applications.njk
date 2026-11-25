@@ -370,57 +370,12 @@
       });
     });
 
-    // Handle "Add" link clicks for adding applications to list
-    document.querySelectorAll('.add-to-list').forEach(link => {
-      link.addEventListener('click', function(e) {
-        e.preventDefault();
-        const reference = this.getAttribute('data-ref');
-        const isPriorAuthority = this.getAttribute('data-is-prior-authority') === 'true';
-        
-        // Add application to list via fetch
-        fetch('/v6/add-application/' + reference + '?isPriorAuthority=' + isPriorAuthority, { 
-          method: 'GET',
-          headers: {
-            'X-Requested-With': 'XMLHttpRequest'
-          }
-        })
-          .then(response => response.json())
-          .then(data => {
-            const addedCount = data && Number.isFinite(Number(data.addedCount)) ? Number(data.addedCount) : 1;
-            const linkedAddedCount = data && Number.isFinite(Number(data.linkedAddedCount)) ? Number(data.linkedAddedCount) : Math.max(0, addedCount - 1);
-            const linkedLabel = linkedAddedCount === 1 ? 'linked case' : 'linked cases';
-            const toastMessage = linkedAddedCount > 0
-              ? 'You have added ' + reference + ' and ' + linkedAddedCount + ' ' + linkedLabel + ' to your list'
-              : 'You have added ' + reference + ' to your list';
-
-            // Show toast notification using GOV.UK toast component
-            const toastContainer = document.getElementById('toast-notification');
-            
-            // Clear any existing toasts first
-            toastContainer.innerHTML = '';
-            
-            const toast = document.createElement('div');
-            toast.setAttribute('data-module', 'govuk-notification-banner');
-            toast.setAttribute('role', 'region');
-            toast.setAttribute('aria-labelledby', 'govuk-notification-banner-title');
-            toast.className = 'govuk-notification-banner govuk-notification-banner--success';
-            toast.style.cssText = 'margin-bottom: 20px;';
-            toast.innerHTML = '<div class="govuk-notification-banner__header"><h2 id="govuk-notification-banner-title" class="govuk-notification-banner__title">Success</h2></div><div class="govuk-notification-banner__content"><p class="govuk-notification-banner__heading">' + toastMessage + '</p></div>';
-            
-            toastContainer.appendChild(toast);
-            
-            // Reload page after 1 second to update the list
-            setTimeout(() => {
-              window.location.reload();
-            }, 1000);
-          })
-          .catch(error => console.error('Error:', error));
-      });
-    });
   </script>
 {% endblock %}
 
 {% block bodyEnd %}
+  <script src="/public/javascripts/v6-assignment-queue.js"></script>
+  <script src="/public/javascripts/v6-open-assignments.js"></script>
   <script src="/plugin-assets/govuk-prototype-kit/lib/assets/javascripts/kit.js"></script>
   <script src="/plugin-assets/govuk-prototype-kit/lib/assets/javascripts/auto-store-data.js"></script>
   <script type="module" src="/plugin-assets/govuk-frontend/dist/govuk/govuk-frontend.min.js"></script>
